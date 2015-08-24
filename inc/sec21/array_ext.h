@@ -3,6 +3,7 @@
 
 #include <array>
 #include <vector>
+#include <cmath>
 
 #include <boost/config.hpp>
 
@@ -56,23 +57,23 @@ namespace sec21
                }
             };
 
-            template<
-               class T,
-               unsigned long N>
-            inline T length2(std::array<T, N> const& value) BOOST_NOEXCEPT
-            {
-               return length2_impl<T, N, N>::apply(value);
-            }
-
-            template<
-               class T,
-               unsigned long N>
-            inline T length(std::array<T, N> const& value) 
-            {
-               return std::sqrt(length2(value));
-            }
-
          } // namespace hidden
+
+         template<
+            class T,
+            unsigned long N>
+         inline T length2(std::array<T, N> const& value) BOOST_NOEXCEPT
+         {
+            return hidden::length2_impl<T, N, N>::apply(value);
+         }
+
+         template<
+            class T,
+            unsigned long N>
+         inline T length(std::array<T, N> const& value) 
+         {
+            return std::sqrt(length2(value));
+         }
 
          template<
             class T,
@@ -81,7 +82,7 @@ namespace sec21
             std::array<T, N> const& u,
             std::array<T, N> const& v) BOOST_NOEXCEPT
          {
-            return (hidden::length(u) < hidden::length(v));
+            return (length(u) < length(v));
          }
 
          template<
