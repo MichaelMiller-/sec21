@@ -1,0 +1,12 @@
+[submodule "deps/range-v3"]
+	path = deps/range-v3
+	url = https://github.com/ericniebler/range-v3.git
+[submodule "deps/range-v3-vs2015"]
+	path = deps/range-v3-vs2015
+	url = https://github.com/Microsoft/Range-V3-VS2015.git
+[submodule "deps/Catch"]
+	path = deps/Catch
+	url = https://github.com/philsquared/Catch
+[submodule "deps/eigen"]
+	path = deps/eigen
+	url = https://github.com/RLovelett/eigen
