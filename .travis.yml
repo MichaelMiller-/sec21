@@ -31,7 +31,7 @@ script:
 
   # compile and execute unit tests
   - mkdir -p build && cd build
-  - cmake .. && cmake --build . -j4 
+  - cmake .. && cmake --build . --config Release -- -j4
   - ctest
   - cd ..
 
