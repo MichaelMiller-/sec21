@@ -25,8 +25,8 @@ install:
   - export CXX="${COMPILER}"
 
 script:
-  - if [ "${CXX}" != "" ]; then (travis_wait mkdir build && cd build && cmake .. && cmake --build . && test); fi
-
-notifications:
-  email:
-    - miller.michael@gmx.de
+  - mkdir -p build && cd build
+  - cmake .. && cmake --build . -j4 
+  - ctest
+  - cd ..
+  
