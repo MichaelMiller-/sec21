@@ -7,3 +7,15 @@
 [submodule "deps/Catch"]
 	path = deps/Catch
 	url = https://github.com/philsquared/Catch
+[submodule "deps/nonius"]
+	path = deps/nonius
+	url = https://github.com/rmartinho/nonius.git
+[submodule "deps/wt"]
+	path = deps/wt
+	url = https://github.com/emweb/wt.git
+[submodule "deps/boost"]
+	path = deps/boost
+	url = https://github.com/boostorg/boost.git
+[submodule "deps/bond"]
+	path = deps/bond
+	url = https://github.com/Microsoft/bond
