@@ -1,37 +1,53 @@
-dist: trusty
 language: cpp
-
+sudo: required
 matrix:
-  fast_finish: true
-
   include:
-#  - os: linux
-#    env: COMPILER=clang++-3.5
-#    addons:
-#      apt:
-#        packages: ["clang++-3.5"]
- #       sources: ['llvm-toolchain-precise-3.5', "ubuntu-toolchain-r-test"]
-
   - os: linux
-    env: COMPILER=g++-5
+    env: COMPILER=g++-6
     addons:
       apt:
-        packages: ["g++-5"]
-        sources: ["ubuntu-toolchain-r-test"]
-
+        packages:
+        - g++-6
+        sources:
+        - ubuntu-toolchain-r-test
+  - os: linux
+    env: COMPILER=g++-7
+    addons:
+      apt:
+        packages:
+        - g++-7
+        sources:
+        - ubuntu-toolchain-r-test
+before_install:
+- export CXX="${COMPILER}"
+- sudo apt-get -qq update
+- sudo apt-get install -y catch
+install: 
 before_script:
-
-install:
-  - export CXX="${COMPILER}"
-
+- uname -a
 script:
-  # show OS/compiler version
-  - uname -a
-  - $CXX --version
-
-  # compile and execute unit tests
-  - mkdir -p build && cd build
-  - cmake .. && cmake --build . --config Release -- -j4
-  - ctest
-  - cd ..
-
+- mkdir -p _build && cd _build
+- cmake ..
+- cmake --build . --config Release -- -j4
+- ctest
+after_success:
+## - cpack -G DEB
+before_deploy:
+- git fetch --tags
+deploy:
+  ## TODO
+  ## provider: releases
+  ## user: 
+  ## file: foo_bin1-1.0.0-Linux.deb
+after_deploy: 
+after_script:
+- echo "Deploying build $TRAVIS_BUILD_NUMBER"
+notifications:
+  irc:
+    channels:
+    - chat.freenode.net#my-channel
+    - chat.freenode.net#some-other-channel
+    template:
+    - "%{repository_slug}#%{build_number} (%{branch} - %{commit} : %{author}): %{message}"
+    - 'Change view : %{compare_url}'
+    - 'Build details : %{build_url}'
