@@ -1,9 +1,0 @@
-[submodule "deps/nonius"]
-	path = deps/nonius
-	url = https://github.com/rmartinho/nonius.git
-[submodule "deps/wt"]
-	path = deps/wt
-	url = https://github.com/emweb/wt.git
-[submodule "deps/bond"]
-	path = deps/bond
-	url = https://github.com/Microsoft/bond
