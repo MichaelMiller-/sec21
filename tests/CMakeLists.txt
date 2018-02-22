@@ -10,10 +10,11 @@ endfunction()
 
 ## unit tests via catch
 ##
-test(concat)
+test("concat")
+test("dispatcher")
+test("cache")
 # test(structural_analysis_framework)
-# # test(structural_analysis_force)
-# test(ranges)
+# test(structural_analysis_force)
 # test(triangulate)
 # test(matrix)
 # test(model)
