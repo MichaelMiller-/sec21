@@ -1,8 +1,8 @@
 find_path(CATCH_INCLUDE_DIR catch.hpp)
 include_directories(${CATCH_INCLUDE_DIR})
 
-find_package(Boost)
-include_directories(${Boost_INCLUDE_DIRS})
+# find_package(Boost)
+# include_directories(${Boost_INCLUDE_DIRS})
 
 function(test test)
     string(REPLACE "/" "_" tmp ${test})
