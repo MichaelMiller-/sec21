@@ -34,10 +34,8 @@ namespace sec21
          }
 
          auto func_t = reinterpret_cast<Value(*)(Key)>(fptr);
-
          // call ftor
          value_type result = func_t(key);
-         // add key + value to data
          storage.insert(std::make_pair(key, result));
          // call policy
          ClearPolicy::apply(storage);
@@ -57,11 +55,9 @@ namespace sec21
    auto make_cached_function(Func func)
    {
       auto func_t = detail::make_function(func);
-      using return_type = function_traits<decltype(func_t)>::result_type;
-      using arg0_t = function_traits<decltype(func_t)>::arg<0>::type;
+      using return_type = typename function_traits<decltype(func_t)>::result_type;
+      using arg0_t = typename function_traits<decltype(func_t)>::arg<0>::type;
 
       return cache<arg0_t, return_type, Policy>(func);
    }
-
-   
 }
