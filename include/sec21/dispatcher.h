@@ -21,6 +21,7 @@ namespace sec21
       }
 
       auto operator[] (Key key) const {
+         //! \todo what if key is not found?
          return proxy<return_type>(storage.find(key)->second);
       }
 

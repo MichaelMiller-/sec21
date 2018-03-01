@@ -1,27 +1,12 @@
 #define CATCH_CONFIG_MAIN
-#include "catch.hpp"
+#include <catch.hpp>
 
-
-namespace policies
-{
-   template <std::size_t N>
-   //! \todo rename
-   struct clear_after_N_entries
-   {
-      template <typename T>
-      static void apply(T& t) 
-      {
-         if (t.size() > N)
-            t.clear();
-      }
-   };
-
-   //! \todo policies -> clear cache if current size > MB
-
-}
+#include "sec21/policies/clear.h"
 
 TEST_CASE("test clear N entries", "[cache][policies]")
 {
+   using namespace sec21;
+
    std::vector<int> result{ 1, 2, 3 };
    using policy = policies::clear_after_N_entries<5>;
 
@@ -45,43 +30,29 @@ TEST_CASE("test clear N entries", "[cache][policies]")
    REQUIRE(result.size() == 1);
 }
 
-template <typename Key, typename Value, typename ClearPolicy>
-class cache
-{
-   std::map<Key, Value> data{};
-
-public:
-   auto operator()(Key const& key)
-   {
-      const auto it{ data.find(key) };
-
-      if (it != std::end(data))
-         return it->second;
-
-      // call ftor
-      auto result = int(52);
-      // add key + value to data
-      data.emplace(std::make_pair(key, result));
-      // call policy
-      ClearPolicy::apply(data);
-
-      return result;
-   }
-
-};
+#include "sec21/cache.h"
 
 int real_function(std::string key)
 {
-   return 42;
+   // really time consuming calculation 
+   if (key == "key1")
+      return 42;
+   if (key == "key2")
+      return 7;
+   if (key == "key3")
+      return 1;
+   return 23;
 }
 
-
-TEST_CASE("intersection test", "[cache]")
+TEST_CASE("test cache functionality (cache hits not considered)", "[cache]")
 {
-   cache<
-      std::string, 
-      int, 
-      policies::clear_after_N_entries<5> > c;
+   using namespace sec21;
 
-   REQUIRE(c("foo") == 42);
+   using policy = policies::clear_after_N_entries<5>;
+   auto f = make_cached_function<policy>(real_function);
+
+   REQUIRE(f("key1") == 42);
+   REQUIRE(f("key2") == 7);
+   REQUIRE(f("key3") == 1);
+   REQUIRE(f("unkown key") == 23);
 }

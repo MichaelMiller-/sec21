@@ -1,0 +1,28 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build sec21",
+            "type": "shell",
+            "command": "build/make",
+            "args": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "build cmake vcpkg toolchain",
+            "type": "shell",
+            "command": "build/cmake",
+            "args": [
+                "..",
+                "-DCMAKE_TOOLCHAIN_FILE=\"C:/dev/vcpkg/scripts/buildsystems/vcpkg.cmake\""
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}

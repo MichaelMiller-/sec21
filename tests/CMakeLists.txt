@@ -1,5 +1,8 @@
-find_package(Catch 2.1.2 REQUIRED)
-include_directories(${CATCH_INCLUDE_DIRS})
+find_path(CATCH_INCLUDE_DIR catch.hpp)
+include_directories(${CATCH_INCLUDE_DIR})
+
+find_package(Boost REQUIRED)
+include_directories(${Boost_INCLUDE_DIRS})
 
 function(test test)
     string(REPLACE "/" "_" tmp ${test})
@@ -13,12 +16,6 @@ endfunction()
 test("concat")
 test("dispatcher")
 test("cache")
-# test(structural_analysis_framework)
-# test(structural_analysis_force)
-# test(triangulate)
-# test(matrix)
-# test(model)
-# test(task.single_span_beam)
 
 ## Installation
 ## Copies files from build directory into install directory.
