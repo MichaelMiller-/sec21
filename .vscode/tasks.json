@@ -14,7 +14,7 @@
         {
             "label": "build cmake vcpkg toolchain",
             "type": "shell",
-            "command": "build/cmake",
+            "command": "cmake",
             "args": [
                 "..",
                 "-DCMAKE_TOOLCHAIN_FILE=\"C:/dev/vcpkg/scripts/buildsystems/vcpkg.cmake\""
