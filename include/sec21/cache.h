@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <functional>
 
 #include <boost/function_types/result_type.hpp>
 #include <boost/function_types/parameter_types.hpp>
@@ -56,8 +57,8 @@ namespace sec21
    template <typename Policy, typename Func>
    constexpr auto make_cached_function(Func func) {
       return cache<
-         boost::mpl::at_c<boost::function_types::parameter_types<Func>, 0>::type,      
-         boost::function_types::result_type<Func>::type, 
+         typename boost::mpl::at_c<boost::function_types::parameter_types<Func>, 0>::type,
+         typename boost::function_types::result_type<Func>::type, 
          Policy>(func);
    }
 }
