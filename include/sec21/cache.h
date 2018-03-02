@@ -2,7 +2,9 @@
 
 #include <map>
 
-#include "sec21/function_traits.h"
+#include <boost/function_types/result_type.hpp>
+#include <boost/function_types/parameter_types.hpp>
+
 #include "sec21/policies/clear.h"
 
 namespace sec21 
@@ -52,13 +54,10 @@ namespace sec21
    }
 
    template <typename Policy, typename Func>
-   constexpr auto make_cached_function(Func func)
-   {
-      auto func_t = detail::make_function(func);
-      using return_type = typename function_traits<decltype(func_t)>::result_type;
-      using arg0 = typename function_traits<decltype(func_t)>::arg<0>;
-      using arg0_t = typename arg0::type;
-
-      return cache<arg0_t, return_type, Policy>(func);
+   constexpr auto make_cached_function(Func func) {
+      return cache<
+         boost::mpl::at_c<boost::function_types::parameter_types<Func>, 0>::type,      
+         boost::function_types::result_type<Func>::type, 
+         Policy>(func);
    }
 }
