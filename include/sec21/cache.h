@@ -22,7 +22,7 @@ namespace sec21
 
    public:
       template <typename Func>
-      explicit cache(Func func) : fptr{ reinterpret_cast<function_type>(func) } 
+      constexpr explicit cache(Func func) : fptr{ reinterpret_cast<function_type>(func) }
       { }
 
       auto operator()(key_type key)
@@ -46,17 +46,18 @@ namespace sec21
 
    namespace detail {
       template <typename R, typename... Args>
-      auto make_function(R(*p)(Args...)) -> std::function<R(Args...)> {
+      constexpr auto make_function(R(*p)(Args...)) -> std::function<R(Args...)> {
          return { p };
       }
    }
 
    template <typename Policy, typename Func>
-   auto make_cached_function(Func func)
+   constexpr auto make_cached_function(Func func)
    {
       auto func_t = detail::make_function(func);
       using return_type = typename function_traits<decltype(func_t)>::result_type;
-      using arg0_t = typename function_traits<decltype(func_t)>::arg<0>::type;
+      using arg0 = typename function_traits<decltype(func_t)>::arg<0>;
+      using arg0_t = typename arg0::type;
 
       return cache<arg0_t, return_type, Policy>(func);
    }
