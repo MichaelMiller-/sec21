@@ -19,23 +19,22 @@ matrix:
         sources:
         - ubuntu-toolchain-r-test
 before_install:
-- export CXX="${COMPILER}"
-- sudo apt-get -qq update
-- sudo apt-get install -y catch
-- sudo apt-get install -y libboost-dev
+  - export CXX="${COMPILER}"
+  - sudo apt-get -qq update
+  - sudo apt-get install -y catch
+  - sudo apt-get install -y libboost-dev
 install: 
 before_script:
-- uname -a
+  - uname -a
 script:
-- mkdir -p _build && cd _build
-- cmake ..
-- cmake --build . --config Release -- -j4
-- ctest
-- make install
+  - mkdir -p _build && cd _build
+  - cmake ..
+  - cmake --build . --config Release -- -j4
+  - ctest
 after_success:
-## - cpack -G DEB
+  ## - cpack -G DEB
+  - cpack -G ZIP
 before_deploy:
-  # - git fetch --tags
   - git tag "$(date +'%Y%m%d%H%M%S')-$(git log --format=%h -1)"
 deploy:
   provider: releases
@@ -49,7 +48,7 @@ deploy:
     all_branches: true
 after_deploy: 
 after_script:
-- echo "Deploying build $TRAVIS_BUILD_NUMBER"
+  - echo "Deploying build $TRAVIS_BUILD_NUMBER"
 notifications:
   irc:
     channels:
