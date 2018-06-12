@@ -31,15 +31,22 @@ script:
 - cmake ..
 - cmake --build . --config Release -- -j4
 - ctest
+- make install
 after_success:
 ## - cpack -G DEB
 before_deploy:
-- git fetch --tags
+  # - git fetch --tags
+  - git tag "$(date +'%Y%m%d%H%M%S')-$(git log --format=%h -1)"
 deploy:
-  ## TODO
-  ## provider: releases
-  ## user: 
-  ## file: foo_bin1-1.0.0-Linux.deb
+  provider: releases
+  api_key: 86124491218dcd75ac73c5a4b76bbd50eb445a27
+  ## todo 
+  file: sec21-app1-1.2.3-x64.zip
+  skip_cleanup: true
+  overwrite: true
+  on:
+    tags: true
+    all_branches: true
 after_deploy: 
 after_script:
 - echo "Deploying build $TRAVIS_BUILD_NUMBER"
