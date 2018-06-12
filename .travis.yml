@@ -43,17 +43,16 @@ deploy:
   file: sec21-app1-1.2.3-x64.zip
   skip_cleanup: true
   overwrite: true
-  on:
-    tags: true
-    all_branches: true
+#  on:
+#    tags: true
+#    all_branches: true
 after_deploy: 
 after_script:
   - echo "Deploying build $TRAVIS_BUILD_NUMBER"
 notifications:
   irc:
     channels:
-    - chat.freenode.net#my-channel
-    - chat.freenode.net#some-other-channel
+    - chat.freenode.net#sec21
     template:
     - "%{repository_slug}#%{build_number} (%{branch} - %{commit} : %{author}): %{message}"
     - 'Change view : %{compare_url}'
