@@ -1,5 +1,5 @@
 #define CATCH_CONFIG_MAIN
-#include <catch.hpp>
+#include "catch.hpp"
 
 #include "sec21/policies/clear.h"
 
@@ -34,7 +34,7 @@ TEST_CASE("test clear N entries", "[cache][policies]")
 
 int real_function(std::string key)
 {
-   // really time consuming calculation 
+   // real time consuming calculation 
    if (key == "key1")
       return 42;
    if (key == "key2")
@@ -43,6 +43,7 @@ int real_function(std::string key)
       return 1;
    return 23;
 }
+
 
 TEST_CASE("test cache functionality (cache hits not considered)", "[cache]")
 {
