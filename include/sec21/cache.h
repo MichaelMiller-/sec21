@@ -38,6 +38,7 @@ namespace sec21
 
          auto func_t = reinterpret_cast<Value(*)(Key)>(fptr);
          // call ftor
+         //! \todo look at std::invoke()
          value_type result = func_t(key);
          storage.insert(std::make_pair(key, result));
          // call policy
