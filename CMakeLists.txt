@@ -1,23 +1,16 @@
 cmake_minimum_required(VERSION 3.1)
 project(sec21 CXX)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_BUILD_TYPE "Release")
 
-set(CMAKE_BUILD_TYPE Release)
+include_directories("include")
 
-find_package(Boost)
-include_directories(${Boost_INCLUDE_DIRS})
+## Windows
+## cmake .. "-DCMAKE_TOOLCHAIN_FILE=C:/dev/vcpkg/scripts/buildsystems/vcpkg.cmake"
 
-## global settings
-#set(GLOBAL_OUTPUT_PATH "${PROJECT_BINARY_DIR}/bin")
-#set(CMAKE_INSTALL_PREFIX "${PROJECT_BINARY_DIR}/install")
-
-## compiler flags
-# if (not MSVC)
-#     set(CMAKE_CXX_STANDARD 14)
-# endif()
-
-include_directories(include)
+## enable benchmarks 
+## add_subdirectory(benchmarks)
 
 # enable dashboard scripting
 
@@ -25,4 +18,3 @@ include_directories(include)
 include(CTest)
 enable_testing()
 add_subdirectory(tests)
-
