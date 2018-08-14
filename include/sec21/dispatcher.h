@@ -2,6 +2,8 @@
 
 #include <map>
 #include <typeindex>
+#include <type_traits>
+#include <cassert>
 
 namespace sec21 
 {
