@@ -18,6 +18,22 @@ matrix:
         - g++-7
         sources:
         - ubuntu-toolchain-r-test
+  - os: linux
+    env: COMPILER=g++-8
+    addons:
+      apt:
+        packages:
+        - g++-8
+        sources:
+        - ubuntu-toolchain-r-test
+  - os: linux
+    env: COMPILER=clang
+    addons:
+      apt:
+        packages:
+        - clang
+        sources:
+        - ubuntu-toolchain-r-test
 before_install:
 - export CXX="${COMPILER}"
 - sudo apt-get -qq update
