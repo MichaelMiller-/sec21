@@ -1,12 +1,12 @@
 #define CATCH_CONFIG_MAIN
-#include "catch.hpp"
+#include <catch.hpp>
 
 #include <sec21/dispatcher.h>
 
 int func1() { return 1; }
 int func2() { return 2; }
 int func3() { return 3; }
-int ulimate_answer(int i) { return 42; }
+int ulimate_answer(int i) { return i + 2; }
 
 TEST_CASE("simple test", "[dispatcher]")
 {
@@ -20,5 +20,5 @@ TEST_CASE("simple test", "[dispatcher]")
    REQUIRE(d["call1"]() == 1);
    REQUIRE(d["call2"]() == 2);
    REQUIRE(d["call3"]() == 3);
-   REQUIRE(d["ulimate_answer"](2) == 42);
+   REQUIRE(d["ulimate_answer"](40) == 42);
 }
