@@ -13,7 +13,10 @@ function(test test)
    endif()
 
    add_test(test.${tmp} test.${tmp})
-   target_link_libraries(test.${tmp} --coverage)
+
+   if (NOT MSVC)
+      target_link_libraries(test.${tmp} --coverage)
+   endif()
 endfunction()
 
 ## unit tests via catch
