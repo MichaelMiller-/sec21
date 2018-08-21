@@ -7,7 +7,7 @@ build_script:
 
     cd build
     
-    cmake c:\projects\source -G "Visual Studio 15"
+    cmake c:\projects\source -G "Visual Studio 15" -DBOOST_ROOT=C:\Libraries\boost_1_67_0
     
     cmake --build . --config "Debug"
 
