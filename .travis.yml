@@ -50,11 +50,11 @@ script:
 - cmake .. -DENABLE_COVERAGE:BOOL=TRUE
 - cmake --build . -- -j4
 - ctest -j2
-- bash <(curl -s https://codecov.io/bash)
 after_script:
-- echo "Deploying build $TRAVIS_BUILD_NUMBER"
+
 
 after_success:
+- bash <(curl -s https://codecov.io/bash)
 - cpack -G ZIP
 
 before_deploy:
