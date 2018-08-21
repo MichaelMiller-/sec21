@@ -48,9 +48,10 @@ before_script:
 - uname -a
 script:
 - mkdir -p _build && cd _build
-- cmake ..
-- cmake --build . --config Release -- -j4
-- ctest
+- cmake .. -D ENABLE_COVERAGE:BOOL=TRUE
+- cmake --build . -- -j4
+- ctest -j4
+- bash <(curl -s https://codecov.io/bash)
 after_script:
 - echo "Deploying build $TRAVIS_BUILD_NUMBER"
 
