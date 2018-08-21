@@ -39,7 +39,6 @@ matrix:
 before_install:
 - export CXX="${COMPILER}"
 - sudo apt-get -qq update
-- sudo apt-get install -y catch
 - sudo apt-get install -y libboost-dev
 - sudo apt-get install -y witty
 install: 
@@ -48,9 +47,9 @@ before_script:
 - uname -a
 script:
 - mkdir -p _build && cd _build
-- cmake .. -D ENABLE_COVERAGE:BOOL=TRUE
+- cmake .. -DENABLE_COVERAGE:BOOL=TRUE
 - cmake --build . -- -j4
-- ctest -j4
+- ctest -j2
 - bash <(curl -s https://codecov.io/bash)
 after_script:
 - echo "Deploying build $TRAVIS_BUILD_NUMBER"
