@@ -1,8 +1,8 @@
-images:
+image:
   - Visual Studio 2017
 
 build_script:
-  - cmd: >-
+- cmd: >-
   mkdir _build
   cd _build
   cmake .. -G "Visual Studio 15"  # == 2017
