@@ -54,7 +54,7 @@ after_script:
 
 
 after_success:
-- bash <(curl -s https://codecov.io/bash)
+- bash <(curl -s https://codecov.io/bash) -x /usr/bin/gcov
 - cpack -G ZIP
 
 before_deploy:
