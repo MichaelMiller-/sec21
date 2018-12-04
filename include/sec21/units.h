@@ -108,13 +108,13 @@ namespace sec21
          constexpr const T& get() const noexcept { return m_value; }
 
          template <typename U, typename S>
-         friend constexpr auto operator == (quantity const& lhs, quantity<U, Dimension, S> const& rhs) noexcept {
+         friend constexpr bool operator == (quantity const& lhs, quantity<U, Dimension, S> const& rhs) noexcept {
             return lhs.m_value == quantity(rhs).m_value;
          }
 
          template <typename U, typename S>
-         friend constexpr auto operator != (quantity const& lhs, quantity<U, Dimension, S> const& rhs) noexcept {
-            return !(*this == rhs);
+         friend constexpr bool operator != (quantity const& lhs, quantity<U, Dimension, S> const& rhs) noexcept {
+            return !(lhs == rhs);
          }
 
          template <typename U, typename S>
@@ -214,7 +214,7 @@ namespace sec21
       inline namespace literals
       {
          constexpr auto operator "" _mm(unsigned long long v) noexcept  -> Millimeter<long long> { return std::move(v); }
-         //! \todo long double to double conversion ? 
+         //! \todo solve long double to double conversion 
          constexpr auto operator "" _mm(long double v) noexcept         -> Millimeter<double> { return std::move(v); }
 
          constexpr auto operator "" _cm(unsigned long long v) noexcept  -> Centimeter<long long> { return std::move(v); }
@@ -244,6 +244,7 @@ namespace sec21
 
          constexpr auto operator "" _t(unsigned long long v) noexcept   -> Tonne<long long> { return std::move(v); }
          constexpr auto operator "" _t(long double v) noexcept          -> Tonne<double> { return std::move(v); }
+
 
          constexpr auto operator "" _N(long double v) noexcept    -> Newton<double> { return std::move(v); }
          constexpr auto operator "" _kN(long double v) noexcept   -> Kilonewton<double> { return std::move(v); }
