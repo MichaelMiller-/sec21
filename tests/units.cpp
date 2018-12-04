@@ -14,8 +14,6 @@ constexpr su::Centimeter<int> m200{ 200 };
 constexpr su::Foot<int> f1{ 1 };
 constexpr su::Inch<int> i12{ 12 };
 
-constexpr su::SquareMeter<int> a1{ 1 };
-
 constexpr auto r1 = su::Inch<int>(5) + su::Centimeter<int>(8);
 constexpr auto r2 = m1 * m1;
 
@@ -32,9 +30,8 @@ static_assert(r1 == 207_mm, "must be equal");
 
 static_assert(m2 - m1 == m1, "must be equal");
 
-static_assert((m1 * m1) == a1, "must be equal");
+static_assert((m1 * m1) == su::SquareMeter<int>(1), "must be equal");
 static_assert((su::Foot<int>{3} * su::Foot<int>{4}) == su::SquareFoot<int>{12}, "must be equal");
-
 
 static_assert((m1 * m1 * m1) == su::CubicMeter<int>(1), "must be equal");
 
@@ -56,13 +53,8 @@ static_assert(1.0_MN == 1000.0_kN, "must be equal");
 static_assert(1.0_MN == 1'000'000.0_N, "must be equal");
 
 
-TEST_CASE("runtime tests", "[units]")
-{
-   //auto xx = (sec21::Foot<int>{ 3 } * sec21::Foot<int>{ 4 });
-
-   //std::cout << "long double: " << sizeof(long double) << std::endl;
-   //std::cout << "double: " << sizeof(double) << std::endl;
-
-   bool b = false;
-   REQUIRE(b);
-}
+//TEST_CASE("runtime tests", "[units]")
+//{
+//   bool b = false;
+//   REQUIRE(b);
+//}
