@@ -39,9 +39,9 @@ static_assert((su::Foot<int>{3} * su::Foot<int>{4}) == su::SquareFoot<int>{12}, 
 
 static_assert((m1 * m1 * m1) == su::CubicMeter<int>(1), "must be equal");
 
-#endif
-
 static_assert((m1 / m1) == su::Id<int>(1), "must be equal");
+
+#endif
 
 // unit conversion
 static_assert(1_m == 100_cm, "must be equal");
