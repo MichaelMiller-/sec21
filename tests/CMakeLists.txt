@@ -3,11 +3,12 @@ include_directories(${Boost_INCLUDE_DIRS})
 
 include_directories(${CMAKE_SOURCE_DIR}/deps/Range-V3-VS2015/include)
 
-
 function(test test)
    string(REPLACE "/" "_" tmp ${test})
       
    add_executable(test.${tmp} ${CMAKE_CURRENT_LIST_DIR}/${test}.cpp)
+
+   set(CMAKE_CXX_STANDARD 17)
 
    if (MSVC)
       add_compile_options(/W4)
