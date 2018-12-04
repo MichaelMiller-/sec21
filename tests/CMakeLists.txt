@@ -8,7 +8,17 @@ function(test test)
       
    add_executable(test.${tmp} ${CMAKE_CURRENT_LIST_DIR}/${test}.cpp)
 
-   add_compile_options("/std:c++latest")
+   if (MSVC_VERSION GREATER_EQUAL "1900")
+    include(CheckCXXCompilerFlag)
+    CHECK_CXX_COMPILER_FLAG("/std:c++latest" _cpp_latest_flag_supported)
+    if (_cpp_latest_flag_supported)
+        add_compile_options("/std:c++latest")
+    endif()
+   endif()
+
+   if (NOT MSVC)
+      add_compile_options("std=c++17")
+   endif()
 
    if (MSVC)
       add_compile_options(/W4)
