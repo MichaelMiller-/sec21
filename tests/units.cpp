@@ -30,7 +30,7 @@ static_assert(r1 == 207_mm, "must be equal");
 
 static_assert(m2 - m1 == m1, "must be equal");
 
-static_assert((m1 * m1) == su::SquareMeter<int>(1), "must be equal");
+static_assert(r2 == su::SquareMeter<int>(1), "must be equal");
 static_assert((su::Foot<int>{3} * su::Foot<int>{4}) == su::SquareFoot<int>{12}, "must be equal");
 
 static_assert((m1 * m1 * m1) == su::CubicMeter<int>(1), "must be equal");
