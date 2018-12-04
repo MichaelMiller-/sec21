@@ -17,7 +17,7 @@ function(test test)
    endif()
 
    if (NOT MSVC)
-      add_compile_options("std=c++17")
+      add_compile_options("-std=c++17")
    endif()
 
    if (MSVC)
