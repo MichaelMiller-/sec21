@@ -62,16 +62,17 @@ static_assert(1_km == 1000_m, "must be equal");
 static_assert(1_kg == 1000_g, "must be equal");
 static_assert(1_t == 1000_kg, "must be equal");
 static_assert(1_t == 1'000'000_g, "must be equal");
+static_assert(1.0_lb == 0.4535924_kg, "must be equal");
 //! \todo conversion error -> mismatch between int and double
-//static_assert(1_g == 0.001_kg, "must be equal");
+// static_assert(1_g == 0.001_kg, "must be equal");
 
 static_assert(1.0_kN == 1000.0_N, "must be equal");
 static_assert(1.0_MN == 1000.0_kN, "must be equal");
 static_assert(1.0_MN == 1'000'000.0_N, "must be equal");
 
+TEST_CASE("runtime tests", "[units]")
+{
 
-//TEST_CASE("runtime tests", "[units]")
-//{
-//   bool b = false;
-//   REQUIRE(b);
-//}
+   bool b = false;
+   REQUIRE(b);
+}
