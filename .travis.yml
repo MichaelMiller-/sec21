@@ -18,14 +18,14 @@ matrix:
         - g++-8
         sources:
         - ubuntu-toolchain-r-test
-##  - os: linux
-##    env: COMPILER=clang
-##    addons:
-##      apt:
-##        packages:
-##        - clang
-##        sources:
-##        - ubuntu-toolchain-r-test
+  - os: linux
+    env: COMPILER=clang
+    addons:
+      apt:
+        packages:
+        - clang
+        sources:
+        - ubuntu-toolchain-r-test
 
 before_install:
 - export CXX="${COMPILER}"

@@ -4,17 +4,17 @@
 
 #include <sec21/units.h>
 
-namespace su = sec21::units;
-using namespace su::literals;
+namespace unit = sec21::unit;
+using namespace unit::literals;
 
-constexpr su::Meter<int> m1{ 1 };
-constexpr su::Meter<int> m2{ 2 };
-constexpr su::Centimeter<int> m200{ 200 };
+constexpr unit::meter<int> m1{ 1 };
+constexpr unit::meter<int> m2{ 2 };
+constexpr unit::centimeter<int> m200{ 200 };
 
-constexpr su::Foot<int> f1{ 1 };
-constexpr su::Inch<int> i12{ 12 };
+constexpr unit::foot<int> f1{ 1 };
+constexpr unit::inch<int> i12{ 12 };
 
-constexpr auto r1 = su::Inch<int>(5) + su::Centimeter<int>(8);
+constexpr auto r1 = unit::inch<int>(5) + unit::centimeter<int>(8);
 constexpr auto r2 = m1 * m1;
 
 // equal tests
@@ -33,13 +33,14 @@ static_assert(m2 - m1 == m1, "must be equal");
 #include <boost/version.hpp>
 
 #if BOOST_VERSION >= 106700
+//! \todo fix: boost::mpl::transform didn't consider the order of the sequences in previos version
+//! \todo fix: check boost version or write a workaround 
+static_assert(r2 == unit::square_meter<int>(1), "must be equal");
+static_assert((unit::foot<int>{3} * unit::foot<int>{4}) == unit::square_foot<int>{12}, "must be equal");
 
-static_assert(r2 == su::SquareMeter<int>(1), "must be equal");
-static_assert((su::Foot<int>{3} * su::Foot<int>{4}) == su::SquareFoot<int>{12}, "must be equal");
+static_assert((m1 * m1 * m1) == unit::cubic_meter<int>(1), "must be equal");
 
-static_assert((m1 * m1 * m1) == su::CubicMeter<int>(1), "must be equal");
-
-static_assert((m1 / m1) == su::Id<int>(1), "must be equal");
+static_assert((m1 / m1) == unit::id_t<int>(1), "must be equal");
 
 #endif
 

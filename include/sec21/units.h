@@ -10,7 +10,7 @@
 
 namespace sec21
 {
-   namespace units
+   namespace unit
    {
       namespace dimension
       {
@@ -59,7 +59,7 @@ namespace sec21
          };
 
          //! \todo replace with "using"
-         template<typename R1, typename R2>
+         template <typename R1, typename R2>
          struct common_ratio
          {
             using type = typename std::ratio<std::gcd(R1::num, R2::num), std::lcm(R1::den, R2::den)>::type;
@@ -161,96 +161,98 @@ namespace sec21
       };
 
       // clang-format off
-      template <typename T> using Id = quantity<T, dimension::scalar, std::ratio<1>>;
+      template <typename T> using id_t = quantity<T, dimension::scalar, std::ratio<1>>;
 
-      template <typename T, typename Scale> using Length = quantity<T, dimension::length, Scale>;
-      template <typename T, typename Scale> using Mass = quantity<T, dimension::mass, Scale>;
-      template <typename T, typename Scale> using Time = quantity<T, dimension::time, Scale>;
+      template <typename T, typename Scale> using length_t = quantity<T, dimension::length, Scale>;
+      template <typename T, typename Scale> using mass_t = quantity<T, dimension::mass, Scale>;
+      template <typename T, typename Scale> using time_t = quantity<T, dimension::time, Scale>;
 
-      template <typename T, typename Scale> using Area = quantity<T, dimension::area, Scale>;
-      template <typename T, typename Scale> using Volume = quantity<T, dimension::volume, Scale>;
+      template <typename T, typename Scale> using area_t = quantity<T, dimension::area, Scale>;
+      template <typename T, typename Scale> using volume_t = quantity<T, dimension::volume, Scale>;
 
-      template <typename T, typename Scale> using Velocity = quantity<T, dimension::velocity, Scale>;
-      template <typename T, typename Scale> using Acceleration = quantity<T, dimension::acceleration, Scale>;
+      template <typename T, typename Scale> using velocity_t = quantity<T, dimension::velocity, Scale>;
+      template <typename T, typename Scale> using acceleration_t = quantity<T, dimension::acceleration, Scale>;
 
-      template <typename T, typename Scale> using Force = quantity<T, dimension::force, Scale>;
+      template <typename T, typename Scale> using force_t = quantity<T, dimension::force, Scale>;
 
       //
       // scaled units
       //
-      template <typename T> using Millimeter = Length<T, std::milli>;
-      template <typename T> using Centimeter = Length<T, std::centi>;
-      template <typename T> using Meter = Length<T, std::ratio<1>>;   // SI-Unit
-      template <typename T> using Kilometer = Length<T, std::kilo>;
+      template <typename T> using millimeter = length_t<T, std::milli>;
+      template <typename T> using centimeter = length_t<T, std::centi>;
+      template <typename T> using meter = length_t<T, std::ratio<1>>;         // SI-Unit
+      template <typename T> using kilometer = length_t<T, std::kilo>;
 
-      template <typename T> using Inch = Length<T, std::ratio<254, 10000>::type>;
-      template <typename T> using Foot = Length<T, std::ratio<3048, 10000>::type>;
-      template <typename T> using Yard = Length<T, std::ratio<9144, 10000>::type>;
-      template <typename T> using Mile = Length<T, std::ratio<1609344, 1000>::type>;
+      template <typename T> using inch = length_t<T, std::ratio<254, 10000>::type>;
+      template <typename T> using foot = length_t<T, std::ratio<3048, 10000>::type>;
+      template <typename T> using yard = length_t<T, std::ratio<9144, 10000>::type>;
+      template <typename T> using mile = length_t<T, std::ratio<1609344, 1000>::type>;
 
-      template <typename T> using Gram = Mass<T, std::milli>;
-      template <typename T> using Kilogram = Mass<T, std::ratio<1>>;       // SI-Unit
-      template <typename T> using Tonne = Mass<T, std::kilo>;
+      template <typename T> using gram = mass_t<T, std::milli>;
+      template <typename T> using kilogram = mass_t<T, std::ratio<1>>;       // SI-Unit
+      template <typename T> using tonne = mass_t<T, std::kilo>;
 
-      template <typename T> using Second = Time<T, std::ratio<1>>;         // SI-Unit
-      template <typename T> using Minute = Time<T, std::ratio<60>>;
-      template <typename T> using Hour = Time<T, std::ratio<3600>>;
+      template <typename T> using second = time_t<T, std::ratio<1>>;         // SI-Unit
+      template <typename T> using minute = time_t<T, std::ratio<60>>;
+      template <typename T> using hour = time_t<T, std::ratio<3600>>;
 
       //! \todo check SquareMillimeter
-      // template <typename T> using SquareMillimeter = Area<T, std::milli>;  
-      template <typename T> using SquareMeter = Area<T, std::ratio<1>>;
-      template <typename T> using SquareFoot = Area<T, std::ratio<145161, 1562500>>;
+      // template <typename T> using square_millimeter = Area<T, std::milli>;  
+      template <typename T> using square_meter = area_t<T, std::ratio<1>>;
+      template <typename T> using square_foot = area_t<T, std::ratio<145161, 1562500>>;
 
-      template <typename T> using CubicMeter = Volume<T, std::ratio<1>>;
+      template <typename T> using cubic_meter = volume_t<T, std::ratio<1>>;
 
-      template <typename T> using Kmh = Velocity<T, std::ratio<1000, 3600>::type>;
-      template <typename T> using Mph = Velocity<T, std::ratio<1609344, 3600000>::type>;
+      template <typename T> using kmh = velocity_t<T, std::ratio<1000, 3600>::type>;
+      template <typename T> using mph = velocity_t<T, std::ratio<1609344, 3600000>::type>;
 
-      template <typename T> using Newton = Force<T, std::ratio<1>>;   // SI-Unit
-      template <typename T> using Kilonewton = Force<T, std::kilo>;
-      template <typename T> using Meganewton = Force<T, std::mega>;
+      template <typename T> using newton = force_t<T, std::ratio<1>>;   // SI-Unit
+      template <typename T> using kilonewton = force_t<T, std::kilo>;
+      template <typename T> using meganewton = force_t<T, std::mega>;
 
 
       inline namespace literals
       {
-         constexpr auto operator "" _mm(unsigned long long v) noexcept  -> Millimeter<long long> { return std::move(v); }
+         constexpr auto operator "" _mm(unsigned long long v) noexcept  -> millimeter<long long> { return std::move(v); }
          //! \todo solve long double to double conversion 
-         constexpr auto operator "" _mm(long double v) noexcept         -> Millimeter<double> { return std::move(v); }
+         constexpr auto operator "" _mm(long double v) noexcept         -> millimeter<double> { return std::move(v); }
 
-         constexpr auto operator "" _cm(unsigned long long v) noexcept  -> Centimeter<long long> { return std::move(v); }
-         constexpr auto operator "" _cm(long double v) noexcept         -> Centimeter<double> { return std::move(v); }
+         constexpr auto operator "" _cm(unsigned long long v) noexcept  -> centimeter<long long> { return std::move(v); }
+         constexpr auto operator "" _cm(long double v) noexcept         -> centimeter<double> { return std::move(v); }
 
-         constexpr auto operator "" _m(unsigned long long v) noexcept   -> Meter<long long> { return std::move(v); }
-         constexpr auto operator "" _m(long double v) noexcept          -> Meter<double> { return std::move(v); }
+         constexpr auto operator "" _m(unsigned long long v) noexcept   -> meter<long long> { return std::move(v); }
+         constexpr auto operator "" _m(long double v) noexcept          -> meter<double> { return std::move(v); }
 
-         constexpr auto operator "" _km(unsigned long long v) noexcept  -> Kilometer<long long> { return std::move(v); }
-         constexpr auto operator "" _km(long double v) noexcept         -> Kilometer<double> { return std::move(v); }
+         constexpr auto operator "" _km(unsigned long long v) noexcept  -> kilometer<long long> { return std::move(v); }
+         constexpr auto operator "" _km(long double v) noexcept         -> kilometer<double> { return std::move(v); }
 
-         constexpr auto operator "" _in(unsigned long long v) noexcept  -> Inch<long long> { return std::move(v); }
-         constexpr auto operator "" _in(long double v) noexcept         -> Inch<double> { return std::move(v); }
+         constexpr auto operator "" _in(unsigned long long v) noexcept  -> inch<long long> { return std::move(v); }
+         constexpr auto operator "" _in(long double v) noexcept         -> inch<double> { return std::move(v); }
 
-         constexpr auto operator "" _ft(unsigned long long v) noexcept  -> Foot<long long> { return std::move(v); }
-         constexpr auto operator "" _ft(long double v) noexcept         -> Foot<double> { return std::move(v); }
+         constexpr auto operator "" _ft(unsigned long long v) noexcept  -> foot<long long> { return std::move(v); }
+         constexpr auto operator "" _ft(long double v) noexcept         -> foot<double> { return std::move(v); }
 
-         constexpr auto operator "" _yd(unsigned long long v) noexcept  -> Yard<long long> { return std::move(v); }
-         constexpr auto operator "" _yd(long double v) noexcept         -> Yard<double> { return std::move(v); }
-
-
-         constexpr auto operator "" _g(unsigned long long v) noexcept   -> Gram<long long> { return std::move(v); }
-         constexpr auto operator "" _g(long double v) noexcept          -> Gram<double> { return std::move(v); }
-
-         constexpr auto operator "" _kg(unsigned long long v) noexcept  -> Kilogram<long long> { return std::move(v); }
-         constexpr auto operator "" _kg(long double v) noexcept         -> Kilogram<double> { return std::move(v); }
-
-         constexpr auto operator "" _t(unsigned long long v) noexcept   -> Tonne<long long> { return std::move(v); }
-         constexpr auto operator "" _t(long double v) noexcept          -> Tonne<double> { return std::move(v); }
+         constexpr auto operator "" _yd(unsigned long long v) noexcept  -> yard<long long> { return std::move(v); }
+         constexpr auto operator "" _yd(long double v) noexcept         -> yard<double> { return std::move(v); }
 
 
-         constexpr auto operator "" _N(long double v) noexcept    -> Newton<double> { return std::move(v); }
-         constexpr auto operator "" _kN(long double v) noexcept   -> Kilonewton<double> { return std::move(v); }
-         constexpr auto operator "" _MN(long double v) noexcept   -> Meganewton<double> { return std::move(v); }
+         constexpr auto operator "" _g(unsigned long long v) noexcept   -> gram<long long> { return std::move(v); }
+         constexpr auto operator "" _g(long double v) noexcept          -> gram<double> { return std::move(v); }
+
+         constexpr auto operator "" _kg(unsigned long long v) noexcept  -> kilogram<long long> { return std::move(v); }
+         constexpr auto operator "" _kg(long double v) noexcept         -> kilogram<double> { return std::move(v); }
+
+         constexpr auto operator "" _t(unsigned long long v) noexcept   -> tonne<long long> { return std::move(v); }
+         constexpr auto operator "" _t(long double v) noexcept          -> tonne<double> { return std::move(v); }
+
+
+         constexpr auto operator "" _N(long double v) noexcept    -> newton<double> { return std::move(v); }
+         constexpr auto operator "" _kN(long double v) noexcept   -> kilonewton<double> { return std::move(v); }
+         constexpr auto operator "" _MN(long double v) noexcept   -> meganewton<double> { return std::move(v); }
       }
       // clang-format on
+
+      //! \todo concept
 
       //template <typename T> 
       //constexpr auto g = Acceleration<T, std::ratio<1>>{ 9.82 };
