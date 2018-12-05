@@ -1,7 +1,8 @@
 find_package(Boost)
 include_directories(${Boost_INCLUDE_DIRS})
 
-include_directories(${CMAKE_SOURCE_DIR}/deps/Range-V3-VS2015/include)
+## remove
+## include_directories(${CMAKE_SOURCE_DIR}/deps/Range-V3-VS2015/include)
 
 function(test test)
    string(REPLACE "/" "_" tmp ${test})
@@ -9,11 +10,11 @@ function(test test)
    add_executable(test.${tmp} ${CMAKE_CURRENT_LIST_DIR}/${test}.cpp)
 
    if (MSVC_VERSION GREATER_EQUAL "1900")
-    include(CheckCXXCompilerFlag)
-    CHECK_CXX_COMPILER_FLAG("/std:c++latest" _cpp_latest_flag_supported)
-    if (_cpp_latest_flag_supported)
-        add_compile_options("/std:c++latest")
-    endif()
+      include(CheckCXXCompilerFlag)
+      CHECK_CXX_COMPILER_FLAG("/std:c++latest" _cpp_latest_flag_supported)
+      if (_cpp_latest_flag_supported)
+         add_compile_options("/std:c++latest")
+      endif()
    endif()
 
    if (NOT MSVC)
@@ -33,11 +34,13 @@ function(test test)
    endif()
 endfunction()
 
-## unit tests via catch
+## unit tests via catch (alphabetical order)
 ##
+test("cache")
 test("concat")
 test("dispatcher")
-test("cache")
+test("enumerate")
 test("in_range")
 test("strong_types")
+test("support")
 test("units")

@@ -17,18 +17,26 @@ constexpr unit::inch<int> i12{ 12 };
 constexpr auto r1 = unit::inch<int>(5) + unit::centimeter<int>(8);
 constexpr auto r2 = m1 * m1;
 
-// equal tests
+
 static_assert(m1 == m1, "must be equal");
 static_assert(m2 == m2, "must be equal");
 static_assert(m200 == m2, "must be equal");
 static_assert(f1 == i12, "must be equal");
 
+constexpr auto F = 15_kg * unit::constants::g;
+
 //! \todo more tests
 // operations
+
+// add
 static_assert(m1 + m1 == m2, "must be equal");
 static_assert(r1 == 207_mm, "must be equal");
 
+// substract
 static_assert(m2 - m1 == m1, "must be equal");
+
+// negation
+static_assert(-1.0_MN == -1.0_MN, "must be equal");
 
 #include <boost/version.hpp>
 
@@ -41,6 +49,8 @@ static_assert((unit::foot<int>{3} * unit::foot<int>{4}) == unit::square_foot<int
 static_assert((m1 * m1 * m1) == unit::cubic_meter<int>(1), "must be equal");
 
 static_assert((m1 / m1) == unit::id_t<int>(1), "must be equal");
+
+static_assert(F == unit::newton<decltype(F)::value_t>(147.09975), "must be equal");
 
 #endif
 
