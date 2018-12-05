@@ -89,7 +89,6 @@ namespace sec21::unit
 
    public:
       using value_t = T;
-      using value_t = T;
       using dimension_t = Dimension;
       using scale_t = Scale;
 
