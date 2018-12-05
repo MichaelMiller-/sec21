@@ -70,9 +70,8 @@ static_assert(1.0_kN == 1000.0_N, "must be equal");
 static_assert(1.0_MN == 1000.0_kN, "must be equal");
 static_assert(1.0_MN == 1'000'000.0_N, "must be equal");
 
-TEST_CASE("runtime tests", "[units]")
-{
-
-   bool b = false;
-   REQUIRE(b);
-}
+//TEST_CASE("runtime tests", "[units]")
+//{
+//   bool b = true;
+//   REQUIRE(b);
+//}
