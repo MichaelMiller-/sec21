@@ -1,16 +1,7 @@
 language: cpp
-sudo: false
 
 matrix:
   include:
-  - os: linux
-    env: COMPILER=g++-6
-    addons:
-      apt:
-        packages:
-        - g++-6
-        sources:
-        - ubuntu-toolchain-r-test
   - os: linux
     env: COMPILER=g++-7
     addons:
