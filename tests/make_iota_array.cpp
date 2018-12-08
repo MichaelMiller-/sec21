@@ -1,25 +1,24 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-#include <vector>
-#include <iterator>
-#include <utility>
+#include <sec21/make_iota_array.h>
 
-namespace sec21
+#include <algorithm>
+
+TEST_CASE("make iota array", "[core]")
 {
-   namespace detail 
-   {
-      template<typename T, T... Ns>
-      constexpr auto make_iota_array(T const offset, std::integer_sequence<T, Ns...>) noexcept -> std::array<T, sizeof...(Ns)> 
-      {
-         return {{(Ns + offset)...}};
-      }
-   }
+   using namespace sec21;
 
-   template<typename T, T N>
-   constexpr auto make_iota_array(T const offset = {}) noexcept 
+   SECTION("simple test")
    {
-      static_assert(N >= T{}, "no negative sizes");
-      return detail::make_iota_array<T>(offset, std::make_integer_sequence<T, N>{});
+      auto result = make_iota_array<int, 4>();
+      const decltype(result) expected{ 0,1,2,3 };
+      REQUIRE(std::equal(std::begin(result), std::end(result), std::begin(expected)) == true);
    }
-}
+   SECTION("with offset")
+   {
+      auto result = make_iota_array<int, 4>(2);
+      const decltype(result) expected{ 2,3,4,5 };
+      REQUIRE(std::equal(std::begin(result), std::end(result), std::begin(expected)) == true);
+   }
+}   

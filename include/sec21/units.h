@@ -25,22 +25,22 @@ namespace sec21::unit
       >;
 
       // clang-format off
-      using scalar = dimension_t<0, 0, 0, 0, 0>;
+      using scalar         = dimension_t<0, 0, 0, 0, 0>;
 
-      using length      = dimension_t<1, 0, 0, 0, 0>;
-      using mass        = dimension_t<0, 1, 0, 0, 0>;
-      using time        = dimension_t<0, 0, 1, 0, 0>;
-      using charge      = dimension_t<0, 0, 0, 1, 0>;
-      using temperature = dimension_t<0, 0, 0, 0, 1>;
+      using length         = dimension_t<1, 0, 0, 0, 0>;
+      using mass           = dimension_t<0, 1, 0, 0, 0>;
+      using time           = dimension_t<0, 0, 1, 0, 0>;
+      using charge         = dimension_t<0, 0, 0, 1, 0>;
+      using temperature    = dimension_t<0, 0, 0, 0, 1>;
 
-      using area        = dimension_t<2, 0, 0, 0, 0>;
-      using volume      = dimension_t<3, 0, 0, 0, 0>;
+      using area           = dimension_t<2, 0, 0, 0, 0>;
+      using volume         = dimension_t<3, 0, 0, 0, 0>;
 
       using velocity       = dimension_t<1, 0, -1, 0, 0>;
       using acceleration   = dimension_t<1, 0, -2, 0, 0>;
 
-      using force    = dimension_t<1, 1, -2, 0, 0>;
-      using torque   = dimension_t<2, 1, -2, 0, 0>;
+      using force          = dimension_t<1, 1, -2, 0, 0>;
+      using torque         = dimension_t<2, 1, -2, 0, 0>;
       // clang-format on
    }
 
@@ -171,6 +171,7 @@ namespace sec21::unit
    // quantities
    //
    template <typename T> using id_t = quantity<T, dimension::scalar, std::ratio<1>>;
+   template <typename T> using scalar_t = quantity<T, dimension::scalar, std::ratio<1>>;
 
    template <typename T, typename Scale> using length_t = quantity<T, dimension::length, Scale>;
    template <typename T, typename Scale> using mass_t = quantity<T, dimension::mass, Scale>;
@@ -185,12 +186,12 @@ namespace sec21::unit
    template <typename T, typename Scale> using acceleration_t = quantity<T, dimension::acceleration, Scale>;
 
    template <typename T, typename Scale> using force_t = quantity<T, dimension::force, Scale>;
+   template <typename T, typename Scale> using torque_t = quantity<T, dimension::torque, Scale>;
 
    //
    // scaled and derived units
    //
    // length
-   //
    template <typename T> using millimeter = length_t<T, std::milli>;
    template <typename T> using centimeter = length_t<T, std::centi>;
    template <typename T> using meter = length_t<T, std::ratio<1>>;         // SI-Unit
@@ -202,7 +203,6 @@ namespace sec21::unit
    template <typename T> using mile = length_t<T, std::ratio<1609344, 1'000>::type>;
 
    // mass
-   //
    template <typename T> using gram = mass_t<T, std::milli>;
    template <typename T> using kilogram = mass_t<T, std::ratio<1>>;       // SI-Unit
    template <typename T> using ton = mass_t<T, std::kilo>;
@@ -210,32 +210,38 @@ namespace sec21::unit
    template <typename T> using pound = mass_t<T, std::ratio<4535924, 10'000'000>::type>;
 
    // time
-   //
    template <typename T> using second = time_t<T, std::ratio<1>>;         // SI-Unit
    template <typename T> using minute = time_t<T, std::ratio<60>>;
    template <typename T> using hour = time_t<T, std::ratio<3600>>;
 
    // charge
-   //
    template <typename T> using milliampere = charge_t<T, std::milli>;
    template <typename T> using ampere = charge_t<T, std::ratio<1>>;        // SI-Unit
 
    // temperature
-   //
    template <typename T> using kelvin = temperature_t<T, std::ratio<1>>;   // SI-Unit
 
+   // area
    template <typename T> using square_millimeter = area_t<T, std::micro>;  
    template <typename T> using square_meter = area_t<T, std::ratio<1>>;
    template <typename T> using square_foot = area_t<T, std::ratio<145161, 1562500>>;
 
+   // volumen
    template <typename T> using cubic_meter = volume_t<T, std::ratio<1>>;
 
+   // velocity
    template <typename T> using kmh = velocity_t<T, std::ratio<1000, 3600>::type>;
    template <typename T> using mph = velocity_t<T, std::ratio<1609344, 3600000>::type>;
 
-   template <typename T> using newton = force_t<T, std::ratio<1>>;   // SI-Unit
+   // force
+   template <typename T> using newton = force_t<T, std::ratio<1>>;         // Base-Unit
    template <typename T> using kilonewton = force_t<T, std::kilo>;
    template <typename T> using meganewton = force_t<T, std::mega>;
+
+   // torque
+   template <typename T> using newton_meter = torque_t<T, std::ratio<1>>;  // Base-Unit
+   template <typename T> using kilonewton_meter = torque_t<T, std::kilo>;
+
 
    inline namespace literals
    {
@@ -285,6 +291,10 @@ namespace sec21::unit
       constexpr auto operator "" _N(long double v) noexcept  -> newton<double> { return std::move(v); }
       constexpr auto operator "" _kN(long double v) noexcept -> kilonewton<double> { return std::move(v); }
       constexpr auto operator "" _MN(long double v) noexcept -> meganewton<double> { return std::move(v); }
+
+      //
+      constexpr auto operator "" _Nm(long double v) noexcept  -> newton_meter<double> { return std::move(v); }
+      constexpr auto operator "" _kNm(long double v) noexcept -> kilonewton_meter<double> { return std::move(v); }
    }
    // clang-format on
 

@@ -1,8 +1,6 @@
 find_package(Boost)
 include_directories(${Boost_INCLUDE_DIRS})
 
-## remove
-## include_directories(${CMAKE_SOURCE_DIR}/deps/Range-V3-VS2015/include)
 
 function(test test)
    string(REPLACE "/" "_" tmp ${test})
@@ -39,8 +37,10 @@ endfunction()
 test("cache")
 test("concat")
 test("dispatcher")
+test("double_values")
 test("enumerate")
 test("in_range")
+test("make_iota_array")
 test("strong_types")
-test("support")
+test("structural_analysis.support")
 test("units")
