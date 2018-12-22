@@ -70,6 +70,9 @@ static_assert(1.0_kN == 1000.0_N, "must be equal");
 static_assert(1.0_MN == 1000.0_kN, "must be equal");
 static_assert(1.0_MN == 1'000'000.0_N, "must be equal");
 
+TEST_CASE("units", "[compilation-only]") {
+   SUCCEED("Nothing to test. Compiletests");
+}
 //TEST_CASE("runtime tests", "[units]")
 //{
 //   bool b = true;
