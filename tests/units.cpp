@@ -77,7 +77,7 @@ TEST_CASE("units", "[compilation-only]") {
 
 //! test c++20 concepts
 template <typename T>
-auto len(T t) requires sec21::unit::Length<T> { return true; }
+auto len(T t) requires sec21::unit::Length<T> { return t.get(); }
 
 TEST_CASE("runtime tests", "[units]")
 {
