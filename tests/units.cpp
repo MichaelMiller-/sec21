@@ -77,11 +77,12 @@ TEST_CASE("units", "[compilation-only]") {
 
 //! test c++20 concepts
 template <typename T>
-auto fowe(T t) requires sec21::unit::Length<T> { return true; }
+auto len(T t) requires sec21::unit::Length<T> { return true; }
 
 TEST_CASE("runtime tests", "[units]")
 {
-   REQUIRE(fowe(meter<double>(5.0)) == Approx(5.0));
+   using namespace sec21::unit;
+   REQUIRE(len(meter<double>(5.0)) == Approx(5.0));
 }
 
 #endif
