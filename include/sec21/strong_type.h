@@ -23,6 +23,6 @@ namespace sec21
          : m_value{ std::move(value) }
       {}
 
-      [[nodiscard]] constexpr auto get() const noexcept { return m_value; }
+      [[nodiscard]] constexpr auto get() const noexcept -> type { return m_value; }
    };
 }

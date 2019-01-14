@@ -17,7 +17,6 @@ constexpr unit::inch<int> i12{ 12 };
 constexpr auto r1 = unit::inch<int>(5) + unit::centimeter<int>(8);
 constexpr auto r2 = m1 * m1;
 
-
 static_assert(m1 == m1, "must be equal");
 static_assert(m2 == m2, "must be equal");
 static_assert(m200 == m2, "must be equal");
@@ -40,7 +39,7 @@ static_assert(-1.0_MN == -1.0_MN, "must be equal");
 
 #include <boost/version.hpp>
 
-#if BOOST_VERSION >= 106700
+#if BOOST_VERSION == 106700
 //! \todo fix: boost::mpl::transform didn't consider the order of the sequences in previos version
 //! \todo fix: check boost version or write a workaround 
 static_assert(r2 == unit::square_meter<int>(1), "must be equal");
@@ -50,7 +49,7 @@ static_assert((m1 * m1 * m1) == unit::cubic_meter<int>(1), "must be equal");
 
 static_assert((m1 / m1) == unit::id_t<int>(1), "must be equal");
 
-static_assert(F == unit::newton<decltype(F)::value_t>(147.09975), "must be equal");
+static_assert(F == unit::newton<decltype(F)::value_t>(147.099750), "must be equal");
 
 #endif
 
@@ -73,8 +72,17 @@ static_assert(1.0_MN == 1'000'000.0_N, "must be equal");
 TEST_CASE("units", "[compilation-only]") {
    SUCCEED("Nothing to test. Compiletests");
 }
-//TEST_CASE("runtime tests", "[units]")
-//{
-//   bool b = true;
-//   REQUIRE(b);
-//}
+
+#ifdef __cpp_concepts
+
+//! test c++20 concepts
+template <typename T>
+auto fowe(T t) requires sec21::unit::Length<T> { return true; }
+
+TEST_CASE("runtime tests", "[units]")
+{
+   REQUIRE(fowe(meter<double>(5.0)) == Approx(5.0));
+}
+
+#endif
+

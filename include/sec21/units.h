@@ -2,6 +2,7 @@
 
 #include <ratio>
 #include <numeric>
+#include <type_traits>
 
 #include <boost/mpl/vector_c.hpp>
 #include <boost/mpl/transform.hpp>
@@ -164,6 +165,7 @@ namespace sec21::unit
 
 #ifdef __cpp_deduction_guides
    //! \todo 
+   // template <typename T, typename Dimension, typename Scale> quantity(T) -> quantity<T, Dimension, Scale>;
 #endif
 
    // clang-format off
@@ -303,5 +305,23 @@ namespace sec21::unit
       constexpr auto g = acceleration_t<double, std::ratio<1>>{ 9.80665 };
    }
 
-   //! \todo concepts
+#ifdef __cpp_concepts
+   inline namespace concepts
+   {
+      template <typename T> using value_t = typename T::value_t;
+      template <typename T> using dimension_t = typename T::dimension_t;
+      template <typename T> using scale_t = typename T::scale_t;
+
+      template <typename T>
+      concept bool Unit = requires(T t) { 
+         typename value_t<T>;
+         typename dimension_t<T>;
+         typename scale_t<T>;
+      };
+
+      template <typename T>
+      concept bool Length = Unit<T> && std::is_same_v<dimension_t<T>, dimension::length>;
+   }
+#endif
+
 }

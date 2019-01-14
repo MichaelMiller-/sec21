@@ -47,7 +47,7 @@ TEST_CASE("double_values", "[core]")
          { "3", 3, 3.14 },
          { "3", 3, 3.14 } };
       REQUIRE(result == expected);
-   }   
+   }
    SECTION("transformation into tuple")
    {
       std::vector<int> input{ 1, 2, 3 };
