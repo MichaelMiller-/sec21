@@ -10,5 +10,8 @@ namespace sec21
       constexpr bool operator == (T const& other) const noexcept {
          return this->self().get() == other.get();
       }
+      constexpr bool operator != (T const& other) const noexcept {
+         return !(this->self().get() == other.get());
+      }
    };
 }
