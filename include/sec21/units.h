@@ -98,7 +98,7 @@ namespace sec21::unit
       //! \todo check noexcept
       // explicit
       constexpr quantity(T && t) noexcept // (noexcept(T{ std::move(t) }))
-         : m_value{ std::forward<T>(t) }
+         : m_value{ std::move(t) }
       {}
 
       template <typename U, typename S>
@@ -251,52 +251,52 @@ namespace sec21::unit
       //
       constexpr auto operator "" _mm(unsigned long long v) noexcept  -> millimeter<long long> { return std::move(v); }
       //! \todo solve long double to double conversion 
-      constexpr auto operator "" _mm(long double v) noexcept         -> millimeter<double> { return std::move(v); }
+      constexpr auto operator "" _mm(long double v) noexcept         -> millimeter<long double> { return std::move(v); }
 
       constexpr auto operator "" _cm(unsigned long long v) noexcept  -> centimeter<long long> { return std::move(v); }
-      constexpr auto operator "" _cm(long double v) noexcept         -> centimeter<double> { return std::move(v); }
+      constexpr auto operator "" _cm(long double v) noexcept         -> centimeter<long double> { return std::move(v); }
 
       constexpr auto operator "" _m(unsigned long long v) noexcept   -> meter<long long> { return std::move(v); }
-      constexpr auto operator "" _m(long double v) noexcept          -> meter<double> { return std::move(v); }
+      constexpr auto operator "" _m(long double v) noexcept          -> meter<long double> { return std::move(v); }
 
       constexpr auto operator "" _km(unsigned long long v) noexcept  -> kilometer<long long> { return std::move(v); }
-      constexpr auto operator "" _km(long double v) noexcept         -> kilometer<double> { return std::move(v); }
+      constexpr auto operator "" _km(long double v) noexcept         -> kilometer<long double> { return std::move(v); }
 
       constexpr auto operator "" _in(unsigned long long v) noexcept  -> inch<long long> { return std::move(v); }
-      constexpr auto operator "" _in(long double v) noexcept         -> inch<double> { return std::move(v); }
+      constexpr auto operator "" _in(long double v) noexcept         -> inch<long double> { return std::move(v); }
 
       constexpr auto operator "" _ft(unsigned long long v) noexcept  -> foot<long long> { return std::move(v); }
-      constexpr auto operator "" _ft(long double v) noexcept         -> foot<double> { return std::move(v); }
+      constexpr auto operator "" _ft(long double v) noexcept         -> foot<long double> { return std::move(v); }
 
       constexpr auto operator "" _yd(unsigned long long v) noexcept  -> yard<long long> { return std::move(v); }
-      constexpr auto operator "" _yd(long double v) noexcept         -> yard<double> { return std::move(v); }
+      constexpr auto operator "" _yd(long double v) noexcept         -> yard<long double> { return std::move(v); }
 
       // mass
       //
       constexpr auto operator "" _g(unsigned long long v) noexcept   -> gram<long long> { return std::move(v); }
-      constexpr auto operator "" _g(long double v) noexcept          -> gram<double> { return std::move(v); }
+      constexpr auto operator "" _g(long double v) noexcept          -> gram<long double> { return std::move(v); }
 
       constexpr auto operator "" _kg(unsigned long long v) noexcept  -> kilogram<long long> { return std::move(v); }
-      constexpr auto operator "" _kg(long double v) noexcept         -> kilogram<double> { return std::move(v); }
+      constexpr auto operator "" _kg(long double v) noexcept         -> kilogram<long double> { return std::move(v); }
 
       constexpr auto operator "" _t(unsigned long long v) noexcept   -> ton<long long> { return std::move(v); }
-      constexpr auto operator "" _t(long double v) noexcept          -> ton<double> { return std::move(v); }
+      constexpr auto operator "" _t(long double v) noexcept          -> ton<long double> { return std::move(v); }
 
       constexpr auto operator "" _lb(unsigned long long v) noexcept   -> pound<long long> { return std::move(v); }
-      constexpr auto operator "" _lb(long double v) noexcept          -> pound<double> { return std::move(v); }
+      constexpr auto operator "" _lb(long double v) noexcept          -> pound<long double> { return std::move(v); }
 
       // temperature
       //
-      constexpr auto operator "" _K(long double v) noexcept  -> kelvin<double> { return std::move(v); }
+      constexpr auto operator "" _K(long double v) noexcept  -> kelvin<long double> { return std::move(v); }
 
       //
-      constexpr auto operator "" _N(long double v) noexcept  -> newton<double> { return std::move(v); }
-      constexpr auto operator "" _kN(long double v) noexcept -> kilonewton<double> { return std::move(v); }
-      constexpr auto operator "" _MN(long double v) noexcept -> meganewton<double> { return std::move(v); }
+      constexpr auto operator "" _N(long double v) noexcept  -> newton<long double> { return std::move(v); }
+      constexpr auto operator "" _kN(long double v) noexcept -> kilonewton<long double> { return std::move(v); }
+      constexpr auto operator "" _MN(long double v) noexcept -> meganewton<long double> { return std::move(v); }
 
       //
-      constexpr auto operator "" _Nm(long double v) noexcept  -> newton_meter<double> { return std::move(v); }
-      constexpr auto operator "" _kNm(long double v) noexcept -> kilonewton_meter<double> { return std::move(v); }
+      constexpr auto operator "" _Nm(long double v) noexcept  -> newton_meter<long double> { return std::move(v); }
+      constexpr auto operator "" _kNm(long double v) noexcept -> kilonewton_meter<long double> { return std::move(v); }
    }
    // clang-format on
 
