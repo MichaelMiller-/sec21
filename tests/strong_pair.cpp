@@ -4,27 +4,21 @@
 
 #include <sec21/strong_pair.h>
 
-TEST_CASE("strong pair", "[core]")
-{
-   using namespace sec21;
-   
-   using sample_t = strong_pair<int, int>;
+using sample_t = sec21::strong_pair<int, int>;
 
-   const auto id00 = sample_t{ 0, 0 };
-   const auto id01 = sample_t{ 0, 1 };
-   const auto id10 = sample_t{ 1, 0 };
-   const auto id11 = sample_t{ 1, 1 };
+constexpr sample_t example00{ 0, 0 };
+constexpr sample_t example01{ 0, 1 };
+constexpr sample_t example10{ 1, 0 };
+constexpr sample_t example11{ 1, 1 };
 
-   SECTION("same first and second element")
-   {
-      REQUIRE(id00 == id00);
-      REQUIRE(id01 == id01);
-      REQUIRE(id10 == id10);
-      REQUIRE(id11 == id11);
-   }
-   SECTION("same first but different second elements")
-   {
-      REQUIRE((id00 == id01) == false);
-      REQUIRE((id10 == id11) == false);
-   }
+static_assert(example00 == example00, "must be equal");
+static_assert(example01 == example01, "must be equal");
+static_assert(example10 == example10, "must be equal");
+static_assert(example11 == example11, "must be equal");
+
+static_assert((example00 == example01) == false, "should be false");
+static_assert((example10 == example11) == false, "should be false");
+
+TEST_CASE("strong pair", "[compilation-only]") {
+   SUCCEED("Nothing to test. Compiletests");
 }
