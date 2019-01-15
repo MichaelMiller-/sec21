@@ -25,5 +25,7 @@ namespace sec21
       constexpr bool operator == (strong_pair const& other) const noexcept {
          return first == other.first && second == other.second;
       }
-   };   
+   };
+
+   template <typename T, typename U> strong_pair(T, U) -> strong_pair<T, U>;
 }
