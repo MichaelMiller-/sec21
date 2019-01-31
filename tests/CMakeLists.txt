@@ -3,6 +3,9 @@ include_directories(${Boost_INCLUDE_DIRS})
 
 include_directories("${CMAKE_SOURCE_DIR}/deps/range-v3/include")
 
+# find_package(range-v3 CONFIG REQUIRED)
+# target_link_libraries(main PRIVATE meta range-v3)
+
 function(test test)
    string(REPLACE "/" "_" tmp ${test})
    add_executable(test.${tmp} ${CMAKE_CURRENT_LIST_DIR}/${test}.cpp)
@@ -14,6 +17,8 @@ function(test test)
       if (_cpp_latest_flag_supported)
          add_compile_options("/std:c++latest")
       endif()
+
+      add_compile_options("/permissive-")
    endif()
 
    if (CMAKE_COMPILER_IS_GNUCXX)
@@ -56,8 +61,8 @@ test("enumerate")
 test("fixed_string")
 test("in_range")
 test("make_iota_array")
+test("projection_func")
 test("strong_types")
 test("strong_pair")
 test("structural_analysis.support")
 test("units")
-
