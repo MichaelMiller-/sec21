@@ -1,5 +1,6 @@
+#define _SILENCE_CXX17_UNCAUGHT_EXCEPTION_DEPRECATION_WARNING
 #define CATCH_CONFIG_MAIN
-#include <catch.hpp>
+#include "catch.hpp"
 
 #include <vector>
 #include <algorithm>
@@ -9,7 +10,7 @@
 TEST_CASE("projection wrapper function", "[core]")
 {
    using namespace sec21;
-   
+
    struct foo
    {
       int a;
