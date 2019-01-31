@@ -4,29 +4,12 @@
 #include <vector>
 #include <algorithm>
 
-template <typename Function, typename Projection>
-class projection_func
-{
-   Function    m_function;
-   Projection  m_projection;
-
-public:
-   projection_func(Function function, Projection projection) noexcept
-      : m_function{ std::move(function) }
-      , m_projection{ std::move(projection) }
-   {}
-
-   projection_func() = delete;
-
-   template <typename... Args>
-   decltype(auto) operator() (Args &&... args) const 
-   {
-      return std::invoke(m_function, std::invoke(m_projection, std::forward<Args>(args))...);
-   }
-};
+#include <sec21/projection_func.h>
 
 TEST_CASE("projection wrapper function", "[core]")
 {
+   using namespace sec21;
+   
    struct foo
    {
       int a;
