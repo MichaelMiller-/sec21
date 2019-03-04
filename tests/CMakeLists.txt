@@ -1,10 +1,9 @@
 find_package(Boost)
 include_directories(${Boost_INCLUDE_DIRS})
 
-include_directories("${CMAKE_SOURCE_DIR}/deps/range-v3/include")
-
 # find_package(range-v3 CONFIG REQUIRED)
 # target_link_libraries(main PRIVATE meta range-v3)
+include_directories("${CMAKE_SOURCE_DIR}/deps/range-v3/include")
 
 function(test test)
    string(REPLACE "/" "_" tmp ${test})
@@ -61,6 +60,7 @@ test("enumerate")
 test("fixed_string")
 test("in_range")
 test("make_iota_array")
+test("math")
 test("projection_func")
 test("strong_types")
 test("strong_pair")
