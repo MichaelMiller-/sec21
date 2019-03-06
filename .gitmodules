@@ -1,6 +1,3 @@
-[submodule "deps/nonius"]
-	path = deps/nonius
-	url = https://github.com/libnonius/nonius.git
 [submodule "deps/range-v3"]
 	path = deps/range-v3
 	url = https://github.com/ericniebler/range-v3.git
