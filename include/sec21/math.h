@@ -1,14 +1,12 @@
 #pragma once
-#pragma once
 
-#include <vector>
 #include <numeric>
 #include <cmath>
 #include <iterator>
 
 namespace sec21
 {
-   //! \brief calculates the absolute norm of an array (Euklidische Norm)
+   //! calculates the absolute norm of an array (Euklidische Norm)
    template <typename Iterator>
    constexpr auto norm(Iterator first, Iterator last) noexcept
    {
