@@ -17,4 +17,12 @@ namespace sec21
               typename std::iterator_traits<Iterator>::value_type(), 
               [](auto const& a, auto const& b){ return a + (b * b); }));
    }
+
+   template <typename Arithmetic, typename... Args>
+   decltype(auto) fmin(Arithmetic v, Args ... args)
+   {
+      auto result{ v };
+      ((result = std::fmin(result, args)), ...);
+      return result;
+   }   
 }
