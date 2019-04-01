@@ -1,15 +1,3 @@
 [submodule "deps/range-v3"]
 	path = deps/range-v3
 	url = https://github.com/ericniebler/range-v3.git
-[submodule "deps/sqlpp11"]
-	path = deps/sqlpp11
-	url = https://github.com/rbock/sqlpp11
-[submodule "deps/sqlpp11-connector-sqlite3"]
-	path = deps/sqlpp11-connector-sqlite3
-	url = https://github.com/rbock/sqlpp11-connector-sqlite3
-[submodule "deps/sqlpp17"]
-	path = deps/sqlpp17
-	url = https://github.com/rbock/sqlpp17
-[submodule "deps/date"]
-	path = deps/date
-	url = https://github.com/HowardHinnant/date
