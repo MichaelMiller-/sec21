@@ -3,6 +3,18 @@
 
 #include <sec21/math.h>
 
+TEST_CASE("average", "[math]")
+{
+   SECTION("average over ints") 
+   {
+      REQUIRE(sec21::average(1, 2, 3, 4, 5, 6, 7, 8, 9) == 5);
+   }
+   SECTION("average over doubles") 
+   {
+      REQUIRE(sec21::average(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0) == Approx(5.0));
+   }
+}
+
 TEST_CASE("test absolute norm of an array", "[math]")
 {
    const std::vector input{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };

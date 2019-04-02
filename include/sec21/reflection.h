@@ -8,6 +8,7 @@
 namespace sec21::reflection
 {
    //! every class has to spezialize this function
+   //!
    //! example:
    //! template <>
    //! inline auto metainfo<person>() 
@@ -22,10 +23,11 @@ namespace sec21::reflection
    template <typename Class, typename T>
    class register_member
    {
-      using class_t = Class;
-      using member_t = T;
+   public:
       using member_ptr_t = T Class::*;
+      using value_t = T;
    
+   private:
       const std::string_view  m_name{};
       member_ptr_t            m_ptr{nullptr};
 

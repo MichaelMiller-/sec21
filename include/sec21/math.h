@@ -6,6 +6,12 @@
 
 namespace sec21
 {
+   template <typename... Args>
+   auto average(Args &&... args) noexcept
+   {
+      return (std::forward<Args>(args) + ...) / sizeof...(Args);
+   }
+
    //! calculates the absolute norm of an array (Euklidische Norm)
    template <typename Iterator>
    constexpr auto norm(Iterator first, Iterator last) noexcept
@@ -19,7 +25,7 @@ namespace sec21
    }
 
    template <typename Arithmetic, typename... Args>
-   decltype(auto) fmin(Arithmetic v, Args ... args)
+   decltype(auto) fmin(Arithmetic v, Args &&... args)
    {
       auto result{ v };
       ((result = std::fmin(result, args)), ...);
