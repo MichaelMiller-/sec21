@@ -1,7 +1,9 @@
 find_package(Boost)
 include_directories(${Boost_INCLUDE_DIRS})
 
-include_directories("${CMAKE_SOURCE_DIR}/deps/range-v3/include")
+## include_directories("${CMAKE_SOURCE_DIR}/deps/range-v3/include")
+## include_directories("${CMAKE_SOURCE_DIR}/deps")
+## find_file (NLOHMANN_JSON_INCLUDE NAMES "nlohmann/json.hpp")
 
 function(test test)
    string(REPLACE "/" "_" tmp ${test})
@@ -35,6 +37,9 @@ function(test test)
    else()
       add_compile_options(-Wall -Wextra) ## -Wpedantic)
    endif()
+
+   target_include_directories(test.${tmp} PRIVATE ${CMAKE_SOURCE_DIR}/deps/range-v3/include)
+   target_include_directories(test.${tmp} PRIVATE ${CMAKE_SOURCE_DIR}/deps)
 
    add_test(test.${tmp} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test.${tmp})
 
