@@ -5,7 +5,13 @@
 #include <sec21/serializer.h>
 #include <sec21/archive/json.h>
 
+#ifdef __GNUC__ == 7
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
+#else
 #include <filesystem>
+namespace fs = std::filesystem;
+#endif
 #include <string>
 
 struct properties
@@ -53,8 +59,6 @@ TEST_CASE("reflection and json-serializer test", "[reflection]")
 {
    using namespace sec21;
    using nlohmann::json;
-   
-   namespace fs = std::filesystem;
 
    const auto tmp_file = fs::temp_directory_path() / "tmp.json";
 
