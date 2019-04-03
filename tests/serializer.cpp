@@ -5,6 +5,9 @@
 #include <sec21/serializer.h>
 #include <sec21/archive/json.h>
 
+#include <filesystem>
+#include <string>
+
 struct properties
 {
    int z;
@@ -46,11 +49,36 @@ namespace sec21::reflection
    }
 }
 
-
 TEST_CASE("reflection and json-serializer test", "[reflection]")
 {
    using namespace sec21;
    using nlohmann::json;
+   
+   namespace fs = std::filesystem;
+
+   const auto tmp_file = fs::temp_directory_path() / "tmp.json";
+
+   SECTION("write and read some testdata into a temporary json file") 
+   {
+      properties p1{ 18, "test data" };
+      std::ofstream ofs{ tmp_file };
+
+      REQUIRE_NOTHROW([&]{
+         archive::json aro{ ofs };
+         aro << p1;
+      }());
+   }
+   SECTION("read the testdata from the temporary json file") 
+   {
+      // read the written data
+      properties read_data;
+      std::ifstream ifs{ tmp_file };
+      archive::json ari{ ifs };
+      ari >> read_data;      
+      
+      REQUIRE(read_data.z == 18);
+      REQUIRE(read_data.b == "test data");
+   }
 
    //! \todo parse from string
    //const auto j2 = R"(
@@ -58,26 +86,6 @@ TEST_CASE("reflection and json-serializer test", "[reflection]")
    //   "b": "any long string",
    //   "z": 43
    //})"_json;
-    
-   SECTION("write and read some testdata to a json file") 
-   {
-      properties p1{ 18, "test data" };
-      std::ofstream ofs{"tmp.json" };
-
-      REQUIRE_NOTHROW([&]{
-         archive::json o{ ofs };
-         o << p1;
-      }());
-
-      // read the written data
-      properties read_data;
-      std::ifstream ifs{ "tmp.json" };
-      archive::json o{ ifs };
-      o >> read_data;      
-      
-      REQUIRE(read_data.z == 18);
-      REQUIRE(read_data.b == "test data");
-   }
 
 #ifndef WIN32
    //! \todo find file under windows
