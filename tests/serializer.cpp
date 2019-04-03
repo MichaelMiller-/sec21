@@ -5,7 +5,7 @@
 #include <sec21/serializer.h>
 #include <sec21/archive/json.h>
 
-#ifdef __GNUC__ == 7
+#if __GNUC__ == 7
 #include <experimental/filesystem>
 namespace fs = std::experimental::filesystem;
 #else

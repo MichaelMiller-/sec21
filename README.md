@@ -12,3 +12,4 @@ Windows [![Build status](https://ci.appveyor.com/api/projects/status/4s6bg4yexj0
 |-------|---------:|------------------------|
 | Boost | 1.67.0 | https://www.boost.org |
 | NLohmann JSON (Single header) | 3.5.0 | https://github.com/nlohmann/json |
+| | | |
