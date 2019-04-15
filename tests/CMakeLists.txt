@@ -47,13 +47,13 @@ function(test test)
 endfunction()
 
 ## TODO behavior of runtime output directory variable under windows seams odd
-if (NOT MSVC)
+# if (NOT MSVC)
 ## TODO: do not always copy configure_files (what if project is not loaded -> project dependency)
-   configure_file(
-     "${PROJECT_SOURCE_DIR}/tests/data/test_properties1.json"
-     "${PROJECT_BINARY_DIR}/test_properties1.json"
-     COPYONLY)
-endif()
+#   configure_file(
+#     "${PROJECT_SOURCE_DIR}/tests/data/test_properties1.json"
+#     "${PROJECT_BINARY_DIR}/test_properties1.json"
+#     COPYONLY)
+#endif()
 
 ## unit tests via catch (alphabetical order)
 ##

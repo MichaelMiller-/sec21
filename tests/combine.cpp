@@ -4,8 +4,7 @@
 
 #include <sec21/combine.h>
 
-// namespace are ony for convenience
-
+// namespaces are only for convenience
 namespace test_case_all_of
 {
    constexpr auto lambda1 = [](auto e){ return e < 100; };
