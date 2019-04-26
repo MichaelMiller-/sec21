@@ -5,6 +5,7 @@
 
 namespace sec21
 {
+   //! \brief logical AND combination of functors
    template <typename... Fs>
    class all_of
    {
@@ -26,6 +27,7 @@ namespace sec21
       }
    };
 
+   //! \brief logical OR combination of functors
    template <typename... Fs>
    class any_of
    {

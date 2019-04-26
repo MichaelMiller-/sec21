@@ -16,7 +16,7 @@ struct foo
    }
 };
 
-TEST_CASE("double_values", "[core]")
+TEST_CASE("double each value in a sequence", "[core]")
 {
    using namespace sec21;
 

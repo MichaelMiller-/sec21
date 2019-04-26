@@ -27,9 +27,7 @@ endif()
 # cmake .. "-DCMAKE_TOOLCHAIN_FILE=C:/dev/vcpkg/scripts/buildsystems/vcpkg.cmake"
 
 ## enable benchmarks 
-add_subdirectory(benchmarks)
-
-# add_subdirectory(deps)
+# add_subdirectory(benchmarks)
 # add_subdirectory(portal)
 
 ## to disable testing set BUILD_TESTING to false

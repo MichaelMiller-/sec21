@@ -12,6 +12,7 @@ namespace sec21
       const auto s{ std::distance(first, last) };
       std::vector<T> result(s * N);
 
+      //!\todo write nice code
       for (auto i = 0; i < s; ++i)
       {
          //! \todo loop unrolling

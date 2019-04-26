@@ -1,5 +1,4 @@
-﻿#define _SILENCE_CXX17_UNCAUGHT_EXCEPTION_DEPRECATION_WARNING
-#define CATCH_CONFIG_MAIN
+﻿#define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
 #include <sec21/structural_analysis/support.h>

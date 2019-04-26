@@ -1,7 +1,7 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-#include "sec21/concat.h"
+#include <sec21/concat.h>
 
 struct foo
 {

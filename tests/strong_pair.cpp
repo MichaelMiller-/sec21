@@ -19,6 +19,7 @@ static_assert(example11 == example11, "must be equal");
 static_assert((example00 == example01) == false, "should be false");
 static_assert((example10 == example11) == false, "should be false");
 
-TEST_CASE("strong pair", "[compilation-only]") {
-   SUCCEED("Nothing to test. Compiletests");
+TEST_CASE("strong pair", "[compilation-only]") 
+{
+   SUCCEED("Nothing to test. Compiletime-Tests");
 }

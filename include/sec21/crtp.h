@@ -2,8 +2,8 @@
 
 namespace sec21
 {
-   //! \brief Curiously recurring template pattern (CRTP)
-   //! \brief https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern
+   //! Curiously recurring template pattern (CRTP)
+   //! https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern
    //
    template <typename T, template<typename> typename Crtp>
    struct crtp

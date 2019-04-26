@@ -6,6 +6,7 @@
 
 namespace sec21::structural_analysis
 {
+   //! \todo simple approch
    enum class support_kind : std::uint8_t
    {
       Free = 0,

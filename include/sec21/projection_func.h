@@ -5,6 +5,7 @@
 
 namespace sec21
 {
+   //! \todo will be replaced with std::ranges:: and std::identity{}
    template <typename Function, typename Projection>
    class projection_func
    {
@@ -14,7 +15,7 @@ namespace sec21
    public:
       projection_func() = delete;
 
-      projection_func(Function function, Projection projection) noexcept
+      explicit projection_func(Function function, Projection projection) noexcept
          : m_function{ std::move(function) }
          , m_projection{ std::move(projection) }
       {}
