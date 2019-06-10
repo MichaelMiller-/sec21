@@ -38,15 +38,15 @@ before_script:
 - uname -a
 script:
 - mkdir -p _build && cd _build
-- cmake .. -DENABLE_COVERAGE:BOOL=TRUE
-- cmake --build . -- -j4
+  ## codecov.io only supprts c++11 -> disable coverage
+- cmake .. -DENABLE_COVERAGE:BOOL=FALSE
+- cmake --build . -- -j4 VERBOSE=1
 - ctest -j2
+- make gcov
+
 after_script:
 
-
 after_success:
-- bash <(curl -s https://codecov.io/bash) -x /usr/bin/gcov
-- cpack -G ZIP
 
 # before_deploy:
 #- git tag "$(date +'%Y%m%d%H%M%S')-$(git log --format=%h -1)"
