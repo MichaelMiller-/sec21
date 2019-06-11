@@ -57,7 +57,7 @@ function(test test)
 
       add_compile_options(-Wall -Wextra -Wpedantic)
 
-      target_link_libraries(test.${tmp} "-lstdc++fs")
+      target_link_libraries(test.${tmp} PRIVATE "-lstdc++fs")
 
 #      if (ENABLE_COVERAGE)
 #         target_link_libraries(test.${tmp} "--coverage")
