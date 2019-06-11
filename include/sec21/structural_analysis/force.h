@@ -10,9 +10,9 @@ namespace sec21::structural_analysis
 {
    template <std::size_t Dimension, typename Unit = unit::kilonewton<double>>
 //! \todo concept
-// #ifdef __cpp_concepts
-//    requires Force<Unit>
-// #endif
+#ifdef __cpp_concepts
+   requires Force<Unit>
+#endif
    class force
    {
    public:
@@ -105,10 +105,6 @@ namespace sec21::structural_analysis
    [[nodiscard]] auto superposition(Iterator first, Iterator last) noexcept
    {
       auto result = detail::null_force<typename std::iterator_traits<Iterator>::value_type>();
-      //! \todo 2019-04-26 basically the same as std::accumulate, but the code below didn't work 
-      // return std::accumulate(first, last, std::decay_t<std::iterator_traits<Iterator>::value_type>{});
-      for (; first != last; ++first)
-         result = result + *first;
-      return result;
+      return std::accumulate(first, last, result);
    }
 }

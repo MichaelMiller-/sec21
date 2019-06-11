@@ -304,24 +304,29 @@ namespace sec21::unit
    {
       constexpr auto g = acceleration_t<double, std::ratio<1>>{ 9.80665 };
    }
-
+}
+  
 #ifdef __cpp_concepts
-   inline namespace concepts
+namespace sec21 
+{
+   namespace detail 
    {
       template <typename T> using value_t = typename T::value_t;
       template <typename T> using dimension_t = typename T::dimension_t;
       template <typename T> using scale_t = typename T::scale_t;
-
-      template <typename T>
-      concept bool Unit = requires(T t) { 
-         typename value_t<T>;
-         typename dimension_t<T>;
-         typename scale_t<T>;
-      };
-
-      template <typename T>
-      concept bool Length = Unit<T> && std::is_same_v<dimension_t<T>, dimension::length>;
    }
-#endif
 
+   template <typename T>
+   concept bool Unit = requires(T t) { 
+      typename detail::value_t<T>;
+      typename detail::dimension_t<T>;
+      typename detail::scale_t<T>;
+   };
+
+   template <typename T>
+   concept bool Length = Unit<T> && std::is_same_v<detail::dimension_t<T>, unit::dimension::length>;
+
+   template <typename T>
+   concept bool Force = Unit<T> && std::is_same_v<detail::dimension_t<T>, unit::dimension::force>;
 }
+#endif
