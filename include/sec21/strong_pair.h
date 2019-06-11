@@ -4,9 +4,7 @@
 
 namespace sec21
 {
-   //! \todo possible to use strong_type
-   //! \todo policies?!?
-   //! \todo sortable
+   //! \todo implement policies (like strong_type)
    template <typename First, typename Second>
    class strong_pair
    {

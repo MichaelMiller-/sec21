@@ -9,6 +9,7 @@ namespace sec21
    struct crtp
    {
       T& self() noexcept { return static_cast<T&>(*this); }
+
       const T& self() const noexcept { return static_cast<const T&>(*this);  }
    };
 }

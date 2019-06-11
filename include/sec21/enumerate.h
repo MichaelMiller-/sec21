@@ -9,24 +9,25 @@ namespace sec21
       typename T,
       typename Iterator = decltype(std::begin(std::declval<T>())),
       typename = decltype(std::end(std::declval<T>()))>
-   constexpr auto enumerate(T && iterable)
+   constexpr auto enumerate(T && iterable) noexcept
    {
       struct iterator
       {
          size_t i{0};
          Iterator iter;
 
-         bool operator != (iterator const& other) const { return iter != other.iter; }
+         bool operator != (iterator const& other) const noexcept { return iter != other.iter; }
 
-         void operator ++ () { ++i; ++iter; }
-         auto operator * () const { return std::tie(i, *iter); }
+         void operator ++ () noexcept { ++i; ++iter; }
+         auto operator * () const noexcept { return std::tie(i, *iter); }
       };
+
       struct iterable_wrapper
       {
          T iterable;
 
-         auto begin() { return iterator{ 0, std::begin(iterable) }; }
-         auto end() { return iterator{ 0, std::end(iterable) }; }
+         auto begin() noexcept { return iterator{ 0, std::begin(iterable) }; }
+         auto end() noexcept { return iterator{ 0, std::end(iterable) }; }
       };
 
       return iterable_wrapper{ std::forward<T>(iterable) };

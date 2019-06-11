@@ -13,7 +13,7 @@ namespace sec21::structural_analysis
 #endif
    class force
    {
-      static_assert(Dimension == 2 || Dimension == 3, "only works in 2D and 3D");
+      static_assert(Dimension == 2 || Dimension == 3, "Only works in 2D and 3D");
 
       std::array<Unit, Dimension> value;
 
@@ -23,6 +23,15 @@ namespace sec21::structural_analysis
          : value{ std::forward<Args>(args)... } 
       {
          static_assert(sizeof...(args) < Dimension + 1, "too many arguments for this class");
+      }
+
+      constexpr auto begin() const noexcept
+      {
+         return std::begin(value); 
+      }
+      constexpr auto end() const noexcept 
+      { 
+         return std::end(value); 
       }
 
       [[nodiscard]] friend constexpr auto operator + (force<Dimension> const& lhs, force<Dimension> const& rhs) noexcept -> force<Dimension>
