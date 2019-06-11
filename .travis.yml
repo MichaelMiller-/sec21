@@ -42,7 +42,7 @@ script:
 - cmake .. -DENABLE_COVERAGE:BOOL=FALSE
 - cmake --build . -- -j4 VERBOSE=1
 - ctest -j2
-- make gcov
+## - make gcov
 
 after_script:
 
