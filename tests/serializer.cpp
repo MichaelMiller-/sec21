@@ -12,12 +12,13 @@ namespace fs = std::experimental::filesystem;
 #include <filesystem>
 namespace fs = std::filesystem;
 #endif
+
 #include <string>
 
 struct properties
 {
-   int z;
-   std::string b;
+   int i;
+   std::string s;
 };
 
 template <typename T>
@@ -38,8 +39,8 @@ namespace sec21::reflection
    inline auto metainfo<properties>()
    {
       return std::tuple{ 
-         register_member{ "z", &properties::z },
-         register_member{ "b", &properties::b } 
+         register_member{ "i", &properties::i },
+         register_member{ "s", &properties::s } 
       };
    }
 
@@ -55,21 +56,66 @@ namespace sec21::reflection
    }
 }
 
-TEST_CASE("reflection and json-serializer test", "[reflection]")
+TEST_CASE("simple reflection and json-serializer test", "[reflection]")
 {
-   using namespace sec21;
-   using nlohmann::json;
+   constexpr std::string_view temporary_test_file{ "tmp.json" };
 
-   SECTION("write and read some testdata into a temporary json file") 
+   using namespace sec21;
+
+   SECTION("write some data into a temporary json file") 
    {
-      properties p1{ 18, "test data" };
-      std::ofstream ofs{ "tmp.json" };
+      properties p{ 42, "test data" };
+      std::ofstream ofs{ temporary_test_file };
 
       REQUIRE_NOTHROW([&]{
-         archive::json aro{ ofs };
-         aro << p1;
+         archive::json ar{ ofs };
+         ar << p;
       }());
    }
+   SECTION("read testdata from temporary json file") 
+   {
+      std::ifstream ifs{ temporary_test_file };
+      archive::json ar{ ifs };
+
+      properties p;
+      ar >> p;
+
+      REQUIRE(p.i == 42);
+      REQUIRE(p.s == "test data");
+   }
+}
+
+#if 0
+TEST_CASE("nested reflection and json-serializer test", "[reflection]")
+{
+   constexpr std::string_view temporary_test_file{ "tmp1.json" };
+
+   using namespace sec21;
+
+   SECTION("write some data into a temporary json file") 
+   {
+      person_t p{ "Ned Flanders", 42, "Mainstreet 123", { 987, "additional test string" } };
+      std::ofstream ofs{ temporary_test_file };
+
+      //! \todo output is wrong
+      REQUIRE_NOTHROW([&]{
+         archive::json ar{ ofs };
+         ar << p;
+      }());
+   }
+   //SECTION("read testdata from temporary json file") 
+   //{
+   //   std::ifstream ifs{ temporary_test_file };
+   //   archive::json ar{ ifs };
+
+   //   person_t in;
+   //   ar >> in;
+
+   //   REQUIRE(in.i == 42);
+   //   REQUIRE(in.s == "test data");
+   //}
+}
+#endif
 
 //! \todo 2019-04-03: there is a problem with finding the datafiles -> buildsystem
 #if 0
@@ -105,4 +151,3 @@ TEST_CASE("reflection and json-serializer test", "[reflection]")
       REQUIRE(p2.b == "json serializer unit test data");
    }
 #endif
-}

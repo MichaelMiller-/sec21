@@ -1,10 +1,31 @@
-find_package(Boost)
+find_package(Boost REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
 
+## TODO
+## find_package(Catch2 REQUIRED)
+## target_link_libraries(tests Catch2::Catch2)
 
 function(test test)
    string(REPLACE "/" "_" tmp ${test})
    add_executable(test.${tmp} "${CMAKE_CURRENT_LIST_DIR}/${test}.cpp")
+
+   target_include_directories(test.${tmp} PRIVATE "${CMAKE_SOURCE_DIR}/deps/range-v3/include")
+   ## ned14/outcome.hpp -> use this until boost 1.70 is available
+   target_include_directories(test.${tmp} PRIVATE "${CMAKE_SOURCE_DIR}/deps/ned14")
+   ## nlohman/json.hpp
+   target_include_directories(test.${tmp} PRIVATE "${CMAKE_SOURCE_DIR}/deps")
+   ## viennacl
+   target_include_directories(test.${tmp} PRIVATE "${CMAKE_SOURCE_DIR}/deps/viennacl")
+
+   if (OPENMP_FOUND)
+      message("-- ViennaCL OpenMP Support is enabled") ## TODO: for "exe name"
+      target_compile_definitions(test.${tmp} PRIVATE VIENNACL_WITH_OPENMP)
+      target_compile_options(test.${tmp} PRIVATE "${OpenMP_CXX_FLAGS}")
+      target_link_libraries(test.${tmp} PRIVATE "${OpenMP_CXX_FLAGS}")
+   endif()
+
+   # VIENNACL_WITH_OPENCL
+   # VIENNACL_WITH_CUDA
 
    include(CheckCXXCompilerFlag)
 
@@ -16,6 +37,11 @@ function(test test)
 
       add_compile_options("/permissive-")
       add_compile_options(/W4) ## /WX)
+
+      ## TODO check this option
+      if (OPENMP_FOUND)
+         add_compile_options("/Zc:twoPhase-")
+      endif()
    endif()
 
    if (CMAKE_COMPILER_IS_GNUCXX)
@@ -29,13 +55,10 @@ function(test test)
          endif()
       endif()
 
-      add_compile_options(-Wall -Wextra) ## -Wpedantic)
+      add_compile_options(-Wall -Wextra -Wpedantic)
 
       target_link_libraries(test.${tmp} "-lstdc++fs")
    endif()
-
-   target_include_directories(test.${tmp} PRIVATE "${CMAKE_SOURCE_DIR}/deps/range-v3/include")
-   target_include_directories(test.${tmp} PRIVATE "${CMAKE_SOURCE_DIR}/deps")
 
    add_test(test.${tmp} "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test.${tmp}")
 
@@ -46,14 +69,7 @@ function(test test)
    endif()   
 endfunction()
 
-## TODO behavior of runtime output directory variable under windows seams odd
-# if (NOT MSVC)
-## TODO: do not always copy configure_files (what if project is not loaded -> project dependency)
-#   configure_file(
-#     "${PROJECT_SOURCE_DIR}/tests/data/test_properties1.json"
-#     "${PROJECT_BINARY_DIR}/test_properties1.json"
-#     COPYONLY)
-#endif()
+## configure_file(in out COPYONLY)
 
 ## unit tests via catch (alphabetical order)
 ##
@@ -64,12 +80,17 @@ test("dispatcher")
 test("double_values")
 test("enumerate")
 test("fixed_string")
+test("flat_vector")
 test("in_range")
 test("make_iota_array")
 test("math")
+test("perfect.forwarding")
 test("projection_func")
+test("property_tree")
 test("serializer")
 test("strong_types")
 test("strong_pair")
+test("structural_analysis.force")
 test("structural_analysis.support")
+test("traits")
 test("units")

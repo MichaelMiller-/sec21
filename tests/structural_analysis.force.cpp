@@ -3,6 +3,7 @@
 
 #include <sec21/structural_analysis/force.h>
 
+
 TEST_CASE("2D force", "[force]")
 {
    using namespace sec21::structural_analysis;
