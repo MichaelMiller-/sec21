@@ -58,15 +58,13 @@ function(test test)
       add_compile_options(-Wall -Wextra -Wpedantic)
 
       target_link_libraries(test.${tmp} "-lstdc++fs")
+
+#      if (ENABLE_COVERAGE)
+#         target_link_libraries(test.${tmp} "--coverage")
+#      endif()   
    endif()
 
    add_test(test.${tmp} "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test.${tmp}")
-
-   if (ENABLE_COVERAGE)
-      if (NOT MSVC)
-         target_link_libraries(test.${tmp} "--coverage")
-      endif()
-   endif()   
 endfunction()
 
 ## configure_file(in out COPYONLY)
