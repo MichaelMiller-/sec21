@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.1)
+## TODO: OpenMP Support is improved if cmake version is greater then 3.9
 project(sec21 CXX)
 
 ## set(CMAKE_BUILD_TYPE "Release")
@@ -6,6 +7,15 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_CXX_STANDARD 17)
 
 include_directories("include")
+
+find_package(OpenMP)
+if (OPENMP_FOUND)
+   message("-- OpenMP Support is enabled")
+   ## TODO
+   # set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+   # set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+   # set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+endif()
 
 if (CMAKE_COMPILER_IS_GNUCXX)
    option(ENABLE_COVERAGE "Enable coverage reporting for gcc/clang" FALSE)
@@ -56,5 +66,12 @@ endif()
 include(CTest)
 enable_testing()
 add_subdirectory(tests)
+## -- or
+## include(Catch)
+## catch_discover_tests(foo)
+## -- or
+## include(ParseAndAddCatchTests)
+## ParseAndAddCatchTests(foo)
+## -- or
 
 ## TODO: enable dashboard scripting
