@@ -58,7 +58,8 @@ namespace sec21::reflection
 
 TEST_CASE("simple reflection and json-serializer test", "[reflection]")
 {
-   constexpr std::string_view temporary_test_file{ "tmp.json" };
+   using namespace std::literals::string_literals;
+   const auto temporary_test_file{ "tmp.json"s };
 
    using namespace sec21;
 
