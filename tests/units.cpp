@@ -67,7 +67,7 @@ static_assert((1_m * 1_m * 1_m) == unit::cubic_meter<int>(1), "must be equal");
 
 static_assert((1_m / 1_m) == unit::id_t<int>(1), "must be equal");
 
-static_assert(15_kg * unit::constants::g == unit::newton<decltype(F)::value_t>(147.099750), "must be equal");
+static_assert(15.0_kg * unit::constants::g == unit::newton<double>(147.099750), "must be equal");
 
 #endif
 
