@@ -1,4 +1,8 @@
 #pragma once
+	
+#ifdef pascal
+   #undef pascal
+#endif
 
 #include <ratio>
 #include <numeric>
@@ -6,8 +10,11 @@
 
 #include <boost/mpl/vector_c.hpp>
 #include <boost/mpl/transform.hpp>
-#include <boost/mpl/plus.hpp>
-#include <boost/mpl/minus.hpp>
+//#include <boost/mpl/plus.hpp>
+//#include <boost/mpl/minus.hpp>
+
+#include <sec21/ignore_warning/push.h>
+#include <sec21/ignore_warning/argument_conversion.h>
 
 namespace sec21::unit
 {
@@ -42,6 +49,8 @@ namespace sec21::unit
 
       using force          = dimension_t<1, 1, -2, 0, 0>;
       using torque         = dimension_t<2, 1, -2, 0, 0>;
+
+      using pressure       = dimension_t<-1, 1, -2, 0, 0>;
       // clang-format on
    }
 
@@ -90,14 +99,15 @@ namespace sec21::unit
    {
       T m_value;
 
+      static_assert(std::is_arithmetic_v<T>, "T must be an arithmetic type");
+
    public:
       using value_t = T;
       using dimension_t = Dimension;
       using scale_t = Scale;
 
-      //! \todo check noexcept
       // explicit
-      constexpr quantity(T && t) noexcept // (noexcept(T{ std::move(t) }))
+      constexpr quantity(T && t) noexcept(noexcept(T{ std::move(t) }))
          : m_value{ std::move(t) }
       {}
 
@@ -107,7 +117,7 @@ namespace sec21::unit
          : m_value{ detail::scale_helper<S, Scale>::apply(static_cast<T>(other.get())) }
       {}
 
-      constexpr const T& get() const noexcept { return m_value; }
+      constexpr auto get() const noexcept { return m_value; }
 
       template <typename U, typename S>
       friend constexpr bool operator == (quantity const& lhs, quantity<U, Dimension, S> const& rhs) noexcept {
@@ -190,6 +200,7 @@ namespace sec21::unit
    template <typename T, typename Scale> using force_t = quantity<T, dimension::force, Scale>;
    template <typename T, typename Scale> using torque_t = quantity<T, dimension::torque, Scale>;
 
+   template <typename T, typename Scale> using pressure_t = quantity<T, dimension::pressure, Scale>;
    //
    // scaled and derived units
    //
@@ -244,7 +255,14 @@ namespace sec21::unit
    template <typename T> using newton_meter = torque_t<T, std::ratio<1>>;  // Base-Unit
    template <typename T> using kilonewton_meter = torque_t<T, std::kilo>;
 
+   // pressure
+   template <typename T> using pascal = pressure_t<T, std::ratio<1>>;      // Base-Unit [N m^-2] [kg m^-1 s^-2]
+   template <typename T> using kilopascal = pressure_t<T, std::kilo>;      // 1 kN/m^2 == 1kPa
+   template <typename T> using megapascal = pressure_t<T, std::mega>;      // 1 N/mm^2 == 1MPa
+   template <typename T> using gigapascal = pressure_t<T, std::giga>;
 
+   //template <typename T> using youngs_modulus = pressure_t<T, std::ratio<1>>;      // Base-Unit [kg m^-1 s^-2]
+   
    inline namespace literals
    {
       // length
@@ -285,24 +303,53 @@ namespace sec21::unit
       constexpr auto operator "" _lb(unsigned long long v) noexcept   -> pound<long long> { return std::move(v); }
       constexpr auto operator "" _lb(long double v) noexcept          -> pound<long double> { return std::move(v); }
 
-      // temperature
+      // time
       //
-      constexpr auto operator "" _K(long double v) noexcept  -> kelvin<long double> { return std::move(v); }
+      constexpr auto operator "" _s(unsigned long long v) noexcept   -> second<long long> { return std::move(v); }
+      constexpr auto operator "" _s(long double v) noexcept          -> second<long double> { return std::move(v); }
 
-      //
-      constexpr auto operator "" _N(long double v) noexcept  -> newton<long double> { return std::move(v); }
-      constexpr auto operator "" _kN(long double v) noexcept -> kilonewton<long double> { return std::move(v); }
-      constexpr auto operator "" _MN(long double v) noexcept -> meganewton<long double> { return std::move(v); }
+      constexpr auto operator "" _min(unsigned long long v) noexcept -> minute<long long> { return std::move(v); }
+      constexpr auto operator "" _min(long double v) noexcept        -> minute<long double> { return std::move(v); }
 
+      constexpr auto operator "" _h(unsigned long long v) noexcept   -> hour<long long> { return std::move(v); }
+      constexpr auto operator "" _h(long double v) noexcept          -> hour<long double> { return std::move(v); }
+
+      // area
       //
-      constexpr auto operator "" _Nm(long double v) noexcept  -> newton_meter<long double> { return std::move(v); }
-      constexpr auto operator "" _kNm(long double v) noexcept -> kilonewton_meter<long double> { return std::move(v); }
+      //constexpr auto operator "" _m^2(unsigned long long v) noexcept   -> square_meter<long long> { return std::move(v); }
+      //constexpr auto operator "" _m^2(long double v) noexcept          -> square_meter<double> { return std::move(v); }
+
+      // force
+      //
+      constexpr auto operator "" _N(long double v) noexcept  -> newton<double> { return std::move(v); }
+      constexpr auto operator "" _kN(long double v) noexcept -> kilonewton<double> { return std::move(v); }
+      constexpr auto operator "" _MN(long double v) noexcept -> meganewton<double> { return std::move(v); }
+
+      // torque
+      //
+      constexpr auto operator "" _Nm(long double v) noexcept  -> newton_meter<double> { return std::move(v); }
+      constexpr auto operator "" _kNm(long double v) noexcept -> kilonewton_meter<double> { return std::move(v); }
+
+      // pressure
+      //
+      constexpr auto operator "" _Pa(long double v) noexcept  -> pascal<double> { return std::move(v); }
+      constexpr auto operator "" _kPa(long double v) noexcept -> kilopascal<double> { return std::move(v); }
+      constexpr auto operator "" _MPa(long double v) noexcept -> megapascal<double> { return std::move(v); }
+      constexpr auto operator "" _GPa(long double v) noexcept -> gigapascal<double> { return std::move(v); }
    }
    // clang-format on
 
    inline namespace constants
    {
       constexpr auto g = acceleration_t<double, std::ratio<1>>{ 9.80665 };
+
+      //! \todo 
+      // Young's modulus E = [ kg m-1 s-2 ]
+      //
+      constexpr auto baustahl = 210.0_GPa;
+      constexpr auto titan = 110.0_GPa;
+      constexpr auto gold = 78.0_GPa;
+      constexpr auto blei = 19.0_GPa;
    }
 }
   
@@ -360,3 +407,5 @@ namespace sec21
    concept bool Torque = Unit<T> && std::is_same_v<detail::dimension_t<T>, unit::dimension::torque>;   
 }
 #endif
+
+#include <sec21/ignore_warning/pop.h>
