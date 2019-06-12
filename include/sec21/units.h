@@ -13,9 +13,6 @@
 //#include <boost/mpl/plus.hpp>
 //#include <boost/mpl/minus.hpp>
 
-#include <sec21/ignore_warning/push.h>
-#include <sec21/ignore_warning/argument_conversion.h>
-
 namespace sec21::unit
 {
    namespace dimension
@@ -106,10 +103,21 @@ namespace sec21::unit
       using dimension_t = Dimension;
       using scale_t = Scale;
 
-      // explicit
-      constexpr quantity(T && t) noexcept(noexcept(T{ std::move(t) }))
-         : m_value{ std::move(t) }
+      template <typename U
+#ifndef __cpp_concepts
+      , typename = std::enable_if_t<std::is_constructible_v<value_t, U>>>
+#else   
+      > requires std::is_constructible_v<value_t, U>
+#endif
+      constexpr quantity(U && u) noexcept
+         : m_value{ std::forward<U>(u) }
       {}
+
+      // explicit
+      //! \todo perfect forwarding instead of move?
+      //constexpr quantity(T && t) noexcept(noexcept(T{ std::move(t) }))
+      //   : m_value{ std::move(t) }
+      //{}
 
       template <typename U, typename S>
       //! \todo check noexcept
@@ -267,75 +275,73 @@ namespace sec21::unit
    {
       // length
       //
-      constexpr auto operator "" _mm(unsigned long long v) noexcept  -> millimeter<long long> { return std::move(v); }
-      //! \todo solve long double to double conversion 
-      constexpr auto operator "" _mm(long double v) noexcept         -> millimeter<long double> { return std::move(v); }
+      constexpr auto operator "" _mm(unsigned long long v) noexcept  -> millimeter<unsigned long long> { return v; }
+      constexpr auto operator "" _mm(long double v) noexcept         -> millimeter<double> { return static_cast<double>(v); }
 
-      constexpr auto operator "" _cm(unsigned long long v) noexcept  -> centimeter<long long> { return std::move(v); }
-      constexpr auto operator "" _cm(long double v) noexcept         -> centimeter<long double> { return std::move(v); }
+      constexpr auto operator "" _cm(unsigned long long v) noexcept  -> centimeter<unsigned long long> { return v; }
+      constexpr auto operator "" _cm(long double v) noexcept         -> centimeter<double> { return static_cast<double>(v); }
 
-      constexpr auto operator "" _m(unsigned long long v) noexcept   -> meter<long long> { return std::move(v); }
-      constexpr auto operator "" _m(long double v) noexcept          -> meter<long double> { return std::move(v); }
+      constexpr auto operator "" _m(unsigned long long v) noexcept   -> meter<unsigned long long> { return v; }
+      constexpr auto operator "" _m(long double v) noexcept          -> meter<double> { return static_cast<double>(v); }
 
-      constexpr auto operator "" _km(unsigned long long v) noexcept  -> kilometer<long long> { return std::move(v); }
-      constexpr auto operator "" _km(long double v) noexcept         -> kilometer<long double> { return std::move(v); }
+      constexpr auto operator "" _km(unsigned long long v) noexcept  -> kilometer<unsigned long long> { return v; }
+      constexpr auto operator "" _km(long double v) noexcept         -> kilometer<double> { return static_cast<double>(v); }
 
-      constexpr auto operator "" _in(unsigned long long v) noexcept  -> inch<long long> { return std::move(v); }
-      constexpr auto operator "" _in(long double v) noexcept         -> inch<long double> { return std::move(v); }
+      constexpr auto operator "" _in(unsigned long long v) noexcept  -> inch<unsigned long long> { return v; }
+      constexpr auto operator "" _in(long double v) noexcept         -> inch<double> { return static_cast<double>(v); }
 
-      constexpr auto operator "" _ft(unsigned long long v) noexcept  -> foot<long long> { return std::move(v); }
-      constexpr auto operator "" _ft(long double v) noexcept         -> foot<long double> { return std::move(v); }
+      constexpr auto operator "" _ft(unsigned long long v) noexcept  -> foot<unsigned long long> { return v; }
+      constexpr auto operator "" _ft(long double v) noexcept         -> foot<double> { return static_cast<double>(v); }
 
-      constexpr auto operator "" _yd(unsigned long long v) noexcept  -> yard<long long> { return std::move(v); }
-      constexpr auto operator "" _yd(long double v) noexcept         -> yard<long double> { return std::move(v); }
+      constexpr auto operator "" _yd(unsigned long long v) noexcept  -> yard<unsigned long long> { return v; }
+      constexpr auto operator "" _yd(long double v) noexcept         -> yard<double> { return static_cast<double>(v); }
 
       // mass
       //
-      constexpr auto operator "" _g(unsigned long long v) noexcept   -> gram<long long> { return std::move(v); }
-      constexpr auto operator "" _g(long double v) noexcept          -> gram<long double> { return std::move(v); }
+      constexpr auto operator "" _g(unsigned long long v) noexcept   -> gram<unsigned long long> { return v; }
+      constexpr auto operator "" _g(long double v) noexcept          -> gram<double> { return static_cast<double>(v); }
 
-      constexpr auto operator "" _kg(unsigned long long v) noexcept  -> kilogram<long long> { return std::move(v); }
-      constexpr auto operator "" _kg(long double v) noexcept         -> kilogram<long double> { return std::move(v); }
+      constexpr auto operator "" _kg(unsigned long long v) noexcept  -> kilogram<unsigned long long> { return v; }
+      constexpr auto operator "" _kg(long double v) noexcept         -> kilogram<double> { return static_cast<double>(v); }
 
-      constexpr auto operator "" _t(unsigned long long v) noexcept   -> ton<long long> { return std::move(v); }
-      constexpr auto operator "" _t(long double v) noexcept          -> ton<long double> { return std::move(v); }
+      constexpr auto operator "" _t(unsigned long long v) noexcept   -> ton<unsigned long long> { return v; }
+      constexpr auto operator "" _t(long double v) noexcept          -> ton<double> { return static_cast<double>(v); }
 
-      constexpr auto operator "" _lb(unsigned long long v) noexcept   -> pound<long long> { return std::move(v); }
-      constexpr auto operator "" _lb(long double v) noexcept          -> pound<long double> { return std::move(v); }
+      constexpr auto operator "" _lb(unsigned long long v) noexcept   -> pound<unsigned long long> { return v; }
+      constexpr auto operator "" _lb(long double v) noexcept          -> pound<double> { return static_cast<double>(v); }
 
       // time
       //
-      constexpr auto operator "" _s(unsigned long long v) noexcept   -> second<long long> { return std::move(v); }
-      constexpr auto operator "" _s(long double v) noexcept          -> second<long double> { return std::move(v); }
+      constexpr auto operator "" _s(unsigned long long v) noexcept   -> second<unsigned long long> { return v; }
+      constexpr auto operator "" _s(long double v) noexcept          -> second<double> { return static_cast<double>(v); }
 
-      constexpr auto operator "" _min(unsigned long long v) noexcept -> minute<long long> { return std::move(v); }
-      constexpr auto operator "" _min(long double v) noexcept        -> minute<long double> { return std::move(v); }
+      constexpr auto operator "" _min(unsigned long long v) noexcept -> minute<unsigned long long> { return v; }
+      constexpr auto operator "" _min(long double v) noexcept        -> minute<double> { return static_cast<double>(v); }
 
-      constexpr auto operator "" _h(unsigned long long v) noexcept   -> hour<long long> { return std::move(v); }
-      constexpr auto operator "" _h(long double v) noexcept          -> hour<long double> { return std::move(v); }
+      constexpr auto operator "" _h(unsigned long long v) noexcept   -> hour<unsigned long long> { return v; }
+      constexpr auto operator "" _h(long double v) noexcept          -> hour<double> { return static_cast<double>(v); }
 
       // area
       //
-      //constexpr auto operator "" _m^2(unsigned long long v) noexcept   -> square_meter<long long> { return std::move(v); }
-      //constexpr auto operator "" _m^2(long double v) noexcept          -> square_meter<double> { return std::move(v); }
+      //! \todo 
 
       // force
       //
-      constexpr auto operator "" _N(long double v) noexcept  -> newton<double> { return std::move(v); }
-      constexpr auto operator "" _kN(long double v) noexcept -> kilonewton<double> { return std::move(v); }
-      constexpr auto operator "" _MN(long double v) noexcept -> meganewton<double> { return std::move(v); }
+      constexpr auto operator "" _N(long double v) noexcept  -> newton<double> { return static_cast<double>(v); }
+      constexpr auto operator "" _kN(long double v) noexcept -> kilonewton<double> { return static_cast<double>(v); }
+      constexpr auto operator "" _MN(long double v) noexcept -> meganewton<double> { return static_cast<double>(v); }
 
       // torque
       //
-      constexpr auto operator "" _Nm(long double v) noexcept  -> newton_meter<double> { return std::move(v); }
-      constexpr auto operator "" _kNm(long double v) noexcept -> kilonewton_meter<double> { return std::move(v); }
+      constexpr auto operator "" _Nm(long double v) noexcept  -> newton_meter<double> { return static_cast<double>(v); }
+      constexpr auto operator "" _kNm(long double v) noexcept -> kilonewton_meter<double> { return static_cast<double>(v); }
 
       // pressure
       //
-      constexpr auto operator "" _Pa(long double v) noexcept  -> pascal<double> { return std::move(v); }
-      constexpr auto operator "" _kPa(long double v) noexcept -> kilopascal<double> { return std::move(v); }
-      constexpr auto operator "" _MPa(long double v) noexcept -> megapascal<double> { return std::move(v); }
-      constexpr auto operator "" _GPa(long double v) noexcept -> gigapascal<double> { return std::move(v); }
+      constexpr auto operator "" _Pa(long double v) noexcept  -> pascal<double> { return static_cast<double>(v); }
+      constexpr auto operator "" _kPa(long double v) noexcept -> kilopascal<double> { return static_cast<double>(v); }
+      constexpr auto operator "" _MPa(long double v) noexcept -> megapascal<double> { return static_cast<double>(v); }
+      constexpr auto operator "" _GPa(long double v) noexcept -> gigapascal<double> { return static_cast<double>(v); }
    }
    // clang-format on
 
@@ -407,5 +413,3 @@ namespace sec21
    concept bool Torque = Unit<T> && std::is_same_v<detail::dimension_t<T>, unit::dimension::torque>;   
 }
 #endif
-
-#include <sec21/ignore_warning/pop.h>
