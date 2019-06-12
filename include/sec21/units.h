@@ -327,6 +327,36 @@ namespace sec21
    concept bool Length = Unit<T> && std::is_same_v<detail::dimension_t<T>, unit::dimension::length>;
 
    template <typename T>
+   concept bool Mass = Unit<T> && std::is_same_v<detail::dimension_t<T>, unit::dimension::mass>;
+
+   template <typename T>
+   concept bool Time = Unit<T> && std::is_same_v<detail::dimension_t<T>, unit::dimension::time>;
+
+   template <typename T>
+   concept bool Charge = Unit<T> && std::is_same_v<detail::dimension_t<T>, unit::dimension::charge>;
+
+   template <typename T>
+   concept bool Temperature = Unit<T> && std::is_same_v<detail::dimension_t<T>, unit::dimension::temperature>;
+
+
+   template <typename T>
+   concept bool Area = Unit<T> && std::is_same_v<detail::dimension_t<T>, unit::dimension::area>;
+
+   template <typename T>
+   concept bool Volume = Unit<T> && std::is_same_v<detail::dimension_t<T>, unit::dimension::volume>;
+
+
+   template <typename T>
+   concept bool Velocity = Unit<T> && std::is_same_v<detail::dimension_t<T>, unit::dimension::velocity>;
+
+   template <typename T>
+   concept bool Acceleration = Unit<T> && std::is_same_v<detail::dimension_t<T>, unit::dimension::acceleration>;
+
+
+   template <typename T>
    concept bool Force = Unit<T> && std::is_same_v<detail::dimension_t<T>, unit::dimension::force>;
+
+   template <typename T>
+   concept bool Torque = Unit<T> && std::is_same_v<detail::dimension_t<T>, unit::dimension::torque>;   
 }
 #endif
