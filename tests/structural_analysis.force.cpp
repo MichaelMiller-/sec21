@@ -11,9 +11,12 @@ TEST_CASE("2D force", "[force]")
 
    using force_t = force<2>;
 
-   force_t f1{ { 3.0_kN, 1.0_kN } };
-   force_t f2{ { 0.0, 10.0 } };
-   force_t f3{ { 10.0_N, 4.0_MN } };
+   constexpr force_t f1{ { 3.0_kN, 1.0_kN } };
+   constexpr force_t f2{ { 0.0, 10.0 } };
+   constexpr force_t f3{ { 10.0_N, 4.0_MN } };
+
+   //! \todo 
+   //static_assert(f1 == f1, "must be equal");
 
    SECTION("equal test")
    {
@@ -53,9 +56,9 @@ TEST_CASE("3D force", "[force]")
 
    using force_t = force<3>;
 
-   force_t f1{ {3.0_kN, 1.0, 2.0_kN} };
-   force_t f2{ {0.0, 10.0, 0.0} };
-   force_t f3{ {10.0_N, 4.0_MN, 0.3_MN} };
+   constexpr force_t f1{ {3.0_kN, 1.0, 2.0_kN} };
+   constexpr force_t f2{ {0.0, 10.0, 0.0} };
+   constexpr force_t f3{ {10.0_N, 4.0_MN, 0.3_MN} };
 
    SECTION("equal test")
    {
