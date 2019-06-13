@@ -8,28 +8,18 @@
 #include <numeric>
 #include <type_traits>
 
-#include <boost/mpl/vector_c.hpp>
-#include <boost/mpl/transform.hpp>
-//#include <boost/mpl/plus.hpp>
-//#include <boost/mpl/minus.hpp>
+//! \todo check boost version
+#include <boost/mp11.hpp>
 
 namespace sec21::unit
 {
    namespace dimension
    {
       // International System of Units
-      //! \todo consider other dimensions
-      //! \todo not a good wrapper; maybe a another container or boost::hana
-      template <int Length, int Mass, int Time, int ElectricCurrent, int Temperature>
-      using dimension_t = boost::mpl::vector5<
-         boost::mpl::integral_c<decltype(Length), Length>,
-         boost::mpl::integral_c<decltype(Mass), Mass>,
-         boost::mpl::integral_c<decltype(Time), Time>,
-         boost::mpl::integral_c<decltype(ElectricCurrent), ElectricCurrent>,
-         boost::mpl::integral_c<decltype(Temperature), Temperature>
-      >;
-
       // clang-format off
+      template <int Length, int Mass, int Time, int ElectricCurrent, int Temperature>
+      using dimension_t = boost::mp11::mp_list_c<int, Length, Mass, Time, ElectricCurrent, Temperature>;
+
       using scalar         = dimension_t<0, 0, 0, 0, 0>;
 
       using length         = dimension_t<1, 0, 0, 0, 0>;
@@ -65,30 +55,14 @@ namespace sec21::unit
          }
       };
 
-      //! \todo replace with "using"
       template <typename R1, typename R2>
-      struct common_ratio
-      {
-         using type = typename std::ratio<std::gcd(R1::num, R2::num), std::lcm(R1::den, R2::den)>::type;
-      };
+      using common_ratio = std::ratio<std::gcd(R1::num, R2::num), std::lcm(R1::den, R2::den)>;
 
-      struct plus_f
-      {
-         template <typename T, typename U>
-         struct apply
-         {
-            using type = typename boost::mpl::plus<T, U>::type;
-         };
-      };
+      template <typename T, typename U>
+      using plus_f = boost::mp11::mp_int<T::value + U::value>;
 
-      struct minus_f
-      {
-         template <typename T, typename U>
-         struct apply
-         {
-            using type = typename boost::mpl::minus<T, U>::type;
-         };
-      };
+      template <typename T, typename U>
+      using minus_f = boost::mp11::mp_int<T::value - U::value>;
    }
 
    template <typename T, typename Dimension, typename Scale>
@@ -113,14 +87,7 @@ namespace sec21::unit
          : m_value{ std::forward<U>(u) }
       {}
 
-      // explicit
-      //! \todo perfect forwarding instead of move?
-      //constexpr quantity(T && t) noexcept(noexcept(T{ std::move(t) }))
-      //   : m_value{ std::move(t) }
-      //{}
-
       template <typename U, typename S>
-      //! \todo check noexcept
       constexpr quantity(quantity<U, Dimension, S> const& other) noexcept
          : m_value{ detail::scale_helper<S, Scale>::apply(static_cast<T>(other.get())) }
       {}
@@ -140,7 +107,7 @@ namespace sec21::unit
       template <typename U, typename S>
       friend constexpr auto operator + (quantity const& lhs, quantity<U, Dimension, S> const& rhs) noexcept
       {
-         using result_ratio_t = typename detail::common_ratio<Scale, S>::type;
+         using result_ratio_t = detail::common_ratio<Scale, S>;
          using result_t = quantity<decltype(lhs.get() + rhs.get()), Dimension, result_ratio_t>;
 
          return result_t{ result_t(lhs).get() + result_t(rhs).get() };
@@ -161,7 +128,7 @@ namespace sec21::unit
       template <typename U, typename S>
       friend constexpr auto operator - (quantity const& lhs, quantity<U, Dimension, S> const& rhs) noexcept
       {
-         using result_ratio_t = typename detail::common_ratio<Scale, S>::type;
+         using result_ratio_t = detail::common_ratio<Scale, S>;
          using result_t = quantity<decltype(lhs.get() - rhs.get()), Dimension, result_ratio_t>;
 
          return result_t{ result_t(lhs).get() - result_t(rhs).get() };
@@ -182,33 +149,52 @@ namespace sec21::unit
       template <typename U, typename D, typename S>
       friend constexpr auto operator * (quantity const& lhs, quantity<U, D, S> const& rhs) noexcept
       {
-         using result_ratio_t = typename std::ratio_multiply<Scale, S>::type;
-         using result_dim_t = typename boost::mpl::transform<Dimension, D, detail::plus_f>::type;
+         using result_ratio_t = std::ratio_multiply<Scale, S>;
+         using result_dim_t = boost::mp11::mp_transform<detail::plus_f, Dimension, D>;
          using result_t = quantity<decltype(lhs.get() * rhs.get()), result_dim_t, result_ratio_t>;
 
          return result_t{ lhs.get() * rhs.get() };
       }
+
+      template <typename U
+#ifndef __cpp_concepts
+      , typename = std::enable_if_t<std::is_convertible_v<U, value_t>>>
+#else   
+         //! \todo is_nothrow_convertible
+      > requires std::is_convertible_v<U, value_t>
+#endif
+      friend constexpr auto operator * (quantity const& lhs, U const& rhs) noexcept
+      {
+         return quantity{ lhs.get() * rhs };
+      }      
 
       template <typename U, typename D, typename S>
       friend constexpr auto operator / (quantity const& lhs, quantity<U, D, S> const& rhs) noexcept
       {
-         using result_ratio_t = typename std::ratio_multiply<Scale, S>::type;
-         using result_dim_t = typename boost::mpl::transform<Dimension, D, detail::minus_f>::type;
+         using result_ratio_t = std::ratio_multiply<Scale, S>;
+         using result_dim_t = boost::mp11::mp_transform<detail::minus_f, Dimension, D>;
          using result_t = quantity<decltype(lhs.get() * rhs.get()), result_dim_t, result_ratio_t>;
 
          return result_t{ lhs.get() * rhs.get() };
       }
+
+      template <typename U
+#ifndef __cpp_concepts
+      , typename = std::enable_if_t<std::is_convertible_v<U, value_t>>>
+#else   
+         //! \todo is_nothrow_convertible
+      > requires std::is_convertible_v<U, value_t>
+#endif
+      friend constexpr auto operator / (quantity const& lhs, U const& rhs) noexcept
+      {
+         return quantity{ lhs.get() / rhs };
+      }      
 
       constexpr const auto operator - () const noexcept {
          auto new_value = -get();
          return quantity(std::move(new_value));
       }
    };
-
-#ifdef __cpp_deduction_guides
-   //! \todo 
-   // template <typename T, typename Dimension, typename Scale> quantity(T) -> quantity<T, Dimension, Scale>;
-#endif
 
    // clang-format off
    //

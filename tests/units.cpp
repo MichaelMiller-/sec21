@@ -32,35 +32,28 @@ static_assert(1_km + 1_m == 1001_m, "must be equal");
 static_assert(5_in + 8_cm == 207_mm, "must be equal");
 static_assert(1_m + 4 == 5_m, "must be equal");    // with scalar
 
+//! \todo special for values from a quantity of time
+
 // substract
 static_assert(2_m - 1_m == 1_m, "must be equal");
 static_assert(20_m - 5 == 15_m, "must be equal");
 static_assert(1.0_kN - 5.0 == -4.0_kN, "must be equal");
 
 // multiply
-//static_assert(10_km / 2 == 5_km);
+static_assert(10_km / 2 == 5_km);
 // static_assert(1000 / 1_s == 1_kHz);
-// static_assert(10_km / 5_km == 2);
 
 // negation
 static_assert(-1.0_MN == -1.0_MN, "must be equal");
-
 
 // dimension conversions
 static_assert(1.0_Pa == (1.0_N / (1.0_m * 1.0_m)), "must be equal");
 
 //static_assert(1_km / 1_s == 1000_mps, "must be equal");
-//static_assert(2_kmph * 2_h == 4_km, "must be equal");
+// static_assert(2_kmph * 2_h == 4_km, "must be equal");
 //static_assert(4_km / 2_kmph == 2_h, "must be equal");
-//static_assert(1000 / 1_s == 1_kHz, "must be equal");
-//static_assert(10_km / 5_km == 2, "must be equal");
 
 
-#include <boost/version.hpp>
-
-#if BOOST_VERSION == 106700
-//! \todo fix: boost::mpl::transform didn't consider the order of the sequences in previos version
-//! \todo fix: check boost version or write a workaround 
 static_assert(1_m * 1_m == unit::square_meter<int>(1), "must be equal");
 static_assert(3_ft * 4_ft == unit::square_foot<int>{12}, "must be equal");
 
@@ -69,8 +62,6 @@ static_assert((1_m * 1_m * 1_m) == unit::cubic_meter<int>(1), "must be equal");
 static_assert((1_m / 1_m) == unit::id_t<int>(1), "must be equal");
 
 static_assert(15.0_kg * unit::constants::g == unit::newton<double>(147.099750), "must be equal");
-
-#endif
 
 // simple interface test
 
