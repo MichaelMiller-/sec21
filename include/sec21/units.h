@@ -146,6 +146,18 @@ namespace sec21::unit
          return result_t{ result_t(lhs).get() + result_t(rhs).get() };
       }
 
+      template <typename U
+#ifndef __cpp_concepts
+      , typename = std::enable_if_t<std::is_convertible_v<U, value_t>>>
+#else   
+         //! \todo is_nothrow_convertible
+      > requires std::is_convertible_v<U, value_t>
+#endif
+      friend constexpr auto operator + (quantity const& lhs, U const& rhs) noexcept
+      {
+         return quantity{ lhs.get() + rhs };
+      }
+
       template <typename U, typename S>
       friend constexpr auto operator - (quantity const& lhs, quantity<U, Dimension, S> const& rhs) noexcept
       {
@@ -153,6 +165,18 @@ namespace sec21::unit
          using result_t = quantity<decltype(lhs.get() - rhs.get()), Dimension, result_ratio_t>;
 
          return result_t{ result_t(lhs).get() - result_t(rhs).get() };
+      }
+
+      template <typename U
+#ifndef __cpp_concepts
+      , typename = std::enable_if_t<std::is_convertible_v<U, value_t>>>
+#else   
+         //! \todo is_nothrow_convertible
+      > requires std::is_convertible_v<U, value_t>
+#endif
+      friend constexpr auto operator - (quantity const& lhs, U const& rhs) noexcept
+      {
+         return quantity{ lhs.get() - rhs };
       }
 
       template <typename U, typename D, typename S>

@@ -17,9 +17,7 @@ static_assert(1_kg == 1000_g, "must be equal");
 static_assert(1_t == 1000_kg, "must be equal");
 static_assert(1_t == 1'000'000_g, "must be equal");
 static_assert(1.0_lb == 0.4535924_kg, "must be equal");
-
-//! \todo conversion error -> mismatch between int and double
-// static_assert(1_g == 0.001_kg, "must be equal");
+static_assert(1.0_g == 0.001_kg, "must be equal");
 
 static_assert(1.0_kN == 1000.0_N, "must be equal");
 static_assert(1.0_MN == 1000.0_kN, "must be equal");
@@ -28,13 +26,16 @@ static_assert(1.0_MN == 1'000'000.0_N, "must be equal");
 static_assert(1_h == 3'600_s, "must be equal");
 
 // simple numeric operations
-// add
+// addition
 static_assert(1_m + 1_m == 2_m, "must be equal");
 static_assert(1_km + 1_m == 1001_m, "must be equal");
 static_assert(5_in + 8_cm == 207_mm, "must be equal");
+static_assert(1_m + 4 == 5_m, "must be equal");    // with scalar
 
 // substract
 static_assert(2_m - 1_m == 1_m, "must be equal");
+static_assert(20_m - 5 == 15_m, "must be equal");
+static_assert(1.0_kN - 5.0 == -4.0_kN, "must be equal");
 
 // multiply
 //static_assert(10_km / 2 == 5_km);
