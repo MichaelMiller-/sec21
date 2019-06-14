@@ -1,4 +1,16 @@
 cmake_minimum_required(VERSION 3.1)
+
+## 
+## https://github.com/sutambe/cpptruths/
+## http://cpptruths.blogspot.com/2019/03/bootstrapping-vcpkg-based-cmake-project_31.html
+##
+## set(MY_PROJECT_DEPENDENCIES boost) 
+# This section of cmake is using AutoVcpkg to download, install, and configure vcpkg.
+## list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
+## include(AutoVcpkg)
+## vcpkg_install(${MY_PROJECT_DEPENDENCIES})
+message(STATUS "CMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}")
+
 ## TODO: OpenMP Support is improved if cmake version is greater then 3.9
 project(sec21 CXX)
 
