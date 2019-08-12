@@ -16,12 +16,25 @@ namespace sec21
          nlohmann::json j{};
 
          template <typename U>
-         explicit json(U && u) noexcept : stream{ u }
+         explicit json(U && u) noexcept : stream{ std::forward<U>(u) }
          {}
 
-         template <typename U>
+         template <typename U, std::enable_if_t<!reflection::is_registered_v<std::decay_t<U>>, int> = 0>
          void write(std::string_view name, U const& u) {
             j[name.data()] = u;
+         }
+
+         template <typename U, std::enable_if_t<reflection::is_registered_v<std::decay_t<U>>, int> = 0>
+         void write(std::string_view name, U const& u) 
+         {
+            j[name.data()] = nlohmann::json::object();
+            //! \todo serialize object into **j[name.data()]**
+
+            std::cout << "obj: " << name.data() << std::endl;
+            //serialize(j[name.data()], u);
+            //! \todo 
+            std::ignore = name;
+            std::ignore = u;
          }
 
          template <typename U>
