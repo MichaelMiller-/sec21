@@ -26,3 +26,8 @@ TEST_CASE("floating point min()", "[math]")
    REQUIRE(sec21::fmin(-1.5f, 1.0f, 3.0f) == -1.5f);
    REQUIRE(sec21::fmin(NAN, 1.0f, 3.0f) == 1.0f);
 }
+
+TEST_CASE("accumulate", "[math]")
+{
+   REQUIRE(sec21::accumulate(1, 2, 3, 4.5f, 3.145684, 2) == Approx(15.645684));
+}

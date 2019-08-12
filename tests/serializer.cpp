@@ -1,19 +1,18 @@
 #define CATCH_CONFIG_MAIN
+#define CATCH_CONFIG_ENABLE_BENCHMARKING
 #include "catch.hpp"
 
 #include <sec21/reflection.h>
 #include <sec21/serializer.h>
 #include <sec21/archive/json.h>
 
-#if __GNUC__ == 7
-#include <experimental/filesystem>
-namespace fs = std::experimental::filesystem;
-#else
 #include <filesystem>
-namespace fs = std::filesystem;
-#endif
-
 #include <string>
+
+using namespace sec21;
+using namespace std::literals::string_literals;
+
+namespace fs = std::filesystem;
 
 struct properties
 {
@@ -58,10 +57,7 @@ namespace sec21::reflection
 
 TEST_CASE("simple reflection and json-serializer test", "[reflection]")
 {
-   using namespace std::literals::string_literals;
    const auto temporary_test_file{ "tmp.json"s };
-
-   using namespace sec21;
 
    SECTION("write some data into a temporary json file") 
    {
@@ -85,6 +81,41 @@ TEST_CASE("simple reflection and json-serializer test", "[reflection]")
       REQUIRE(p.s == "test data");
    }
 }
+
+TEST_CASE("nested reflection and json-serializer test", "[reflection]")
+{
+   const auto temporary_test_file{ "tmp2.json"s };
+
+   SECTION("write some data into a temporary json file")
+   {
+      person_t p{ "hans dampf", 42, "test address 13456", { 1, "s" } };
+      std::ofstream ofs{ temporary_test_file };
+
+      REQUIRE_NOTHROW([&] {
+         archive::json ar{ ofs };
+         ar << p;
+      }());
+   }
+}
+
+//TEST_CASE("simple copy from one container to another") //, "[benchmark]")
+//{
+//   BENCHMARK("for-each with push_back()")
+//   {
+//      const auto input = std::vector<int>(100, 0);
+//      auto result = std::vector<int>();
+//      for (auto e : input)
+//         result.push_back(e);
+//      return result;
+//   };
+//   BENCHMARK("std::copy()")
+//   {
+//      const auto input = std::vector<int>(100, 0);
+//      auto result = std::vector<int>();
+//      std::copy(std::begin(input), std::end(input), std::back_inserter(result));
+//      return result;
+//   };
+//}
 
 #if 0
 TEST_CASE("nested reflection and json-serializer test", "[reflection]")
