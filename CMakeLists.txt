@@ -55,7 +55,6 @@ option(ENABLE_WEBINTERFACE "Enable web interface" FALSE)
 
 if (ENABLE_BENCHMARKS)
    message("-- Benchmarks is enabled")
-   configure_file(${CMAKE_SOURCE_DIR}/benchmarks.sqlite3 ${CMAKE_BINARY_DIR}/benchmarks.sqlite3 COPYONLY)
    add_subdirectory(benchmarks)
 endif()
 
