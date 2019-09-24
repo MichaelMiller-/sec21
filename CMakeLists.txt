@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 3.1)
-
 ## 
 ## https://github.com/sutambe/cpptruths/
 ## http://cpptruths.blogspot.com/2019/03/bootstrapping-vcpkg-based-cmake-project_31.html
@@ -22,7 +21,7 @@ include_directories("include")
 
 find_package(OpenMP)
 if (OPENMP_FOUND)
-   message("-- OpenMP Support is enabled")
+   message(STATUS "OpenMP Support is enabled")
    ## TODO
    # set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
    # set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
@@ -33,9 +32,37 @@ if (CMAKE_COMPILER_IS_GNUCXX)
    option(ENABLE_COVERAGE "Enable coverage reporting for gcc/clang" FALSE)
 
    if (ENABLE_COVERAGE)
-      message("-- Coverage is enabled")
+      message(STATUS "Coverage is enabled")
       add_compile_options(--coverage -O0)
    endif()
+endif()
+
+# find_program(CMAKE_CXX_INCLUDE_WHAT_YOU_USE NAMES iwyu)
+# if (CMAKE_CXX_INCLUDE_WHAT_YOU_USE)
+#    message(STATUS "*include what you use* is enabled")
+# endif()
+
+# find_program(CMAKE_LINK_WHAT_YOU_USE NAMES lwyu)
+# if (CMAKE_LINK_WHAT_YOU_USE)
+#    message(STATUS "*link what you use* is enabled")
+# endif()
+
+# find_program(CMAKE_CXX_CLANG_TIDY NAMES clang-tidy)
+# if (CMAKE_CXX_CLANG_TIDY)
+#    message(STATUS "clang tidy is enabled")
+# endif()
+
+find_program(CMAKE_CXX_CPPCHECK NAMES cppcheck)
+if (CMAKE_CXX_CPPCHECK)
+   message(STATUS "CppCheck is enabled")
+   list(
+      APPEND CMAKE_CXX_CPPCHECK 
+         "--enable=warning"
+         "--inconclusive"
+         "--force" 
+         "--inline-suppr"
+         # "--suppressions-list=${CMAKE_SOURCE_DIR}/CppCheckSuppressions.txt"
+   )
 endif()
 
 ## display with http://webgraphviz.com/
@@ -52,26 +79,44 @@ option(ENABLE_BENCHMARKS "Enable benchmarks" FALSE)
 option(ENABLE_DATABASE_SERIALIZER "Enable database serlializer" FALSE)
 option(ENABLE_VIEWER "Enable system viewer" FALSE)
 option(ENABLE_WEBINTERFACE "Enable web interface" FALSE)
+option(ENABLE_PLOTTER "Enable plotter" FALSE)
+option(ENABLE_COLLECT "Enable collect" FALSE)
 
 if (ENABLE_BENCHMARKS)
-   message("-- Benchmarks is enabled")
+   message(STATUS "Benchmarks is enabled")
+   configure_file(${CMAKE_SOURCE_DIR}/benchmarks.sqlite3 ${CMAKE_BINARY_DIR}/benchmarks.sqlite3 COPYONLY)
    add_subdirectory(benchmarks)
 endif()
 
+add_subdirectory(scripting2)
+
 if (ENABLE_WEBINTERFACE)
-   message("-- Wt Web interface is enabled")
+   message(STATUS "Wt Web interface is enabled")
    add_subdirectory(portal)
 endif()   
 
 if (ENABLE_DATABASE_SERIALIZER)
-   message("-- Wt DBO database serializer is enabled")
+   message(STATUS "Wt DBO database serializer is enabled")
    add_subdirectory(database-serializer)
 endif()
 
 if (ENABLE_VIEWER)
-   message("-- OpenGL SDL system viewer is enabled")
+   message(STATUS "OpenGL SDL system viewer is enabled")
    add_subdirectory(viewer)
 endif()
+
+if (ENABLE_PLOTTER)
+   message(STATUS "Plotter is enabled")
+   add_subdirectory(plotter)
+endif()
+
+if (ENABLE_COLLECT)
+   message(STATUS "Collect is enabled")
+   add_subdirectory(collect)
+endif()
+
+# disable CppCheck for UnitTest
+unset(CMAKE_CXX_CPPCHECK)
 
 ## to disable testing set BUILD_TESTING to false
 include(CTest)
