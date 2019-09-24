@@ -17,7 +17,7 @@ namespace sec21
    template <typename Iterator>
    auto max_drawdown(Iterator first, Iterator last)
    {
-      using value_t = std::iterator_traits<Iterator>::value_type;
+      using value_t = typename std::iterator_traits<Iterator>::value_type;
       const auto n = std::distance(first, last);
  
       std::vector<value_t> maxs(n);
