@@ -11,7 +11,7 @@ Windows [![Build status](https://ci.appveyor.com/api/projects/status/4s6bg4yexj0
 | Name | Version | Project Website | Note |
 |-------|---------:|------------------------|-|
 | Boost | 1.66.0 | https://www.boost.org | |
+| ned14/outcome (Single header) | 2.1.1 | https://github.com/ned14/outcome | Recommened to copy in source tree |
 | NLohmann JSON (Single header) | 3.5.0 | https://github.com/nlohmann/json | Recommened to copy in source tree |
 | ViennaCL | 1.71.0 | http://viennacl.sourceforge.net/ | Recommened to copy in source tree |
-| spdlog | 1.3.1 | https://github.com/gabime/spdlog | Recommened to copy in source tree |
 | Catch2 | 2.9.2 | https://github.com/catchorg/Catch2 | Recommened to copy in source tree |
