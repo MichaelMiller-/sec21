@@ -1,5 +1,5 @@
 language: cpp
-dist: xenial
+dist: bionic
 
 matrix:
   include:
@@ -39,7 +39,7 @@ before_script:
 - uname -a
 script:
 - mkdir -p _build && cd _build
-  ## codecov.io only supprts c++11 -> disable coverage
+  ## codecov.io only supports only c++11 -> disable coverage
 - cmake .. -DENABLE_COVERAGE:BOOL=FALSE
 - cmake --build . -- -j4 VERBOSE=1
 - ctest -j2
@@ -49,16 +49,10 @@ after_script:
 
 after_success:
 
-# before_deploy:
-#- git tag "$(date +'%Y%m%d%H%M%S')-$(git log --format=%h -1)"
-#deploy:
-  #provider: releases
-  #api_key:
-    #secure: oTNYwLBN6Ey3uWgWZ5YGsQUu/lOxcPRpaHPByqQJbpU/pNK+MA+f1SBE2Uszgs/JQTzVwYj8WFWGcn0lnKLATBZCC2H6h1mV/Yl1k1sYQxS22uU23Lvdza32Py7xJtV9mNpIjTPvuMIE5M2EL94vslFefeKmHCQYhTVZA9ZraTWbLswg9F1TCP56pWkVX+N6SSzYiSEklzowRZEBTR2xUUZeHcDyLVuQsN28nj1JTUsnF+qSVHCgGZj/gI70Kx+9aOLm3pHJw5y4J/P4pBZxem7hQ55bEAQT3vn+W2mtVtZDJUXHA/jqQr7ZcsJtPLP2DdeTX4zmVaxCtKqHRAKC4MNcVMgDMjVYb5/HplMzF6T2Kr4ZoigQSlqdRfAlbMs/eLtouHEU5Omw3Z5NyF0VPZEf0KSehWPjPAYTltPdi4mK3Vu9Gzd6x90sYAgpD6LRc/4j8Rx69Wq2W5r+pfdGYYV+qW7R6RoJwdso7DxADqHfXpLfRLvRR/Vdrnc4E2Q7uqq9snoOLew7W6LDy4FGlR3LoZhVALM0c6umziBn7KHrWmzTHW+8fEsmv1qQzlyOX4ZKz41+A61Twh1+xZza2n/bYjSr0m4Uj6y3syFT5SdLMQs/pKwvEq8VU7H29fSFuGNbL60aHm1Xyd59inTnuM9JuY/NSEH6gatDf0Vu+7o=
-  #file: sec21-app1-0.1.0-x64.zip
-  #on:
-    #repo: MichaelMiller-/sec21
-#after_deploy: 
+branches:
+  only:
+  - master
+  - "/^v\\d+\\./"
 
 notifications:
   irc:
