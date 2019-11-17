@@ -1,5 +1,5 @@
 find_package(Boost 1.66 REQUIRED)
-find_package(ViennaCL)
+# find_package(ViennaCL)
    # VIENNACL_WITH_OPENCLbasti
    # VIENNACL_WITH_CUDA
 
