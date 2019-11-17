@@ -10,10 +10,14 @@ namespace sec21
 
    inline namespace literals
    {
-      constexpr auto operator "" _B(unsigned long long v)  noexcept { 
+      constexpr auto operator "" _B(unsigned long long v) noexcept { 
          return disk_space_t{ v }; 
       }
-      
+
+      constexpr auto operator "" _kB(unsigned long long v) noexcept { 
+         return disk_space_t{ v * 1024 }; 
+      }
+
       constexpr auto operator "" _MB(unsigned long long v) noexcept { 
          return disk_space_t{ v * 1024 * 1024 }; 
       }
