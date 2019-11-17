@@ -47,7 +47,7 @@ class lookup
 #endif
        auto reserve(Iterator first, Iterator last)
    {
-      static_assert(std::is_same_v<typename std::iterator_traits<Iterator>::value_type, key_t>, "iterator::value_type must be the same type as Key1");
+      static_assert(std::is_same_v<typename std::iterator_traits<Iterator>::value_type, key1_t>, "iterator::value_type must be the same type as Key1");
 
       values.resize(std::distance(first, last) * Dim);
       std::copy(first, last, std::back_inserter(keys));
