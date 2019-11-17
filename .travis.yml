@@ -25,7 +25,7 @@ before_install:
 - export CXX="${COMPILER}"
 - sudo apt-get -qq update
 - sudo apt-get install -y libboost-dev
-- sudo apt-get install -y witty
+## - sudo apt-get install -y witty
 install: 
 
 before_script:
