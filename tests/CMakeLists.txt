@@ -66,12 +66,13 @@ function(test test)
       target_link_libraries(test.${tmp} PRIVATE "-ltbb")
       # target_link_libraries(test.${tmp} PRIVATE "-lpthread")
       target_link_libraries(test.${tmp} PRIVATE "-lstdc++fs")
-      target_link_libraries(test.${tmp} PUBLIC sec21)
 
      if (ENABLE_COVERAGE)
         target_link_libraries(test.${tmp} "--coverage")
      endif()   
    endif()
+
+   target_link_libraries(test.${tmp} PUBLIC sec21)
 
    add_test(test.${tmp} "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test.${tmp}")
 endfunction()
