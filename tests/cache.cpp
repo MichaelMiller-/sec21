@@ -1,7 +1,7 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-#include "sec21/policies/clear.h"
+#include <sec21/policies/clear.h>
 
 TEST_CASE("test clear N entries", "[cache][policies]")
 {
@@ -30,7 +30,7 @@ TEST_CASE("test clear N entries", "[cache][policies]")
    REQUIRE(result.size() == 1);
 }
 
-#include "sec21/cache.h"
+#include <sec21/cache.h>
 
 int real_function(std::string key)
 {
