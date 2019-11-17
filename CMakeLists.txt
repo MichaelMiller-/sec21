@@ -17,15 +17,15 @@ project(sec21 CXX)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_CXX_STANDARD 17)
 
-include_directories("include")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/deps/viennacl/cmake")
 
 find_package(OpenMP)
 if (OPENMP_FOUND)
    message(STATUS "OpenMP Support is enabled")
-   ## TODO
-   # set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-   # set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-   # set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+   # TODO
+   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 endif()
 
 if (CMAKE_COMPILER_IS_GNUCXX)
@@ -36,6 +36,11 @@ if (CMAKE_COMPILER_IS_GNUCXX)
       add_compile_options(--coverage -O0)
    endif()
 endif()
+
+add_library(sec21 INTERFACE)
+find_package(Boost 1.66 REQUIRED)
+# target_sources(sec21 INTERFACE …)
+target_include_directories(sec21 SYSTEM INTERFACE include/)
 
 # find_program(CMAKE_CXX_INCLUDE_WHAT_YOU_USE NAMES iwyu)
 # if (CMAKE_CXX_INCLUDE_WHAT_YOU_USE)
@@ -52,18 +57,18 @@ endif()
 #    message(STATUS "clang tidy is enabled")
 # endif()
 
-find_program(CMAKE_CXX_CPPCHECK NAMES cppcheck)
-if (CMAKE_CXX_CPPCHECK)
-   message(STATUS "CppCheck is enabled")
-   list(
-      APPEND CMAKE_CXX_CPPCHECK 
-         "--enable=warning"
-         "--inconclusive"
-         "--force" 
-         "--inline-suppr"
-         # "--suppressions-list=${CMAKE_SOURCE_DIR}/CppCheckSuppressions.txt"
-   )
-endif()
+# find_program(CMAKE_CXX_CPPCHECK NAMES cppcheck)
+# if (CMAKE_CXX_CPPCHECK)
+#    message(STATUS "CppCheck is enabled")
+#    list(
+#       APPEND CMAKE_CXX_CPPCHECK 
+#          "--enable=warning"
+#          "--inconclusive"
+#          "--force" 
+#          "--inline-suppr"
+#          "--suppressions-list=${CMAKE_SOURCE_DIR}/CppCheckSuppressions.txt"
+#    )
+# endif()
 
 ## display with http://webgraphviz.com/
 # add_custom_target(
@@ -74,6 +79,8 @@ endif()
 
 ## local Windows
 # cmake .. "-DCMAKE_TOOLCHAIN_FILE=C:/dev/vcpkg/scripts/buildsystems/vcpkg.cmake"
+
+## todo: gcc fsanitize
 
 option(ENABLE_BENCHMARKS "Enable benchmarks" FALSE)
 option(ENABLE_DATABASE_SERIALIZER "Enable database serlializer" FALSE)
