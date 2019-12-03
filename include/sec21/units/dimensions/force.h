@@ -1,0 +1,31 @@
+#pragma once
+
+#include <sec21/units/dimensions/base_dimensions.h>
+#include <sec21/units/quantity.h>
+
+namespace sec21::units
+{
+   // clang-format off
+   using force = dimension<
+      exponent<base_dimension_mass, 1>, exponent<base_dimension_length, 1>, 
+      exponent<base_dimension_time, -2>>;
+   // clang-format on
+
+   // units
+   struct newton : coherent_derived_unit<newton, force> {};
+   struct kilonewton : derived_unit<kilonewton, force, std::kilo> {};
+   struct meganewton : derived_unit<meganewton, force, std::mega> {};
+
+   inline namespace literals
+   {
+      constexpr auto operator "" _N(unsigned long long v) noexcept  { return quantity<newton, unsigned long long>{ v }; }
+
+      constexpr auto operator "" _kN(unsigned long long v) noexcept  { return quantity<kilonewton, unsigned long long>{ v }; }
+
+      constexpr auto operator "" _MN(unsigned long long v) noexcept  { return quantity<meganewton, unsigned long long>{ v }; }
+   }
+
+#ifdef __cpp_concepts
+
+#endif
+}

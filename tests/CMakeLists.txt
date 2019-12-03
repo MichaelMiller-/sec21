@@ -15,6 +15,10 @@ function(test test)
    string(REPLACE "/" "_" tmp ${test})
    add_executable(test.${tmp} "${CMAKE_CURRENT_LIST_DIR}/${test}.cpp")
 
+   ## boost 
+   target_include_directories(test.${tmp} PRIVATE ${Boost_INCLUDE_DIRS})
+   target_link_libraries(test.${tmp} PRIVATE ${Boost_LIBRARIES})
+   ## range-v3
    target_include_directories(test.${tmp} PRIVATE "${CMAKE_SOURCE_DIR}/deps/range-v3/include")
    ## ned14/outcome/outcome.hpp -> use this until boost 1.70 is available
    target_include_directories(test.${tmp} PRIVATE "${CMAKE_SOURCE_DIR}/deps/ned14-outcome")
@@ -85,7 +89,6 @@ test("cache")
 test("combine")
 test("concat")
 test("contains")
-test("disk_space")
 test("dispatcher")
 test("double_values")
 test("drawdown")
@@ -109,6 +112,9 @@ test("structural_analysis.member")
 test("structural_analysis.support")
 test("traits")
 test("units")
+test("units.dimension")
+test("units.quantity")
+test("units.ratio")
 
 ## TODO 
 ## set_tests_properties("units" PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=/path_where_libbaz.so_is_on_my_target_system")
