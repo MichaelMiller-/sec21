@@ -18,7 +18,7 @@ namespace sec21::reflection
    //! }
    //!
    template <typename Class>
-   inline constexpr auto metainfo() { return std::tuple{}; }
+   inline constexpr auto metainfo() noexcept { return std::tuple{}; }
 
 
    template <typename Class, typename T>
@@ -58,14 +58,14 @@ namespace sec21::reflection
    };
 
 #if 0
-   template <typename T>
+   template <typename T, typename Class>
    class register_member_setter_and_getter
    {
    public:
       using value_t = T;
    
-      using setter_function_t = std::function<value_t&()>;;
-      using getter_function_t = std::function<value_t()>;;
+      using setter_function_t = std::function<value_t&(Class& obj)>;
+      using getter_function_t = std::function<value_t(Class const& obj)>;
 
    private:
       const std::string_view  m_name{};
@@ -73,9 +73,9 @@ namespace sec21::reflection
 
    public:
       template <typename Invokable>
-      explicit register_member_setter_and_getter(std::string_view name, Invokable f1) noexcept
+      explicit register_member_setter_and_getter(std::string_view name, Invokable&& f1) noexcept
          : m_name{ name }
-         , set_f { std::forward<Invokable>(f1) }
+         , set_f (std::forward<Invokable>(f1)) 
       { }
 
       auto name() const noexcept { return m_name; }

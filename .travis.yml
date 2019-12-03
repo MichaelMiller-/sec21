@@ -12,27 +12,20 @@ matrix:
         sources:
         - ubuntu-toolchain-r-test
   - os: linux
-    env: COMPILER=g++-9
+    env: COMPILER=clang++-6.0
     addons:
       apt:
         packages:
-        - g++-9
+        - clang-6.0
         sources:
         - ubuntu-toolchain-r-test
-  - os: linux
-    env: COMPILER=clang
-    addons:
-      apt:
-        packages:
-        - clang
-        sources:
-        - ubuntu-toolchain-r-test
+        - llvm-toolchain-bionic-6.0
 
 before_install:
 - export CXX="${COMPILER}"
 - sudo apt-get -qq update
 - sudo apt-get install -y libboost-dev
-- sudo apt-get install -y witty
+# - sudo apt-get install -y witty
 install: 
 
 before_script:
@@ -46,13 +39,18 @@ script:
 ## - make gcov
 
 after_script:
-
 after_success:
 
 branches:
   only:
   - master
   - "/^v\\d+\\./"
+
+# after_script:
+# after_success:
+# before_deploy:
+# deploy:
+# after_deploy: 
 
 notifications:
   irc:

@@ -12,7 +12,12 @@ namespace sec21
    {
       reflection::for_each_member<std::decay_t<T>>([&](auto const& member) 
       {
-         ar.write(member.name(), member.get(t));
+         // static_assert(reflection::is_registered_v<std::decay_t<decltype(member)>>, "wtf ser");
+
+         // if constexpr (reflection::is_registered_v<std::decay_t<decltype(member)>>)
+         //    serialize(ar, member);
+         // else
+            ar.write(member.name(), member.get(t));
       });
    }
 
@@ -22,6 +27,7 @@ namespace sec21
    {
       reflection::for_each_member<std::decay_t<T>>([&](auto const& member) 
       {
+         // static_assert(reflection::is_registered_v<std::decay_t<member>>, "wtf");
          ar.read(member.name(), member.get(t));
       });
    }    

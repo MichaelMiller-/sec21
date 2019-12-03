@@ -19,7 +19,7 @@ struct properties
 namespace sec21::reflection
 {
    template <>
-   inline auto metainfo<properties>()
+   inline auto metainfo<properties>() noexcept
    {
       return std::tuple{ 
          register_member{ "i", &properties::i },

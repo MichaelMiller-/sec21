@@ -1,4 +1,3 @@
-#define _SILENCE_CXX17_UNCAUGHT_EXCEPTION_DEPRECATION_WARNING
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
@@ -54,3 +53,23 @@ TEST_CASE("enumerate over map and get current value and index", "[enumerate]")
    }
 #endif
 }
+
+#ifdef CATCH_CONFIG_ENABLE_BENCHMARKING
+TEST_CAST("enumerate vs for_each_indexed", "[benchmark]")
+{
+   auto i = GENERATE(take(500));
+
+   BENCHMARK("Benchmark: festgehaltene_zeilen mit lookup table als &&")
+   {
+      auto node_row_lookup = node_matrix_row_lookup_table(std::begin(sys.nodes), std::end(sys.nodes));
+      auto result = festgehaltene_zeilen(std::begin(sys.nodes), std::end(sys.nodes), node_row_lookup);
+      return result;
+   };
+   BENCHMARK("Benchmark: festgehaltene_zeilen mit lookup table als const& -> .at() instead []")
+   {
+      auto node_row_lookup = node_matrix_row_lookup_table(std::begin(sys.nodes), std::end(sys.nodes));
+      auto result = v2::festgehaltene_zeilen(std::begin(sys.nodes), std::end(sys.nodes), node_row_lookup);
+      return result;
+   };
+}
+#endif
