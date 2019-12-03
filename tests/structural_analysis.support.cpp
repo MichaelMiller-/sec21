@@ -5,7 +5,17 @@
 
 using namespace sec21::structural_analysis;
 
-static_assert(reactions(support_kind::Free) == 0, "invalid reactions for free support");
-static_assert(reactions(support_kind::Roller) == 1, "invalid reactions for roller support");
-static_assert(reactions(support_kind::Hinge) == 2, "invalid reactions for hinged support");
-static_assert(reactions(support_kind::Fixed) == 3, "invalid reactions for fixed support");
+static_assert(static_cast<int>(Support::Free) == 0);
+static_assert(static_cast<int>(Support::Roller) == 1);
+static_assert(static_cast<int>(Support::Hinge) == 2);
+static_assert(static_cast<int>(Support::Fixed) == 3);
+
+static_assert(variability(Support::Free) == 0);
+static_assert(variability(Support::Roller) == 1);
+static_assert(variability(Support::Hinge) == 2);
+static_assert(variability(Support::Fixed) == 3);
+
+TEST_CASE("combine", "[compilation-only]") {
+   SUCCEED("Nothing to test. Compiletests");
+}
+

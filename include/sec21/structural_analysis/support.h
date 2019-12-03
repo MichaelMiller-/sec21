@@ -1,27 +1,37 @@
 #pragma once
 
 #include <type_traits>
- 	
-// #include <boost/qvm/quat.hpp>
 
 namespace sec21::structural_analysis
 {
-   //! \todo simple approch
-   enum class support_kind : std::uint8_t
+   //! \todo 2019-08-27 nameing of all enum class
+   enum class [[deprecated("replace with support")]] support_kind : std::uint8_t
    {
       Free = 0,
       // reaction only in the y-axis
       Roller = 1,
       // reactions in the x & y axis
-      Hinge,
+      Hinge = 2,
       // reactions in the x & y axis and one moment as reaction
-      Fixed
+      Fixed = 3
    };
 
-   //! \todo a support is a kind and a rotation aka boost::qvm::quat<double>
+   enum class Support
+   {
+      Free = 0,
+      // reaction only in the y-axis
+      Roller = 1,
+      // reactions in the x & y axis
+      Hinge = 2,
+      // reactions in the x & y axis and one moment as reaction
+      Fixed = 3
+   };
 
-   constexpr auto reactions(support_kind s) noexcept
+
+   //! \return Anzahl der Freiheitsgrade
+   constexpr auto variability(Support s) noexcept
    {
       return static_cast<std::underlying_type<decltype(s)>::type>(s);
    }
 } // namespace sec21::structural_analysis
+
