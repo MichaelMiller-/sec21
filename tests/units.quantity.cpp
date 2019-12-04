@@ -13,6 +13,8 @@
 
 #include <sec21/units.h>
 
+#include <limits>
+
 TEST_CASE("quantity cast", "[units-v2]")
 {
    using namespace sec21::units;
@@ -20,7 +22,7 @@ TEST_CASE("quantity cast", "[units-v2]")
    static_assert(quantity_cast<quantity<meter, int>>(2_km).value() == 2'000);
    static_assert(quantity_cast<quantity<kilometer, int>>(2'000_m).value() == 2);
 
-   SUCCEED("Nothing to test. Compiletests");
+   SUCCEED("Compiletime-Tests");
 }
 
 TEST_CASE("quantity test", "[units-v2]")
@@ -63,8 +65,9 @@ TEST_CASE("quantity test", "[units-v2]")
    static_assert(quantity<example_unit, double>::min().value() == std::numeric_limits<double>::lowest());
    static_assert(quantity<example_unit, double>::max().value() == std::numeric_limits<double>::max());
 
-   //! \todo
    // unary operators
+   static_assert(-quantity<example_unit, int>{1} == quantity<example_unit, int>{-1});
+   static_assert(-quantity<example_unit, int>{-1} == quantity<example_unit, int>{1});
 
    //! \todo
    // binary member operators
@@ -97,7 +100,7 @@ TEST_CASE("quantity test", "[units-v2]")
    static_assert(1'000_m >= 1_km);
    static_assert(1'000_m <= 1_km);
 
-   SUCCEED("Nothing to test. Compiletests");
+   SUCCEED("Compiletime-Tests");
 }
 
 TEST_CASE("SI units test", "[units-v2]")
@@ -182,7 +185,7 @@ TEST_CASE("SI units test", "[units-v2]")
    //static_assert(10_km * 10_km * 10_km == 1000_cub_km);
    //static_assert(1_cub_m == 1'000'000_cub_cm);
 
-   SUCCEED("Compiletimetests");
+   SUCCEED("Compiletime-Tests");
 }
 
 TEST_CASE("constant quantities", "[units-v2]")
@@ -192,5 +195,5 @@ TEST_CASE("constant quantities", "[units-v2]")
 
    static_assert(G == 9.80665_mps_sq);
 
-   SUCCEED("Compiletimetests");
+   SUCCEED("Compiletime-Tests");
 }

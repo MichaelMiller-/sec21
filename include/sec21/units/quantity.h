@@ -4,6 +4,7 @@
 #include <limits>
 #include <ratio>
 
+#include <sec21/units/dimension.h>
 #include <sec21/units/unit.h>
 #include <sec21/units/ratio.h>
 
@@ -44,6 +45,10 @@ namespace sec21::units
 
       constexpr auto value() const noexcept {
          return m_value;
+      }
+
+      constexpr auto operator - () const noexcept {
+         return quantity(-value());
       }
 
       //[[nodiscard]] static constexpr quantity zero() noexcept {
