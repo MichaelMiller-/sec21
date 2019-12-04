@@ -34,7 +34,6 @@ namespace sec21::units
       quantity() = default;
 
       constexpr quantity(T const& t) noexcept
-         //: m_value{ std::forward<T>(t) }
          : m_value{ static_cast<T>(t) }
       {}
 

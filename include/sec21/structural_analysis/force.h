@@ -1,6 +1,7 @@
 #pragma once
 
-#include <sec21/units.h>
+#include <sec21/units/quantity.h>
+#include <sec21/units/dimensions/force.h>
 
 #include <array>
 #include <type_traits>
@@ -8,7 +9,7 @@
 namespace sec21::structural_analysis
 {
    template <size_t Dimension>
-   using force_t = std::array<unit::kilonewton<double>, Dimension>;
+   using force_t = std::array<units::quantity<units::kilonewton, double>, Dimension>;
 
    using force_2D_t = force_t<2>;
    using force_3D_t = force_t<3>;

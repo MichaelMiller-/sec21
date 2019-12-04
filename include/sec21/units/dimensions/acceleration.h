@@ -12,6 +12,7 @@ namespace sec21::units
    inline namespace literals
    {
       constexpr auto operator "" _mps_sq(unsigned long long v) noexcept  { return quantity<meter_per_second_squared, unsigned long long>{ v }; }
+      constexpr auto operator "" _mps_sq(long double v) noexcept  { return quantity<meter_per_second_squared, long double>{ v }; }
    }
 
 #ifdef __cpp_concepts

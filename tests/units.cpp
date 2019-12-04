@@ -50,7 +50,7 @@ static_assert(-1.0_MN == -1.0_MN, "must be equal");
 static_assert(1.0_Pa == (1.0_N / (1.0_m * 1.0_m)), "must be equal");
 
 //static_assert(1_km / 1_s == 1000_mps, "must be equal");
-// static_assert(2_kmph * 2_h == 4_km, "must be equal");
+//static_assert(2_kmph * 2_h == 4_km, "must be equal");
 //static_assert(4_km / 2_kmph == 2_h, "must be equal");
 
 
@@ -63,30 +63,7 @@ static_assert((1_m / 1_m) == unit::id_t<int>(1), "must be equal");
 
 static_assert(15.0_kg * unit::constants::g == unit::newton<double>(147.099750), "must be equal");
 
-// simple interface test
-
-//constexpr unit::quantity<velocity> average_speed(unit::quantity<length> d, unit::quantitya<time> t)
-//{
-//   return d / t;
-//}
-
 TEST_CASE("units", "[compilation-only]") 
 {
    SUCCEED("Nothing to test. Compiletests");
 }
-
-#ifdef __cpp_concepts
-
-//! test c++20 concepts
-template <typename T>
-auto len(T t) requires sec21::Length<T> { return t.get(); }
-
-TEST_CASE("runtime tests", "[units]")
-{
-   using namespace sec21::unit;
-   REQUIRE(len(meter<double>(5.0)) == Approx(5.0));
-   REQUIRE(len(kilometer<double>(5.0)) == Approx(5.0));
-}
-
-#endif
-

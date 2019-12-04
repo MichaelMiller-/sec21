@@ -19,10 +19,13 @@ namespace sec21::units
    inline namespace literals
    {
       constexpr auto operator "" _N(unsigned long long v) noexcept  { return quantity<newton, unsigned long long>{ v }; }
+      constexpr auto operator "" _N(long double v) noexcept  { return quantity<newton, long double>{ v }; }
 
       constexpr auto operator "" _kN(unsigned long long v) noexcept  { return quantity<kilonewton, unsigned long long>{ v }; }
+      constexpr auto operator "" _kN(long double v) noexcept  { return quantity<kilonewton, long double>{ v }; }
 
       constexpr auto operator "" _MN(unsigned long long v) noexcept  { return quantity<meganewton, unsigned long long>{ v }; }
+      constexpr auto operator "" _MN(long double v) noexcept  { return quantity<meganewton, long double>{ v }; }
    }
 
 #ifdef __cpp_concepts

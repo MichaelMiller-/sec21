@@ -39,7 +39,6 @@ endif()
 
 add_library(sec21 INTERFACE)
 find_package(Boost 1.66 REQUIRED)
-# target_sources(sec21 INTERFACE …)
 target_include_directories(sec21 SYSTEM INTERFACE include/)
 
 # find_program(CMAKE_CXX_INCLUDE_WHAT_YOU_USE NAMES iwyu)

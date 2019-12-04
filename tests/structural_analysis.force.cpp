@@ -6,7 +6,7 @@
 TEST_CASE("2D force", "[force]")
 {
    using namespace sec21::structural_analysis;
-   using namespace sec21::unit::literals;
+   using namespace sec21::units::literals;
 
    using force_t = force_2D_t;
 
@@ -49,7 +49,7 @@ TEST_CASE("2D force", "[force]")
 TEST_CASE("3D force", "[force]")
 {
    using namespace sec21::structural_analysis;
-   using namespace sec21::unit::literals;
+   using namespace sec21::units::literals;
 
    using force_t = force_3D_t;
 
