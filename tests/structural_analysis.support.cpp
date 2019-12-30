@@ -15,7 +15,7 @@ static_assert(variability(Support::Roller) == 1);
 static_assert(variability(Support::Hinge) == 2);
 static_assert(variability(Support::Fixed) == 3);
 
-TEST_CASE("combine", "[compilation-only]") {
+TEST_CASE("structural analysis support", "[compilation-only]") {
    SUCCEED("Nothing to test. Compiletests");
 }
 
