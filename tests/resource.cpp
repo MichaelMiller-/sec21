@@ -5,8 +5,7 @@
 
 #include <sec21/resource.h>
 
-// possible resource types
-namespace mock
+namespace abstraction
 {
    namespace legacy
    {
@@ -66,11 +65,8 @@ namespace mock
    }
 }
 
-// -> pattern
-// a function to acquire
-// a function to release
-
-namespace behavior
+//! user defined handle
+namespace customization_point
 {
    template <typename T>
    struct free_store
@@ -142,9 +138,9 @@ TEST_CASE("generic unique resource class", "[core]")
 {
    using namespace sec21;
 
-   resource<behavior::file> res1;
+   resource<customization_point::file> res1;
    REQUIRE(res1.operator bool() == false);
 
-   resource<behavior::file> res2{ mock::file::open_file() };
+   resource<customization_point::file> res2{ abstraction::file::open_file() };
    REQUIRE(res2.operator bool() == true);
 }
