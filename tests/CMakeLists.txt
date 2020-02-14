@@ -1,5 +1,5 @@
 find_package(Boost 1.66 REQUIRED)
-find_package(glm CONFIG REQUIRED)
+# find_package(glm CONFIG REQUIRED)
 # find_package(ViennaCL)
    # VIENNACL_WITH_OPENCLbasti
    # VIENNACL_WITH_CUDA
@@ -123,7 +123,7 @@ test("enumerate")
 test("fixed_string")
 test("flat_matrix")
 test("flat_vector")
-test("geometry")
+# test("geometry")
 test("in_range")
 test("lookup")
 test("make_iota_array")
