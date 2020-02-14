@@ -1,13 +1,22 @@
 image:
   - Visual Studio 2017
 clone_folder: c:\projects\source
+install:
+- cd C:\tools\vcpkg
+- git pull
+- .\bootstrap-vcpkg.bat
+- cd %APPVEYOR_BUILD_FOLDER%
+- vcpkg install glm:x86-windows
+- cd c:\tools\vcpkg
+- vcpkg integrate install
+
 build_script:
 - cmd: >-
     mkdir build
 
     cd build
-    
-    cmake c:\projects\source -G "Visual Studio 15" -DBOOST_ROOT=C:\Libraries\boost_1_67_0
+
+    cmake c:\projects\source -G "Visual Studio 15" -DBOOST_ROOT=C:\Libraries\boost_1_67_0 -DCMAKE_TOOLCHAIN_FILE=c:\tools\vcpkg\scripts\buildsystems\vcpkg.cmake ..
     
     cmake --build . --config "Debug"
 
