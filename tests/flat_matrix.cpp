@@ -29,12 +29,13 @@ TEST_CASE("flatten matrix to a std::vector", "[core]")
       REQUIRE(std::size(result) == std::size(expected));
       REQUIRE(result == expected);
    }
+#if 0   
    SECTION("example 1x5 matrix")
    {
       std::vector<std::vector<int>> helper_input{ 
          std::vector{ 1, 2, 3, 4, 5 },
       };
-      auto input = copy_to_matrix(helper_input, 1, 5);
+      auto input = helper::make_matrix(1, 5, helper_input);
       auto result = flat_matrix(input);
 
       const std::vector<int> expected{ 1, 2, 3, 4, 5 };
@@ -50,7 +51,7 @@ TEST_CASE("flatten matrix to a std::vector", "[core]")
          std::vector{ 4 },
          std::vector{ 5 }
       };
-      auto input = copy_to_matrix(helper_input, 5, 1);
+      auto input = helper::make_matrix(5, 1, helper_input);
       auto result = flat_matrix(input);
 
       const std::vector<int> expected{ 1, 2, 3, 4, 5 };
@@ -63,11 +64,12 @@ TEST_CASE("flatten matrix to a std::vector", "[core]")
          std::vector{ 1, 2, 3, 4 },
          std::vector{ 5, 6, 7, 8 }
       };
-      auto input = copy_to_matrix(helper_input, 2, 4);
+      auto input = helper::make_matrix(2, 4, helper_input);
       auto result = flat_matrix(input);
 
       const std::vector<int> expected{ 1, 2, 3, 4, 5, 6, 7, 8 };
       REQUIRE(std::size(result) == std::size(expected));
       REQUIRE(result == expected);
    }
+#endif   
 }
