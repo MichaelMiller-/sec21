@@ -5,6 +5,7 @@
 
 #include <vector>
 #include <algorithm>
+#include <array>
 
 TEST_CASE("row_to_col()", "[sec21][structural_analysis_impl][space_truss]")
 {
