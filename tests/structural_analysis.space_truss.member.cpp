@@ -1,0 +1,93 @@
+﻿#define CATCH_CONFIG_MAIN
+#include "catch.hpp"
+
+#include <sec21/structural_analysis/space_truss.h>
+
+#include <limits>
+
+TEST_CASE("add member to system", "[space_truss]")
+{
+   using namespace sec21::structural_analysis;
+
+   SECTION("add one member")
+   {
+      auto sys = space_truss{};
+      auto n1 = add_node(sys, { 1 });
+      auto n2 = add_node(sys, { 2 });
+      REQUIRE(static_cast<bool>(n1) == true);
+      REQUIRE(n1.value() == 1);
+      REQUIRE(static_cast<bool>(n2) == true);
+      REQUIRE(n2.value() == 2);
+
+      auto m1 = add_member(sys, n1.value(), n2.value(), { 1, 1.0, 1.0 });
+      REQUIRE(static_cast<bool>(m1) == true);
+      REQUIRE(m1.value() == 1);
+   }
+   SECTION("add member with invalid id")
+   {
+      auto sys = space_truss{};
+      auto n1 = add_node(sys, { 1 });
+      auto n2 = add_node(sys, { 2 });
+      REQUIRE(static_cast<bool>(n1) == true);
+      REQUIRE(n1.value() == 1);
+      REQUIRE(static_cast<bool>(n2) == true);
+      REQUIRE(n2.value() == 2);
+
+      auto m1 = add_member(sys, n1.value(), n2.value(), { std::numeric_limits<std::size_t>::max(), 1.0, 1.0 });
+      REQUIRE(static_cast<bool>(m1) == false);
+   }
+   SECTION("add two member with the same id")
+   {
+      auto sys = space_truss{};
+      auto n1 = add_node(sys, { 1 });
+      auto n2 = add_node(sys, { 2 });
+      REQUIRE(static_cast<bool>(n1) == true);
+      REQUIRE(n1.value() == 1);
+      REQUIRE(static_cast<bool>(n2) == true);
+      REQUIRE(n2.value() == 2);
+
+      auto m1 = add_member(sys, n1.value(), n2.value(), { 1, 1.0, 1.0 });
+      auto m2 = add_member(sys, n1.value(), n2.value(), { 1, 1.0, 1.0 });
+      REQUIRE(static_cast<bool>(m1) == true);
+      REQUIRE(m1.value() == 1);
+      REQUIRE(static_cast<bool>(m2) == false);
+   }
+   SECTION("add one member via parameter pack")
+   {
+      auto sys = space_truss{};
+      auto n1 = add_node(sys, { 1 });
+      auto n2 = add_node(sys, { 2 });
+      REQUIRE(static_cast<bool>(n1) == true);
+      REQUIRE(n1.value() == 1);
+      REQUIRE(static_cast<bool>(n2) == true);
+      REQUIRE(n2.value() == 2);
+
+      auto m1 = add_member(sys, n1.value(), n2.value(), decltype(sys)::member_descriptor_t{ 1 });
+      REQUIRE(static_cast<bool>(m1) == true);
+      REQUIRE(m1.value() == 1);
+   }
+   SECTION("add one member via empty parameter pack")
+   {
+      auto sys = space_truss{};
+      auto n1 = add_node(sys, { 1 });
+      auto n2 = add_node(sys, { 2 });
+      REQUIRE(static_cast<bool>(n1) == true);
+      REQUIRE(n1.value() == 1);
+      REQUIRE(static_cast<bool>(n2) == true);
+      REQUIRE(n2.value() == 2);
+
+      auto m1 = add_member(sys, n1.value(), n2.value());
+      REQUIRE(static_cast<bool>(m1) == false);
+   }
+   SECTION("add member to a invalid node")
+   {
+      auto sys = space_truss{};
+      auto n1 = add_node(sys, { 1 });
+      REQUIRE(static_cast<bool>(n1) == true);
+      REQUIRE(n1.value() == 1);
+
+      auto m1 = add_member(sys, n1.value(), 42);
+      REQUIRE(static_cast<bool>(m1) == false);
+   }
+   //! \todo 2019-04-23 add congruent member test
+}
