@@ -1,11 +1,12 @@
 #pragma once
 
+#include <sec21/structural_analysis/impl/axis.h>
+
 #include <vector>
 #include <algorithm>
 #include <type_traits>
 #include <functional>
-
-#include <sec21/structural_analysis/impl/axis.h>
+#include <numeric>
 
 namespace sec21::structural_analysis::impl
 {
