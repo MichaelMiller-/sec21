@@ -8,13 +8,13 @@
 
 namespace sec21::structural_analysis
 {
-   template <size_t Dimension>
+   template <auto Dimension>
    using force_t = std::array<units::quantity<units::kilonewton, double>, Dimension>;
 
    using force_2D_t = force_t<2>;
    using force_3D_t = force_t<3>;
 
-   template <size_t Dimension>
+   template <auto Dimension>
    [[nodiscard]] constexpr auto operator + (force_t<Dimension> const& lhs, force_t<Dimension> const& rhs) noexcept -> force_t<Dimension>
    {
       if constexpr (Dimension == 2) {
