@@ -1,21 +1,24 @@
 find_package(Boost 1.66 REQUIRED)
+find_package(glm CONFIG REQUIRED)
 # find_package(ViennaCL)
    # VIENNACL_WITH_OPENCLbasti
    # VIENNACL_WITH_CUDA
 
-## TODO
-## find_package(Catch2 REQUIRED)
-## target_link_libraries(tests Catch2::Catch2)
+cmake_host_system_information(RESULT CPU_SSE2_SUPPORTED QUERY HAS_SSE2)
+
+if (CPU_SSE2_SUPPORTED)
+   message(STATUS "SSE2 cpu instruction set will be enabled")
+endif()
 
 if (OPENMP_FOUND)
-   message("-- ViennaCL OpenMP Support is enabled") ## TODO: for "exe name"
+   message(STATUS "ViennaCL OpenMP Support is enabled") ## TODO: for "exe name"
 endif()
 
 function(test test)
    string(REPLACE "/" "_" tmp ${test})
    add_executable(test.${tmp} "${CMAKE_CURRENT_LIST_DIR}/${test}.cpp")
 
-   ## boost 
+   ## boost
    target_include_directories(test.${tmp} PRIVATE ${Boost_INCLUDE_DIRS})
    target_link_libraries(test.${tmp} PRIVATE ${Boost_LIBRARIES})
    ## range-v3
@@ -45,8 +48,11 @@ function(test test)
          add_compile_options("/std:c++latest")
       endif()
 
+      ## todo /arch:AVX
+      ## todo SSE2
+
       add_compile_options("/permissive-")
-      add_compile_options(/W4) ## /WX)
+      add_compile_options("/W4") ## /WX)
 
       ## TODO check this option
       if (OPENMP_FOUND)
@@ -58,22 +64,42 @@ function(test test)
       CHECK_CXX_COMPILER_FLAG("-std=c++2a" _cpp20_experimental_supported)
       if (_cpp20_experimental_supported)
          add_compile_options("-std=c++2a")
-         
+
          CHECK_CXX_COMPILER_FLAG("-fconcepts" _cpp_concepts_supported)
          if (_cpp_concepts_supported)
             add_compile_options("-fconcepts")
          endif()
       endif()
 
-      add_compile_options(-Wall -Wextra -Wpedantic -Wconversion)
+      add_compile_options("-Wall" "-Wextra" "-Wpedantic" "-Wconversion")
 
       target_link_libraries(test.${tmp} PRIVATE "-ltbb")
       # target_link_libraries(test.${tmp} PRIVATE "-lpthread")
       target_link_libraries(test.${tmp} PRIVATE "-lstdc++fs")
 
+      if (CPU_SSE2_SUPPORTED)
+         add_compile_options("-msse2")
+         add_compile_options("-mfpmath=sse")
+      endif()
+
+      # -msse
+      # -msse2
+      # -msse3
+      # -mssse3
+      # -msse4
+      # -msse4a
+      # -msse4.1
+      # -msse4.2
+      # -mavx
+      # -mavx2
+      
+      if (ENABLE_EXPERIMENTAL)
+         add_compile_options("-march=sandybridge")
+      endif()
+
      if (ENABLE_COVERAGE)
         target_link_libraries(test.${tmp} "--coverage")
-     endif()   
+     endif()
    endif()
 
    target_link_libraries(test.${tmp} PUBLIC sec21)
@@ -85,6 +111,7 @@ endfunction()
 
 ## unit tests via catch (alphabetical order)
 ##
+test("any_of")
 test("cache")
 test("combine")
 test("concat")
@@ -94,7 +121,9 @@ test("double_values")
 test("drawdown")
 test("enumerate")
 test("fixed_string")
+test("flat_matrix")
 test("flat_vector")
+test("geometry")
 test("in_range")
 test("lookup")
 test("make_iota_array")
@@ -108,12 +137,16 @@ test("strong_types")
 test("strong_pair")
 test("structural_analysis.axis")
 test("structural_analysis.force")
+test("structural_analysis.lookup")
 test("structural_analysis.member")
+test("structural_analysis.space_truss")
+test("structural_analysis.space_truss.member")
+test("structural_analysis.space_truss.node")
 test("structural_analysis.support")
 test("traits")
 test("units.dimension")
 test("units.quantity")
 test("units.ratio")
 
-## TODO 
+## TODO
 ## set_tests_properties("units" PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=/path_where_libbaz.so_is_on_my_target_system")
