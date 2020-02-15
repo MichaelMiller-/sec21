@@ -1,16 +1,12 @@
 find_package(Boost 1.66 REQUIRED)
-# find_package(glm CONFIG REQUIRED)
-# find_package(ViennaCL)
-   # VIENNACL_WITH_OPENCLbasti
-   # VIENNACL_WITH_CUDA
 
-cmake_host_system_information(RESULT CPU_SSE2_SUPPORTED QUERY HAS_SSE2)
+## TODO: how to enable options with find_package
+# set(ENABLE_OPENMP ON)
+# set(ENABLE_CUDA ON)
+# set(ENABLE_OPENCL ON)
+find_package(ViennaCL)
 
-if (CPU_SSE2_SUPPORTED)
-   message(STATUS "SSE2 cpu instruction set will be enabled")
-endif()
-
-if (OPENMP_FOUND)
+if (OPENMP_FOUND AND VIENNACL_FOUND)
    message(STATUS "ViennaCL OpenMP Support is enabled") ## TODO: for "exe name"
 endif()
 
@@ -22,19 +18,15 @@ function(test test)
    target_include_directories(test.${tmp} PRIVATE ${Boost_INCLUDE_DIRS})
    target_link_libraries(test.${tmp} PRIVATE ${Boost_LIBRARIES})
    ## range-v3
-   target_include_directories(test.${tmp} PRIVATE "${CMAKE_SOURCE_DIR}/deps/range-v3/include")
+   ## target_include_directories(test.${tmp} PRIVATE "${CMAKE_SOURCE_DIR}/deps/range-v3/include")
+
    ## ned14/outcome/outcome.hpp -> use this until boost 1.70 is available
    target_include_directories(test.${tmp} PRIVATE "${CMAKE_SOURCE_DIR}/deps/ned14-outcome")
    ## nlohman/json.hpp
    target_include_directories(test.${tmp} PRIVATE "${CMAKE_SOURCE_DIR}/deps")
    ## viennacl
-   target_include_directories(test.${tmp} PRIVATE "${CMAKE_SOURCE_DIR}/deps/viennacl")
-
-   # if (OPENMP_FOUND)
-   #    # target_compile_definitions(test.${tmp} PRIVATE VIENNACL_WITH_OPENMP)
-   #    # target_compile_options(test.${tmp} PRIVATE "${OpenMP_CXX_FLAGS}")
-   #    # target_link_libraries(test.${tmp} PRIVATE "${OpenMP_CXX_FLAGS}")
-   # endif()
+   target_include_directories(test.${tmp} PRIVATE ${ViennaCL_INCLUDE_DIRS})
+   target_link_libraries(test.${tmp} PRIVATE ${ViennaCL_LIBRARIES})
 
    if (ENABLE_BENCHMARKS)
       add_compile_definitions(CATCH_CONFIG_ENABLE_BENCHMARKING)
@@ -42,6 +34,8 @@ function(test test)
 
    include(CheckCXXCompilerFlag)
 
+   ## platform specific
+   ##
    if (MSVC_VERSION GREATER_EQUAL "1900")
       CHECK_CXX_COMPILER_FLAG("/std:c++latest" _cpp_latest_flag_supported)
       if (_cpp_latest_flag_supported)
@@ -49,7 +43,6 @@ function(test test)
       endif()
 
       ## todo /arch:AVX
-      ## todo SSE2
 
       add_compile_options("/permissive-")
       add_compile_options("/W4") ## /WX)
@@ -77,18 +70,6 @@ function(test test)
       # target_link_libraries(test.${tmp} PRIVATE "-lpthread")
       target_link_libraries(test.${tmp} PRIVATE "-lstdc++fs")
 
-      if (CPU_SSE2_SUPPORTED)
-         add_compile_options("-msse2")
-         add_compile_options("-mfpmath=sse")
-      endif()
-
-      # -msse
-      # -msse2
-      # -msse3
-      # -mssse3
-      # -msse4
-      # -msse4a
-      # -msse4.1
       # -msse4.2
       # -mavx
       # -mavx2
@@ -139,7 +120,9 @@ test("structural_analysis.axis")
 test("structural_analysis.force")
 test("structural_analysis.lookup")
 test("structural_analysis.member")
-test("structural_analysis.space_truss")
+if (VIENNACL_FOUND)
+   test("structural_analysis.space_truss")
+endif()
 test("structural_analysis.space_truss.member")
 test("structural_analysis.space_truss.node")
 test("structural_analysis.support")
