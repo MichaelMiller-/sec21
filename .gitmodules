@@ -1,3 +1,0 @@
-[submodule "deps/range-v3"]
-path = deps/range-v3/
-url = git://github.com/ericniebler/range-v3
