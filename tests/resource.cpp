@@ -1,11 +1,12 @@
 #define CATCH_CONFIG_MAIN
-#include "catch.hpp"
+#include <catch.hpp>
 
 #include <memory>
 
 #include <sec21/resource.h>
 
-namespace abstraction
+// abstraction
+namespace mock 
 {
    namespace legacy
    {
@@ -141,6 +142,6 @@ TEST_CASE("generic unique resource class", "[core]")
    resource<customization_point::file> res1;
    REQUIRE(res1.operator bool() == false);
 
-   resource<customization_point::file> res2{ abstraction::file::open_file() };
+   resource<customization_point::file> res2{ mock::file::open_file() };
    REQUIRE(res2.operator bool() == true);
 }
