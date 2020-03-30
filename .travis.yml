@@ -12,20 +12,33 @@ matrix:
         sources:
         - ubuntu-toolchain-r-test
   - os: linux
-    env: COMPILER=clang++-6.0
+    env: COMPILER=g++-9
     addons:
       apt:
         packages:
-        - clang-6.0
+        - g++-9
         sources:
-        - ubuntu-toolchain-r-test
-        - llvm-toolchain-bionic-6.0
+        - ubuntu-toolchain-r-test        
+  - os: linux
+    env: COMPILER=clang++-8.0
+    addons:
+      apt:
+        packages:
+        - clang-8.0
+        sources:
+        - llvm-toolchain-bionic-8.0
+  - os: linux
+    env: COMPILER=clang++-9.0
+    addons:
+      apt:
+        packages:
+        - clang-9.0
+        sources:
+        - llvm-toolchain-bionic-9.0
 
 before_install:
 - export CXX="${COMPILER}"
 - sudo apt-get -qq update
-
-install: 
 
 before_script:
 - uname -a
