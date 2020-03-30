@@ -44,8 +44,6 @@ function(test test)
          endif()
       endif()
 
-      target_link_libraries(test.${tmp} PRIVATE "-ltbb")
-      # target_link_libraries(test.${tmp} PRIVATE "-lpthread")
       target_link_libraries(test.${tmp} PRIVATE "-lstdc++fs")
 
       # -msse4.2
