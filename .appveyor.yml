@@ -1,21 +1,42 @@
 image:
   - Visual Studio 2017
+  - Visual Studio 2019
+
+environment:
+  matrix:
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      CMAKE_GENERATOR: Visual Studio 15
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+      CMAKE_GENERATOR: Visual Studio 16
+
+platform:
+  - x64
+
 clone_folder: c:\projects\source
+
+cache: c:\tools\vcpkg\installed
+
 install:
-- cd C:\tools\vcpkg
-- git pull
-- .\bootstrap-vcpkg.bat
-- cd %APPVEYOR_BUILD_FOLDER%
-- vcpkg install glm:x86-windows
-- cd c:\tools\vcpkg
-- vcpkg integrate install
+  - cd c:\tools\vcpkg
+  - git pull
+  - .\bootstrap-vcpkg.bat
+  - cd %APPVEYOR_BUILD_FOLDER%
+  - vcpkg install boost-geometry:x64-windows
+  - vcpkg install boost-math:x64-windows
+  - vcpkg install boost-outcome:x64-windows
+  - vcpkg install boost-ublas:x64-windows
+  - vcpkg install boost-catch2:x64-windows
+  - vcpkg install glm:x64-windows
+  - vcpkg install nlohmann-json:x64-windows
+  - cd c:\tools\vcpkg
+  - vcpkg integrate install
 
 build_script:
-- cmd: >-
-    mkdir build
-    cd build
-    cmake c:\projects\source -G "Visual Studio 15" -DCMAKE_TOOLCHAIN_FILE=C:/Tools/vcpkg/scripts/buildsystems/vcpkg.cmake ..
-    cmake --build . --config "Debug"
+  - cmd: >-
+      mkdir c:\projects\source\build
+      cd c:\projects\source\build
+      cmake c:\projects\source -G $(CMAKE_GENERATOR) -A x64 -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake ..
+      cmake --build . --config "Debug"
 
 test_script:
-- cmd: ctest -C Debug
+  - cmd: ctest -C Debug
