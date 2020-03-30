@@ -31,11 +31,9 @@ before_script:
 - uname -a
 script:
 - mkdir -p _build && cd _build
-  ## codecov.io only supports only c++11 -> disable coverage
 - cmake .. -DENABLE_COVERAGE:BOOL=FALSE
-- cmake --build . -- -j4 VERBOSE=1
+- cmake --build . -- -j4
 - ctest -j2
-## - make gcov
 
 after_script:
 after_success:
