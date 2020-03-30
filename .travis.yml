@@ -19,22 +19,22 @@ matrix:
         - g++-9
         sources:
         - ubuntu-toolchain-r-test        
-  - os: linux
-    env: COMPILER=clang++-9.0
-    addons:
-      apt:
-        packages:
-        - clang-9.0
-        sources:
-        - llvm-toolchain-bionic-9
-  - os: linux
-    env: COMPILER=clang++-10.0
-    addons:
-      apt:
-        packages:
-        - clang-10.0
-        sources:
-        - llvm-toolchain-bionic-10
+  # - os: linux
+  #   env: COMPILER=clang++-9.0
+  #   addons:
+  #     apt:
+  #       packages:
+  #       - clang-9.0
+  #       sources:
+  #       - llvm-toolchain-bionic-9
+  # - os: linux
+  #   env: COMPILER=clang++-10.0
+  #   addons:
+  #     apt:
+  #       packages:
+  #       - clang-10.0
+  #       sources:
+  #       - llvm-toolchain-bionic-10
 
 before_install:
 - export CXX="${COMPILER}"
