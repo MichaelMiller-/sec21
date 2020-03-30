@@ -1,5 +1,4 @@
 image:
-  - Visual Studio 2017
   - Visual Studio 2019
 
 environment:
@@ -8,9 +7,6 @@ environment:
       CMAKE_GENERATOR: Visual Studio 15
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
       CMAKE_GENERATOR: Visual Studio 16
-
-platform:
-  - x64
 
 clone_folder: c:\projects\source
 
@@ -25,7 +21,7 @@ install:
   - vcpkg install boost-math:x64-windows
   - vcpkg install boost-outcome:x64-windows
   - vcpkg install boost-ublas:x64-windows
-  - vcpkg install boost-catch2:x64-windows
+  - vcpkg install catch2:x64-windows
   - vcpkg install glm:x64-windows
   - vcpkg install nlohmann-json:x64-windows
   - cd c:\tools\vcpkg
