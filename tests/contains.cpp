@@ -1,14 +1,14 @@
 ﻿#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
+#include <catch.hpp>
 
 #include <sec21/contains.h>
 
 #include <vector>
 
-using namespace sec21;
-
-TEST_CASE("check if sequence contains a element", "[core]")
+TEST_CASE("check if sequence contains a specific element", "[core]")
 {
+   using namespace sec21;
+
    SECTION("empty sequence")
    {
       auto input = std::vector<int>{};
