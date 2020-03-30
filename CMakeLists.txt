@@ -1,86 +1,60 @@
-cmake_minimum_required(VERSION 3.1)
-## 
-## https://github.com/sutambe/cpptruths/
-## http://cpptruths.blogspot.com/2019/03/bootstrapping-vcpkg-based-cmake-project_31.html
-##
-## set(MY_PROJECT_DEPENDENCIES boost) 
-# This section of cmake is using AutoVcpkg to download, install, and configure vcpkg.
-## list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
-## include(AutoVcpkg)
-## vcpkg_install(${MY_PROJECT_DEPENDENCIES})
-message(STATUS "CMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}")
-
 ## TODO: OpenMP Support is improved if cmake version is greater then 3.9
+cmake_minimum_required(VERSION 3.1)
+
 project(sec21 CXX)
+include(cmake/StandardProjectSettings.cmake)
 
-## set(CMAKE_BUILD_TYPE "Release")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_CXX_STANDARD 17)
+## TOOD: should be a vcpkg dependency
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/deps/viennacl/cmake")
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/deps/viennacl/cmake")
+## dependencies
+if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+  include(cmake/Vcpkg.cmake)
+  vcpkg_install(nlohmann-json boost-geometry boost-math boost-outcome boost-ublas catch2)
+  include(${CMAKE_TOOLCHAIN_FILE})
+endif()
+
+## header-only library
+add_library(${PROJECT_NAME} INTERFACE)
+set(Boost_USE_STATIC_LIBS ON)
+set(Boost_USE_STATIC_RUNTIME ON)
+find_package(Boost REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
+target_link_libraries(${PROJECT_NAME} INTERFACE nlohmann_json nlohmann_json::nlohmann_json)
+target_include_directories(sec21 SYSTEM INTERFACE include)
+
+include(cmake/CompilerWarnings.cmake)
+set_project_warnings(sec21)
+
+include(cmake/Sanitizers.cmake)
+enable_sanitizers(sec21)
+
+include(cmake/Doxygen.cmake)
+enable_doxygen()
+
+include(cmake/StaticAnalyzers.cmake)
+
+option(ENABLE_PCH "Enable Precompiled Headers" OFF)
+if (ENABLE_PCH)
+   target_precompile_headers(sec21 INTERFACE <vector> <string> <map> <utility> <algorithm>)
+endif()
+
+### 
+## TODO: cleanup
 
 find_package(OpenMP)
 if (OPENMP_FOUND)
-   message(STATUS "OpenMP Support is enabled")
+   set(ENABLE_OPENMP ON)
+   ## message(STATUS "OpenMP Support is enabled")
    # TODO
    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 endif()
+## TODO: cleanup
 
-if (CMAKE_COMPILER_IS_GNUCXX)
-   option(ENABLE_COVERAGE "Enable coverage reporting for gcc/clang" FALSE)
 
-   if (ENABLE_COVERAGE)
-      message(STATUS "Coverage is enabled")
-      add_compile_options(--coverage -O0)
-   endif()
-endif()
-
-add_library(sec21 INTERFACE)
-find_package(Boost 1.66 REQUIRED)
-target_include_directories(sec21 SYSTEM INTERFACE include/)
-
-# find_program(CMAKE_CXX_INCLUDE_WHAT_YOU_USE NAMES iwyu)
-# if (CMAKE_CXX_INCLUDE_WHAT_YOU_USE)
-#    message(STATUS "*include what you use* is enabled")
-# endif()
-
-# find_program(CMAKE_LINK_WHAT_YOU_USE NAMES lwyu)
-# if (CMAKE_LINK_WHAT_YOU_USE)
-#    message(STATUS "*link what you use* is enabled")
-# endif()
-
-# find_program(CMAKE_CXX_CLANG_TIDY NAMES clang-tidy)
-# if (CMAKE_CXX_CLANG_TIDY)
-#    message(STATUS "clang tidy is enabled")
-# endif()
-
-# find_program(CMAKE_CXX_CPPCHECK NAMES cppcheck)
-# if (CMAKE_CXX_CPPCHECK)
-#    message(STATUS "CppCheck is enabled")
-#    list(
-#       APPEND CMAKE_CXX_CPPCHECK 
-#          "--enable=warning"
-#          "--inconclusive"
-#          "--force" 
-#          "--inline-suppr"
-#          "--suppressions-list=${CMAKE_SOURCE_DIR}/CppCheckSuppressions.txt"
-#    )
-# endif()
-
-## display with http://webgraphviz.com/
-# add_custom_target(
-#    graphviz ALL
-#    "${CMAKE_COMMAND}" "--graphviz=graphviz.sec21" .
-#    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
-#    )
-
-## local Windows
-# cmake .. "-DCMAKE_TOOLCHAIN_FILE=C:/dev/vcpkg/scripts/buildsystems/vcpkg.cmake"
-
-## todo: gcc fsanitize
-
+option(ENABLE_TESTS "Enable tests" ON)
 option(ENABLE_BENCHMARKS "Enable benchmarks" FALSE)
 option(ENABLE_DATABASE_SERIALIZER "Enable database serlializer" FALSE)
 option(ENABLE_VIEWER "Enable system viewer" FALSE)
@@ -88,9 +62,10 @@ option(ENABLE_WEB_INTERFACE "Enable web interface" FALSE)
 option(ENABLE_PLOTTER "Enable plotter" FALSE)
 option(ENABLE_COLLECT "Enable collect" FALSE)
 option(ENABLE_SCRIPT_INTERFACE "Enable script interface" FALSE)
+option(ENABLE_EXPERIMENTAL "Enable experimental mode" OFF)
 
 if (ENABLE_BENCHMARKS)
-   message(STATUS "Benchmarks is enabled")
+   message(STATUS "Benchmarks enabled")
    configure_file(${CMAKE_SOURCE_DIR}/benchmarks.sqlite3 ${CMAKE_BINARY_DIR}/benchmarks.sqlite3 COPYONLY)
    add_subdirectory(benchmarks)
 endif()
@@ -125,19 +100,14 @@ if (ENABLE_SCRIPT_INTERFACE)
    add_subdirectory(scripting)
 endif()  
 
-# disable CppCheck for UnitTest
-unset(CMAKE_CXX_CPPCHECK)
+## TODO
+# if (ENABLE_FUZZING)
+#    message(STATUS "Fuzzing is enabled")
+#    add_subdirectory(fuzz_tests)
+# endif()  
 
-## to disable testing set BUILD_TESTING to false
-include(CTest)
-enable_testing()
-add_subdirectory(tests)
-## -- or
-## include(Catch)
-## catch_discover_tests(foo)
-## -- or
-## include(ParseAndAddCatchTests)
-## ParseAndAddCatchTests(foo)
-## -- or
-
-## TODO: enable dashboard scripting
+if (ENABLE_TESTS)
+   include(CTest)
+   enable_testing()
+   add_subdirectory(tests)
+endif()
