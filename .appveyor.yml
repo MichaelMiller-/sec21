@@ -31,7 +31,7 @@ build_script:
   - cmd: >-
       mkdir c:\projects\source\build
       cd c:\projects\source\build
-      cmake c:\projects\source -G $(CMAKE_GENERATOR) -A x64 -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake ..
+      cmake c:\projects\source -G $CMAKE_GENERATOR -A x64 -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake ..
       cmake --build . --config "Debug"
 
 test_script:
