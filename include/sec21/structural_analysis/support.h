@@ -6,7 +6,6 @@ namespace sec21::structural_analysis
 {
    enum class Support
    {
-      Free = 0,
       // reaction only in the y-axis
       Roller = 1,
       // reactions in the x & y axis
