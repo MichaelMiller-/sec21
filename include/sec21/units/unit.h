@@ -12,6 +12,7 @@ namespace sec21::units
    {
       using dimension_t = Dimension;
       using ratio_t = Ratio;
+      //! \todo abbreviation? as template parameter std::string_view
    };
 
 
@@ -28,13 +29,16 @@ namespace sec21::units
    };
 
    struct no_prefix;
+   struct base_unit;
 
-   // coherent derived units (units with ratio<1>)
    template <typename Child, typename Dimension, typename Prefix = no_prefix>
    struct coherent_derived_unit : cast_helper<unit<Dimension, std::ratio<1>>, Child> {};
 
    template<typename Child, typename...>
    struct derived_unit;
+
+   template <typename Child, typename Dimension>
+   struct derived_unit<Child, Dimension, base_unit> : cast_helper<unit<Dimension,  std::ratio<1>>, Child> {};
 
    template <typename Child, typename Dimension, typename Ratio>
    struct derived_unit<Child, Dimension, Ratio> : cast_helper<unit<Dimension, Ratio>, Child> {};
