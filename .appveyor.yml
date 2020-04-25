@@ -29,7 +29,7 @@ install:
 
 build_script:
   - cmd: >-
-      mkdir c:\projects\source\build
+      # mkdir c:\projects\source\build
       cd c:\projects\source\build
       cmake -G "Visual Studio 16" -A x64 -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake ..
       cmake --build . --config "Debug"
