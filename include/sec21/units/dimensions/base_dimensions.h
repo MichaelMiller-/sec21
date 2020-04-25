@@ -16,5 +16,5 @@ namespace sec21::units
    struct base_dimension_luminous_intensity : base_dimension<6> {};
 
    // tag to mark the SI base units
-   struct si_tag;
+   using si_tag = base_unit;
 }
