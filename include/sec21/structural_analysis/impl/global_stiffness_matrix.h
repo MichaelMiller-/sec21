@@ -11,7 +11,7 @@ namespace sec21::structural_analysis::impl
       using namespace boost::numeric;
 
       constexpr auto dim = System::node_t::dimension_v;
-      static_assert(dim == 2, "currently only works with 2D systems");
+      static_assert(System::node_t::dimension_v == 2, "Only works with 2D system");
 
       const auto n = std::size(sys.nodes) * dim;
       ublas::matrix<typename System::precision_t> result(n, n, 0);
