@@ -17,4 +17,11 @@ namespace sec21::units
 
    template <typename R1, typename R2>
    using common_ratio_t = typename detail::common_ratio_impl<R1, R2>::type;
+
+   template<auto Num, auto Denom>
+   constexpr auto factor(std::ratio<Num, Denom>) noexcept
+   {
+      static_assert(Denom != 0);
+      return Num / Denom;
+   }
 }
