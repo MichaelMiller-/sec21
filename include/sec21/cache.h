@@ -6,7 +6,7 @@
 #include <boost/function_types/result_type.hpp>
 #include <boost/function_types/parameter_types.hpp>
 
-#include "sec21/policies/clear.h"
+#include <sec21/policies/clear.h>
 
 namespace sec21 
 {
