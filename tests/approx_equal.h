@@ -1,4 +1,6 @@
-﻿#include "catch.hpp"
+﻿#pragma once
+
+#include <catch.hpp>
 
 #include <algorithm>
 
