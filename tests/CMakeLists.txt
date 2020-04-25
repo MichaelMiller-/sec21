@@ -1,11 +1,12 @@
 
 find_package(Catch2 CONFIG REQUIRED)
-find_package(Boost REQUIRED)
-find_package(ViennaCL)
+find_package(Boost 1.70 REQUIRED)
+# TODO:
+# find_package(ViennaCL)
 
-if (OPENMP_FOUND AND VIENNACL_FOUND)
-   message(STATUS "ViennaCL OpenMP Support is enabled") ## TODO: for "exe name"
-endif()
+# if (OPENMP_FOUND AND VIENNACL_FOUND)
+#    message(STATUS "ViennaCL OpenMP Support is enabled") ## TODO: for "exe name"
+# endif()
 
 
 function(test test)
@@ -13,6 +14,9 @@ function(test test)
    add_executable(test.${tmp} "${CMAKE_CURRENT_LIST_DIR}/${test}.cpp")
 
    target_link_libraries(test.${tmp} PRIVATE Catch2::Catch2)
+   # boost
+   target_include_directories(test.${tmp} PRIVATE ${Boost_INCLUDE_DIRS})
+   target_link_libraries(test.${tmp} PRIVATE ${Boost_LIBRARIES})
    ## viennacl
    target_include_directories(test.${tmp} PRIVATE "${CMAKE_SOURCE_DIR}/deps/viennacl")
 
@@ -56,7 +60,10 @@ function(test test)
 
    target_link_libraries(test.${tmp} PUBLIC sec21)
 
-   add_test(test.${tmp} "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test.${tmp}")
+   add_test(
+      NAME test.${tmp} 
+      COMMAND "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test.${tmp}"
+      WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
 endfunction()
 
 ## test data
@@ -66,8 +73,8 @@ configure_file("${PROJECT_SOURCE_DIR}/data/example_2.json" "${PROJECT_BINARY_DIR
 ## unit tests via catch (alphabetical order)
 ##
 test("any_of")
+test("all_of")
 test("cache")
-test("combine")
 test("concat")
 test("contains")
 test("dispatcher")
@@ -77,9 +84,11 @@ test("enumerate")
 test("fixed_string")
 test("flat_matrix")
 test("flat_vector")
+test("for_each_chunk")
 test("in_range")
 test("make_iota_array")
 test("math")
+test("numeric.make_vector")
 test("perfect.forwarding")
 test("projection_func")
 test("property_tree")
@@ -89,10 +98,8 @@ test("structural_analysis.axis")
 test("structural_analysis.force")
 test("structural_analysis.lookup")
 test("structural_analysis.member")
-# if (VIENNACL_FOUND)
-   # test("structural_analysis.space_truss")
-   # test("structural_analysis.space_truss.example2")
-# endif()
+test("structural_analysis.space_truss")
+#  test("structural_analysis.space_truss.example2")
 test("structural_analysis.space_truss.member")
 test("structural_analysis.space_truss.node")
 test("structural_analysis.support")
@@ -100,3 +107,4 @@ test("traits")
 test("units.dimension")
 test("units.quantity")
 test("units.ratio")
+test("zip")
