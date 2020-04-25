@@ -199,4 +199,104 @@ namespace sec21::units
       return rt{ lhs / rhs.value() };
    }
 
+   template <typename T>
+   struct type_info {};
+
+   template <typename T>
+   struct abbreviation {};
+
+   template <typename CharT, typename Trais, typename Unit, typename T>
+   auto operator << (std::basic_ostream<CharT, Trais>& os, quantity<Unit, T> const& v) -> std::basic_ostream<CharT, Trais>&
+   {
+      return os << v.value(); // << abbreviation<T>::value;
+   }
+}
+
+
+#include <nlohmann/json.hpp>
+#include <boost/lexical_cast.hpp>
+#include <tuple>
+#include <sstream>
+#include <string_view>
+
+namespace sec21::units
+{
+   namespace detail
+   {
+      template <typename T>
+      auto to_abbreviation(T) noexcept
+      {
+         return abbreviation<T>::value;
+      }
+      template <typename Tuple, std::size_t... Is>
+      constexpr decltype(auto) transform_to_abbreviation(Tuple&& tuple, std::index_sequence<Is...>)
+      {
+         // c++20
+         // constexpr auto impl = []<typename T>(T){ return abbreviation<T>::value; };
+         return std::tuple{ to_abbreviation(std::get<Is>(tuple))...};
+      }
+
+      template <typename T, typename Precision = double>
+      auto valid_dimension(std::string_view unit) -> bool
+      {
+         typename type_info<T>::valid_types_t valid_types{};
+
+         constexpr auto N = std::tuple_size_v<decltype(valid_types)>;
+         const auto dfs = transform_to_abbreviation(valid_types, std::make_index_sequence<N>{});
+
+         return std::apply([&](auto const &... v) { return ((v == unit) || ...); }, dfs);
+      }
+
+      auto split(std::string const& input)
+      {
+         const std::string delimiter = "_";    
+         auto pos = input.find(delimiter);
+         if (pos == std::string::npos)
+            throw std::runtime_error("");
+
+         auto token = input.substr(0, pos);
+         auto unit = input.substr(pos + std::size(delimiter));
+
+         return std::tuple{token, unit};
+      }
+
+      template <typename Unit, typename T>
+      auto to_string(quantity<Unit, T> const& obj) -> std::string
+      {
+         std::stringstream ss;
+         ss << obj.value() << '_' << abbreviation<Unit>::value;
+         return ss.str();
+      }
+
+      template <typename Unit, typename T>
+      auto from_string(std::string const& input) -> quantity<Unit, T>
+      {
+         auto [value, unit] = split(input);
+
+         bool valid = valid_dimension<typename Unit::dimension_t>(unit);
+         
+         if (valid == false)
+            throw std::runtime_error("couldn't match input unit with dimension type");
+
+         auto v = boost::lexical_cast<double>(value) * 1.0;
+         //! \todo 
+         return { static_cast<T>(v) };
+      }
+   }
+
+   template <typename Unit, typename T>
+   void to_json(nlohmann::json& j, quantity<Unit, T> const& obj) {
+      // auto v = obj.value();
+      j = nlohmann::json{
+         {"value", detail::to_string(obj)}
+      };
+   }
+
+   template <typename Unit, typename T>
+   void from_json(nlohmann::json const& j, quantity<Unit, T>& obj) 
+   {
+      std::string value;
+      j.at("value").get_to(value);
+      obj = detail::from_string<Unit, T>(value);
+   }
 }
