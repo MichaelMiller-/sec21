@@ -9,10 +9,43 @@ namespace sec21::units
    using length = dimension<exponent<base_dimension_length, 1>>;
    
    // units
-   struct meter : coherent_derived_unit<meter, length, si_tag> {};
+   struct meter : derived_unit<meter, length, si_tag> {};
    struct millimeter : derived_unit<millimeter, length, std::milli> {};
    struct centimeter : derived_unit<centimeter, length, std::centi> {};
    struct kilometer : derived_unit<kilometer, length, std::kilo> {};
+
+   template <>
+   struct abbreviation<meter>
+   {
+      using dimension_t = meter::dimension_t;
+      constexpr static std::string_view value{"m"};
+   };
+   template <>
+   struct abbreviation<millimeter>
+   {
+      using dimension_t = millimeter::dimension_t;
+      constexpr static std::string_view value{"mm"};
+   };
+   template <>
+   struct abbreviation<centimeter>
+   {
+      using dimension_t = millimeter::dimension_t;
+      constexpr static std::string_view value{"mm"};
+   };   
+   template <>
+   struct abbreviation<kilometer>
+   {
+      using type_t = kilometer;
+      using dimension_t = kilometer::dimension_t;
+      constexpr static std::string_view value{"km"};
+   };
+
+   template <>
+   struct type_info<length>
+   {
+      using valid_types_t = std::tuple<kilometer, millimeter, meter>;
+      constexpr static std::string_view name{"length"};
+   };
 
    inline namespace literals
    {

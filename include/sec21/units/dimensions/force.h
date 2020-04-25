@@ -16,6 +16,29 @@ namespace sec21::units
    struct kilonewton : derived_unit<kilonewton, force, std::kilo> {};
    struct meganewton : derived_unit<meganewton, force, std::mega> {};
 
+   template <>
+   struct abbreviation<newton>
+   {
+      constexpr static std::string_view value{"N"};
+   };
+   template <>
+   struct abbreviation<kilonewton>
+   {
+      constexpr static std::string_view value{"kN"};
+   };
+   template <>
+   struct abbreviation<meganewton>
+   {
+      constexpr static std::string_view value{"MN"};
+   };   
+
+   template <>
+   struct type_info<force>
+   {
+      using valid_types_t = std::tuple<newton, kilonewton, meganewton>;
+      constexpr static std::string_view name{"force"};
+   };
+
    inline namespace literals
    {
       constexpr auto operator "" _N(unsigned long long v) noexcept  { return quantity<newton, unsigned long long>{ v }; }
