@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 namespace sec21
 {
    namespace detail
@@ -10,9 +12,9 @@ namespace sec21
          static_assert(ChunkSize > 1);
 
          template <typename Iterator, typename Callable, std::size_t ...Is>
-         constexpr auto invoke(Iterator first, Callable func, std::index_sequence<Is...>) const
+         constexpr auto invoke(Iterator first, Callable&& func, std::index_sequence<Is...>) const
          {
-            return std::invoke(func, *std::next(first, Is)...);
+            return std::invoke(std::forward<Callable>(func), *std::next(first, Is)...);
          }
 
       public:
@@ -21,9 +23,10 @@ namespace sec21
          {
             while (std::distance(first, last) >= ChunkSize)
             {
-                  invoke(first, std::forward<Callable>(func), std::make_index_sequence<ChunkSize>{});
-                  std::advance(first, ChunkSize);
+               invoke(first, std::forward<Callable>(func), std::make_index_sequence<ChunkSize>{});
+               std::advance(first, ChunkSize);
             }
+            //! \todo: if std::distance(first, last) > 0 
          }
       };
    }
@@ -31,6 +34,6 @@ namespace sec21
    template <auto ChunkSize, typename Iterator, typename Callable>
    void for_each_chunk(Iterator first, Iterator last, Callable&& func)
    {
-      return detail::for_each_chunk_impl<ChunkSize>()(first, last, std::forward<Callable>(func));
+      detail::for_each_chunk_impl<ChunkSize>()(first, last, std::forward<Callable>(func));
    }
 }
