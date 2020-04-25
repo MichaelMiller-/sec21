@@ -1,5 +1,6 @@
 #pragma once
 
+#include <sec21/access.h>
 #include <sec21/units/quantity.h>
 #include <sec21/units/dimensions/force.h>
 
@@ -18,13 +19,16 @@ namespace sec21::structural_analysis
    [[nodiscard]] constexpr auto operator + (force_t<Dimension> const& lhs, force_t<Dimension> const& rhs) noexcept -> force_t<Dimension>
    {
       if constexpr (Dimension == 2) {
-         return { { std::get<0>(lhs) + std::get<0>(rhs), std::get<1>(lhs) + std::get<1>(rhs) } };
+         return { { 
+            X(lhs) + X(rhs), 
+            Y(lhs) + Y(rhs) 
+         } };
       }
       if constexpr (Dimension == 3) {
          return { { 
-            std::get<0>(lhs) + std::get<0>(rhs),
-            std::get<1>(lhs) + std::get<1>(rhs),
-            std::get<2>(lhs) + std::get<2>(rhs)
+            X(lhs) + X(rhs),
+            Y(lhs) + Y(rhs),
+            Z(lhs) + Z(rhs)
          } };
       }
    }
