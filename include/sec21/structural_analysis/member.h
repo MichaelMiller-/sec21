@@ -39,3 +39,22 @@ namespace sec21::structural_analysis
    concept Member = is_member<T>::value;
 #endif   
 }
+
+#include <nlohmann/json.hpp>
+
+namespace sec21::structural_analysis
+{
+   void to_json(nlohmann::json& j, member const& obj) {
+      j = nlohmann::json{
+         {"id", obj.id},
+         {"E", obj.E},
+         {"A", obj.A}
+      };
+   }
+   void from_json(nlohmann::json const& j, member& obj) 
+   {
+      j.at("id").get_to(obj.id);
+      j.at("E").get_to(obj.E);
+      j.at("A").get_to(obj.A);
+   }
+}
