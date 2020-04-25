@@ -1,12 +1,12 @@
 ﻿#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
+#include <catch.hpp>
 
 #include <type_traits>
 #include <ratio>
 
 #include <sec21/units/ratio.h>
 
-TEST_CASE("units ratio", "[compilation-only]") 
+TEST_CASE("units ratio", "[sec21][units]") 
 {
    using namespace sec21::units;
 
@@ -15,8 +15,6 @@ TEST_CASE("units ratio", "[compilation-only]")
 
    using r1 = common_ratio_t<two_third, one_sixth>;
 
-   static_assert(std::is_same_v<r1, std::ratio<2, 3>>);
-
-   SUCCEED("Compiletimetests");
+   STATIC_REQUIRE(std::is_same_v<r1, std::ratio<2, 3>>);
 }
 
