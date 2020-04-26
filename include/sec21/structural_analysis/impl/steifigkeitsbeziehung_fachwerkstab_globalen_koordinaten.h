@@ -12,13 +12,14 @@ namespace sec21::structural_analysis::impl
    //   --- * | -c^2  -s*c   c^2   s*c | * | u_2 |  =  | Fx2 | 
    //    l    | -s*c  -s^2   s*c   s^2 |   | v_2 |     | Fy2 | 
    //
+
+   //! \todo rename
    template <typename System>
    [[nodiscard]] auto steifigkeitsbeziehung_fachwerkstab_globalen_koordinaten(
       System const& sys,
       typename System::member_descriptor_t id)
    {
-      const auto[start_node, end_node] = sys.adjacency_list.at(id);
-      const auto angle = angle_to_x_axis(sys.nodes.at(start_node), sys.nodes.at(end_node));
+      const auto angle = angle_to_x_axis(sys, id);
 
       using namespace boost::math;
 
