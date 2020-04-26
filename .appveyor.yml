@@ -28,10 +28,10 @@ install:
   - vcpkg integrate install
 
 build_script:
-  - cmd: >-
-      cd c:\projects\source\build
-      cmake -G "Visual Studio 16" -A x64 -DCMAKE_TOOLCHAIN_FILE=c:\tools\vcpkg\scripts\buildsystems\vcpkg.cmake ..
-      cmake --build . --config "Debug"
+  - mkdir c:\projects\source\_build
+  - cd c:\projects\source\_build
+  - cmake -G "Visual Studio 16" -A x64 -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake ..
+  - cmake --build . --config "Debug"
 
 test_script:
   - cmd: ctest -C Debug
