@@ -1,6 +1,6 @@
 #pragma once
 
-#include <sec21/structural_analysis/impl/zuordnungsmatrix.h>
+#include <sec21/structural_analysis/impl/coincidence_matrix.h>
 #include <sec21/structural_analysis/impl/steifigkeitsbeziehung_fachwerkstab_globalen_koordinaten.h>
 
 #include <boost/numeric/ublas/matrix.hpp>
@@ -14,7 +14,7 @@ namespace sec21::structural_analysis::impl
       using namespace boost::numeric;
 
       constexpr auto dim = System::node_t::dimension_v;
-      static_assert(dim == 2, "currently only works with 2D systems");
+      static_assert(System::node_t::dimension_v == 2, "Only works with 2D system");
 
       using precision_t = typename System::precision_t;
 
@@ -24,10 +24,10 @@ namespace sec21::structural_analysis::impl
       if (const auto it = std::find_if(std::begin(sys.members), std::end(sys.members), [&id](auto && e) { return id == e.id; }); it != std::end(sys.members))
       {
          auto K = steifigkeitsbeziehung_fachwerkstab_globalen_koordinaten(sys, it->id);
-         auto Z = zuordnungsmatrix(sys, it->id);
+         auto Z = coincidence_matrix(sys, it->id);
          ublas::matrix<precision_t> Z_transposed = boost::numeric::ublas::trans(Z);
          ublas::matrix<precision_t> K_1 = ublas::prod(Z_transposed, K);
-         //! \todo use opb_prod() or axpy_prod()
+         //! \todo use opb_prod() or axpy_prod() -> benchmark
          // ublas::opb_prod(ublas::prod(Z_transposed, K), Z, result, false);
          result = ublas::prod(K_1, Z);
       }
