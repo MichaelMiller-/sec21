@@ -1,7 +1,7 @@
 
 set(CMAKE_CXX_STANDARD 17)
 # output directory
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 
 find_program(CCACHE ccache)
@@ -13,7 +13,7 @@ else()
 endif()
 
 # Generate compile_commands.json to make it easier to work with clang based tools
-set(CMAKE_EXPORT_COMPILE_COMMANDS OFF)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 ## TODO: possible to connect with: https://www.sourcetrail.com/
 
 
