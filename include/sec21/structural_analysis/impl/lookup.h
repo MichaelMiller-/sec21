@@ -10,7 +10,6 @@
 
 namespace sec21::structural_analysis::impl
 {
-   //! \todo 2019-09-10: more lika a matrix-row and -col
    enum class Row {};
    enum class Col {};
 
@@ -21,15 +20,15 @@ namespace sec21::structural_analysis::impl
    struct is_col : std::is_same<T, Col> {};
 
    // pre-increment behavior for Row
-   Row& operator++(Row &r) noexcept {
+   Row& operator ++ (Row &r) noexcept 
+   {
       using ut = typename std::underlying_type<Row>::type;
       r = static_cast<Row>(static_cast<ut>(r) + 1);
       return r;
    }
 
-
    template <typename System, typename T, typename Predicate>
-   auto filter(System const& sys, T&& in, Predicate pred)
+   auto filter(System const& sys, T&& in, Predicate&& pred)
    {
       auto result{in};
       auto first = std::begin(result);
@@ -75,5 +74,33 @@ namespace sec21::structural_analysis::impl
       });
       return result;
    }
-} // namespace sec21::structural_analysis
 
+   template <
+      typename InputIterator1, 
+      typename InputIterator2, 
+      typename OutputIterator1,
+      typename OutputIterator2>
+   //! \todo possible to implement as a real partition and return the pivot iterator 
+   auto partition_lookup(
+      InputIterator1 first1, 
+      InputIterator1 last1, 
+      InputIterator2 first2, 
+      InputIterator2 last2, 
+      OutputIterator1 out_true,
+      OutputIterator2 out_false) -> std::pair<OutputIterator1, OutputIterator2>
+   {
+      static_assert(std::is_convertible_v<typename std::iterator_traits<InputIterator2>::value_type, bool>);
+
+      while (first1 != last1 && first2 != last2) 
+      {
+         if (*first2 == true)
+            *out_true++ = *first1;
+         else
+            *out_false++ = *first1;
+         ++first1;
+         ++first2;
+      }
+      return { out_true, out_false };
+   }
+
+} // namespace sec21::structural_analysis
