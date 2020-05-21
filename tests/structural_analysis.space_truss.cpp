@@ -1,5 +1,4 @@
-﻿#define CATCH_CONFIG_MAIN
-#include <catch.hpp>
+﻿#include <catch.hpp>
 #include "approx_equal.h"
 
 #include <sec21/access.h>
@@ -7,16 +6,11 @@
 #include <sec21/flat_matrix.h>
 #include <sec21/structural_analysis/space_truss.h>
 #include <sec21/structural_analysis/system_result.h>
-// test impl
-#include <sec21/structural_analysis/impl/coincidence_matrix.h>
-#include <sec21/structural_analysis/impl/geometry.h>
-#include <sec21/structural_analysis/impl/stiffness_matrix.h>
-#include <sec21/structural_analysis/impl/global_stiffness_matrix.h>
-#include <sec21/structural_analysis/impl/load_vector.h>
-#include <sec21/structural_analysis/impl/steifigkeitsbeziehung_fachwerkstab_globalen_koordinaten.h>
+#include <sec21/structural_analysis/solve.h>
 
 #include <vector>
 #include <array>
+#include <valarray>
 #include <utility>
 #include <algorithm>
 
@@ -35,11 +29,13 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    static_assert(is_space_truss_2D<decltype(sys)>::value);
 
    using precision_t = decltype(sys)::precision_t;
+   using node_t = decltype(sys)::node_t;
+   using support_t = node_t::global_support_t;
 
    auto n1 = add_node(sys, {1, {0.0, 3.0}});
    auto n2 = add_node(sys, {2, {3.0, 3.0}, std::nullopt, space_truss::force_t{{10.0_kN, -10.0_kN}}});
-   auto n3 = add_node(sys, {3, {3.0, 0.0}, Support::Roller});
-   auto n4 = add_node(sys, {4, {0.0, 0.0}, Support::Hinge});
+   auto n3 = add_node(sys, {3, {3.0, 0.0}, support_t{ false, true }});
+   auto n4 = add_node(sys, {4, {0.0, 0.0}, support_t{ true, true }});
 
    REQUIRE(static_cast<bool>(n1) == true);
    REQUIRE(static_cast<bool>(n2) == true);
@@ -49,13 +45,15 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    //! \todo use units
    // constexpr auto E = 210.0_kPa;
    // constexpr auto A = unit::square_meter<double>(0.004);
+   auto m1 = add_member(sys, 1, 2, {1, 0.004, 21'000'000});
+   auto m2 = add_member(sys, 3, 2, {2, 0.004, 21'000'000});
+   auto m3 = add_member(sys, 4, 3, {3, 0.004, 21'000'000});
+   auto m4 = add_member(sys, 4, 1, {4, 0.004, 21'000'000});
+   auto m5 = add_member(sys, 4, 2, {5, 0.004, 21'000'000});
+   auto m6 = add_member(sys, 3, 1, {6, 0.004, 21'000'000});
 
-   auto m1 = add_member(sys, 1, 2, {1, 0.004, 210'000'000});
-   auto m2 = add_member(sys, 3, 2, {2, 0.004, 210'000'000});
-   auto m3 = add_member(sys, 4, 3, {3, 0.004, 210'000'000});
-   auto m4 = add_member(sys, 4, 1, {4, 0.004, 210'000'000});
-   auto m5 = add_member(sys, 4, 2, {5, 0.004, 210'000'000});
-   auto m6 = add_member(sys, 3, 1, {6, 0.004, 210'000'000});
+   const auto EA_l1 = 28'000;
+   const auto EA_l2 = 19'798.98987;
 
    REQUIRE(static_cast<bool>(m1) == true);
    REQUIRE(static_cast<bool>(m2) == true);
@@ -64,11 +62,11 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    REQUIRE(static_cast<bool>(m5) == true);
    REQUIRE(static_cast<bool>(m6) == true);
 
-   // {
-   //    std::ofstream ofs{"output_example_1.json"};
-   //    nlohmann::json j = sys;
-   //    ofs << std::setw(4) << j;
-   // }
+   {
+      std::ofstream ofs{"output_example_1.json"};
+      nlohmann::json j = sys;
+      ofs << std::setw(4) << j;
+   }
 
    SECTION("test the geometry of the system")
    {
@@ -109,13 +107,24 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       REQUIRE(std::size(lookup) == std::size(expected));
       REQUIRE(std::equal(std::begin(lookup), std::end(lookup), std::begin(expected)));
 
-      //! \todo check
-      auto result = filter(sys, lookup, is_node_in_dir_supported);
-      //! \todo rename
-      const auto expected_festgehaltende_zeilen = std::vector{ Row{5}, Row{6}, Row{7} };
+      std::vector<bool> mask;
+      support_mask(std::begin(sys.nodes), std::end(sys.nodes), std::back_inserter(mask));
 
-      REQUIRE(std::size(result) == std::size(expected_festgehaltende_zeilen));
-      REQUIRE(std::equal(std::begin(result), std::end(result), std::begin(expected_festgehaltende_zeilen)));
+      decltype(lookup) supported_nodes;
+      decltype(lookup) not_supported_nodes;
+
+      partition_lookup(
+         std::begin(lookup), 
+         std::end(lookup),
+         std::begin(mask), 
+         std::end(mask),
+         std::back_inserter(supported_nodes),
+         std::back_inserter(not_supported_nodes));
+
+      const auto expected_rows = std::vector{ Row{5}, Row{6}, Row{7} };
+
+      REQUIRE(std::size(supported_nodes) == std::size(expected_rows));
+      REQUIRE(std::equal(std::begin(supported_nodes), std::end(supported_nodes), std::begin(expected_rows)));
    }
    SECTION("Steifigkeitsbeziehung vom Fachwerkstab 1 in globalen Koordinaten")
    {
@@ -131,12 +140,13 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       /// Fx2           -1  0  1  0      u2
       /// Fy2            0  0  0  0      v2
       ///
-      const auto expected = std::array{
+      auto expected = std::valarray{
          1, 0,-1, 0,
          0, 0, 0, 0,
         -1, 0, 1, 0,
          0, 0, 0, 0
       };
+      expected *= EA_l1;
       //! \clang-format on
       REQUIRE(approx_equal(sec21::flat_matrix(result), expected, kDivergence));
    }
@@ -154,12 +164,13 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       /// Fx2            0  0  0  0      u2
       /// Fy2            0 -1  0  1      v2
       ///
-      const auto expected = std::array{
+      auto expected = std::valarray{
          0, 0, 0, 0,
          0, 1, 0,-1,
          0, 0, 0, 0,
          0,-1, 0, 1
       };
+      expected *= EA_l1;
       //! \clang-format on
       REQUIRE(approx_equal(sec21::flat_matrix(result), expected, kDivergence));
    }
@@ -177,12 +188,13 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       /// Fx3           -1  0  1  0      u3
       /// Fy3            0  0  0  0      v3
       ///
-      const auto expected = std::array{
+      auto expected = std::valarray{
          1, 0,-1, 0,
          0, 0, 0, 0,
         -1, 0, 1, 0,
          0, 0, 0, 0
       };
+      expected *= EA_l1;
       //! \clang-format on
       REQUIRE(approx_equal(sec21::flat_matrix(result), expected, kDivergence));
    }
@@ -200,27 +212,29 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       /// Fx4            0  0  0  0      u4
       /// Fy4            0  -1  0  1     v4
       ///
-      const auto expected = std::array{
+      auto expected = std::valarray{
          0, 0, 0, 0,
          0, 1, 0,-1,
          0, 0, 0, 0,
          0,-1, 0, 1
       };
+      expected *= EA_l1;
       //! \clang-format on
       REQUIRE(approx_equal(sec21::flat_matrix(result), expected, kDivergence));
-   }         
+   }
    SECTION("Steifigkeitsbeziehung vom Fachwerkstab 5 in globalen Koordinaten")
    {
       auto result = impl::steifigkeitsbeziehung_fachwerkstab_globalen_koordinaten(sys, m5.value());
       REQUIRE(result.size1() == 4);
       REQUIRE(result.size2() == 4);
       //! \clang-format off
-      const auto expected = std::array{
-          0.35355, 0.35355,-0.35355,-0.35355,
-          0.35355, 0.35355,-0.35355,-0.35355,
-         -0.35355,-0.35355, 0.35355, 0.35355,
-         -0.35355,-0.35355, 0.35355, 0.35355
+      auto expected = std::valarray{
+          0.5, 0.5,-0.5,-0.5,
+          0.5, 0.5,-0.5,-0.5,
+         -0.5,-0.5, 0.5, 0.5,
+         -0.5,-0.5, 0.5, 0.5
       };
+      expected *= EA_l2; // E*A / l
       //! \clang-format on
       REQUIRE(approx_equal(sec21::flat_matrix(result), expected, kDivergence));
    }
@@ -230,16 +244,17 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       REQUIRE(result.size1() == 4);
       REQUIRE(result.size2() == 4);
       //! \clang-format off
-      const auto expected = std::array{
-          0.35355,-0.35355,-0.35355, 0.35355,
-         -0.35355, 0.35355, 0.35355,-0.35355,
-         -0.35355, 0.35355, 0.35355,-0.35355,
-          0.35355,-0.35355,-0.35355, 0.35355
+      auto expected = std::valarray{
+          0.5,-0.5,-0.5, 0.5,
+         -0.5, 0.5, 0.5,-0.5,
+         -0.5, 0.5, 0.5,-0.5,
+          0.5,-0.5,-0.5, 0.5
       };
+      expected *= EA_l2; // E*A / l
       //! \clang-format on
       REQUIRE(approx_equal(sec21::flat_matrix(result), expected, kDivergence));
    }
-   SECTION("Zuordnungsmatrix vom Fachwerkstab 1")
+   SECTION("coincidence matrix from member 1")
    {
       auto Z = impl::coincidence_matrix(sys, m1.value());
       REQUIRE(Z.size1() == 4);
@@ -254,7 +269,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       //! \clang-format on
       REQUIRE(approx_equal(sec21::flat_matrix(Z), expected, kDivergence));
    }
-   SECTION("Zuordnungsmatrix vom Fachwerkstab 2")
+   SECTION("coincidence matrix from member 2")
    {
       auto Z = impl::coincidence_matrix(sys, m2.value());
       REQUIRE(Z.size1() == 4);
@@ -269,7 +284,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       //! \clang-format on
       REQUIRE(approx_equal(sec21::flat_matrix(Z), expected, kDivergence));
    }
-   SECTION("Zuordnungsmatrix vom Fachwerkstab 3")
+   SECTION("coincidence matrix from member 3")
    {
       auto Z = impl::coincidence_matrix(sys, m3.value());
       REQUIRE(Z.size1() == 4);
@@ -284,7 +299,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       //! \clang-format on
       REQUIRE(approx_equal(sec21::flat_matrix(Z), expected, kDivergence));
    }
-   SECTION("Zuordnungsmatrix vom Fachwerkstab 4")
+   SECTION("coincidence matrix from member 4")
    {
       auto Z = impl::coincidence_matrix(sys, m4.value());
       REQUIRE(Z.size1() == 4);
@@ -299,7 +314,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       //! \clang-format on
       REQUIRE(approx_equal(sec21::flat_matrix(Z), expected, kDivergence));
    }     
-   SECTION("Zuordnungsmatrix vom Fachwerkstab 5")
+   SECTION("coincidence matrix from member 5")
    {
       auto Z = impl::coincidence_matrix(sys, m5.value());
       REQUIRE(Z.size1() == 4);
@@ -314,7 +329,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       //! \clang-format on
       REQUIRE(approx_equal(sec21::flat_matrix(Z), expected, kDivergence));
    }
-   SECTION("Zuordnungsmatrix vom Fachwerkstab 6")
+   SECTION("coincidence matrix from member 6")
    {
       auto Z = impl::coincidence_matrix(sys, m6.value());
       REQUIRE(Z.size1() == 4);
@@ -328,14 +343,14 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       };
       //! \clang-format on
       REQUIRE(approx_equal(sec21::flat_matrix(Z), expected, kDivergence));
-   }   
-   SECTION("Steifigkeitsmatrix vom Fachwerkstab 1")
+   }
+   SECTION("stiffness matrix from member 1")
    {
       auto K = impl::stiffness_matrix(sys, m1.value());
       REQUIRE(K.size1() == 8);
       REQUIRE(K.size2() == 8);
       //! \clang-format off
-      const auto expected = std::array{
+      auto expected = std::valarray{
          1.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
          0.0, 0.0,  0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
         -1.0, 0.0,  1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -345,18 +360,19 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
          0.0, 0.0,  0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
          0.0, 0.0,  0.0, 0.0, 0.0, 0.0, 0.0, 0.0
       };
+      expected *= EA_l1;
       //! \clang-format on
       const auto flattend_K = sec21::flat_matrix(K);
       REQUIRE(std::size(flattend_K) == std::size(expected));
       REQUIRE(approx_equal(flattend_K, expected, kDivergence));
    }   
-   SECTION("Steifigkeitsmatrix vom Fachwerkstab 2")
+   SECTION("stiffness matrix from member 2")
    {
       auto K = impl::stiffness_matrix(sys, m2.value());
       REQUIRE(K.size1() == 8);
       REQUIRE(K.size2() == 8);
       //! \clang-format off
-      const auto expected = std::array{
+      auto expected = std::valarray{
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -366,18 +382,19 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
       };
+      expected *= EA_l1;
       //! \clang-format on
       const auto flattend_K = sec21::flat_matrix(K);
       REQUIRE(std::size(flattend_K) == std::size(expected));
       REQUIRE(approx_equal(flattend_K, expected, kDivergence));
    }
-   SECTION("Steifigkeitsmatrix vom Fachwerkstab 3")
+   SECTION("stiffness matrix from member 3")
    {
       auto K = impl::stiffness_matrix(sys, m3.value());
       REQUIRE(K.size1() == 8);
       REQUIRE(K.size2() == 8);
       //! \clang-format off
-      const auto expected = std::array{
+      auto expected = std::valarray{
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -387,18 +404,19 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
          0.0, 0.0, 0.0, 0.0,-1.0, 0.0, 1.0, 0.0,
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
       };
+      expected *= EA_l1;
       //! \clang-format on
       const auto flattend_K = sec21::flat_matrix(K);
       REQUIRE(std::size(flattend_K) == std::size(expected));
       REQUIRE(approx_equal(flattend_K, expected, kDivergence));
    }
-   SECTION("Steifigkeitsmatrix vom Fachwerkstab 4")
+   SECTION("stiffness matrix from member 4")
    {
       auto K = impl::stiffness_matrix(sys, m4.value());
       REQUIRE(K.size1() == 8);
       REQUIRE(K.size2() == 8);
       //! \clang-format off
-      const auto expected = std::array{
+      auto expected = std::valarray{
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
          0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0,-1.0,
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -408,60 +426,63 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
          0.0,-1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0
       };
-      //! \clang-format on
-      const auto flattend_K = sec21::flat_matrix(K);
-      REQUIRE(std::size(flattend_K) == std::size(expected));
-      REQUIRE(approx_equal(flattend_K, expected, kDivergence));
-   }      
-   SECTION("Steifigkeitsmatrix vom Fachwerkstab 5")
-   {
-      auto K = impl::stiffness_matrix(sys, m5.value());
-      REQUIRE(K.size1() == 8);
-      REQUIRE(K.size2() == 8);
-      //! \clang-format off
-      const auto expected = std::array{
-         0.0, 0.0,  0.0,  0.0,  0.0, 0.0,  0.0,   0.0,
-         0.0, 0.0,  0.0,  0.0,  0.0, 0.0,  0.0,   0.0,
-         0.0, 0.0,  0.35, 0.35, 0.0, 0.0, -0.35, -0.35,
-         0.0, 0.0,  0.35, 0.35, 0.0, 0.0, -0.35, -0.35,
-         0.0, 0.0,  0.0,  0.0,  0.0, 0.0,  0.0,   0.0,
-         0.0, 0.0,  0.0,  0.0,  0.0, 0.0,  0.0,   0.0,
-         0.0, 0.0, -0.35,-0.35, 0.0, 0.0,  0.35,  0.35,
-         0.0, 0.0, -0.35,-0.35, 0.0, 0.0,  0.35,  0.35
-      };
+      expected *= EA_l1;
       //! \clang-format on
       const auto flattend_K = sec21::flat_matrix(K);
       REQUIRE(std::size(flattend_K) == std::size(expected));
       REQUIRE(approx_equal(flattend_K, expected, kDivergence));
    }
-   SECTION("Steifigkeitsmatrix vom Fachwerkstab 6")
+   SECTION("stiffness matrix from member 5")
+   {
+      auto K = impl::stiffness_matrix(sys, m5.value());
+      REQUIRE(K.size1() == 8);
+      REQUIRE(K.size2() == 8);
+      //! \clang-format off
+      auto expected = std::valarray{
+         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.5, 0.5, 0.0, 0.0,-0.5,-0.5,
+         0.0, 0.0, 0.5, 0.5, 0.0, 0.0,-0.5,-0.5,
+         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.0,-0.5,-0.5, 0.0, 0.0, 0.5, 0.5,
+         0.0, 0.0,-0.5,-0.5, 0.0, 0.0, 0.5, 0.5
+      };
+      expected *= EA_l2;
+      //! \clang-format on
+      const auto flattend_K = sec21::flat_matrix(K);
+      REQUIRE(std::size(flattend_K) == std::size(expected));
+      REQUIRE(approx_equal(flattend_K, expected, kDivergence));
+   }
+   SECTION("stiffness matrix from member 6")
    {
       auto K = impl::stiffness_matrix(sys, m6.value());
       REQUIRE(K.size1() == 8);
       REQUIRE(K.size2() == 8);
       //! \clang-format off
-      const auto expected = std::array{
-         0.35,-0.35, 0.0, 0.0,-0.35, 0.35, 0.0, 0.0,
-        -0.35, 0.35, 0.0, 0.0, 0.35,-0.35, 0.0, 0.0,
-         0.0,  0.0,  0.0, 0.0, 0.0,  0.0,  0.0, 0.0,
-         0.0,  0.0,  0.0, 0.0, 0.0,  0.0,  0.0, 0.0,
-        -0.35, 0.35, 0.0, 0.0, 0.35,-0.35, 0.0, 0.0,
-         0.35,-0.35, 0.0, 0.0,-0.35, 0.35, 0.0, 0.0,
-         0.0,  0.0,  0.0, 0.0, 0.0,  0.0,  0.0, 0.0,
-         0.0,  0.0,  0.0, 0.0, 0.0,  0.0,  0.0, 0.0,
+      auto expected = std::valarray{
+         0.5,-0.5, 0.0, 0.0,-0.5, 0.5, 0.0, 0.0,
+        -0.5, 0.5, 0.0, 0.0, 0.5,-0.5, 0.0, 0.0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+        -0.5, 0.5, 0.0, 0.0, 0.5,-0.5, 0.0, 0.0,
+         0.5,-0.5, 0.0, 0.0,-0.5, 0.5, 0.0, 0.0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
       };
+      expected *= EA_l2;
       //! \clang-format on
       const auto flattend_K = sec21::flat_matrix(K);
       REQUIRE(std::size(flattend_K) == std::size(expected));
       REQUIRE(approx_equal(flattend_K, expected, kDivergence));
-   }     
-   SECTION("Systemsteifigkeitsmatrix ohne Berücksichtigung der Auflagerbedingungen")
+   }
+   SECTION("global stiffness matrix without supports")
    {
       auto K = impl::global_stiffness_matrix(sys);
       REQUIRE(K.size1() == 8);
       REQUIRE(K.size2() == 8);
       //! \clang-format off
-      const auto expected = std::array{
+      auto expected = std::valarray{
           1.35, -0.35,-1.0,  0.0, -0.35, 0.35, 0.0,   0.0,
          -0.35,  1.35, 0.0,  0.0,  0.35,-0.35, 0.0,  -1.0,
          -1.0,   0.0,  1.35, 0.35, 0.0,  0.0, -0.35, -0.35,
@@ -471,21 +492,35 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
           0.0,   0.0, -0.35,-0.35,-1.0,  0.0,  1.35,  0.35,
           0.0,  -1.0, -0.35,-0.35, 0.0,  0.0,  0.35,  1.35
       };
+      expected *= EA_l1;
       //! \clang-format on
       const auto flattend_K = sec21::flat_matrix(K);
       REQUIRE(std::size(flattend_K) == std::size(expected));
       REQUIRE(approx_equal(flattend_K, expected, kDivergence));
    }
-   SECTION("Systemsteifigkeitsmatrix unter Berücksichtigung der Auflagerbedingungen")
+   SECTION("global stiffness matrix without supports")
    {
-      const auto lookup = impl::make_lookup(sys, impl::Row{0});
-      //! \todo names -> rename
-      const auto festgehaltende_zeilen = impl::filter(sys, lookup, impl::is_node_in_dir_supported);
-      const auto festgehaltende_spalten = impl::row_to_col(std::begin(festgehaltende_zeilen), std::end(festgehaltende_zeilen));
+      using namespace sec21::structural_analysis::impl;
+
+      std::vector<bool> mask;
+      support_mask(std::begin(sys.nodes), std::end(sys.nodes), std::back_inserter(mask));
+
+      auto lookup = make_lookup(sys, Row{0});
+      decltype(lookup) supported_rows;
+      decltype(lookup) not_supported_rows;
+
+      partition_lookup(
+         std::begin(lookup), 
+         std::end(lookup),
+         std::begin(mask), 
+         std::end(mask),
+         std::back_inserter(supported_rows),
+         std::back_inserter(not_supported_rows));
+
+      const auto supported_cols = impl::row_to_col(std::begin(supported_rows), std::end(supported_rows));
 
       auto K = impl::global_stiffness_matrix(sys);
-      auto K_without_supports = impl::remove_from_matrix(K, festgehaltende_zeilen, festgehaltende_spalten);
-      
+      auto K_without_supports = impl::remove_from_matrix(K, supported_rows, supported_cols);
       REQUIRE(K_without_supports.size1() == 5);
       REQUIRE(K_without_supports.size2() == 5);
       // clang-format off
@@ -494,13 +529,14 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       // 2.8 * 10^3 * | -1.0,   0.0,   1.35  0.35, 0.0,  | * | u2 | = | Fx2 |
       //              |  0.0,   0.0,   0.35, 1.35, 0.0,  |   | v2 |   | Fy2 |
       //              | -0.35,  0.35,  0.0,  0.0,  1.35  |   | u3 |   | Fx3 |
-      const auto expected = std::array{
+      auto expected = std::valarray{
           1.35, -0.35, -1.0,  0.0, -0.35,
          -0.35,  1.35,  0.0,  0.0,  0.35,
          -1.0,   0.0,   1.35, 0.35, 0.0,
           0.0,   0.0,   0.35, 1.35, 0.0,
          -0.35,  0.35,  0.0,  0.0,  1.35
       };
+      expected *= EA_l1;
       // clang-format on
       const auto flattend_K = sec21::flat_matrix(K_without_supports);
       REQUIRE(std::size(flattend_K) == std::size(expected));      
@@ -514,22 +550,29 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       REQUIRE(std::size(F) == std::size(expected));
       REQUIRE(std::equal(std::begin(F), std::end(F), std::begin(expected)));
    }
-   //! \todo name
    SECTION("K strich")
    {
-      const auto n = std::distance(std::begin(sys.nodes), std::end(sys.nodes));
-      const auto lookup = impl::make_lookup(sys, impl::Row{0});
-      const auto festgehaltende_zeilen = impl::filter(sys, lookup, impl::is_node_in_dir_supported);
-      const auto festgehaltende_spalten = impl::row_to_col(std::begin(festgehaltende_zeilen), std::end(festgehaltende_zeilen));
-      //! \todo const -> 
-      //! \todo more like filter() with is_node_in_dir_supported() == false
-      auto verschiebungs_zeilen = std::vector<impl::Row>((
-         static_cast<std::size_t>(n) * static_cast<std::size_t>(decltype(sys)::dimension_v)) - std::size(festgehaltende_spalten));
-      std::iota(std::begin(verschiebungs_zeilen), std::end(verschiebungs_zeilen), impl::Row{0});
+      using namespace sec21::structural_analysis::impl;
+
+      std::vector<bool> mask;
+      support_mask(std::begin(sys.nodes), std::end(sys.nodes), std::back_inserter(mask));
+
+      auto lookup = make_lookup(sys, Row{0});
+      decltype(lookup) supported_rows;
+      decltype(lookup) not_supported_rows;
+
+      partition_lookup(
+         std::begin(lookup), 
+         std::end(lookup),
+         std::begin(mask), 
+         std::end(mask),
+         std::back_inserter(supported_rows),
+         std::back_inserter(not_supported_rows));
+
+      const auto supported_cols = impl::row_to_col(std::begin(supported_rows), std::end(supported_rows));
 
       auto K = impl::global_stiffness_matrix(sys);
-      auto K_strich = impl::remove_from_matrix(K, verschiebungs_zeilen, festgehaltende_spalten);
-
+      auto K_strich = impl::remove_from_matrix(K, not_supported_rows, supported_cols);
       REQUIRE(K_strich.size1() == 3);
       REQUIRE(K_strich.size2() == 5);
       // clang-format off
@@ -538,11 +581,12 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       // 2.8 * 10^3 * |  0.0,   0.0,  -0.35, -0.35, -1.0,  | * | u2 | = | Fx4 |  
       //              |  0.0,  -1.0,  -0.35  -0.35,  0.0   |   | v2 |   | Fy4 |
       //                                                       | u3 |
-      const auto expected = std::array{
+      auto expected = std::valarray{
           0.35, -0.35, 0.0,  -1.0,  -0.35,
           0.0,   0.0, -0.35, -0.35, -1.0,
           0.0,  -1.0, -0.35, -0.35,  0.0
       };
+      expected *= EA_l1;
       // clang-format on
       REQUIRE(approx_equal(sec21::flat_matrix(K_strich), expected, kDivergence));
    }
@@ -552,6 +596,9 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
 
       auto [success, result] = solve(sys);
       REQUIRE(success == true);
+
+      // auto it = result.nodes.find(1);
+      // REQUIRE(it != std::end(result.nodes));
 
       // unit: newton [N]
       REQUIRE(X(result.node[n1.value()].support_reaction).value() == Approx(0.0));
@@ -564,25 +611,30 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       REQUIRE(Y(result.node[n4.value()].support_reaction).value() == Approx(-10'000.0));
 
       // unit: millimeter [mm]
-      REQUIRE(X(result.node[n1.value()].displacement).value() == Approx(0.869117));
-      REQUIRE(Y(result.node[n1.value()].displacement).value() == Approx(0.18));
-      REQUIRE(X(result.node[n2.value()].displacement).value() == Approx(1.049117));
-      REQUIRE(Y(result.node[n2.value()].displacement).value() == Approx(-0.54));
-      REQUIRE(X(result.node[n3.value()].displacement).value() == Approx(0.18));
+      REQUIRE(X(result.node[n1.value()].displacement).value() == Approx(0.86).epsilon(kDivergence));
+      REQUIRE(Y(result.node[n1.value()].displacement).value() == Approx(0.178571));
+      REQUIRE(X(result.node[n2.value()].displacement).value() == Approx(1.04079));
+      REQUIRE(Y(result.node[n2.value()].displacement).value() == Approx(-0.535714));
+      REQUIRE(X(result.node[n3.value()].displacement).value() == Approx(0.178571));
       REQUIRE(Y(result.node[n3.value()].displacement).value() == Approx(0.0));
       REQUIRE(X(result.node[n4.value()].displacement).value() == Approx(0.0));
       REQUIRE(Y(result.node[n4.value()].displacement).value() == Approx(0.0));
 
       // unit: newton [N])
-      REQUIRE(result.member[m1.value()].normal_force.value() == Approx(5'040));
-      REQUIRE(result.member[m2.value()].normal_force.value() == Approx(-15'120));
-      REQUIRE(result.member[m3.value()].normal_force.value() == Approx(5'040));
-      REQUIRE(result.member[m4.value()].normal_force.value() == Approx(5'040));
-      REQUIRE(result.member[m5.value()].normal_force.value() == Approx(7'127.6363543604));
-      REQUIRE(result.member[m6.value()].normal_force.value() == Approx(-7'127.6363543604));
+      REQUIRE(result.member[m1.value()].normal_force.value() == Approx(5'000));
+      REQUIRE(result.member[m2.value()].normal_force.value() == Approx(-15'000));
+      REQUIRE(result.member[m3.value()].normal_force.value() == Approx(5'000));
+      REQUIRE(result.member[m4.value()].normal_force.value() == Approx(5'000));
+      REQUIRE(result.member[m5.value()].normal_force.value() == Approx(7'071.0678118655));
+      REQUIRE(result.member[m6.value()].normal_force.value() == Approx(-7'071.0678118655));
+
+      {
+         std::ofstream ofs{"output_example_1_result.json"};
+         nlohmann::json tmp = result;
+         ofs << std::setw(4) << tmp;
+      }      
    }
 }
-
 TEST_CASE("example 1.1 with different node id's (N1 switched with N3 from example 1)", "[sec21][structural_analysis][space_truss]")
 {
    using namespace sec21::structural_analysis;
@@ -591,25 +643,26 @@ TEST_CASE("example 1.1 with different node id's (N1 switched with N3 from exampl
    auto sys = space_truss{};
    using precision_t = decltype(sys)::precision_t;
 
-   auto n1 = add_node(sys, {1, {3.0, 0.0}, Support::Roller});
+   using precision_t = decltype(sys)::precision_t;
+   using node_t = decltype(sys)::node_t;
+   using support_t = node_t::global_support_t;
+
+   auto n1 = add_node(sys, {1, {3.0, 0.0}, support_t{ false, true }});
    auto n2 = add_node(sys, {2, {3.0, 3.0}, std::nullopt, space_truss::force_t{{10.0_kN, -10.0_kN}}});
    auto n3 = add_node(sys, {3, {0.0, 3.0}});
-   auto n4 = add_node(sys, {4, {0.0, 0.0}, Support::Hinge});
+   auto n4 = add_node(sys, {4, {0.0, 0.0}, support_t{ true, true }});
 
    REQUIRE(static_cast<bool>(n1) == true);
    REQUIRE(static_cast<bool>(n2) == true);
    REQUIRE(static_cast<bool>(n3) == true);
    REQUIRE(static_cast<bool>(n4) == true);
 
-   // constexpr auto E = 210.0_kPa;
-   // constexpr auto A = unit::square_meter<double>(0.004);
-
-   auto m1 = add_member(sys, 3, 2, {1, 0.004, 210'000'000});
-   auto m2 = add_member(sys, 1, 2, {2, 0.004, 210'000'000});
-   auto m3 = add_member(sys, 4, 1, {3, 0.004, 210'000'000});
-   auto m4 = add_member(sys, 4, 3, {4, 0.004, 210'000'000});
-   auto m5 = add_member(sys, 4, 2, {5, 0.004, 210'000'000});
-   auto m6 = add_member(sys, 1, 3, {6, 0.004, 210'000'000});
+   auto m1 = add_member(sys, 3, 2, {1, 0.004, 21'000'000});
+   auto m2 = add_member(sys, 1, 2, {2, 0.004, 21'000'000});
+   auto m3 = add_member(sys, 4, 1, {3, 0.004, 21'000'000});
+   auto m4 = add_member(sys, 4, 3, {4, 0.004, 21'000'000});
+   auto m5 = add_member(sys, 4, 2, {5, 0.004, 21'000'000});
+   auto m6 = add_member(sys, 1, 3, {6, 0.004, 21'000'000});
 
    REQUIRE(static_cast<bool>(m1) == true);
    REQUIRE(static_cast<bool>(m2) == true);
@@ -640,22 +693,35 @@ TEST_CASE("example 1.1 with different node id's (N1 switched with N3 from exampl
    SECTION("filter supported nodes from lookup table") 
    {
       using namespace sec21::structural_analysis::impl;
-      auto lookup = impl::make_lookup(sys, Row{0});
-      const auto expected = std::array{ Row{0}, Row{1}, Row{2}, Row{3}, Row{4}, Row{5}, Row{6}, Row{7} };
 
+      auto lookup = impl::make_lookup(sys, Row{0});
+
+      const auto expected = std::array{ Row{0}, Row{1}, Row{2}, Row{3}, Row{4}, Row{5}, Row{6}, Row{7} };
       REQUIRE(std::size(lookup) == std::size(expected));
       REQUIRE(std::equal(std::begin(lookup), std::end(lookup), std::begin(expected)));
 
-      auto result = impl::filter(sys, lookup, is_node_in_dir_supported);
-      const auto expected_festgehaltende_zeilen = std::vector{ Row{1}, Row{6}, Row{7} };
+      std::vector<bool> mask;
+      support_mask(std::begin(sys.nodes), std::end(sys.nodes), std::back_inserter(mask));
 
-      REQUIRE(std::size(result) == std::size(expected_festgehaltende_zeilen));
-      REQUIRE(std::equal(std::begin(result), std::end(result), std::begin(expected_festgehaltende_zeilen)));
-   }   
-   SECTION("Zuordnungsmatrix vom Fachwerkstab 1")
+      decltype(lookup) supported_nodes;
+      decltype(lookup) not_supported_nodes;
+
+      partition_lookup(
+         std::begin(lookup), 
+         std::end(lookup),
+         std::begin(mask), 
+         std::end(mask),
+         std::back_inserter(supported_nodes),
+         std::back_inserter(not_supported_nodes));
+
+      const auto expected_rows = std::vector{ Row{1}, Row{6}, Row{7} };
+
+      REQUIRE(std::size(supported_nodes) == std::size(expected_rows));
+      REQUIRE(std::equal(std::begin(supported_nodes), std::end(supported_nodes), std::begin(expected_rows)));
+   }
+   SECTION("coincidence matrix from member 1")
    {
       auto Z = impl::coincidence_matrix(sys, m1.value());
-      
       REQUIRE(Z.size1() == 4);
       REQUIRE(Z.size2() == 8);
       //! \clang-format off
@@ -668,10 +734,9 @@ TEST_CASE("example 1.1 with different node id's (N1 switched with N3 from exampl
       //! \clang-format on
       REQUIRE(approx_equal(sec21::flat_matrix(Z), expected, kDivergence));
    }
-   SECTION("Zuordnungsmatrix vom Fachwerkstab 2")
+   SECTION("coincidence matrix from member 2")
    {
       auto Z = impl::coincidence_matrix(sys, m2.value());
-      
       REQUIRE(Z.size1() == 4);
       REQUIRE(Z.size2() == 8);
       //! \clang-format off
@@ -684,10 +749,9 @@ TEST_CASE("example 1.1 with different node id's (N1 switched with N3 from exampl
       //! \clang-format on
       REQUIRE(approx_equal(sec21::flat_matrix(Z), expected, kDivergence));
    }
-   SECTION("Zuordnungsmatrix vom Fachwerkstab 3")
+   SECTION("coincidence matrix from member 3")
    {
       auto Z = impl::coincidence_matrix(sys, m3.value());
-      
       REQUIRE(Z.size1() == 4);
       REQUIRE(Z.size2() == 8);
       //! \clang-format off
@@ -700,10 +764,9 @@ TEST_CASE("example 1.1 with different node id's (N1 switched with N3 from exampl
       //! \clang-format on
       REQUIRE(approx_equal(sec21::flat_matrix(Z), expected, kDivergence));
    }
-   SECTION("Zuordnungsmatrix vom Fachwerkstab 4")
+   SECTION("coincidence matrix from member 4")
    {
       auto Z = impl::coincidence_matrix(sys, m4.value());
-      
       REQUIRE(Z.size1() == 4);
       REQUIRE(Z.size2() == 8);
       //! \clang-format off
@@ -716,10 +779,9 @@ TEST_CASE("example 1.1 with different node id's (N1 switched with N3 from exampl
       //! \clang-format on
       REQUIRE(approx_equal(sec21::flat_matrix(Z), expected, kDivergence));
    }     
-   SECTION("Zuordnungsmatrix vom Fachwerkstab 5")
+   SECTION("coincidence matrix from member 5")
    {
       auto Z = impl::coincidence_matrix(sys, m5.value());
-      
       REQUIRE(Z.size1() == 4);
       REQUIRE(Z.size2() == 8);
       //! \clang-format off
@@ -732,10 +794,9 @@ TEST_CASE("example 1.1 with different node id's (N1 switched with N3 from exampl
       //! \clang-format on
       REQUIRE(approx_equal(sec21::flat_matrix(Z), expected, kDivergence));
    }
-   SECTION("Zuordnungsmatrix vom Fachwerkstab 6")
+   SECTION("coincidence matrix from member 6")
    {
       auto Z = impl::coincidence_matrix(sys, m6.value());
-      
       REQUIRE(Z.size1() == 4);
       REQUIRE(Z.size2() == 8);
       //! \clang-format off
@@ -748,7 +809,6 @@ TEST_CASE("example 1.1 with different node id's (N1 switched with N3 from exampl
       //! \clang-format on
       REQUIRE(approx_equal(sec21::flat_matrix(Z), expected, kDivergence));
    }   
-
    SECTION("solve")
    {
       using namespace sec21;
@@ -767,25 +827,24 @@ TEST_CASE("example 1.1 with different node id's (N1 switched with N3 from exampl
       REQUIRE(Y(result.node[n4.value()].support_reaction).value() == Approx(-10'000.0));
 
       // unit: millimeter [mm]
-      REQUIRE(X(result.node[n1.value()].displacement).value() == Approx(0.18));
+      REQUIRE(X(result.node[n1.value()].displacement).value() == Approx(0.18).epsilon(kDivergence));
       REQUIRE(Y(result.node[n1.value()].displacement).value() == Approx(0.0));
-      REQUIRE(X(result.node[n2.value()].displacement).value() == Approx(1.049117));
-      REQUIRE(Y(result.node[n2.value()].displacement).value() == Approx(-0.54));
-      REQUIRE(X(result.node[n3.value()].displacement).value() == Approx(0.869117));
-      REQUIRE(Y(result.node[n3.value()].displacement).value() == Approx(0.18));
+      REQUIRE(X(result.node[n2.value()].displacement).value() == Approx(1.04).epsilon(kDivergence));
+      REQUIRE(Y(result.node[n2.value()].displacement).value() == Approx(-0.54).epsilon(kDivergence));
+      REQUIRE(X(result.node[n3.value()].displacement).value() == Approx(0.86).epsilon(kDivergence));
+      REQUIRE(Y(result.node[n3.value()].displacement).value() == Approx(0.18).epsilon(kDivergence));
       REQUIRE(X(result.node[n4.value()].displacement).value() == Approx(0.0));
       REQUIRE(Y(result.node[n4.value()].displacement).value() == Approx(0.0));
 
       // unit: newton [N])
-      REQUIRE(result.member[m1.value()].normal_force.value() == Approx(5'040));
-      REQUIRE(result.member[m2.value()].normal_force.value() == Approx(-15'120));
-      REQUIRE(result.member[m3.value()].normal_force.value() == Approx(5'040));
-      REQUIRE(result.member[m4.value()].normal_force.value() == Approx(5'040));
-      REQUIRE(result.member[m5.value()].normal_force.value() == Approx(7'127.6363543604));
-      REQUIRE(result.member[m6.value()].normal_force.value() == Approx(-7'127.6363543604));
+      REQUIRE(result.member[m1.value()].normal_force.value() == Approx(5'000));
+      REQUIRE(result.member[m2.value()].normal_force.value() == Approx(-15'000));
+      REQUIRE(result.member[m3.value()].normal_force.value() == Approx(5'000));
+      REQUIRE(result.member[m4.value()].normal_force.value() == Approx(5'000));
+      REQUIRE(result.member[m5.value()].normal_force.value() == Approx(7'071).epsilon(kDivergence));
+      REQUIRE(result.member[m6.value()].normal_force.value() == Approx(-7'071).epsilon(kDivergence));
    }
 }
-
 TEST_CASE("example system 1.2 with half load from example 1.0", "[sec21][structural_analysis][space_truss]")
 {
    using namespace sec21::structural_analysis;
@@ -794,11 +853,13 @@ TEST_CASE("example system 1.2 with half load from example 1.0", "[sec21][structu
    auto sys = space_truss{};
 
    using precision_t = decltype(sys)::precision_t;
+   using node_t = decltype(sys)::node_t;
+   using support_t = node_t::global_support_t;
 
    auto n1 = add_node(sys, {1, {0.0, 3.0}});
    auto n2 = add_node(sys, {2, {3.0, 3.0}, std::nullopt, space_truss::force_t{{5.0_kN, -5.0_kN}}});
-   auto n3 = add_node(sys, {3, {3.0, 0.0}, Support::Roller});
-   auto n4 = add_node(sys, {4, {0.0, 0.0}, Support::Hinge});
+   auto n3 = add_node(sys, {3, {3.0, 0.0}, support_t{ false, true }});
+   auto n4 = add_node(sys, {4, {0.0, 0.0}, support_t{ true, true }});
 
    REQUIRE(static_cast<bool>(n1) == true);
    REQUIRE(static_cast<bool>(n2) == true);
@@ -807,13 +868,12 @@ TEST_CASE("example system 1.2 with half load from example 1.0", "[sec21][structu
 
    // constexpr auto E = 210.0_kPa;
    // constexpr auto A = unit::square_meter<double>(0.004);
-
-   auto m1 = add_member(sys, 1, 2, {1, 0.004, 210'000'000});
-   auto m2 = add_member(sys, 3, 2, {2, 0.004, 210'000'000});
-   auto m3 = add_member(sys, 4, 3, {3, 0.004, 210'000'000});
-   auto m4 = add_member(sys, 4, 1, {4, 0.004, 210'000'000});
-   auto m5 = add_member(sys, 4, 2, {5, 0.004, 210'000'000});
-   auto m6 = add_member(sys, 3, 1, {6, 0.004, 210'000'000});
+   auto m1 = add_member(sys, 1, 2, {1, 0.004, 21'000'000});
+   auto m2 = add_member(sys, 3, 2, {2, 0.004, 21'000'000});
+   auto m3 = add_member(sys, 4, 3, {3, 0.004, 21'000'000});
+   auto m4 = add_member(sys, 4, 1, {4, 0.004, 21'000'000});
+   auto m5 = add_member(sys, 4, 2, {5, 0.004, 21'000'000});
+   auto m6 = add_member(sys, 3, 1, {6, 0.004, 21'000'000});
 
    REQUIRE(static_cast<bool>(m1) == true);
    REQUIRE(static_cast<bool>(m2) == true);
@@ -828,8 +888,8 @@ TEST_CASE("example system 1.2 with half load from example 1.0", "[sec21][structu
       REQUIRE(length(sys, m2.value()) == 3.0_m);
       REQUIRE(length(sys, m3.value()) == 3.0_m);
       REQUIRE(length(sys, m4.value()) == 3.0_m);
-      REQUIRE(length(sys, m5.value()).value() == Approx(4.24264)); //_m);
-      REQUIRE(length(sys, m6.value()).value() == Approx(4.24264)); //_m);
+      REQUIRE(length(sys, m5.value()).value() == Approx(4.24264).epsilon(kDivergence)); //_m);
+      REQUIRE(length(sys, m6.value()).value() == Approx(4.24264).epsilon(kDivergence)); //_m);
 
       namespace bmc = boost::math::constants;
       const auto fourth_pi{bmc::half_pi<precision_t>() * 0.5};
@@ -859,25 +919,24 @@ TEST_CASE("example system 1.2 with half load from example 1.0", "[sec21][structu
       REQUIRE(Y(result.node[n4.value()].support_reaction).value() == Approx(-5'000.0));
 
       // unit: millimeter [mm]
-      REQUIRE(X(result.node[n1.value()].displacement).value() == Approx(0.4345584412));
-      REQUIRE(Y(result.node[n1.value()].displacement).value() == Approx(0.09));
-      REQUIRE(X(result.node[n2.value()].displacement).value() == Approx(0.5245584412));
-      REQUIRE(Y(result.node[n2.value()].displacement).value() == Approx(-0.27));
-      REQUIRE(X(result.node[n3.value()].displacement).value() == Approx(0.09));
+      REQUIRE(X(result.node[n1.value()].displacement).value() == Approx(0.43).epsilon(kDivergence));
+      REQUIRE(Y(result.node[n1.value()].displacement).value() == Approx(0.09).epsilon(kDivergence));
+      REQUIRE(X(result.node[n2.value()].displacement).value() == Approx(0.52).epsilon(kDivergence));
+      REQUIRE(Y(result.node[n2.value()].displacement).value() == Approx(-0.27).epsilon(kDivergence));
+      REQUIRE(X(result.node[n3.value()].displacement).value() == Approx(0.09).epsilon(kDivergence));
       REQUIRE(Y(result.node[n3.value()].displacement).value() == Approx(0.0));
       REQUIRE(X(result.node[n4.value()].displacement).value() == Approx(0.0));
       REQUIRE(Y(result.node[n4.value()].displacement).value() == Approx(0.0));
 
       // unit: newton [N])
-      REQUIRE(result.member[m1.value()].normal_force.value() == Approx(2'520));
-      REQUIRE(result.member[m2.value()].normal_force.value() == Approx(-7'560));
-      REQUIRE(result.member[m3.value()].normal_force.value() == Approx(2'520));
-      REQUIRE(result.member[m4.value()].normal_force.value() == Approx(2'520));
-      REQUIRE(result.member[m5.value()].normal_force.value() == Approx(3'563.8181771802));
-      REQUIRE(result.member[m6.value()].normal_force.value() == Approx(-3'563.8181771802));
+      REQUIRE(result.member[m1.value()].normal_force.value() == Approx(2'500));
+      REQUIRE(result.member[m2.value()].normal_force.value() == Approx(-7'500));
+      REQUIRE(result.member[m3.value()].normal_force.value() == Approx(2'500));
+      REQUIRE(result.member[m4.value()].normal_force.value() == Approx(2'500));
+      REQUIRE(result.member[m5.value()].normal_force.value() == Approx(3'535.53).epsilon(kDivergence));
+      REQUIRE(result.member[m6.value()].normal_force.value() == Approx(-3'535.53).epsilon(kDivergence));
    }
 }
-
 TEST_CASE("example system 1.0 load from json", "[sec21][structural_analysis][space_truss]")
 {
    using namespace sec21::structural_analysis;
@@ -920,7 +979,7 @@ TEST_CASE("example system 1.0 load from json", "[sec21][structural_analysis][spa
                [](auto&& e) { return e.value(); });
          }
 
-         // unit: newton [N]
+         // unit: millimeter [mm]
          const auto expected = std::array{ 0.869117, 0.18, 1.049117, -0.54, 0.18, 0.0, 0.0, 0.0 };
          REQUIRE(approx_equal(flat_displacement, expected, kDivergence));
       }
