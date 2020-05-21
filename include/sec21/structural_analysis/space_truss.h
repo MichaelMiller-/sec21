@@ -51,9 +51,9 @@ namespace sec21::structural_analysis
       using force_t = node_t::load_t;
       using member_descriptor_t = member_t::descriptor_t;
 
-      std::vector<node_t>  nodes;
-      std::vector<member_t>  members;
-      
+      std::optional<std::string> description{};
+      std::vector<node_t> nodes{};
+      std::vector<member_t> members{};
       // member id -> start and end node
       std::map<member_descriptor_t, std::pair<node_descriptor_t, node_descriptor_t>>  coincidence_table{};
    };
@@ -81,9 +81,9 @@ namespace sec21::structural_analysis
    }
 
    //! \return handle type
-   template <typename System>
-#ifdef __cpp_concepts
-      requires SpaceTruss<System>
+   template <typename System> 
+#ifdef __cpp_concepts   
+   requires SpaceTruss<System>
 #endif
    auto add_node(
       System& sys,
@@ -158,6 +158,19 @@ namespace sec21::structural_analysis
       return add_member(sys, from, to, { std::forward<Args>(args)... });
    }
 
+   template <typename System>
+#ifdef __cpp_concepts
+      requires SpaceTruss<System>
+#endif   
+   void clear_loads(System& sys) noexcept
+   {
+      std::transform(
+         std::begin(sys.nodes), 
+         std::end(sys.nodes), 
+         std::begin(sys.nodes), 
+         [](auto& n){ n.load.reset(); return n; });
+   }
+
    //! \todo 2019-04-16 error handling -> outcome
    template <typename System>
 #ifdef __cpp_concepts
@@ -179,8 +192,10 @@ namespace sec21::structural_analysis
 
 namespace sec21::structural_analysis
 {
-   void to_json(nlohmann::json& j, space_truss const& obj) {
+   void to_json(nlohmann::json& j, space_truss const& obj) 
+   {
       j = nlohmann::json{
+         {"description", obj.description},
          {"nodes", obj.nodes},
          {"members", obj.members}, 
          {"connected", obj.coincidence_table}
@@ -189,6 +204,7 @@ namespace sec21::structural_analysis
 
    void from_json(nlohmann::json const& j, space_truss& obj) 
    {
+      j.at("description").get_to(obj.description);
       j.at("nodes").get_to(obj.nodes);
       j.at("members").get_to(obj.members);
       j.at("connected").get_to(obj.coincidence_table);
