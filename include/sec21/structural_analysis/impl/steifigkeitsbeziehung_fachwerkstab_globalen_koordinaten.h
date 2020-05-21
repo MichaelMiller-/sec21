@@ -21,48 +21,42 @@ namespace sec21::structural_analysis::impl
    {
       const auto angle = angle_to_x_axis(sys, id);
 
-      using namespace boost::math;
+      auto it = std::find_if(
+         std::begin(sys.members), 
+         std::end(sys.members), 
+         [&id](auto&& m) { return m.id == id; });
 
-      //! \todo lookup for known angle
-      //! \todo approx to zero
+      if (it == std::end(sys.members))
+         throw std::invalid_argument("invalid member descriptor"); //fmt::format("invalid member descriptor: {}"), id);
+
+      auto m = *it;
+      const auto EA = m.E * m.A; // [kN/m2] [m2]
+      const auto EA_over_l = EA / length(sys, m.id).value();    // m           
+
+      using namespace boost::math;
+      //! \note this approch (rad / pi) get better results -> so the minimal overhead is tolerable
+      const auto npi = angle / constants::pi<decltype(angle)>();
+      auto s = sin_pi(npi);
+      auto c = cos_pi(npi);
+
+      //! \todo approx
       if (angle == 0.0)
       {
-         // clang-format off
-         const auto values = std::array<double, 4*4>{
-            1, 0,-1, 0,
-            0, 0, 0, 0,
-            -1, 0, 1, 0,
-            0, 0, 0, 0
-         };
-         // clang-format on
-         return make_matrix(4, 4, std::begin(values), std::end(values));
+         s = 0;
+         c = 1;
       }
       if (angle == constants::half_pi<typename System::precision_t>())
       {
-         // clang-format off
-         const auto values = std::array<double, 4*4>{
-            0, 0, 0, 0,
-            0, 1, 0,-1,
-            0, 0, 0, 0,
-            0,-1, 0, 1
-         };
-         // clang-format on
-         return make_matrix(4, 4, std::begin(values), std::end(values));
+         s = 1;
+         c = 0;
       }
-
-      //! \note this approch (rad / pi) get better results -> so the minimal overhead is tolerable
-      const auto npi = angle / constants::pi<decltype(angle)>();
-      const auto s{ sin_pi(npi) };
-      const auto c{ cos_pi(npi) } ;
-      //! \todo durch x-y-anteil des stabes teilen?
-      const auto k{ std::sin(std::abs(angle)) + std::cos(std::abs(angle)) };
 
       // clang-format off
       const auto values = std::array{
-         (c * c) / k,  (s * c) / k, (-c * c) / k, (-s * c) / k,
-         (s * c) / k,  (s * s) / k, (-s * c) / k, (-s * s) / k,
-         (-c * c) / k, (-s * c) / k,  (c * c) / k,  (s * c) / k,
-         (-s * c) / k, (-s * s) / k,  (s * c) / k,  (s * s) / k,
+         (c * c) * EA_over_l,  (s * c) * EA_over_l, (-c * c) * EA_over_l, (-s * c) * EA_over_l,
+         (s * c) * EA_over_l,  (s * s) * EA_over_l, (-s * c) * EA_over_l, (-s * s) * EA_over_l,
+         (-c * c) * EA_over_l, (-s * c) * EA_over_l,  (c * c) * EA_over_l,  (s * c) * EA_over_l,
+         (-s * c) * EA_over_l, (-s * s) * EA_over_l,  (s * c) * EA_over_l,  (s * s) * EA_over_l,
       };
       // clang-format on
       return make_matrix(4, 4, std::begin(values), std::end(values));
