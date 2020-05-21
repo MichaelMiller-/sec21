@@ -14,14 +14,6 @@
 
 namespace sec21::structural_analysis
 {
-#ifdef __cpp_concepts
-   template <typename T>
-   concept Descriptor = requires(T t)
-   {
-      { is_valid(t) } -> bool;
-   };
-#endif
-
    template <auto Dimension, typename Precision = double>
    struct node
    {
@@ -36,14 +28,15 @@ namespace sec21::structural_analysis
       //! \todo replace with boost::qvm
       using point_t = boost::geometry::model::point<precision_t, dimension_v, boost::geometry::cs::cartesian>;
       using load_t = force_t<dimension_v>;
+      using global_support_t = support<dimension_v>;
 
       //! \todo 2019-04-23 use strong_type
       descriptor_t id{ std::numeric_limits<descriptor_t>::max() };
       //! \brief World Position
       point_t position{};
-      //! \brief
-      std::optional<Support> support{};
-      //! \brief
+
+      std::optional<global_support_t> global_support{};
+      //! \todo could be in a extra struct; like system_load aka node_load
       std::optional<load_t> load{};
    };
 
@@ -56,20 +49,41 @@ namespace sec21::structural_analysis
    template <typename T>
    constexpr bool is_node_v = is_node<T>::value;
 
-   static_assert(is_node_v<node<2, float>>, "should be a true");
-   static_assert(is_node_v<node<2, double>>, "should be a true");
-   static_assert(is_node_v<int> == false, "should be a false");
+   static_assert(is_node_v<node<2, float>>);
+   static_assert(is_node_v<node<2, double>>);
+   static_assert(is_node_v<int> == false);
+   // static_assert(std::is_trivial_v<node<2, float>>, "node is not trivial");
 
-#ifdef __cpp_concepts
-   template <typename T>
-   concept Node = is_node<T>::value;
-#endif
+   template <typename InputIterator, typename OutputIterator>
+   auto support_mask(InputIterator first, InputIterator last, OutputIterator out) -> OutputIterator
+   {
+      // static_assert(std::is_same_v<typename std::iterator_traits<OutputIterator>::value_type, bool>);
+      using value_t = typename std::iterator_traits<InputIterator>::value_type;
+
+      while (first != last) 
+      {
+         if (first->global_support)
+         {
+            out = std::copy(
+               std::begin(first->global_support.value()), 
+               std::end(first->global_support.value()), 
+               out);
+         }
+         else
+         {
+            for (auto i = 0; i < value_t::dimension_v; ++i)
+               *out++ = false;
+         }
+         ++first;
+      }
+      return out;
+   }
 }
 
 #include <nlohmann/json.hpp>
 
-namespace nlohmann {
-
+namespace nlohmann 
+{
    template <typename T>
    struct adl_serializer<boost::geometry::model::point<T, 2, boost::geometry::cs::cartesian>> 
    {
@@ -155,23 +169,35 @@ namespace nlohmann {
          j.at("x").get_to(std::get<0>(t));
          j.at("y").get_to(std::get<1>(t));
       }
-   };   
+   };
+   template <>
+   struct adl_serializer<sec21::structural_analysis::support<2>> 
+   {
+      using type_t = sec21::structural_analysis::support<2>;
+
+      static void to_json(json& j, type_t const& t) 
+      {
+         j = json{
+            {"x", std::get<0>(t)},
+            {"y", std::get<1>(t)}
+         };
+      }
+      static void from_json(json const& j, type_t& t) 
+      {
+         j.at("x").get_to(std::get<0>(t));
+         j.at("y").get_to(std::get<1>(t));
+      }
+   };      
 }
 
 namespace sec21::structural_analysis
 {
-   NLOHMANN_JSON_SERIALIZE_ENUM(Support, {
-      {Support::Roller, "roller"},
-      {Support::Hinge, "hinge"},
-      {Support::Fixed, "fixed"},
-   })
-
    template <auto Dimension, typename Precision>
    void to_json(nlohmann::json& j, node<Dimension, Precision> const& obj) {
       j = nlohmann::json{
          {"id", obj.id},
          {"position", obj.position}, 
-         {"support", obj.support},
+         {"global_support", obj.global_support},
          {"load", obj.load}
       };
    }
@@ -180,7 +206,7 @@ namespace sec21::structural_analysis
    {
       j.at("id").get_to(obj.id);
       j.at("position").get_to(obj.position);
-      j.at("support").get_to(obj.support);
+      j.at("global_support").get_to(obj.global_support);
       j.at("load").get_to(obj.load);
    }
 }
