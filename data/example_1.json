@@ -1,4 +1,5 @@
 {
+    "description": "Example 1",
     "connected": [
         [
             1,
@@ -46,51 +47,44 @@
     "members": [
         {
             "A": 210000000.0,
-            "E": 0.004,
+            "E": 0.0004,
             "id": 1
         },
         {
             "A": 210000000.0,
-            "E": 0.004,
+            "E": 0.0004,
             "id": 2
         },
         {
             "A": 210000000.0,
-            "E": 0.004,
+            "E": 0.0004,
             "id": 3
         },
         {
             "A": 210000000.0,
-            "E": 0.004,
+            "E": 0.0004,
             "id": 4
         },
         {
             "A": 210000000.0,
-            "E": 0.004,
+            "E": 0.0004,
             "id": 5
         },
         {
             "A": 210000000.0,
-            "E": 0.004,
+            "E": 0.0004,
             "id": 6
         }
     ],
     "nodes": [
         {
             "id": 1,
-            "load": {
-                "x": {
-                    "value": "0_kN"
-                },
-                "y": {
-                    "value": "0_kN"
-                }
-            },
+            "load": null,
             "position": {
                 "x": 0.0,
                 "y": 3.0
             },
-            "support": null
+            "global_support": null
         },
         {
             "id": 2,
@@ -106,39 +100,31 @@
                 "x": 3.0,
                 "y": 3.0
             },
-            "support": null
+            "global_support": null
         },
         {
             "id": 3,
-            "load": {
-                "x": {
-                    "value": "0_kN"
-                },
-                "y": {
-                    "value": "0_kN"
-                }
-            },
+            "load": null,
             "position": {
                 "x": 3.0,
                 "y": 0.0
             },
-            "support": "roller"
+            "global_support": {
+                "x": false,
+                "y": true
+            }
         },
         {
             "id": 4,
-            "load": {
-                "x": {
-                    "value": "0_kN"
-                },
-                "y": {
-                    "value": "0_kN"
-                }
-            },
+            "load": null,
             "position": {
                 "x": 0.0,
                 "y": 0.0
             },
-            "support": "hinge"
+            "global_support": {
+                "x": true,
+                "y": true
+            }
         }
     ]
 }

@@ -1,5 +1,4 @@
-﻿#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
+﻿#include <catch.hpp>
 
 #include <sec21/erase_if_index.h>
 
