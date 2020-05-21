@@ -9,6 +9,10 @@
    #include <boost/math/constants/constants.hpp>
 #endif
 
+#include <boost/geometry/geometries/point.hpp>
+#include <boost/qvm/all.hpp>
+#include <boost/qvm/quat_traits_array.hpp>
+
 namespace sec21::customization_point
 {
    template <typename T, auto N, typename CoordinateSystem>
@@ -18,7 +22,7 @@ namespace sec21::customization_point
       {
          return boost::geometry::get<0>(t);
       }
-      auto& operator()(boost::geometry::model::point<T, N, CoordinateSystem>& t) const noexcept
+      auto& operator()(boost::geometry::model::point<T, N, CoordinateSystem>&& t) const noexcept
       {
          return boost::geometry::get<0>(t);
       }        
@@ -31,27 +35,95 @@ namespace sec21::customization_point
       {
          return boost::geometry::get<1>(t);
       }
-      auto& operator()(boost::geometry::model::point<T, N, CoordinateSystem>& t) const noexcept
+      auto& operator()(boost::geometry::model::point<T, N, CoordinateSystem>&& t) const noexcept
       {
          return boost::geometry::get<1>(t);
       }        
    };   
 }
 
+#if 0 //! \todo not working
+template <typename T, auto N, typename CoordinateSystem>
+using point_t = boost::geometry::model::point<T, N, CoordinateSystem>;
+
+namespace boost::qvm 
+{
+   template <typename T, auto N, typename CoordinateSystem>
+   struct vec_traits<point_t<T, N, CoordinateSystem>> : vec_traits_defaults<point_t<T, N, CoordinateSystem>, T, N> 
+   {
+      using scalar_type = T;
+
+      template <int I>
+      static inline scalar_type& write_element(point_t<T, N, CoordinateSystem>& v) 
+      {
+         return boost::geometry::get<I>(v);
+         // static double r{};
+         // return r;
+      }
+
+      // static inline scalar_type & write_element_idx(int i, point_t& v) 
+      // {
+      //    return v.a[i];
+      // } //optional
+   };
+}
+#endif
+
+namespace boost::qvm 
+{
+   template <typename T, auto N>
+   struct vec_traits<std::array<T, N>> : vec_traits_defaults<std::array<T, N>, T, N> 
+   {
+      using scalar_type = T;
+
+      template <int I>
+      static inline scalar_type& write_element(std::array<T, N>& v) 
+      {
+         return std::get<I>(v);
+      }
+   };
+}
+
 namespace sec21::structural_analysis::impl
 {
    //! \todo  angle_to(...., Axis == )
+   // template <typename Rotation> // = CounterClockwise>
+   // struct angle_t
+   // {
+   //    auto degree() const { return 3; }
+   // };
 
    template <typename T>
    auto angle_to_x_axis(T const& start_position, T const& end_position) noexcept -> double
    {
-      const auto dx = X(end_position) - X(start_position);
-      const auto dy = Y(end_position) - Y(start_position);
-      const auto m = dy / dx; // steigung der geraden
+      using value_t = std::array<double, 2>;
+      //! \todo remove conversion
+      auto from = value_t{ X(start_position), Y(start_position) };
+      auto to = value_t{ X(end_position), Y(end_position) };
 
-      if (std::abs(m) == 1)
-         return boost::math::constants::half_pi<double>() * 0.5 * m;
-      return std::atan(m / 1 + m);
+      using namespace boost::qvm;
+
+      const auto dir = to - from;
+      decltype(dir) project_x{ X(dir) };
+      const auto m = dot(dir, project_x);
+      const auto l1 = mag(dir);
+      const auto l2 = mag(project_x);
+
+      //! \todo approx
+      if (m == 1)
+         return boost::math::constants::half_pi<double>() * 0.5;
+
+      if (0 == (l1 * l2))
+         return boost::math::constants::half_pi<double>();
+
+      auto k1 = 1;
+      if (Y(dir) < 0)
+         k1 *= -1;
+      if (X(dir) < 0)
+         k1 *= -1;
+
+      //! \todo odd accos function?
+      return std::acos(m / (l1 * l2)) * k1;
    }
 
    //! \todo 2019-04-17 error handling -> outcome
