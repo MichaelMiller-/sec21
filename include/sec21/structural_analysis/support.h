@@ -1,6 +1,7 @@
 #pragma once
 
 #include <type_traits>
+#include <array>
 
 namespace sec21::structural_analysis
 {
@@ -14,9 +15,14 @@ namespace sec21::structural_analysis
       Fixed = 3
    };
 
+   // basically tells in which axis (x,y,...,Dimension) the node is supported
+   //! \todo kopplung
+   //! \todo steifigkeit -> feder
+   template <auto Dimension> //, typename Precision = double>
+   using support = std::array<bool, Dimension>;
 
    //! \return Anzahl der Freiheitsgrade
-   constexpr auto variability(Support s) noexcept
+   [[deprecated]] constexpr auto variability(const Support s) noexcept
    {
       return static_cast<std::underlying_type<decltype(s)>::type>(s);
    }
