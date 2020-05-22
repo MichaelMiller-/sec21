@@ -1,16 +1,13 @@
-#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
+#include <catch.hpp>
 
 #include <sec21/structural_analysis/axis.h>
 
-using namespace sec21::structural_analysis;
-
-static_assert(static_cast<int>(Axis::X) == 0, "Value of X-Axis has to be 0");
-static_assert(static_cast<int>(Axis::Y) == 1, "Value of Y-Axis has to be 1");
-static_assert(static_cast<int>(Axis::Z) == 2, "Value of Z-Axis has to be 2");
-
-TEST_CASE("structural analysis axis", "[compilation-only]") 
+TEST_CASE("structural analysis axis", "[sec21][structural_analysis]")
 {
-   SUCCEED("Nothing to test. Compiletests");
+   using namespace sec21::structural_analysis;
+
+   STATIC_REQUIRE(static_cast<int>(Axis::X) == 0);
+   STATIC_REQUIRE(static_cast<int>(Axis::Y) == 1);
+   STATIC_REQUIRE(static_cast<int>(Axis::Z) == 2);
 }
 
