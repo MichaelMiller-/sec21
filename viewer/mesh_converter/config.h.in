@@ -1,0 +1,9 @@
+
+#define VERSION_MAJOR @mesh_converter_VERSION_MAJOR@
+#define VERSION_MINOR @mesh_converter_VERSION_MINOR@
+
+// // does the platform provide exp and log functions?
+// #cmakedefine HAVE_LOG
+// #cmakedefine HAVE_EXP
+
+
