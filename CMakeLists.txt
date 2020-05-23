@@ -4,21 +4,21 @@ cmake_minimum_required(VERSION 3.1)
 project(sec21 CXX)
 include(cmake/StandardProjectSettings.cmake)
 
-## TOOD: should be a vcpkg dependency
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/deps/viennacl/cmake")
-
-## dependencies
+## dependencies 
 if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
   include(cmake/Vcpkg.cmake)
-  vcpkg_install(nlohmann-json boost-geometry boost-math boost-outcome boost-ublas catch2)
+  ## all dependencies
+  ## TODO: reduce dependencies <-> cmake options
+  vcpkg_install(nlohmann-json boost catch2 glm spdlog sdl2 glew imgui entt assimp)
   include(${CMAKE_TOOLCHAIN_FILE})
 endif()
 
 ## header-only library
 add_library(${PROJECT_NAME} INTERFACE)
 set(Boost_USE_STATIC_LIBS ON)
-set(Boost_USE_STATIC_RUNTIME ON)
-find_package(Boost REQUIRED)
+set(Boost_USE_MULTITHREADED ON)
+set(Boost_USE_STATIC_RUNTIME OFF)
+find_package(Boost 1.70 REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME} INTERFACE nlohmann_json nlohmann_json::nlohmann_json)
 target_include_directories(sec21 SYSTEM INTERFACE include)
@@ -34,39 +34,24 @@ enable_doxygen()
 
 include(cmake/StaticAnalyzers.cmake)
 
-option(ENABLE_PCH "Enable Precompiled Headers" OFF)
+option(ENABLE_PCH "Enable Precompiled Headers" ON)
 if (ENABLE_PCH)
    target_precompile_headers(sec21 INTERFACE <vector> <string> <map> <utility> <algorithm>)
 endif()
 
-### 
-## TODO: cleanup
-
-find_package(OpenMP)
-if (OPENMP_FOUND)
-   set(ENABLE_OPENMP ON)
-   ## message(STATUS "OpenMP Support is enabled")
-   # TODO
-   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
-endif()
-## TODO: cleanup
-
-
 option(ENABLE_TESTS "Enable tests" ON)
-option(ENABLE_BENCHMARKS "Enable benchmarks" FALSE)
-option(ENABLE_DATABASE_SERIALIZER "Enable database serlializer" FALSE)
-option(ENABLE_VIEWER "Enable system viewer" FALSE)
-option(ENABLE_WEB_INTERFACE "Enable web interface" FALSE)
-option(ENABLE_PLOTTER "Enable plotter" FALSE)
-option(ENABLE_COLLECT "Enable collect" FALSE)
-option(ENABLE_SCRIPT_INTERFACE "Enable script interface" FALSE)
+option(ENABLE_BENCHMARKS "Enable benchmarks" OFF)
+option(ENABLE_DATABASE_SERIALIZER "Enable database serlializer" OFF)
+option(ENABLE_VIEWER "Enable system viewer" ON)
+option(ENABLE_WEB_INTERFACE "Enable web interface" OFF)
+option(ENABLE_PLOTTER "Enable plotter" OFF)
+option(ENABLE_COLLECT "Enable collect" OFF)
+option(ENABLE_SCRIPT_INTERFACE "Enable script interface" OFF)
 option(ENABLE_EXPERIMENTAL "Enable experimental mode" OFF)
 
 if (ENABLE_BENCHMARKS)
    message(STATUS "Benchmarks enabled")
-   configure_file(${CMAKE_SOURCE_DIR}/benchmarks.sqlite3 ${CMAKE_BINARY_DIR}/benchmarks.sqlite3 COPYONLY)
+   ## configure_file(${CMAKE_SOURCE_DIR}/benchmarks.sqlite3 ${CMAKE_BINARY_DIR}/benchmarks.sqlite3 COPYONLY)
    add_subdirectory(benchmarks)
 endif()
 
@@ -81,7 +66,7 @@ if (ENABLE_DATABASE_SERIALIZER)
 endif()
 
 if (ENABLE_VIEWER)
-   message(STATUS "OpenGL SDL system viewer is enabled")
+   message(STATUS "OpenGL system viewer is enabled")
    add_subdirectory(viewer)
 endif()
 
@@ -110,4 +95,9 @@ if (ENABLE_TESTS)
    include(CTest)
    enable_testing()
    add_subdirectory(tests)
+endif()
+
+## copy optional data 
+if(EXISTS "${PROJECT_SOURCE_DIR}/data/cp_gen.sh")
+   configure_file("${PROJECT_SOURCE_DIR}/data/cp_gen.sh" "${PROJECT_BINARY_DIR}/cp_gen.sh" COPYONLY)
 endif()
