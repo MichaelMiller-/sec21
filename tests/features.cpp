@@ -48,7 +48,7 @@ class Employee
    std::string name{};
 
 public:
-   explicit Employee(int id, std::string const& name) : id{ id }, name{ name } {}
+   explicit Employee(int id_, std::string const& name_) : id{ id_ }, name{ name_ } {}
 
    int getId() const { return id; }
    std::string getName() const { return name; }
@@ -194,7 +194,7 @@ TEST_CASE("Heterogeneous lookup", "[features]")
       };
       REQUIRE(employees.find(2)->getName() == "Bill");
    }
-   SECTION("use generic version from comparator")
+   SECTION("use generic version of comparator")
    {
       auto employees = make_set<Employee>(
          [](Employee const& lhs, Employee const& rhs) { return lhs.getId() < rhs.getId(); },
