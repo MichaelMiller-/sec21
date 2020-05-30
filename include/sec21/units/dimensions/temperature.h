@@ -10,13 +10,22 @@ namespace sec21::units
    struct kelvin : coherent_derived_unit<kelvin, temperature, si_tag> {};
    //! \todo celsius : coherent_derived_unit<celsius, temperature, si_tag> {};
 
+   template <>
+   struct abbreviation<kelvin>
+   {
+      constexpr static std::string_view value{"K"};
+   };
+
+   template <>
+   struct type_info<temperature>
+   {
+      using valid_types_t = std::tuple<kelvin>;
+      constexpr static std::string_view name{"temperature"};
+   };
+
    inline namespace literals
    {
       constexpr auto operator "" _K(unsigned long long v) noexcept  { return quantity<kelvin, unsigned long long>{ v }; }
       constexpr auto operator "" _K(long double v) noexcept         { return quantity<kelvin, long double>{ v }; }
    }
-
-#ifdef __cpp_concepts
-
-#endif
 }
