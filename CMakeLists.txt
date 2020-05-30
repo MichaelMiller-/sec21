@@ -8,8 +8,8 @@ include(cmake/StandardProjectSettings.cmake)
 if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
   include(cmake/Vcpkg.cmake)
   ## all dependencies
-  ## TODO: reduce dependencies <-> cmake options
-  vcpkg_install(nlohmann-json boost catch2 glm spdlog sdl2 glew imgui entt assimp)
+  ## TODO: reduce dependencies <-> install packages only if cmake options are set
+  vcpkg_install(nlohmann-json boost-mp11 boost-math boost-qvm boost-outcome boost-ublas catch2 glm spdlog sdl2 glew imgui entt assimp)
   include(${CMAKE_TOOLCHAIN_FILE})
 endif()
 
