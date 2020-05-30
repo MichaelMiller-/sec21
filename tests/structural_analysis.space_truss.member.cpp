@@ -1,11 +1,10 @@
-﻿#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
+﻿#include <catch.hpp>
 
 #include <sec21/structural_analysis/space_truss.h>
 
 #include <limits>
 
-TEST_CASE("add member to system", "[space_truss]")
+TEST_CASE("add member to system", "[sec21][structural_analysis][space_truss]")
 {
    using namespace sec21::structural_analysis;
 
@@ -89,5 +88,4 @@ TEST_CASE("add member to system", "[space_truss]")
       auto m1 = add_member(sys, n1.value(), 42);
       REQUIRE(static_cast<bool>(m1) == false);
    }
-   //! \todo 2019-04-23 add congruent member test
 }

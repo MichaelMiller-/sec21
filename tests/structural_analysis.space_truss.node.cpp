@@ -1,12 +1,10 @@
-﻿#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
+﻿#include <catch.hpp>
 #include "approx_equal.h"
 
 #include <sec21/units.h>
 #include <sec21/structural_analysis/space_truss.h>
 
-
-TEST_CASE("add node to system", "[space_truss][node]")
+TEST_CASE("add node to system", "[sec21][structural_analysis][space_truss][node]")
 {
    using namespace sec21::structural_analysis;
 
