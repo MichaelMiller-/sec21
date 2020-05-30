@@ -273,9 +273,7 @@ namespace sec21::units
       {
          auto [value, unit] = split(input);
 
-         bool valid = valid_dimension<typename Unit::dimension_t>(unit);
-         
-         if (valid == false)
+         if (bool valid = valid_dimension<typename Unit::dimension_t>(unit); valid == false)
             throw std::runtime_error("couldn't match input unit with dimension type");
 
          auto v = boost::lexical_cast<double>(value) * 1.0;
