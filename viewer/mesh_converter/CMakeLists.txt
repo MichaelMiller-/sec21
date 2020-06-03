@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.1)
 project(mesh_converter)
 
 set(Boost_USE_STATIC_LIBS ON)
-find_package(Boost CONFIG COMPONENTS program_options)
+find_package(Boost 1.70 COMPONENTS program_options REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED) 
 find_package(assimp CONFIG REQUIRED)
