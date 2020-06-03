@@ -26,6 +26,7 @@ install:
   - vcpkg install imgui:x64-windows
   - vcpkg install entt:x64-windows
   - vcpkg install assimp:x64-windows
+  - vcpkg install freetype:x64-windows
   - cd c:\tools\vcpkg
   - vcpkg integrate install
 
