@@ -15,11 +15,13 @@ install:
   - vcpkg install boost-qvm:x64-windows
   - vcpkg install boost-outcome:x64-windows
   - vcpkg install boost-ublas:x64-windows
+  - vcpkg install boost-program-options:x64-windows
   - vcpkg install catch2:x64-windows
   - vcpkg install glm:x64-windows
   - vcpkg install nlohmann-json:x64-windows
   - vcpkg install spdlog:x64-windows
   - vcpkg install sdl2:x64-windows
+  - vcpkg install sdl2-image:x64-windows
   - vcpkg install glew:x64-windows
   - vcpkg install imgui:x64-windows
   - vcpkg install entt:x64-windows
