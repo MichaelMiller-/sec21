@@ -2,13 +2,13 @@
 #include "approx_equal.h"
 
 #include <sec21/flat_matrix.h>
-
+#include <sec21/file_loader.h>
 #include <sec21/structural_analysis/space_truss.h>
+#include <sec21/structural_analysis/loadcase.h>
 #include <sec21/structural_analysis/system_result.h>
 #include <sec21/structural_analysis/solve.h>
 
 #include <array>
-#include <fstream>
 
 TEST_CASE("example system 6.0 load from json", "[sec21][structural_analysis][space_truss]")
 {
@@ -17,22 +17,18 @@ TEST_CASE("example system 6.0 load from json", "[sec21][structural_analysis][spa
    using namespace sec21::structural_analysis;
    using namespace sec21::units::literals;
 
-   std::ifstream ifs{"example_6.json"};
-   using nlohmann::json;
-   json j;
-   ifs >> j;
-   auto sys = j.get<space_truss>();
+   auto sys = sec21::load_from_json<space_truss>("example_6.json");
 
    SECTION("test geometry")
    {
-      // REQUIRE(length(sys, 1) == 5.0_m);
-      // REQUIRE(length(sys, m2.value()) == 3.0_m);
-      REQUIRE(length(sys, 4) == 2.0_m);
-      // REQUIRE(length(sys, 5) == 2.0_m);
-      REQUIRE(length(sys, 6) == 4.0_m);
-      REQUIRE(length(sys, 7) == 4.0_m);
-      // REQUIRE(length(sys, m5.value()).value() == Approx(4.24264)); //_m);
-      // REQUIRE(length(sys, m6.value()).value() == Approx(4.24264)); //_m);
+      // REQUIRE(impl::length(sys, 1) == 5.0_m);
+      // REQUIRE(impl::length(sys, m2.value()) == 3.0_m);
+      REQUIRE(impl::length(sys, 4) == 2.0_m);
+      // REQUIRE(impl::length(sys, 5) == 2.0_m);
+      REQUIRE(impl::length(sys, 6) == 4.0_m);
+      REQUIRE(impl::length(sys, 7) == 4.0_m);
+      // REQUIRE(impl::length(sys, m5.value()).value() == Approx(4.24264)); //_m);
+      // REQUIRE(impl::length(sys, m6.value()).value() == Approx(4.24264)); //_m);
 
       namespace bmc = boost::math::constants;
       using precision_t = double;
@@ -436,9 +432,11 @@ TEST_CASE("example system 6.0 load from json", "[sec21][structural_analysis][spa
       //! \clang-format on
       REQUIRE(approx_equal(sec21::flat_matrix(Z), expected, kDivergence)); 
    }
-   SECTION("solve function")
+   SECTION("solve")
    {
-      auto [success, result] = solve(sys);
+      auto load = sec21::load_from_json<loadcase<decltype(sys)>>("example_6_load.json");
+
+      auto [success, result] = solve(sys, load);
       REQUIRE(success == true);
 
       std::vector<double> flat_support_reaction{};

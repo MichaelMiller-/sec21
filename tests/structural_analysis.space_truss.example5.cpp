@@ -1,13 +1,13 @@
-﻿#define CATCH_CONFIG_MAIN
-#include <catch.hpp>
+﻿#include <catch.hpp>
 #include "approx_equal.h"
 
+#include <sec21/file_loader.h>
 #include <sec21/structural_analysis/space_truss.h>
+#include <sec21/structural_analysis/loadcase.h>
 #include <sec21/structural_analysis/system_result.h>
 #include <sec21/structural_analysis/solve.h>
 
 #include <array>
-#include <fstream>
 
 TEST_CASE("example system 5.0 load from json", "[sec21][structural_analysis][space_truss]")
 {
@@ -16,23 +16,21 @@ TEST_CASE("example system 5.0 load from json", "[sec21][structural_analysis][spa
    using namespace sec21::structural_analysis;
    using namespace sec21::units::literals;
 
-   std::ifstream ifs{"example_5.json"};
-   using nlohmann::json;
-   json j;
-   ifs >> j;
-   auto sys = j.get<space_truss>();
+   auto sys = sec21::load_from_json<space_truss>("example_5.json");
 
    SECTION("test geometry")
    {
-      REQUIRE(length(sys, 3) == 5.0_m);
-      REQUIRE(length(sys, 4) == 5.0_m);
-      REQUIRE(length(sys, 5) == 3.0_m);
-      REQUIRE(length(sys, 6) == 3.0_m);
-      REQUIRE(length(sys, 13) == 4.0_m);
+      REQUIRE(impl::length(sys, 3) == 5.0_m);
+      REQUIRE(impl::length(sys, 4) == 5.0_m);
+      REQUIRE(impl::length(sys, 5) == 3.0_m);
+      REQUIRE(impl::length(sys, 6) == 3.0_m);
+      REQUIRE(impl::length(sys, 13) == 4.0_m);
    }
-   SECTION("solve function")
+   SECTION("solve")
    {
-      auto [success, result] = solve(sys);
+      auto load = sec21::load_from_json<loadcase<decltype(sys)>>("example_5_load.json");
+
+      auto [success, result] = solve(sys, load);
       REQUIRE(success == true);
 
       std::vector<double> flat_support_reaction{};

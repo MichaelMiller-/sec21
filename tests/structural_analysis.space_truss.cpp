@@ -4,7 +4,9 @@
 #include <sec21/access.h>
 #include <sec21/units.h>
 #include <sec21/flat_matrix.h>
+#include <sec21/file_loader.h>
 #include <sec21/structural_analysis/space_truss.h>
+#include <sec21/structural_analysis/loadcase.h>
 #include <sec21/structural_analysis/system_result.h>
 #include <sec21/structural_analysis/solve.h>
 
@@ -31,9 +33,10 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    using precision_t = decltype(sys)::precision_t;
    using node_t = decltype(sys)::node_t;
    using support_t = node_t::global_support_t;
+   using loadcase_t = loadcase<decltype(sys)>;
 
    auto n1 = add_node(sys, {1, {0.0, 3.0}});
-   auto n2 = add_node(sys, {2, {3.0, 3.0}, std::nullopt, space_truss::force_t{{10.0_kN, -10.0_kN}}});
+   auto n2 = add_node(sys, {2, {3.0, 3.0}});
    auto n3 = add_node(sys, {3, {3.0, 0.0}, support_t{ false, true }});
    auto n4 = add_node(sys, {4, {0.0, 0.0}, support_t{ true, true }});
 
@@ -70,12 +73,12 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
 
    SECTION("test the geometry of the system")
    {
-      REQUIRE(length(sys, m1.value()) == 3.0_m);
-      REQUIRE(length(sys, m2.value()) == 3.0_m);
-      REQUIRE(length(sys, m3.value()) == 3.0_m);
-      REQUIRE(length(sys, m4.value()) == 3.0_m);
-      REQUIRE(length(sys, m5.value()).value() == Approx(4.24264)); //_m);
-      REQUIRE(length(sys, m6.value()).value() == Approx(4.24264)); //_m);
+      REQUIRE(impl::length(sys, m1.value()) == 3.0_m);
+      REQUIRE(impl::length(sys, m2.value()) == 3.0_m);
+      REQUIRE(impl::length(sys, m3.value()) == 3.0_m);
+      REQUIRE(impl::length(sys, m4.value()) == 3.0_m);
+      REQUIRE(impl::length(sys, m5.value()).value() == Approx(4.24264)); //_m);
+      REQUIRE(impl::length(sys, m6.value()).value() == Approx(4.24264)); //_m);
 
       namespace bmc = boost::math::constants;
       const auto fourth_pi{bmc::half_pi<precision_t>() * 0.5};
@@ -476,7 +479,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       REQUIRE(std::size(flattend_K) == std::size(expected));
       REQUIRE(approx_equal(flattend_K, expected, kDivergence));
    }
-   SECTION("global stiffness matrix without supports")
+   SECTION("global stiffness matrix")
    {
       auto K = impl::global_stiffness_matrix(sys);
       REQUIRE(K.size1() == 8);
@@ -542,14 +545,6 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       REQUIRE(std::size(flattend_K) == std::size(expected));      
       REQUIRE(approx_equal(flattend_K, expected, kDivergence));
    }
-   SECTION("Knotenpunktslasten/Lastvektor (F)")
-   {
-      auto F = impl::load_vector(sys);
-      const auto expected = std::array{ 0.0_N, 0.0_N, 10'000.0_N, -10'000.0_N, 0.0_N, 0.0_N, 0.0_N, 0.0_N };
-
-      REQUIRE(std::size(F) == std::size(expected));
-      REQUIRE(std::equal(std::begin(F), std::end(F), std::begin(expected)));
-   }
    SECTION("K strich")
    {
       using namespace sec21::structural_analysis::impl;
@@ -594,7 +589,10 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    {
       using namespace sec21;
 
-      auto [success, result] = solve(sys);
+      loadcase_t lf1;
+      lf1.node_load.emplace_back(2, loadcase_t::load_t{{10.0_kN, -10.0_kN}});
+
+      auto [success, result] = solve(sys, lf1);
       REQUIRE(success == true);
 
       // auto it = result.nodes.find(1);
@@ -648,7 +646,7 @@ TEST_CASE("example 1.1 with different node id's (N1 switched with N3 from exampl
    using support_t = node_t::global_support_t;
 
    auto n1 = add_node(sys, {1, {3.0, 0.0}, support_t{ false, true }});
-   auto n2 = add_node(sys, {2, {3.0, 3.0}, std::nullopt, space_truss::force_t{{10.0_kN, -10.0_kN}}});
+   auto n2 = add_node(sys, {2, {3.0, 3.0}});
    auto n3 = add_node(sys, {3, {0.0, 3.0}});
    auto n4 = add_node(sys, {4, {0.0, 0.0}, support_t{ true, true }});
 
@@ -673,12 +671,12 @@ TEST_CASE("example 1.1 with different node id's (N1 switched with N3 from exampl
 
    SECTION("test the geometry of the system")
    {
-      REQUIRE(length(sys, m1.value()) == 3.0_m);
-      REQUIRE(length(sys, m2.value()) == 3.0_m);
-      REQUIRE(length(sys, m3.value()) == 3.0_m);
-      REQUIRE(length(sys, m4.value()) == 3.0_m);
-      REQUIRE(length(sys, m5.value()).value() == Approx(4.24264)); //_m);
-      REQUIRE(length(sys, m6.value()).value() == Approx(4.24264)); //_m);
+      REQUIRE(impl::length(sys, m1.value()) == 3.0_m);
+      REQUIRE(impl::length(sys, m2.value()) == 3.0_m);
+      REQUIRE(impl::length(sys, m3.value()) == 3.0_m);
+      REQUIRE(impl::length(sys, m4.value()) == 3.0_m);
+      REQUIRE(impl::length(sys, m5.value()).value() == Approx(4.24264)); //_m);
+      REQUIRE(impl::length(sys, m6.value()).value() == Approx(4.24264)); //_m);
 
       namespace bmc = boost::math::constants;
       const auto fourth_pi{bmc::half_pi<precision_t>() * 0.5};
@@ -813,7 +811,10 @@ TEST_CASE("example 1.1 with different node id's (N1 switched with N3 from exampl
    {
       using namespace sec21;
 
-      auto [success, result] = solve(sys);
+      loadcase<decltype(sys)> lf1;
+      lf1.node_load.emplace_back(2, loadcase<decltype(sys)>::load_t{{10.0_kN, -10.0_kN}});
+
+      auto [success, result] = solve(sys, lf1);
       REQUIRE(success == true);
 
       // unit: newton [N]
@@ -857,7 +858,7 @@ TEST_CASE("example system 1.2 with half load from example 1.0", "[sec21][structu
    using support_t = node_t::global_support_t;
 
    auto n1 = add_node(sys, {1, {0.0, 3.0}});
-   auto n2 = add_node(sys, {2, {3.0, 3.0}, std::nullopt, space_truss::force_t{{5.0_kN, -5.0_kN}}});
+   auto n2 = add_node(sys, {2, {3.0, 3.0}});
    auto n3 = add_node(sys, {3, {3.0, 0.0}, support_t{ false, true }});
    auto n4 = add_node(sys, {4, {0.0, 0.0}, support_t{ true, true }});
 
@@ -884,12 +885,12 @@ TEST_CASE("example system 1.2 with half load from example 1.0", "[sec21][structu
 
    SECTION("test the geometry of the system")
    {
-      REQUIRE(length(sys, m1.value()) == 3.0_m);
-      REQUIRE(length(sys, m2.value()) == 3.0_m);
-      REQUIRE(length(sys, m3.value()) == 3.0_m);
-      REQUIRE(length(sys, m4.value()) == 3.0_m);
-      REQUIRE(length(sys, m5.value()).value() == Approx(4.24264).epsilon(kDivergence)); //_m);
-      REQUIRE(length(sys, m6.value()).value() == Approx(4.24264).epsilon(kDivergence)); //_m);
+      REQUIRE(impl::length(sys, m1.value()) == 3.0_m);
+      REQUIRE(impl::length(sys, m2.value()) == 3.0_m);
+      REQUIRE(impl::length(sys, m3.value()) == 3.0_m);
+      REQUIRE(impl::length(sys, m4.value()) == 3.0_m);
+      REQUIRE(impl::length(sys, m5.value()).value() == Approx(4.24264).epsilon(kDivergence)); //_m);
+      REQUIRE(impl::length(sys, m6.value()).value() == Approx(4.24264).epsilon(kDivergence)); //_m);
 
       namespace bmc = boost::math::constants;
       const auto fourth_pi{bmc::half_pi<precision_t>() * 0.5};
@@ -905,7 +906,10 @@ TEST_CASE("example system 1.2 with half load from example 1.0", "[sec21][structu
    {
       using namespace sec21;
 
-      auto [success, result] = solve(sys);
+      loadcase<decltype(sys)> lf1{};
+      lf1.node_load.emplace_back(2, loadcase<decltype(sys)>::load_t{{5.0_kN, -5.0_kN}});
+
+      auto [success, result] = solve(sys, lf1);
       REQUIRE(success == true);
 
       // unit: newton [N]
@@ -942,58 +946,54 @@ TEST_CASE("example system 1.0 load from json", "[sec21][structural_analysis][spa
    using namespace sec21::structural_analysis;
    using namespace sec21::units::literals;
 
-   std::ifstream ifs{"example_1.json"};
-   using nlohmann::json;
-   json j;
-   ifs >> j;
-   auto sys = j.get<space_truss>();
+   auto sys = sec21::load_from_json<space_truss>("example_1.json");
 
-   SECTION("solve")
+   loadcase<decltype(sys)> lf1{};
+   lf1.node_load.emplace_back(2, loadcase<decltype(sys)>::load_t{{10.0_kN, -10.0_kN}});
+
+   auto [success, result] = solve(sys, lf1);
+   REQUIRE(success == true);
+
    {
-      auto [success, result] = solve(sys);
-      REQUIRE(success == true);
-
+      std::vector<double> flat_support_reaction{};
+      for (auto [k,v] : result.node) 
       {
-         std::vector<double> flat_support_reaction{};
-         for (auto [k,v] : result.node) 
-         {
-            std::transform(
-               std::begin(v.support_reaction), 
-               std::end(v.support_reaction), 
-               std::back_inserter(flat_support_reaction),
-               [](auto&& e) { return e.value(); });
-         }
-
-         // unit: newton [N]
-         const auto expected = std::array{ 0.0, 0.0, 0.0, 0.0, 0.0, 20'000.0, -10'000.0, -10'000.0 };
-         REQUIRE(approx_equal(flat_support_reaction, expected, kDivergence));
-      }
-      {
-         std::vector<double> flat_displacement{};
-         for (auto [k,v] : result.node) 
-         {
-            std::transform(
-               std::begin(v.displacement), 
-               std::end(v.displacement), 
-               std::back_inserter(flat_displacement),
-               [](auto&& e) { return e.value(); });
-         }
-
-         // unit: millimeter [mm]
-         const auto expected = std::array{ 0.869117, 0.18, 1.049117, -0.54, 0.18, 0.0, 0.0, 0.0 };
-         REQUIRE(approx_equal(flat_displacement, expected, kDivergence));
-      }
-      {
-         // unit: newton [N]
-         std::vector<double> copied_results{};
          std::transform(
-            std::begin(result.member), 
-            std::end(result.member), 
-            std::back_inserter(copied_results), 
-            [](auto&& m) { return m.second.normal_force.value(); });
-
-         const auto expected = std::array{ 5'040.0, -15'120.0, 5'040.0, 5'040.0, 7'127.63635, -7'127.63635 };
-         REQUIRE(approx_equal(copied_results, expected, kDivergence));
+            std::begin(v.support_reaction), 
+            std::end(v.support_reaction), 
+            std::back_inserter(flat_support_reaction),
+            [](auto&& e) { return e.value(); });
       }
+
+      // unit: newton [N]
+      const auto expected = std::array{ 0.0, 0.0, 0.0, 0.0, 0.0, 20'000.0, -10'000.0, -10'000.0 };
+      REQUIRE(approx_equal(flat_support_reaction, expected, kDivergence));
+   }
+   {
+      std::vector<double> flat_displacement{};
+      for (auto [k,v] : result.node) 
+      {
+         std::transform(
+            std::begin(v.displacement), 
+            std::end(v.displacement), 
+            std::back_inserter(flat_displacement),
+            [](auto&& e) { return e.value(); });
+      }
+
+      // unit: millimeter [mm]
+      const auto expected = std::array{ 0.869117, 0.18, 1.049117, -0.54, 0.18, 0.0, 0.0, 0.0 };
+      REQUIRE(approx_equal(flat_displacement, expected, kDivergence));
+   }
+   {
+      // unit: newton [N]
+      std::vector<double> copied_results{};
+      std::transform(
+         std::begin(result.member), 
+         std::end(result.member), 
+         std::back_inserter(copied_results), 
+         [](auto&& m) { return m.second.normal_force.value(); });
+
+      const auto expected = std::array{ 5'040.0, -15'120.0, 5'040.0, 5'040.0, 7'127.63635, -7'127.63635 };
+      REQUIRE(approx_equal(copied_results, expected, kDivergence));
    }
 }
