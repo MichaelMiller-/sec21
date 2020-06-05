@@ -1,0 +1,17 @@
+{
+    "name": "Example 6 Loadcase 1",
+    "node_load": [
+        [
+            5,
+            {
+                "x": {
+                    "value": "-30.0_kN"
+                },
+                "y": {
+                    "value": "-50.0_kN"
+                }
+            }
+        ]
+    ],
+    "temperature_load": []
+}

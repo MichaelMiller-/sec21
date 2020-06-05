@@ -1,0 +1,50 @@
+{
+    "name": "Example 5 Loadcase 1",
+    "node_load": [
+        [
+            3,
+            {
+                "x": {
+                    "value": "0_kN"
+                },
+                "y": {
+                    "value": "-32.0_kN"
+                }
+            }
+        ],
+        [
+            6,
+            {
+                "x": {
+                    "value": "0_kN"
+                },
+                "y": {
+                    "value": "-32.0_kN"
+                }
+            }
+        ],
+        [
+            7,
+            {
+                "x": {
+                    "value": "0_kN"
+                },
+                "y": {
+                    "value": "-20.0_kN"
+                }
+            }
+        ],
+        [
+            9,
+            {
+                "x": {
+                    "value": "0_kN"
+                },
+                "y": {
+                    "value": "-20.0_kN"
+                }
+            }
+        ]
+    ],
+    "temperature_load": []
+}
