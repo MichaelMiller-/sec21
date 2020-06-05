@@ -4,20 +4,7 @@
 #include <sec21/structural_analysis/member.h>
 #include <sec21/structural_analysis/type_traits.h>
 
-//! \todo remove
-// #include <sec21/structural_analysis/impl/geometry.h>
-
-#include <sec21/units/dimensions/length.h>
-
-#include <boost/version.hpp>
 #include <boost/outcome.hpp>
-#include <boost/math/constants/constants.hpp>
-#include <boost/math/special_functions/sin_pi.hpp>
-#include <boost/math/special_functions/cos_pi.hpp>
-#include <boost/geometry/algorithms/distance.hpp> 
-#include <boost/numeric/ublas/matrix.hpp>
-#include <boost/numeric/ublas/matrix_proxy.hpp>
-#include <boost/numeric/ublas/io.hpp>
 
 #include <vector>
 #include <algorithm>
@@ -27,13 +14,6 @@
 namespace sec21::structural_analysis
 {
    namespace outcome = BOOST_OUTCOME_V2_NAMESPACE;
-
-   //! \todo implement/use
-   enum class error_code
-   {
-      invalid_node_id,
-      node_already_exists
-   };
 
    //! \brief Datencontainer für das Stabwerkssystem
    //! \brief A space frame truss is a N-dimensional framework of members pinned at their ends
@@ -48,7 +28,6 @@ namespace sec21::structural_analysis
       using member_t = member;
 
       using node_descriptor_t = node_t::descriptor_t;
-      using force_t = node_t::load_t;
       using member_descriptor_t = member_t::descriptor_t;
 
       std::optional<std::string> description{};
@@ -67,6 +46,7 @@ namespace sec21::structural_analysis
          return v.id == std::numeric_limits<decltype(v.id)>::max();
       }
 
+      //! \todo remove
       template <typename Container, typename Descriptor>
       constexpr auto get_element(Container const& c, Descriptor id) noexcept 
       {
@@ -157,37 +137,8 @@ namespace sec21::structural_analysis
    {
       return add_member(sys, from, to, { std::forward<Args>(args)... });
    }
-
-   template <typename System>
-#ifdef __cpp_concepts
-      requires SpaceTruss<System>
-#endif   
-   void clear_loads(System& sys) noexcept
-   {
-      std::transform(
-         std::begin(sys.nodes), 
-         std::end(sys.nodes), 
-         std::begin(sys.nodes), 
-         [](auto& n){ n.load.reset(); return n; });
-   }
-
-   //! \todo 2019-04-16 error handling -> outcome
-   template <typename System>
-#ifdef __cpp_concepts
-      requires SpaceTruss<System>
-#endif
-   auto length(System const& sys, typename System::member_descriptor_t id) -> units::quantity<units::meter, typename System::precision_t>
-   {
-      //! \todo possible exception
-      const auto [from, to] = sys.coincidence_table.at(id);
-      const auto it_from = get_element(sys.nodes, from);
-      const auto it_to = get_element(sys.nodes, to);
-      //! \todo possible exception
-      return { boost::geometry::distance(it_from->position, it_to->position) };
-   }
 }
 
-//! \todo temporary; guard with a define or move to extra file
 #include <nlohmann/json.hpp>
 
 namespace sec21::structural_analysis
