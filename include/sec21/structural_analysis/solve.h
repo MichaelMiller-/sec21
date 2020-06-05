@@ -8,11 +8,13 @@
 #include <sec21/units/quantity.h>
 #include <sec21/structural_analysis/system_result.h>
 #include <sec21/structural_analysis/impl/lookup.h>
-//! \todo remove/replace header
 #include <sec21/structural_analysis/impl/matrix_helper.h>
 #include <sec21/structural_analysis/impl/geometry.h>
 #include <sec21/structural_analysis/impl/global_stiffness_matrix.h>
-#include <sec21/structural_analysis/impl/load_vector.h>
+
+#include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/matrix_proxy.hpp>
+#include <boost/numeric/ublas/io.hpp>
 
 #include <viennacl/vector.hpp>
 #include <viennacl/matrix.hpp>
@@ -22,30 +24,15 @@
 #include <map>
 #include <string_view>
 
-//! \todo remove
-template <typename Iterator>
-auto dump(Iterator first, Iterator last, std::string_view name)
-{
-   std::cout << name.data() << "n: "<< std::distance(first, last) << "\n(";
-   std::copy(first, last, std::ostream_iterator<typename std::iterator_traits<Iterator>::value_type>(std::cout, ", "));
-   std::cout << ")\n" << std::endl;
-}
-template <typename Sequence>
-auto dump(Sequence&& seq, std::string_view name)
-{
-   dump(std::begin(seq), std::end(seq), std::move(name));
-}
-
 namespace sec21::structural_analysis
 {
-   // template <typename System>
-   // struct system_result;
-
    namespace impl
    {
-      //! \todo name
       template <typename System>
-      [[nodiscard]] auto solve_with_load(System const &sys, boost::numeric::ublas::vector<typename System::precision_t> F)
+      [[nodiscard]] auto solve(
+         System const &sys, 
+         boost::numeric::ublas::matrix<typename System::precision_t> K,
+         boost::numeric::ublas::vector<typename System::precision_t> F)
       {
          auto lookup = impl::make_lookup(sys, impl::Row{0});
 
@@ -65,27 +52,28 @@ namespace sec21::structural_analysis
 
          const auto supported_cols = impl::row_to_col(std::begin(supported_rows), std::end(supported_rows));
 
-         auto K = impl::global_stiffness_matrix(sys);
-         auto K_without_supports = impl::remove_from_matrix(K, supported_rows, supported_cols);
-         auto K_strich = impl::remove_from_matrix(K, not_supported_rows, supported_cols);
-
-std::cout << "K: " << K << std::endl;
-std::cout << "K_without_supports: " << K_without_supports << std::endl;
-std::cout << "K_strich: " << K_strich << std::endl;
+         const auto K_without_supports = impl::remove_from_matrix(K, supported_rows, supported_cols);
+         const auto K_strich = impl::remove_from_matrix(K, not_supported_rows, supported_cols);
+         const auto F_without_supports = impl::remove_from_vector(F, supported_rows);
 
          system_result<System> result;
+
+         // consider sanitiy checks:
+         // F.size1() == K_without_supports.size1() == K_without_supports.size2()
+         // F.size1() == K_strich.size2()
+         // expects(std::size(lookup) == n * dim);
 
          using precision_t = typename System::precision_t;
 
          using namespace boost::numeric;
          using namespace viennacl::linalg;
 
-         viennacl::vector<precision_t> vcl_rhs(F.size());
+         viennacl::vector<precision_t> vcl_rhs(F_without_supports.size());
          //! \todo names
          viennacl::vector<precision_t> vcl_result_gl1(K_without_supports.size2());
          viennacl::matrix<precision_t> vcl_matrix(K_without_supports.size1(), K_without_supports.size2());
 
-         viennacl::copy(F, vcl_rhs);
+         viennacl::copy(F_without_supports, vcl_rhs);
          viennacl::copy(K_without_supports, vcl_matrix);
 
          vcl_result_gl1 = solve(vcl_matrix, vcl_rhs, viennacl::linalg::upper_tag{});
@@ -111,13 +99,9 @@ std::cout << "K_strich: " << K_strich << std::endl;
          const auto n = std::distance(std::begin(sys.nodes), std::end(sys.nodes));
          constexpr auto dim = System::dimension_v;
 
-         //! \todo: possible test: expects(std::size(lookup) == n * dim);
          std::vector<precision_t> support_reactions(n * dim);
          std::vector<precision_t> displacements(n * dim);
          
-         dump(support_reactions, "support_reactions");
-         dump(displacements, "displacements");
-
          //! \todo could be only on zip() call -> benchmark
          zip(
             [&support_reactions](auto&& tuple) { support_reactions[static_cast<int>(std::get<impl::Row>(tuple))] = std::get<1>(tuple); }, 
@@ -147,7 +131,6 @@ std::cout << "K_strich: " << K_strich << std::endl;
             std::begin(sys.nodes), 
             std::end(sys.nodes),
             std::inserter(result.node, std::end(result.node)),
-            //! \todo find a better solution for "typename decltype()"
             [&result](auto&& node){ return std::make_pair(node.id, typename decltype(result)::node_result{}); });
 
          for_each_chunk<dim>(
@@ -190,8 +173,8 @@ std::cout << "K_strich: " << K_strich << std::endl;
             const auto N = (
                -std::cos(alpha) * X(delta_s).value() +
                -std::sin(alpha) * Y(delta_s).value() +
-               std::cos(alpha) * X(delta_e).value() +
-               std::sin(alpha) * Y(delta_e).value()) * k1 * EA_over_l * k2;
+                std::cos(alpha) * X(delta_e).value() +
+                std::sin(alpha) * Y(delta_e).value()) * k1 * EA_over_l * k2;
 
             //! \todo: ungenauigkeit in der berechung
             result.member[m.id].normal_force = N;
@@ -202,41 +185,36 @@ std::cout << "K_strich: " << K_strich << std::endl;
          for (const auto [node, res] : result.node)
             result.nodes.insert({ node, res.displacement, res.support_reaction });
 
-         return std::tuple{true, result};
+         return std::tuple{ true, result };
       }
    }
 
+   // Forward declaration
    template <typename System>
-   [[nodiscard]] auto solve(System const &sys)
+   struct loadcase;
+
+   template <typename System>
+   [[nodiscard]] auto solve(System const& sys, loadcase<System> const& load) // -> std::tuple<bool, system_result<typename System>>
    {
-      //! \todo lookup table is twice required -> consider it as argument
-      auto lookup = impl::make_lookup(sys, impl::Row{0});
+      using value_t = units::quantity<units::newton, typename System::precision_t>;
 
-      std::vector<bool> mask{};
-      support_mask(std::begin(sys.nodes), std::end(sys.nodes), std::back_inserter(mask));
+      constexpr auto dim = System::dimension_v;
 
-      decltype(lookup) supported_rows{};
-      decltype(lookup) not_supported_rows{};
+      std::vector<value_t> action_on_structure(std::size(sys.nodes) * dim);
 
-      partition_lookup(
-         std::begin(lookup), 
-         std::end(lookup),
-         std::begin(mask), 
-         std::end(mask),
-         std::back_inserter(supported_rows),
-         std::back_inserter(not_supported_rows));
+      add_node_load(sys, load, action_on_structure);
+      add_temperature_load(sys, load, action_on_structure);
 
-      const auto load_of_all_nodes = impl::load_vector(sys);
-      const auto load_without_supports = erase_if_index(
-         load_of_all_nodes, 
-         [&](auto i){ return contains(supported_rows, impl::Row{i}); });
-
-      // convert quantities to a more suitable datatype, in this case to ublas::vector<double>
+      //! \todo parallelize K and F
+      auto K = impl::global_stiffness_matrix(sys);
+      // convert quantities to a more suitable datatype, in this case to ublas::vector<T>
       auto F = numeric::make_vector(
-         std::begin(load_without_supports), 
-         std::end(load_without_supports), 
-         [](auto&& q) -> double { return q.value(); });
+         std::begin(action_on_structure), 
+         std::end(action_on_structure), 
+         [](auto&& q) -> typename System::precision_t { return q.value(); });
 
-      return impl::solve_with_load(sys, F);
-   }
+      return impl::solve(sys, K, F);
+
+      //! \todo process(solve) -> post_process(sys, result)
+   }   
 }
