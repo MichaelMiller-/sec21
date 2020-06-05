@@ -5,6 +5,8 @@
 #include "viewable.h"
 #include "vertex_buffer_id.h"
 #include "model_transform.h"
+#include "aabb.h"
+#include "sphere.h"
 
 #include <entt/entt.hpp>
 
@@ -51,30 +53,24 @@ namespace sec21::viewer
       auto entity = registry.create();
       registry.assign<member_tag>(entity);
       registry.assign<selectable>(entity);
-
       //! \todo assign text
       //! \todo assign bounding box or bounding volume
       registry.assign<sphere>(entity, bounding_volume);
       registry.assign<aabb>(entity, bbox);
-
       registry.assign<vertex_buffer_id>(entity, handle_vertexbuffer_cylinder);
       registry.assign<model_transformation>(entity, detail::member_transformation(from, to, radius));
       registry.assign<material>(entity, chrome);
       registry.assign<viewable>(entity, true);
    }
 
-   template <typename CoordinateType, typename CoordinateSystem>
-   void make_member(
-      entt::registry& registry, 
-      float radius, 
-      boost::geometry::model::point<CoordinateType, 2, CoordinateSystem> const& from,
-      boost::geometry::model::point<CoordinateType, 2, CoordinateSystem> const& to)
+   template <typename T>
+   void make_member(entt::registry& registry, float radius, std::array<T, 2> const& from, std::array<T, 2> const& to)
    {
       make_member(
          registry, 
          radius, 
-         glm::vec3{ boost::geometry::get<0>(from), boost::geometry::get<1>(from), 0.0 },
-         glm::vec3{ boost::geometry::get<0>(to), boost::geometry::get<1>(to), 0.0 });
+         glm::vec3{ std::get<0>(from), std::get<1>(from), 0.0 },
+         glm::vec3{ std::get<0>(to), std::get<1>(to), 0.0 });
    }
 
    void make_displaced_member(entt::registry& registry, float radius, glm::vec3 const& from, glm::vec3 const& to)
@@ -88,17 +84,17 @@ namespace sec21::viewer
       registry.assign<viewable>(entity, false);
    }
 
-   template <typename CoordinateType, typename CoordinateSystem>
-   void make_displaced_member(
-      entt::registry& registry, 
-      float radius, 
-      boost::geometry::model::point<CoordinateType, 2, CoordinateSystem> const& from,
-      boost::geometry::model::point<CoordinateType, 2, CoordinateSystem> const& to)
-   {
-      make_displaced_member(
-         registry, 
-         radius, 
-         glm::vec3{ boost::geometry::get<0>(from), boost::geometry::get<1>(from), 0.0 },
-         glm::vec3{ boost::geometry::get<0>(to), boost::geometry::get<1>(to), 0.0 });
-   }   
+   // template <typename CoordinateType, typename CoordinateSystem>
+   // void make_displaced_member(
+   //    entt::registry& registry, 
+   //    float radius, 
+   //    boost::geometry::model::point<CoordinateType, 2, CoordinateSystem> const& from,
+   //    boost::geometry::model::point<CoordinateType, 2, CoordinateSystem> const& to)
+   // {
+   //    make_displaced_member(
+   //       registry, 
+   //       radius, 
+   //       glm::vec3{ boost::geometry::get<0>(from), boost::geometry::get<1>(from), 0.0 },
+   //       glm::vec3{ boost::geometry::get<0>(to), boost::geometry::get<1>(to), 0.0 });
+   // }   
 }

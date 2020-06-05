@@ -9,12 +9,9 @@
 #include "viewable.h"
 #include "selectable.h"
 #include "aabb.h"
-//! \todo remove
-#include "intersection.h"
+#include "sphere.h"
 
 #include <entt/entt.hpp>
-
-#include <boost/geometry/geometries/point.hpp>
 
 namespace sec21::viewer
 {
@@ -48,11 +45,11 @@ namespace sec21::viewer
       registry.assign<viewable>(entity, true);
    }
 
-   template <typename CoordinateType, typename CoordinateSystem>
-   void make_node(entt::registry& registry, float radius, boost::geometry::model::point<CoordinateType, 2, CoordinateSystem> const& pos)
+   template <typename T>
+   void make_node(entt::registry& registry, float radius, std::array<T, 2> const& pos)
    {
-      make_node(registry, radius, glm::vec3{ boost::geometry::get<0>(pos), boost::geometry::get<1>(pos), 0.0 });
-   }
+      make_node(registry, radius, glm::vec3{ std::get<0>(pos), std::get<1>(pos), 0.0 });
+   }   
 
    void make_displaced_node(entt::registry& registry, float radius, glm::vec3 const& pos)
    {
@@ -65,10 +62,4 @@ namespace sec21::viewer
       registry.assign<material>(entity, emerald);
       registry.assign<viewable>(entity, false);	
    }
-
-   template <typename CoordinateType, typename CoordinateSystem>
-   void make_displaced_node(entt::registry& registry, float radius, boost::geometry::model::point<CoordinateType, 2, CoordinateSystem> const& pos)
-   {
-      make_displaced_node(registry, radius, glm::vec3{ boost::geometry::get<0>(pos), boost::geometry::get<1>(pos), 0.0 });
-   }   
 }

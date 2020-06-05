@@ -10,8 +10,6 @@
 
 #include <entt/entt.hpp>
 
-#include <boost/geometry/geometries/point.hpp>
-
 namespace sec21::viewer
 {
    namespace detail
@@ -31,6 +29,7 @@ namespace sec21::viewer
 
          auto cos_phi = 0.f;
          if (m == 0)
+            //! todo: glm or std constant
             cos_phi = boost::math::constants::half_pi<decltype(cos_phi)>();
          else
             cos_phi = std::acos(m / (l1 * l2));
@@ -67,9 +66,9 @@ namespace sec21::viewer
       registry.assign<viewable>(entity, true);
    }
 
-   template <typename CoordinateType, typename CoordinateSystem, typename Direction>
-   void make_single_load(entt::registry& registry, float scale, boost::geometry::model::point<CoordinateType, 2, CoordinateSystem> const& pos, Direction const& dir)
+   template <typename T, typename Direction>
+   void make_single_load(entt::registry& registry, float scale, std::array<T, 2> const& pos, Direction const& dir)
    {
-      make_single_load(registry, scale, glm::vec3{ boost::geometry::get<0>(pos), boost::geometry::get<1>(pos), 0.0 }, dir);
+      make_single_load(registry, scale, glm::vec3{ std::get<0>(pos), std::get<1>(pos), 0.0 }, dir);
    }
 }

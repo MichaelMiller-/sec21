@@ -21,6 +21,11 @@ namespace sec21::viewer
    {
       std::string filename{};
    };
+   struct event_load_model_load
+   {
+      std::string model{};
+      std::string load{};
+   };   
    struct event_load_settings
    {
       std::string filename{};

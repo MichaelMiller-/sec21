@@ -19,27 +19,27 @@
 #include <filesystem>
 #include <string_view>
 
-
 namespace ImGui
 {
-	static auto vector_getter = [](void* vec, int idx, const char** out) 
+	template <typename T>
+	static bool getter(void* vec, int idx, const char** out)
 	{
-		auto& v = *static_cast<std::vector<std::string>*>(vec);
+		auto& v = *static_cast<T*>(vec);
 
-		if (idx < 0 || idx >= static_cast<int>(v.size()))
+		if (idx < 0 || idx >= static_cast<int>(size(v)))
 			return false;
 
 		*out = v.at(static_cast<std::size_t>(idx)).c_str();
 
-		return true;
-	};
+		return true;		
+	}
 
 	bool Combo(const char* label, int* index, std::vector<std::string>& values)
 	{
 		if (values.empty())
 			return false;
 
-		return Combo(label, index, vector_getter, static_cast<void*>(&values), static_cast<int>(values.size()));
+		return Combo(label, index, getter<std::vector<std::string>>, static_cast<void*>(&values), static_cast<int>(values.size()));
 	}
 
 	bool ListBox(const char* label, int* index, std::vector<std::string>& values)
@@ -50,9 +50,9 @@ namespace ImGui
 		return ListBox(
 			label, 
 			index, 
-			vector_getter, 
-			static_cast<void *>(&values), 
-			static_cast<int>(values.size()));
+			getter<std::vector<std::string>>, 
+			static_cast<void*>(&values), 
+			static_cast<int>(size(values)));
 	}
 } // namespace ImGui
 
@@ -110,9 +110,6 @@ namespace sec21::viewer
 
 		auto view = registry.view<debug_data>();
 		const auto& active_debug_data = view.get(*view.begin());		
-
-		std::vector<std::string> files;
-		files = active_debug_data.input_files;
 
 		auto settings_view = registry.view<preferences>();
 		auto& active_settings = settings_view.get(*settings_view.begin());
@@ -192,11 +189,21 @@ namespace sec21::viewer
 
 		ImGui::Begin("sec21::viewer debug window");
 		{
+			auto files = active_debug_data.example_files;
 			static int current_file = 0;
-			if (ImGui::Combo("Filelist", &current_file, files))
+			if (ImGui::Combo("Examples", &current_file, files))
 			{
 				dispatcher.trigger<event_clear_entites>();
 				dispatcher.trigger<event_load_model>(files[static_cast<std::size_t>(current_file)]);
+			}
+
+			auto loads = active_debug_data.example_load_files;
+			static int current_load = 0;
+			if (ImGui::Combo("Loads", &current_load, loads))
+			{
+				dispatcher.trigger<event_load_model_load>(
+					files[static_cast<std::size_t>(current_file)],
+					loads[static_cast<std::size_t>(current_load)]);
 			}
 
 			if (ImGui::CollapsingHeader("Visibility"))

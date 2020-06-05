@@ -10,7 +10,6 @@
 
 #include <entt/entt.hpp>
 
-#include <boost/geometry/geometries/point.hpp>
 #include <boost/math/constants/constants.hpp>
 
 namespace sec21::viewer
@@ -40,10 +39,10 @@ namespace sec21::viewer
       registry.assign<viewable>(entity, true);
    }
 
-   template <typename CoordinateType, typename CoordinateSystem>
-   void make_fixed_support(entt::registry& registry, float radius, boost::geometry::model::point<CoordinateType, 2, CoordinateSystem> const& pos)
+   template <typename T>
+   void make_fixed_support(entt::registry& registry, float radius, std::array<T, 2> const& pos)
    {
-      make_fixed_support(registry, radius, glm::vec3{ boost::geometry::get<0>(pos), boost::geometry::get<1>(pos), 0.0 });
+      make_fixed_support(registry, radius, glm::vec3{ std::get<0>(pos), std::get<1>(pos), 0.0 });
    }
 
    void make_support_roller(entt::registry& registry, float radius, glm::vec3 const& pos)
@@ -58,10 +57,4 @@ namespace sec21::viewer
       registry.assign<material>(entity, ruby);
       registry.assign<viewable>(entity, true);
    }
-
-   template <typename CoordinateType, typename CoordinateSystem>
-   void make_support_roller(entt::registry& registry, float radius, boost::geometry::model::point<CoordinateType, 2, CoordinateSystem> const& pos)
-   {
-      make_support_roller(registry, radius, glm::vec3{ boost::geometry::get<0>(pos), boost::geometry::get<1>(pos), 0.0 });
-   }      
 }
