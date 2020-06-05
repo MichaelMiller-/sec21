@@ -79,7 +79,6 @@
     "nodes": [
         {
             "id": 1,
-            "load": null,
             "position": {
                 "x": 0.0,
                 "y": 3.0
@@ -88,14 +87,6 @@
         },
         {
             "id": 2,
-            "load": {
-                "x": {
-                    "value": "10_kN"
-                },
-                "y": {
-                    "value": "-10_kN"
-                }
-            },
             "position": {
                 "x": 3.0,
                 "y": 3.0
@@ -104,7 +95,6 @@
         },
         {
             "id": 3,
-            "load": null,
             "position": {
                 "x": 3.0,
                 "y": 0.0
@@ -116,7 +106,6 @@
         },
         {
             "id": 4,
-            "load": null,
             "position": {
                 "x": 0.0,
                 "y": 0.0
