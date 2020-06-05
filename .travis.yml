@@ -7,18 +7,35 @@ matrix:
     env: COMPILER=g++-8
     addons:
       apt:
-        packages:
-        - g++-8
+        update: true
         sources:
-        - ubuntu-toolchain-r-test
+          #- sourceline: 'ppa:mhier/libboost-latest'
+          - ubuntu-toolchain-r-test
+        packages:
+          - g++-8
+          #- libboost-dev
   - os: linux
     env: COMPILER=g++-9
     addons:
       apt:
-        packages:
-        - g++-9
+        update: true
         sources:
-        - ubuntu-toolchain-r-test        
+          #- sourceline: 'ppa:mhier/libboost-latest'
+          - ubuntu-toolchain-r-test
+        packages:
+          - g++-10
+          #- libboost-dev
+  - os: linux
+    env: COMPILER=g++-10
+    addons:
+      apt:
+        update: true
+        sources:
+          #- sourceline: 'ppa:mhier/libboost-latest'
+          - ubuntu-toolchain-r-test
+        packages:
+          - g++-10
+          #- libboost-dev
   # - os: linux
   #   env: COMPILER=clang++-9.0
   #   addons:
@@ -42,14 +59,12 @@ before_install:
 
 before_script:
 - uname -a
+
 script:
 - mkdir -p _build && cd _build
 - cmake .. -DENABLE_COVERAGE:BOOL=FALSE
-- cmake --build . -- -j4
+- travis_wait 30 cmake --build . -- -j4
 - ctest -j2
-
-after_script:
-after_success:
 
 branches:
   only:
