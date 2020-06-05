@@ -9,13 +9,14 @@
 
 namespace sec21::structural_analysis
 {
-   template <auto Dimension>
+   //! \todo what about std::valarray?
+   template <auto Dimension> //, typename Precision = double>
    using force_t = std::array<units::quantity<units::kilonewton, double>, Dimension>;
 
    using force_2D_t = force_t<2>;
    using force_3D_t = force_t<3>;
 
-   template <auto Dimension>
+   template <auto Dimension> //, typename Precision>
    [[nodiscard]] constexpr auto operator + (force_t<Dimension> const& lhs, force_t<Dimension> const& rhs) noexcept -> force_t<Dimension>
    {
       if constexpr (Dimension == 2) {
@@ -44,3 +45,49 @@ namespace sec21::structural_analysis
       return result;
    }
 }
+
+#include <nlohmann/json.hpp>
+
+namespace nlohmann 
+{
+   template <>
+   struct adl_serializer<sec21::structural_analysis::force_2D_t> 
+   {
+      using type_t = sec21::structural_analysis::force_2D_t;
+
+      static void to_json(json& j, type_t const& t) 
+      {
+         j = json{
+            {"x", std::get<0>(t)},
+            {"y", std::get<1>(t)}
+         };
+      }
+      static void from_json(json const& j, type_t& t) 
+      {
+         j.at("x").get_to(std::get<0>(t));
+         j.at("y").get_to(std::get<1>(t));
+      }
+   };
+}
+//! \todo force could be only a unit type plus adapter or function like from_xy(X, Y) -> untis::quantity<units::kilonewton, double>
+
+//! \todo qvm adaper   
+// namespace boost::qvm 
+// {
+//    template <auto N>
+//    struct vec_traits<sec21::structural_analysis::force_t<N>> : vec_traits_defaults<sec21::structural_analysis::force_t<N>, T, N> 
+//    {
+//       using scalar_type = T;
+
+//       template <int I>
+//       static inline scalar_type& write_element(std::array<T, N>& v) 
+//       {
+//          return std::get<I>(v);
+//       }
+
+//       // static inline scalar_type & write_element_idx(int i, point_t& v) 
+//       // {
+//       //    return v.a[i];
+//       // } //optional
+//    };
+// }
