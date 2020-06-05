@@ -3,12 +3,9 @@
 #include <sec21/units.h>
 #include <sec21/strong_type.h>
 #include <sec21/structural_analysis/support.h>
-#include <sec21/structural_analysis/force.h>
-
-#include <boost/geometry/geometries/point.hpp>
-#include <boost/geometry/core/cs.hpp>
 
 #include <type_traits>
+#include <array>
 #include <limits>
 #include <optional>
 
@@ -25,9 +22,8 @@ namespace sec21::structural_analysis
 
       using descriptor_t = size_t;
       using precision_t = Precision;
-      //! \todo replace with boost::qvm
-      using point_t = boost::geometry::model::point<precision_t, dimension_v, boost::geometry::cs::cartesian>;
-      using load_t = force_t<dimension_v>;
+
+      using point_t = std::array<precision_t, dimension_v>;
       using global_support_t = support<dimension_v>;
 
       //! \todo 2019-04-23 use strong_type
@@ -36,8 +32,6 @@ namespace sec21::structural_analysis
       point_t position{};
 
       std::optional<global_support_t> global_support{};
-      //! \todo could be in a extra struct; like system_load aka node_load
-      std::optional<load_t> load{};
    };
 
    template <typename T>
@@ -85,52 +79,21 @@ namespace sec21::structural_analysis
 namespace nlohmann 
 {
    template <typename T>
-   struct adl_serializer<boost::geometry::model::point<T, 2, boost::geometry::cs::cartesian>> 
+   struct adl_serializer<std::array<T, 2>> 
    {
-      using type_t = boost::geometry::model::point<T, 2, boost::geometry::cs::cartesian>;
+      using type_t = std::array<T, 2>;
 
-      static void to_json(json& j, type_t const& pt) 
+      static void to_json(json& j, type_t const& pt)
       {
          j = json{
-            { "x", boost::geometry::get<0>(pt) },
-            { "y", boost::geometry::get<1>(pt) }
+            { "x", std::get<0>(pt) },
+            { "y", std::get<1>(pt) }
          };
       }
-      static void from_json(json const& j, type_t& pt) 
+      static void from_json(json const& j, type_t& pt)
       {
-         T x;
-         T y;
-         j.at("x").get_to(x);
-         j.at("y").get_to(y);
-         boost::geometry::set<0>(pt, x);
-         boost::geometry::set<1>(pt, y);
-      }
-   };
-
-   template <typename T>
-   struct adl_serializer<boost::geometry::model::point<T, 3, boost::geometry::cs::cartesian>> 
-   {
-      using type_t = boost::geometry::model::point<T, 3, boost::geometry::cs::cartesian>;
-
-      static void to_json(json& j, type_t const& pt) 
-      {
-         j = json{
-            { "x", boost::geometry::get<0>(pt) },
-            { "y", boost::geometry::get<1>(pt) },
-            { "z", boost::geometry::get<2>(pt) }
-         };
-      }
-      static void from_json(json const& j, type_t& pt) 
-      {
-         T x;
-         T y;
-         T z;
-         j.at("x").get_to(x);
-         j.at("y").get_to(y);
-         j.at("z").get_to(z);
-         boost::geometry::set<0>(pt, x);
-         boost::geometry::set<1>(pt, y);
-         boost::geometry::set<2>(pt, z);
+         j.at("x").get_to(std::get<0>(pt));
+         j.at("y").get_to(std::get<1>(pt));
       }
    };
 
@@ -152,24 +115,7 @@ namespace nlohmann
             opt = j.get<T>();
       }
    };
-   template <>
-   struct adl_serializer<sec21::structural_analysis::force_2D_t> 
-   {
-      using type_t = sec21::structural_analysis::force_2D_t;
-
-      static void to_json(json& j, type_t const& t) 
-      {
-         j = json{
-            {"x", std::get<0>(t)},
-            {"y", std::get<1>(t)}
-         };
-      }
-      static void from_json(json const& j, type_t& t) 
-      {
-         j.at("x").get_to(std::get<0>(t));
-         j.at("y").get_to(std::get<1>(t));
-      }
-   };
+   
    template <>
    struct adl_serializer<sec21::structural_analysis::support<2>> 
    {
@@ -197,8 +143,7 @@ namespace sec21::structural_analysis
       j = nlohmann::json{
          {"id", obj.id},
          {"position", obj.position}, 
-         {"global_support", obj.global_support},
-         {"load", obj.load}
+         {"global_support", obj.global_support}
       };
    }
    template <auto Dimension, typename Precision>
@@ -207,6 +152,5 @@ namespace sec21::structural_analysis
       j.at("id").get_to(obj.id);
       j.at("position").get_to(obj.position);
       j.at("global_support").get_to(obj.global_support);
-      j.at("load").get_to(obj.load);
    }
 }
