@@ -192,8 +192,8 @@ namespace sec21::units
       using dt = divide_dimension_t<typename Q1::dimension_t, typename Q2::dimension_t>;
       using unit1_t = typename Q1::unit_t;
       using unit2_t = typename Q2::unit_t;
-      using ratio1_t = unit1_t::ratio_t;
-      using ratio2_t = unit2_t::ratio_t;
+      using ratio1_t = typename unit1_t::ratio_t;
+      using ratio2_t = typename unit2_t::ratio_t;
       using rt = quantity<unit<dt, std::ratio_divide<ratio1_t, ratio2_t>>, vt>;
 
       return rt{ lhs.value() / rhs.value() };
@@ -213,7 +213,7 @@ namespace sec21::units
       using vt = decltype(lhs / rhs.value());
       using dt = invert_dimension_t<typename Q::dimension_t>;
       using ut = typename Q::unit_t;
-      using ratio_t = ut::ratio_t;
+      using ratio_t = typename ut::ratio_t;
       using rt = quantity<unit<dt, std::ratio<1>>, vt>;
 
       return rt{ lhs / rhs.value() *  ratio_t::den / ratio_t::num };
