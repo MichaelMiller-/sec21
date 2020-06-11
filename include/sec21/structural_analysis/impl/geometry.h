@@ -6,7 +6,7 @@
 
 #ifdef __cpp_lib_math_constants
    #include <numbers>
-   #warning TODO: replace with std::numbers::
+   //! \todo use
 #else 
    #include <boost/math/constants/constants.hpp>
 #endif
