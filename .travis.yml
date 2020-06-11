@@ -32,7 +32,7 @@ matrix:
         update: true
         # sources:
         #   #- sourceline: 'ppa:mhier/libboost-latest'
-        #   - ubuntu-toolchain-r-test
+          - ubuntu-toolchain-r-test
         packages:
           - g++-10
           #- libboost-dev
@@ -55,7 +55,6 @@ matrix:
 
 before_install:
 - export CXX="${COMPILER}"
-- sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
 - sudo apt-get -qq update
 - sudo apt-get -y install git
 - git clone https://github.com/Microsoft/vcpkg.git
