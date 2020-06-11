@@ -101,18 +101,20 @@ namespace sec21::units
           using fn = add_exponent_t<E1, E2>;
       };
 
-       template <typename D1, typename D2>
-       struct multiply_dimension_impl
-       {
-           using L1 = boost::mp11::mp_sort<boost::mp11::mp_copy_if_q<D1, dimension_in_list<D2>>, dimension_less>;
-           using L2 = boost::mp11::mp_sort<boost::mp11::mp_copy_if_q<D2, dimension_in_list<D1>>, dimension_less>;
+      template <typename D1, typename D2>
+      struct multiply_dimension_impl
+      {
+         using L1 = boost::mp11::mp_sort<boost::mp11::mp_copy_if_q<D1, dimension_in_list<D2>>, dimension_less>;
+         using L2 = boost::mp11::mp_sort<boost::mp11::mp_copy_if_q<D2, dimension_in_list<D1>>, dimension_less>;
 
-           using T1 = boost::mp11::mp_transform_q<quoted_exponent_add, L1, L2>;
-           using R1 = boost::mp11::mp_remove_if<T1, is_numerator_null>;
-           using R2 = boost::mp11::mp_remove_if_q<D2, dimension_in_list<D1>>;
+         using T1 = boost::mp11::mp_transform_q<quoted_exponent_add, L1, L2>;
 
-           using type = boost::mp11::mp_sort<boost::mp11::mp_append<R1, R2>, dimension_less>;;
-       };
+         using R1 = boost::mp11::mp_remove_if<T1, is_numerator_null>;
+         using R2 = boost::mp11::mp_remove_if_q<D1, dimension_in_list<D2>>;
+         using R3 = boost::mp11::mp_remove_if_q<D2, dimension_in_list<D1>>;
+
+         using type = boost::mp11::mp_sort<boost::mp11::mp_append<R1, R2, R3>, dimension_less>;
+      };
    }
 
    template <typename D1, typename D2>
