@@ -1,11 +1,14 @@
 find_package(Catch2 CONFIG REQUIRED)
 find_package(Boost 1.70 REQUIRED)
+find_package(OpenMP REQUIRED)
 
 include(ExternalProject)
 ExternalProject_Add(
-   ViennaCL
+   ViennaCL-tests
+   PREFIX tests
    URL https://sourceforge.net/projects/viennacl/files/1.7.x/ViennaCL-1.7.1.zip
    CMAKE_ARGS -D BUILD_EXAMPLES=OFF
+      -D ENABLE_OPENCL=OFF
       -D CMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/viennacl
 )
 
@@ -21,6 +24,9 @@ function(test test)
    # boost
    target_include_directories(test.${tmp} PRIVATE ${Boost_INCLUDE_DIRS})
    target_link_libraries(test.${tmp} PRIVATE ${Boost_LIBRARIES})
+   # openmp
+   target_link_libraries(test.${tmp} PRIVATE OpenMP::OpenMP_CXX)
+   target_compile_definitions(test.${tmp} PRIVATE VIENNACL_WITH_OPENMP)
    ## viennacl
    target_include_directories(test.${tmp} PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/viennacl/include")
 
