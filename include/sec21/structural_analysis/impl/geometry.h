@@ -1,5 +1,6 @@
 #pragma once
 
+#include <sec21/structural_analysis/concepts.h>
 #include <sec21/structural_analysis/node.h>
 // #include <sec21/structural_analysis/error_codes.h>
 #include <sec21/units/dimensions/length.h>
@@ -91,10 +92,10 @@ namespace sec21::structural_analysis::impl
 
       //! \todo approx
       if (m == 1)
-         return constants::half_pi<double>() * 0.5;
+         return constants::half_pi<typename vec_traits<Position>::scalar_type>() * 0.5;
 
       if (0 == (l1 * l2))
-         return constants::half_pi<double>();
+         return constants::half_pi<typename vec_traits<Position>::scalar_type>();
 
       auto k1 = 1;
       if (Y(dir) < 0)
