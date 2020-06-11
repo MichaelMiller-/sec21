@@ -19,7 +19,7 @@ matrix:
     addons:
       apt:
         update: true
-        # sources:
+        sources:
         #   #- sourceline: 'ppa:mhier/libboost-latest'
           - ubuntu-toolchain-r-test
         packages:
