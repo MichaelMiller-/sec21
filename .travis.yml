@@ -23,7 +23,7 @@ matrix:
           #- sourceline: 'ppa:mhier/libboost-latest'
           - ubuntu-toolchain-r-test
         packages:
-          - g++-10
+          - g++-9
           #- libboost-dev
   - os: linux
     env: COMPILER=g++-10
