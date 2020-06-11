@@ -49,23 +49,23 @@ before_install:
 - git clone https://github.com/Microsoft/vcpkg.git
 - cd vcpkg
 - sh bootstrap-vcpkg.sh
-- ./vcpkg install boost-mp11:x64-windows
-- ./vcpkg install boost-math:x64-windows
-- ./vcpkg install boost-qvm:x64-windows
-- ./vcpkg install boost-outcome:x64-windows
-- ./vcpkg install boost-ublas:x64-windows
-- ./vcpkg install boost-program-options:x64-windows
-- ./vcpkg install catch2:x64-windows
-- ./vcpkg install glm:x64-windows
-- ./vcpkg install nlohmann-json:x64-windows
-- ./vcpkg install spdlog:x64-windows
-- ./vcpkg install sdl2:x64-windows
-- ./vcpkg install sdl2-image:x64-windows
-- ./vcpkg install glew:x64-windows
-- ./vcpkg install imgui:x64-windows
-- ./vcpkg install entt:x64-windows
-- ./vcpkg install assimp:x64-windows
-- ./vcpkg install freetype:x64-windows
+- ./vcpkg install boost-mp11
+- ./vcpkg install boost-math
+- ./vcpkg install boost-qvm
+- ./vcpkg install boost-outcome
+- ./vcpkg install boost-ublas
+- ./vcpkg install boost-program-options
+- ./vcpkg install catch2
+- ./vcpkg install glm
+- ./vcpkg install nlohmann-json
+- ./vcpkg install spdlog
+- ./vcpkg install sdl2
+- ./vcpkg install sdl2-image
+- ./vcpkg install glew
+- ./vcpkg install imgui
+- ./vcpkg install entt
+- ./vcpkg install assimp
+- ./vcpkg install freetype
 - cd ..
 
 before_script:
