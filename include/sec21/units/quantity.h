@@ -4,16 +4,13 @@
 #include <limits>
 #include <ratio>
 
+#include <sec21/units/concepts.h>
 #include <sec21/units/dimension.h>
 #include <sec21/units/unit.h>
 #include <sec21/units/ratio.h>
 
 namespace sec21::units
 {
-   // forward declaration
-   template <typename Unit, typename T>
-   class quantity;
-
    template <typename To, typename Unit, typename T>
    [[nodiscard]] constexpr auto quantity_cast(quantity<Unit, T> const& q) noexcept
    {
@@ -34,12 +31,14 @@ namespace sec21::units
 
       quantity() = default;
 
-      constexpr quantity(T const& t) noexcept
-         : m_value{ static_cast<T>(t) }
+      template <Scalar U> // requires std::is_nothrow_convertible<U, T>
+      constexpr quantity(U u) noexcept
+         : m_value{ static_cast<T>(u) }
       {}
 
-      template <typename Q2, typename = std::enable_if<std::is_same_v<dimension_t, typename Q2::dimension_t>>>
-      constexpr quantity(Q2 const& q) noexcept
+      template <Quantity Q>
+      requires SameDimension<quantity<Unit, T>, Q>
+      constexpr quantity(Q const& q) noexcept
          : m_value{ quantity_cast<quantity>(q).value() }
       {}
 
@@ -94,12 +93,10 @@ namespace sec21::units
    template <typename Q1, typename Q2, typename T = std::common_type_t<typename Q1::value_t, typename Q2::value_t>>
    using common_quantity_t = typename detail::common_quantity_impl<Q1, Q2, T>::type;
 
-
-   template <typename U1, typename T1, typename U2, typename T2>
-   [[nodiscard]] constexpr bool operator == (quantity<U1, T1> const& lhs, quantity<U2, T2> const& rhs) noexcept
-      //requires same_dim<typename U1::dimension, typename U2::dimension>
+   template <Quantity Q1, Quantity Q2> requires SameDimension<Q1, Q2>
+   constexpr bool operator == (Q1 const& lhs, Q2 const& rhs) noexcept
    {
-      using ct = common_quantity_t<quantity<U1, T1>, quantity<U1, T2>>;
+      using ct = common_quantity_t<Q1, Q2>;
       return ct{ lhs }.value() == ct{ rhs }.value();
    }
 
@@ -154,49 +151,72 @@ namespace sec21::units
       return ct{ lhs }.value() - ct{ rhs }.value();
    }
 
-   //! \todo operator *
-
-   template <typename U1, typename T1, typename U2, typename T2>
-   // require U1::dimension_t != U2::dimension_t
-   [[nodiscard]] constexpr auto operator * (quantity<U1, T1> const& lhs, quantity<U2, T2> const& rhs)
+   template <Quantity Q1, Quantity Q2> requires SameDimension<Q1, Q2>
+   constexpr auto operator * (Q1 const& lhs, Q2 const& rhs) 
    {
-      using vt = decltype(lhs.value() / rhs.value());
-      using dt = multiply_dimension_t<typename U1::dimension_t, typename U2::dimension_t>;
-      using rt = quantity<unit<dt, std::ratio_multiply<typename U1::ratio_t, typename U2::ratio_t>>, vt>;
+      using vt = decltype(lhs.value() * rhs.value());
+      using unit1_t = typename Q1::unit_t;
+      using unit2_t = typename Q2::unit_t;
+      using ratio1_t = typename unit1_t::ratio_t;
+      using ratio2_t = typename unit2_t::ratio_t;
+      using dt = multiply_dimension_t<typename Q1::dimension_t, typename Q2::dimension_t>;
+      using rt = quantity<unit<dt, std::ratio<1>>, vt>;
+
+      const auto v1 = lhs.value() * ratio1_t::num;
+      const auto v2 = Q1{ rhs.value() * ratio2_t::num }.value();
+      return rt{ v1 * v2 };
+   }
+
+   template <Quantity Q1, Quantity Q2>
+   constexpr auto operator * (Q1 const& lhs, Q2 const& rhs) 
+   {
+      using vt = decltype(lhs.value() * rhs.value());
+      using dt = multiply_dimension_t<typename Q1::dimension_t, typename Q2::dimension_t>;
+      using rt = quantity<unit<dt, std::ratio<1>>, vt>;
+
       return rt{ lhs.value() * rhs.value() };
    }
 
-   //! \todo 
-   // require same_dimension -> return Scalar
-   // [[nodiscard]] constexpr auto operator / (quantity<U1, T1> const& lhs, quantity<U2, T2> const& rhs)
-
-   template <typename U1, typename T1, typename U2, typename T2>
-   // require U1::dimension_t != U2::dimension_t
-   [[nodiscard]] constexpr auto operator / (quantity<U1, T1> const& lhs, quantity<U2, T2> const& rhs)
+   template <Quantity Q1, Quantity Q2> requires SameDimension<Q1, Q2>
+   constexpr auto operator / (Q1 const& lhs, Q2 const& rhs)
    {
+      // [[expects: rhs != 0]]
+      return lhs.value() / Q1{ rhs }.value();
+   }
+
+   template <Quantity Q1, Quantity Q2>
+   [[nodiscard]] constexpr auto operator / (Q1 const& lhs, Q2 const& rhs)
+   {
+      // [[expects: rhs != 0]]
       using vt = decltype(lhs.value() / rhs.value());
-      using dt = divide_dimension_t<typename U1::dimension_t, typename U2::dimension_t>;
-      using rt = quantity<unit<dt, std::ratio_divide<typename U1::ratio_t, typename U2::ratio_t>>, vt>;
+      using dt = divide_dimension_t<typename Q1::dimension_t, typename Q2::dimension_t>;
+      using unit1_t = typename Q1::unit_t;
+      using unit2_t = typename Q2::unit_t;
+      using ratio1_t = unit1_t::ratio_t;
+      using ratio2_t = unit2_t::ratio_t;
+      using rt = quantity<unit<dt, std::ratio_divide<ratio1_t, ratio2_t>>, vt>;
+
       return rt{ lhs.value() / rhs.value() };
    }
 
-   template <typename U1, typename T1, typename T2>
-   [[nodiscard]] constexpr auto operator / (quantity<U1, T1> const& lhs, T2 const& rhs)
+   template <Quantity Q, Scalar T>
+   [[nodiscard]] constexpr auto operator / (Q const& lhs, T rhs) -> Q
    {
-      // [[expects: rhs != quantity<U2, T2>(0)]]
-      using vt = decltype(lhs.value() / rhs);
-      using rt = quantity<U1, vt>;
-      return rt{ rt{ lhs }.value() / rhs };
+      // [[expects: rhs != 0]]
+      return { lhs.value() / rhs };
    }
 
-   template <typename T1, typename U2, typename T2>
-   [[nodiscard]] constexpr auto operator / (T1 const& lhs, quantity<U2, T2> const& rhs)
+   template <Scalar T, Quantity Q>
+   [[nodiscard]] constexpr auto operator / (T lhs, Q const& rhs)
    {
       // [[expects: rhs != quantity<U2, T2>(0)]]
       using vt = decltype(lhs / rhs.value());
-      using dt = invert_dimension_t<typename U2::dimension_t>;
-      using rt = quantity<unit<dt, std::ratio<U2::ratio_t::den, U2::ratio_t::num>>, vt>;
-      return rt{ lhs / rhs.value() };
+      using dt = invert_dimension_t<typename Q::dimension_t>;
+      using ut = typename Q::unit_t;
+      using ratio_t = ut::ratio_t;
+      using rt = quantity<unit<dt, std::ratio<1>>, vt>;
+
+      return rt{ lhs / rhs.value() *  ratio_t::den / ratio_t::num };
    }
 
    template <typename T>
