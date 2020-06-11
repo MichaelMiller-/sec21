@@ -61,7 +61,7 @@ before_install:
 - ./vcpkg install spdlog
 - ./vcpkg install sdl2
 - ./vcpkg install sdl2-image
-- ./vcpkg install glew
+# - ./vcpkg install glew
 - ./vcpkg install imgui
 - ./vcpkg install entt
 - ./vcpkg install assimp
