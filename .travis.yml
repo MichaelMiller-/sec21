@@ -4,17 +4,6 @@ dist: bionic
 matrix:
   include:
   - os: linux
-    env: COMPILER=g++-8
-    addons:
-      apt:
-        update: true
-        sources:
-          #- sourceline: 'ppa:mhier/libboost-latest'
-          - ubuntu-toolchain-r-test
-        packages:
-          - g++-8
-          #- libboost-dev
-  - os: linux
     env: COMPILER=g++-9
     addons:
       apt:
