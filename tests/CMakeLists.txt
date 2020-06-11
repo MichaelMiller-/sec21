@@ -1,12 +1,13 @@
-
 find_package(Catch2 CONFIG REQUIRED)
 find_package(Boost 1.70 REQUIRED)
-# TODO:
-# find_package(ViennaCL)
 
-# if (OPENMP_FOUND AND VIENNACL_FOUND)
-#    message(STATUS "ViennaCL OpenMP Support is enabled") ## TODO: for "exe name"
-# endif()
+include(ExternalProject)
+ExternalProject_Add(
+   ViennaCL
+   URL https://sourceforge.net/projects/viennacl/files/1.7.x/ViennaCL-1.7.1.zip
+   CMAKE_ARGS -D BUILD_EXAMPLES=OFF
+      -D CMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/viennacl
+)
 
 ## speed up the compiletime process
 add_library(catch_main STATIC catch_main.cpp)
@@ -21,37 +22,32 @@ function(test test)
    target_include_directories(test.${tmp} PRIVATE ${Boost_INCLUDE_DIRS})
    target_link_libraries(test.${tmp} PRIVATE ${Boost_LIBRARIES})
    ## viennacl
-   target_include_directories(test.${tmp} PRIVATE "${CMAKE_SOURCE_DIR}/deps/viennacl")
+   target_include_directories(test.${tmp} PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/viennacl/include")
 
    if (ENABLE_BENCHMARKS)
       add_compile_definitions(CATCH_CONFIG_ENABLE_BENCHMARKING)
    endif()
 
    include(CheckCXXCompilerFlag)
-
    ## platform specific
    ##
    if (MSVC_VERSION GREATER_EQUAL "1900")
       CHECK_CXX_COMPILER_FLAG("/std:c++latest" _cpp_latest_flag_supported)
       if (_cpp_latest_flag_supported)
-         add_compile_options("/std:c++latest")
+         target_compile_options(test.${tmp} PRIVATE "/std:c++latest")
       endif()
-
-      add_compile_options("/permissive-")
+      target_compile_options(test.${tmp} PRIVATE "/permissive-")
+   endif()
+   
+   if (CMAKE_COMPILER_IS_GNUCXX)
+      CHECK_CXX_COMPILER_FLAG("-fconcepts" _cpp_concepts_supported)
+      if (_cpp_concepts_supported)
+         target_compile_options(test.${tmp} PRIVATE "-fconcepts")
+      endif()
    endif()
 
    if (CMAKE_COMPILER_IS_GNUCXX)
-      CHECK_CXX_COMPILER_FLAG("-std=c++2a" _cpp20_experimental_supported)
-      if (_cpp20_experimental_supported)
-         add_compile_options("-std=c++2a")
-
-         CHECK_CXX_COMPILER_FLAG("-fconcepts" _cpp_concepts_supported)
-         if (_cpp_concepts_supported)
-            add_compile_options("-fconcepts")
-         endif()
-
-         CHECK_CXX_COMPILER_FLAG("--fcoroutines-ts:" _cpp_coroutines_supported)
-      endif()
+      CHECK_CXX_COMPILER_FLAG("--fcoroutines-ts:" _cpp_coroutines_supported)
 
       target_link_libraries(test.${tmp} PRIVATE "-lstdc++fs")
 
@@ -115,6 +111,7 @@ test("property_tree")
 test("resource")
 test("serializer")
 test("structural_analysis.axis")
+# test("structural_analysis.beam")
 test("structural_analysis.force")
 test("structural_analysis.geometry")
 test("structural_analysis.loadcase")
@@ -123,7 +120,8 @@ test("structural_analysis.member")
 test("structural_analysis.node")
 test("structural_analysis.space_truss" "example_1.json")
 test("structural_analysis.space_truss.example1.temperature" "example_1.json")
-# test("structural_analysis.space_truss.example2" "example_2.json")
+# test("structural_analysis.space_truss.example2" "example_2.json" "example_2_load.json")
+# test("structural_analysis.space_truss.example2.temperature" "example_2.json" "example_2_temperature_load.json")
 test("structural_analysis.space_truss.example3" "example_3.json" "example_3_load.json")
 test("structural_analysis.space_truss.example4" "example_4.json" "example_4_load.json")
 test("structural_analysis.space_truss.example5" "example_5.json" "example_5_load.json")
