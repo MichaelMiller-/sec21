@@ -47,7 +47,6 @@ before_install:
 - sudo apt-get -qq update
 - sudo apt-get -y install git
 - sudo apt-get -y install libglew2.0
-- sudo apt-get -y install libglew-dbg
 - sudo apt-get -y install libglew-dev
 - git clone https://github.com/Microsoft/vcpkg.git
 - cd vcpkg
