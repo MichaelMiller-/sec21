@@ -11,8 +11,9 @@ namespace sec21::units
 {
    // clang-format off
    using pressure = dimension<
+      exponent<base_dimension_length, -1>,
       exponent<base_dimension_mass, 1>, 
-      exponent<base_dimension_length, -1>, exponent<base_dimension_time, -2>>;
+      exponent<base_dimension_time, -2>>;
    // clang-format on
 
    struct pascal : coherent_derived_unit<pascal, pressure> {};
@@ -21,8 +22,4 @@ namespace sec21::units
    {
       constexpr auto operator "" _Pa(unsigned long long v) noexcept  { return quantity<pascal, unsigned long long>{ v }; }
    }
-
-#ifdef __cpp_concepts
-
-#endif
 }

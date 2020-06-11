@@ -7,7 +7,8 @@ namespace sec21::units
 {
    // clang-format off
    using force = dimension<
-      exponent<base_dimension_mass, 1>, exponent<base_dimension_length, 1>, 
+      exponent<base_dimension_length, 1>, 
+      exponent<base_dimension_mass, 1>,
       exponent<base_dimension_time, -2>>;
    // clang-format on
 
@@ -50,8 +51,4 @@ namespace sec21::units
       constexpr auto operator "" _MN(unsigned long long v) noexcept  { return quantity<meganewton, unsigned long long>{ v }; }
       constexpr auto operator "" _MN(long double v) noexcept  { return quantity<meganewton, long double>{ v }; }
    }
-
-#ifdef __cpp_concepts
-
-#endif
 }

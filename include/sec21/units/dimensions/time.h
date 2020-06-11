@@ -5,7 +5,7 @@
 
 namespace sec21::units
 {
-   using time = dimension<exponent<base_dimension_length, 1>>;
+   using time = dimension<exponent<base_dimension_time, 1>>;
 
    // time
    struct second : coherent_derived_unit<second, time, si_tag> {};
@@ -28,8 +28,4 @@ namespace sec21::units
       constexpr auto operator "" _h(unsigned long long v) noexcept { return quantity<hour, unsigned long long>{ v }; }
       //constexpr auto operator "" _h(long double v) noexcept        { return quantity<hour, double>{ v }; }
    }
-
-#ifdef __cpp_concepts
-
-#endif
 }

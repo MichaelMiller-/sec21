@@ -5,7 +5,11 @@
 
 namespace sec21::units
 {
-   using voltage = dimension<exponent<base_dimension_length, 3>>;
+   using voltage = dimension<
+      exponent<base_dimension_length, 2>, 
+      exponent<base_dimension_mass, 1>, 
+      exponent<base_dimension_time, -3>,
+      exponent<base_dimension_current, -1>>;   
 
    struct volt : coherent_derived_unit<volt, voltage> {};
 
@@ -13,8 +17,4 @@ namespace sec21::units
    {
       constexpr auto operator "" _V(unsigned long long v) noexcept  { return quantity<volt, unsigned long long>{ v }; }
    }
-
-#ifdef __cpp_concepts
-
-#endif
 }

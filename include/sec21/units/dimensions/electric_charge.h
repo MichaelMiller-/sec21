@@ -13,8 +13,4 @@ namespace sec21::units
    {
       constexpr auto operator "" _C(unsigned long long v) noexcept  { return quantity<coulomb, unsigned long long>{ v }; }
    }
-
-#ifdef __cpp_concepts
-
-#endif
 }

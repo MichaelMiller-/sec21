@@ -7,7 +7,8 @@ namespace sec21::units
 {
    // clang-format off
    using power = dimension<
-      exponent<base_dimension_mass, 1>, exponent<base_dimension_length, 2>, 
+      exponent<base_dimension_length, 2>,
+      exponent<base_dimension_mass, 1>,
       exponent<base_dimension_time, -3>>;
    // clang-format on
 
@@ -25,9 +26,4 @@ namespace sec21::units
       constexpr auto operator "" _MW(unsigned long long v) noexcept  { return quantity<megawatt, unsigned long long>{ v }; }
       constexpr auto operator "" _GW(unsigned long long v) noexcept  { return quantity<gigawatt, unsigned long long>{ v }; }
    }
-
-#ifdef __cpp_concepts
-   //template <typename T>
-   //concept Mass = --> dimension_mass
-#endif
 }

@@ -7,7 +7,8 @@ namespace sec21::units
 {
    // clang-format off
    using energy = dimension<
-      exponent<base_dimension_mass, 1>, exponent<base_dimension_length, 2>, 
+      exponent<base_dimension_length, 2>, 
+      exponent<base_dimension_mass, 1>, 
       exponent<base_dimension_time, -2>>;
    // clang-format on
 
@@ -25,9 +26,4 @@ namespace sec21::units
       constexpr auto operator "" _MJ(unsigned long long v) noexcept  { return quantity<megajoule, unsigned long long>{ v }; }
       constexpr auto operator "" _GJ(unsigned long long v) noexcept  { return quantity<gigajoule, unsigned long long>{ v }; }
    }
-
-#ifdef __cpp_concepts
-   //template <typename T>
-   //concept Mass = --> dimension_mass
-#endif
 }
