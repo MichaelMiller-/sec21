@@ -278,7 +278,7 @@ TEST_CASE("boyer moore searcher", "[features]")
 TEST_CASE("midpoint", "[features]")
 {
 #ifdef __cpp_lib_interpolate
-   REQUIRE(std::midpoint(2, 8) == 6);
+   REQUIRE(std::midpoint(2, 8) == 5);
 #else
    WARN("std::midpoint is not supported");
 #endif
@@ -297,7 +297,7 @@ TEST_CASE("linear interpolation", "[features]")
 // library feature: c++20
 TEST_CASE("starts_with and end_with", "[features]")
 {
-#ifdef __cpp_lib_starts_ends_with
+#ifdef __cpp_lib_starts_ends_with && !defined(_MSC_VER)
    std::string_view input = "Hello World";
 
    REQUIRE(input.starts_with("H"));
@@ -325,7 +325,7 @@ TEST_CASE("math constants", "[features]")
 // library feature: c++20
 TEST_CASE("shift elements in a range", "[features]")
 {
-#ifdef __cpp_lib_shift
+#ifdef __cpp_lib_shift && !defined(_MSC_VER)
    std::vector<int> result{ 1, 2, 3, 4, 5 };
    auto it = std::shift_left(std::begin(result), std::end(result), 2);
 
