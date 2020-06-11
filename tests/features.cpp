@@ -295,52 +295,52 @@ TEST_CASE("linear interpolation", "[features]")
 }
 
 // library feature: c++20
-TEST_CASE("starts_with and end_with", "[features]")
-{
-#ifdef __cpp_lib_starts_ends_with && !defined(_MSC_VER)
-   std::string_view input = "Hello World";
+// TEST_CASE("starts_with and end_with", "[features]")
+// {
+// #ifdef __cpp_lib_starts_ends_with && !defined(_MSC_VER)
+//    std::string_view input = "Hello World";
 
-   REQUIRE(input.starts_with("H"));
-   REQUIRE(input.starts_with("Hello"));
-   REQUIRE(input.end_with("d"));
-   REQUIRE(input.end_with("World"));
-#else
-   WARN("starts_with() and ends_with() is not supported");
-#endif
-}
+//    REQUIRE(input.starts_with("H"));
+//    REQUIRE(input.starts_with("Hello"));
+//    REQUIRE(input.end_with("d"));
+//    REQUIRE(input.end_with("World"));
+// #else
+//    WARN("starts_with() and ends_with() is not supported");
+// #endif
+// }
 
-#ifdef __cpp_lib_math_constants
-   #include <numbers>
-#endif
+// #ifdef __cpp_lib_math_constants
+//    #include <numbers>
+// #endif
+// // library feature: c++20
+// TEST_CASE("math constants", "[features]")
+// {
+// #ifdef __cpp_lib_math_constants
+//    STATIC_REQUIRE(std::numbers::pi == Approx(3.14));
+// #else
+//    WARN("math constants are not available");
+// #endif
+// }
+
 // library feature: c++20
-TEST_CASE("math constants", "[features]")
-{
-#ifdef __cpp_lib_math_constants
-   STATIC_REQUIRE(std::numbers::pi == Approx(3.14));
-#else
-   WARN("math constants are not available");
-#endif
-}
+// TEST_CASE("shift elements in a range", "[features]")
+// {
+// #ifdef __cpp_lib_shift && !defined(_MSC_VER)
+//    std::vector<int> result{ 1, 2, 3, 4, 5 };
+//    auto it = std::shift_left(std::begin(result), std::end(result), 2);
 
-// library feature: c++20
-TEST_CASE("shift elements in a range", "[features]")
-{
-#ifdef __cpp_lib_shift && !defined(_MSC_VER)
-   std::vector<int> result{ 1, 2, 3, 4, 5 };
-   auto it = std::shift_left(std::begin(result), std::end(result), 2);
+//    std::vector<int> expected1{ 3, 4, 5, 4, 5 };
+//    REQUIRE(std::size(result) == std::size(expected1));
+//    REQUIRE(std::equal(std::begin(result), std::end(result), std::begin(expected1)));
 
-   std::vector<int> expected1{ 3, 4, 5, 4, 5 };
-   REQUIRE(std::size(result) == std::size(expected1));
-   REQUIRE(std::equal(std::begin(result), std::end(result), std::begin(expected1)));
-
-   result.erase(it, std::end(result))
-   std::vector<int> expected2{ 3, 4, 5 };
-   REQUIRE(std::size(result) == std::size(expected2));
-   REQUIRE(std::equal(std::begin(result), std::end(result), std::begin(expected2)));
-#else
-   WARN("math constants are not available");
-#endif
-}
+//    result.erase(it, std::end(result))
+//    std::vector<int> expected2{ 3, 4, 5 };
+//    REQUIRE(std::size(result) == std::size(expected2));
+//    REQUIRE(std::equal(std::begin(result), std::end(result), std::begin(expected2)));
+// #else
+//    WARN("math constants are not available");
+// #endif
+// }
 
 // library feature: c++20
 TEST_CASE("Uniform container erasure", "[features]")
