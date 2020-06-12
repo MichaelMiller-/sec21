@@ -256,6 +256,12 @@ namespace sec21::units
          using fn = typename U::ratio_t;
       };
 
+      template <typename T>
+      auto to_abbreviation(T) { return abbreviation<T>::value; }
+
+      template <typename T>
+      auto convert_ratio(T) { return T::num / double{ T::den }; }
+
       template <Quantity Q>
       auto from_string(std::string const& input) -> Q
       {
@@ -269,8 +275,9 @@ namespace sec21::units
 
          using T1 = boost::mp11::mp_transform_q<quoted_to_ratio, decltype(valid_types)>;
 
-         constexpr auto to_abbreviation = []<typename T>(T){ return abbreviation<T>::value; };
-         constexpr auto convert_ratio = []<typename T>(T){ return T::num / double{ T::den }; };
+         //! \todo: c++20 feature is not working with msvc
+         // constexpr auto to_abbreviation = []<typename T>(T){ return abbreviation<T>::value; };
+         // constexpr auto convert_ratio = []<typename T>(T){ return T::num / double{ T::den }; };
 
          const auto valid_abbreviations = std::apply([&](auto... n){ return std::array{ to_abbreviation(n)... }; }, valid_types);
          const auto matching_ratios = std::apply([&](auto... n){ return std::array{ convert_ratio(n)... }; }, T1{});
