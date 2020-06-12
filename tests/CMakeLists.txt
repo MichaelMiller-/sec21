@@ -9,6 +9,7 @@ ExternalProject_Add(
    URL https://sourceforge.net/projects/viennacl/files/1.7.x/ViennaCL-1.7.1.zip
    CMAKE_ARGS -D BUILD_EXAMPLES=OFF
       -D ENABLE_OPENCL=OFF
+      -D CMAKE_BUILD_TYPE=Release
       -D CMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/viennacl
 )
 
@@ -19,6 +20,7 @@ target_link_libraries(catch_main PRIVATE Catch2::Catch2)
 function(test test)
    string(REPLACE "/" "_" tmp ${test})
    add_executable(test.${tmp} "${CMAKE_CURRENT_LIST_DIR}/${test}.cpp")
+   add_dependencies(test.${tmp} ViennaCL-tests)
 
    target_link_libraries(test.${tmp} PRIVATE Catch2::Catch2)
    # boost
@@ -126,8 +128,8 @@ test("structural_analysis.member")
 test("structural_analysis.node")
 test("structural_analysis.space_truss" "example_1.json")
 test("structural_analysis.space_truss.example1.temperature" "example_1.json")
-# test("structural_analysis.space_truss.example2" "example_2.json" "example_2_load.json")
-# test("structural_analysis.space_truss.example2.temperature" "example_2.json" "example_2_temperature_load.json")
+test("structural_analysis.space_truss.example2" "example_2.json" "example_2_load.json")
+test("structural_analysis.space_truss.example2.temperature" "example_2.json" "example_2_temperature_load.json")
 test("structural_analysis.space_truss.example3" "example_3.json" "example_3_load.json")
 test("structural_analysis.space_truss.example4" "example_4.json" "example_4_load.json")
 test("structural_analysis.space_truss.example5" "example_5.json" "example_5_load.json")
