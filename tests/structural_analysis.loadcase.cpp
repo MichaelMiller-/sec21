@@ -1,10 +1,9 @@
 ﻿#include <catch.hpp>
 #include "approx_equal.h"
 
+#include <sec21/file_loader.h>
 #include <sec21/structural_analysis/loadcase.h>
 #include <sec21/structural_analysis/space_truss.h>
-
-#include <fstream>
 
 TEST_CASE("test loadcase", "[sec21][structural_analysis][loadcase]")
 {
@@ -12,12 +11,7 @@ TEST_CASE("test loadcase", "[sec21][structural_analysis][loadcase]")
    using namespace sec21::units::literals;
    using namespace std::literals;
 
-   std::ifstream ifs{"example_1.json"};
-   using nlohmann::json;
-   json j;
-   ifs >> j;
-   auto sys = j.get<space_truss>();
-
+   auto sys = sec21::load_from_json<space_truss>("example_1.json");
    REQUIRE(std::size(sys.nodes) == 4);
 
    using loadcase_t = loadcase<decltype(sys)>;
