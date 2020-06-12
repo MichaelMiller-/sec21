@@ -1,6 +1,7 @@
 #pragma once
 
 #include <sec21/units.h>
+#include <sec21/structural_analysis/concepts.h>
 #include <sec21/structural_analysis/force.h>
 #include <sec21/structural_analysis/impl/geometry.h>
 
@@ -72,9 +73,9 @@ namespace sec21::structural_analysis
          const auto [s, e] = sys.coincidence_table.at(lf.first);
          const auto delta_t = lf.second.value();
          //! \todo remove magic number
-         const auto alpha_t = 0.00012;
+         const auto alpha_t = 0.012;
          //! \todo use unit system; scale from kN -> N
-         const auto equivalent_force = it->E * it->A * alpha_t * delta_t * 1'000;
+         const auto equivalent_force = it->E.value() * it->A.value() * alpha_t * delta_t;
 
          const auto from = std::find_if(
             begin(sys.nodes), 

@@ -5,10 +5,10 @@
             3,
             {
                 "x": {
-                    "value": "-35.0_kN"
+                    "quantity": "-35.0_kN"
                 },
                 "y": {
-                    "value": "0_kN"
+                    "quantity": "0_kN"
                 }
             }
         ],
@@ -16,10 +16,10 @@
             6,
             {
                 "x": {
-                    "value": "35.0_kN"
+                    "quantity": "35.0_kN"
                 },
                 "y": {
-                    "value": "0_kN"
+                    "quantity": "0_kN"
                 }
             }
         ],
@@ -27,10 +27,10 @@
             7,
             {
                 "x": {
-                    "value": "0_kN"
+                    "quantity": "0_kN"
                 },
                 "y": {
-                    "value": "-140.0_kN"
+                    "quantity": "-140.0_kN"
                 }
             }
         ]

@@ -1,0 +1,12 @@
+{
+    "name": "LF1",
+    "node_load": [],
+    "temperature_load": [
+        [
+            1,
+            {
+                "quantity": "30_K"
+            }
+        ]
+    ]
+}

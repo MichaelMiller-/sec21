@@ -6,6 +6,7 @@
 #include <sec21/for_each_chunk.h>
 #include <sec21/numeric/make_vector.h>
 #include <sec21/units/quantity.h>
+#include <sec21/structural_analysis/common.h>
 #include <sec21/structural_analysis/system_result.h>
 #include <sec21/structural_analysis/impl/lookup.h>
 #include <sec21/structural_analysis/impl/matrix_helper.h>
@@ -16,9 +17,12 @@
 #include <boost/numeric/ublas/matrix_proxy.hpp>
 #include <boost/numeric/ublas/io.hpp>
 
-#include <viennacl/vector.hpp>
-#include <viennacl/matrix.hpp>
-#include <viennacl/linalg/lu.hpp>
+// #pragma GCC diagnostic push
+// #pragma GCC diagnostic ignored "-Wignored-attributes"
+   #include <viennacl/vector.hpp>
+   #include <viennacl/matrix.hpp>
+   #include <viennacl/linalg/lu.hpp>
+// #pragma GCC diagnostic pop
 
 #include <vector>
 #include <map>
@@ -161,8 +165,9 @@ namespace sec21::structural_analysis
             auto delta_s = result.node[s].displacement;
             auto delta_e = result.node[e].displacement;
 
-            const auto EA = m.E * m.A;
-            const auto EA_over_l = EA / length(sys, m.id).value();         
+            const auto EA = m.E.value() * m.A.value();
+            const auto kv = EA / length(sys, m.id).value();
+            // const auto kv = EA_over_l(m.E, m.A, length(sys, m.id)).value();         
 
             const auto alpha = impl::angle_to_x_axis(sys, m.id);
             //! \todo k1?
@@ -174,7 +179,7 @@ namespace sec21::structural_analysis
                -std::cos(alpha) * X(delta_s).value() +
                -std::sin(alpha) * Y(delta_s).value() +
                 std::cos(alpha) * X(delta_e).value() +
-                std::sin(alpha) * Y(delta_e).value()) * k1 * EA_over_l * k2;
+                std::sin(alpha) * Y(delta_e).value()) * k1 * kv * k2;
 
             //! \todo: ungenauigkeit in der berechung
             result.member[m.id].normal_force = N;
