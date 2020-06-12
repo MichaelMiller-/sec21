@@ -74,7 +74,7 @@ before_script:
 script:
 - mkdir -p _build && cd _build
 - cmake -DENABLE_COVERAGE:BOOL=FALSE -DENABLE_PCH:BOOL=FALSE -DENABLE_VIEWER:BOOL=FALSE -DCMAKE_TOOLCHAIN_FILE=../vcpkg/scripts/buildsystems/vcpkg.cmake ..
-- cmake --build . -- -j4
+- make -j4
 - ctest -j2
 
 branches:
