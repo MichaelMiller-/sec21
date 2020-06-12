@@ -17,33 +17,32 @@ namespace sec21::units
    template <>
    struct abbreviation<meter>
    {
-      using dimension_t = meter::dimension_t;
+      using type_t = meter;
       constexpr static std::string_view value{"m"};
    };
    template <>
    struct abbreviation<millimeter>
    {
-      using dimension_t = millimeter::dimension_t;
+      using type_t = millimeter;
       constexpr static std::string_view value{"mm"};
    };
    template <>
    struct abbreviation<centimeter>
    {
-      using dimension_t = millimeter::dimension_t;
-      constexpr static std::string_view value{"mm"};
+      using type_t = centimeter;
+      constexpr static std::string_view value{"cm"};
    };   
    template <>
    struct abbreviation<kilometer>
    {
       using type_t = kilometer;
-      using dimension_t = kilometer::dimension_t;
       constexpr static std::string_view value{"km"};
    };
 
    template <>
    struct type_info<length>
    {
-      using valid_types_t = std::tuple<kilometer, millimeter, meter>;
+      using valid_types_t = std::tuple<meter, millimeter, centimeter, kilometer>;
       constexpr static std::string_view name{"length"};
    };
 
@@ -61,8 +60,4 @@ namespace sec21::units
       constexpr auto operator "" _km(unsigned long long v) noexcept  { return quantity<kilometer, unsigned long long>{ v }; }
       constexpr auto operator "" _km(long double v) noexcept         { return quantity<kilometer, long double>{ v }; }
    }
-
-#ifdef __cpp_concepts
-
-#endif
 }
