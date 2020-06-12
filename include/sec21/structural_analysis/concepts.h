@@ -10,6 +10,8 @@ namespace sec21::structural_analysis
    template <auto Dimension, typename Precision>
    struct node;
 
+   struct member;
+
    struct space_truss;
 
    // type traits
@@ -19,8 +21,14 @@ namespace sec21::structural_analysis
    template <auto Dimension, typename Precision>
    struct is_node<node<Dimension, Precision>> : std::true_type {};
 
+   // template <typename T>
+   // constexpr bool is_node_v = is_node<T>::value;
+
    template <typename T>
-   constexpr bool is_node_v = is_node<T>::value;
+   struct is_member : std::is_same<T, member> {};
+
+   // template <typename T>
+   // constexpr bool is_member_v = is_member<T>::value;
 
    template <typename T>
    struct is_space_truss : std::is_same<T, space_truss> {};
@@ -31,6 +39,9 @@ namespace sec21::structural_analysis
    // concepts
    template <typename T>
    concept Node = is_node<T>::value;
+
+   template <typename T>
+   concept Member = is_member<T>::value;
 
    template <typename T>
    concept SpaceTruss = is_space_truss<T>::value;
