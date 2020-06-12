@@ -1,13 +1,15 @@
 ﻿#pragma once
 
-#include <type_traits>
-#include <limits>
-#include <ratio>
-
 #include <sec21/units/concepts.h>
 #include <sec21/units/dimension.h>
 #include <sec21/units/unit.h>
 #include <sec21/units/ratio.h>
+
+#include <sstream>
+#include <string>
+#include <type_traits>
+#include <limits>
+#include <ratio>
 
 namespace sec21::units
 {
@@ -68,87 +70,52 @@ namespace sec21::units
       }
    };
 
-   namespace detail
-   {
-      template <typename Q1, typename Q2, typename T>
-      struct common_quantity_impl;
-
-      template <typename U, typename T1, typename T2, typename T>
-      struct common_quantity_impl<quantity<U, T1>, quantity<U, T2>, T>
-      {
-         using type = quantity<U, T>;
-      };
-
-      template <typename U1, typename T1, typename U2, typename T2, typename T>
-      //requires same_dim<typename U1::dimension, typename U2::dimension>
-      struct common_quantity_impl<quantity<U1, T1>, quantity<U2, T2>, T>
-      {
-         using cr = common_ratio_t<typename U1::ratio_t, typename U2::ratio_t>;
-         using cu = unit<typename U1::dimension_t, cr>;
-         using type = quantity<cu, T>;
-         // using type = quantity<downcast_target<cu>, T>;
-      };
-   }
-
-   template <typename Q1, typename Q2, typename T = std::common_type_t<typename Q1::value_t, typename Q2::value_t>>
-   using common_quantity_t = typename detail::common_quantity_impl<Q1, Q2, T>::type;
-
    template <Quantity Q1, Quantity Q2> requires SameDimension<Q1, Q2>
    constexpr bool operator == (Q1 const& lhs, Q2 const& rhs) noexcept
    {
-      using ct = common_quantity_t<Q1, Q2>;
-      return ct{ lhs }.value() == ct{ rhs }.value();
+      return lhs.value() == Q1{ rhs }.value();
    }
 
-   template <typename U1, typename T1, typename U2, typename T2>
-   [[nodiscard]] constexpr bool operator != (quantity<U1, T1> const& lhs, quantity<U2, T2> const& rhs) noexcept
+   template <Quantity Q1, Quantity Q2> requires SameDimension<Q1, Q2>
+   constexpr bool operator != (Q1 const& lhs, Q2 const& rhs) noexcept
    {
       return !(lhs == rhs);
    }
 
-   template <typename U1, typename T1, typename U2, typename T2>
-   [[nodiscard]] constexpr bool operator < (quantity<U1, T1> const& lhs, quantity<U2, T2> const& rhs) noexcept
-      //requires same_dim<typename U1::dimension, typename U2::dimension>
+   template <Quantity Q1, Quantity Q2> requires SameDimension<Q1, Q2>
+   constexpr bool operator < (Q1 const& lhs, Q2 const& rhs) noexcept
    {
-      using ct = common_quantity_t<quantity<U1, T1>, quantity<U1, T2>>;
-      return ct{ lhs }.value() < ct{ rhs }.value();
+      return lhs.value() < Q1{ rhs }.value();
    }
 
-   template <typename U1, typename T1, typename U2, typename T2>
-   [[nodiscard]] constexpr bool operator <= (quantity<U1, T1> const& lhs, quantity<U2, T2> const& rhs) noexcept
-      //requires same_dim<typename U1::dimension, typename U2::dimension>
+   template <Quantity Q1, Quantity Q2> requires SameDimension<Q1, Q2>
+   constexpr bool operator <= (Q1 const& lhs, Q2 const& rhs) noexcept
    {
       return !(rhs < lhs);
    }
 
-   template <typename U1, typename T1, typename U2, typename T2>
-   [[nodiscard]] constexpr bool operator > (quantity<U1, T1> const& lhs, quantity<U2, T2> const& rhs) noexcept
-      //requires same_dim<typename U1::dimension, typename U2::dimension>
+   template <Quantity Q1, Quantity Q2> requires SameDimension<Q1, Q2>
+   constexpr bool operator > (Q1 const& lhs, Q2 const& rhs) noexcept
    {
       return rhs < lhs;
    }
 
-   template <typename U1, typename T1, typename U2, typename T2>
-   [[nodiscard]] constexpr bool operator >= (quantity<U1, T1> const& lhs, quantity<U2, T2> const& rhs) noexcept
-      //requires same_dim<typename U1::dimension, typename U2::dimension>
+   template <Quantity Q1, Quantity Q2> requires SameDimension<Q1, Q2>
+   constexpr bool operator >= (Q1 const& lhs, Q2 const& rhs) noexcept
    {
       return !(lhs < rhs);
    }
 
-   template <typename U1, typename T1, typename U2, typename T2>
-   [[nodiscard]] constexpr auto operator + (quantity<U1, T1> const& lhs, quantity<U2, T2> const& rhs) noexcept
-      //      requires same_dim<typename U1::dimension, typename U2::dimension>
+   template <Quantity Q1, Quantity Q2> requires SameDimension<Q1, Q2>
+   constexpr auto operator + (Q1 const& lhs, Q2 const& rhs) noexcept
    {
-      using ct = common_quantity_t<quantity<U1, T1>, quantity<U2, T2>>;
-      return ct{ ct{lhs}.value() + ct{rhs}.value() };
+      return Q1{ lhs.value() + Q1{ rhs }.value() };
    }
 
-   template <typename U1, typename T1, typename U2, typename T2>
-   [[nodiscard]] constexpr auto operator - (quantity<U1, T1> const& lhs, quantity<U2, T2> const& rhs) noexcept
-      //      requires same_dim<typename U1::dimension, typename U2::dimension>
+   template <Quantity Q1, Quantity Q2> requires SameDimension<Q1, Q2>
+   constexpr auto operator - (Q1 const& lhs, Q2 const& rhs) noexcept
    {
-      using ct = common_quantity_t<quantity<U1, T1>, quantity<U2, T2>>;
-      return ct{ lhs }.value() - ct{ rhs }.value();
+      return Q1{ lhs.value() - Q1{ rhs }.value() };
    }
 
    template <Quantity Q1, Quantity Q2> requires SameDimension<Q1, Q2>
@@ -175,6 +142,12 @@ namespace sec21::units
       using rt = quantity<unit<dt, std::ratio<1>>, vt>;
 
       return rt{ lhs.value() * rhs.value() };
+   }
+
+   template <Quantity Q1, Scalar S>
+   constexpr auto operator * (Q1 const& lhs, S rhs) 
+   {
+      return Q1{ lhs.value() * rhs };
    }
 
    template <Quantity Q1, Quantity Q2> requires SameDimension<Q1, Q2>
@@ -225,50 +198,33 @@ namespace sec21::units
    template <typename T>
    struct abbreviation {};
 
-   template <typename CharT, typename Trais, typename Unit, typename T>
-   auto operator << (std::basic_ostream<CharT, Trais>& os, quantity<Unit, T> const& v) -> std::basic_ostream<CharT, Trais>&
+   template <Quantity Q>
+   auto to_string(Q const& obj) -> std::string
    {
-      return os << v.value(); // << abbreviation<T>::value;
+      std::stringstream ss;
+      ss << obj.value() << '_' << abbreviation<typename Q::dimension_t>::value;
+      return ss.str();
+   }
+
+   template <typename Unit, typename T>
+   auto operator << (std::ostream& os, quantity<Unit, T> const& v) -> std::ostream&
+   {
+      return os << v.value(); // to_string(v);
    }
 }
-
 
 #include <nlohmann/json.hpp>
 #include <boost/lexical_cast.hpp>
 #include <tuple>
-#include <sstream>
 #include <string_view>
 
 namespace sec21::units
 {
    namespace detail
    {
-      template <typename T>
-      auto to_abbreviation(T) noexcept
+      inline auto split(std::string const& input)
       {
-         return abbreviation<T>::value;
-      }
-      template <typename Tuple, std::size_t... Is>
-      constexpr decltype(auto) transform_to_abbreviation(Tuple&& tuple, std::index_sequence<Is...>)
-      {
-         // c++20
-         // constexpr auto impl = []<typename T>(T){ return abbreviation<T>::value; };
-         return std::tuple{ to_abbreviation(std::get<Is>(tuple))...};
-      }
-
-      template <typename T, typename Precision = double>
-      auto valid_dimension(std::string_view unit) -> bool
-      {
-         typename type_info<T>::valid_types_t valid_types{};
-
-         constexpr auto N = std::tuple_size_v<decltype(valid_types)>;
-         const auto dfs = transform_to_abbreviation(valid_types, std::make_index_sequence<N>{});
-
-         return std::apply([&](auto const &... v) { return ((v == unit) || ...); }, dfs);
-      }
-
-      auto split(std::string const& input)
-      {
+         //! \todo use cptr regex
          const std::string delimiter = "_";    
          auto pos = input.find(delimiter);
          if (pos == std::string::npos)
@@ -288,33 +244,56 @@ namespace sec21::units
          return ss.str();
       }
 
-      template <typename Unit, typename T>
-      auto from_string(std::string const& input) -> quantity<Unit, T>
+      struct quoted_to_ratio
+      {
+         template <typename U>
+         using fn = typename U::ratio_t;
+      };
+
+      template <Quantity Q>
+      auto from_string(std::string const& input) -> Q
       {
          auto [value, unit] = split(input);
 
-         if (bool valid = valid_dimension<typename Unit::dimension_t>(unit); valid == false)
-            throw std::runtime_error("couldn't match input unit with dimension type");
+         using dim_t = typename Q::dimension_t;
+         using unit_t = typename Q::unit_t;
+         using R1 = typename unit_t::ratio_t;
 
-         auto v = boost::lexical_cast<double>(value) * 1.0;
-         //! \todo 
-         return { static_cast<T>(v) };
-      }
+         typename type_info<dim_t>::valid_types_t valid_types{};
+
+         using T1 = boost::mp11::mp_transform_q<quoted_to_ratio, decltype(valid_types)>;
+
+         constexpr auto to_abbreviation = []<typename T>(T){ return abbreviation<T>::value; };
+         constexpr auto convert_ratio = []<typename T>(T){ return T::num / double{ T::den }; };
+
+         const auto valid_abbreviations = std::apply([&](auto... n){ return std::array{ to_abbreviation(n)... }; }, valid_types);
+         const auto matching_ratios = std::apply([&](auto... n){ return std::array{ convert_ratio(n)... }; }, T1{});
+         static_assert(std::size(valid_abbreviations) == std::size(matching_ratios));
+
+         const auto it = std::find(begin(valid_abbreviations), end(valid_abbreviations), unit);
+         if (it == end(valid_abbreviations))
+            throw std::runtime_error("Couldn't match input quantity with valid dimension type. invalid dimension: " + unit);
+
+         const auto d = std::distance(begin(valid_abbreviations), it);
+         const auto k = R1::num / double{ R1::den };
+         const auto v = boost::lexical_cast<double>(value) * matching_ratios[d] / k;
+
+         return { static_cast<typename Q::value_t>(v) };
+      }    
    }
 
    template <typename Unit, typename T>
    void to_json(nlohmann::json& j, quantity<Unit, T> const& obj) {
-      // auto v = obj.value();
       j = nlohmann::json{
-         {"value", detail::to_string(obj)}
+         {"quantity", detail::to_string(obj)}
       };
    }
 
-   template <typename Unit, typename T>
-   void from_json(nlohmann::json const& j, quantity<Unit, T>& obj) 
+   template <Quantity Q>
+   void from_json(nlohmann::json const& j, Q& obj) 
    {
       std::string value;
-      j.at("value").get_to(value);
-      obj = detail::from_string<Unit, T>(value);
+      j.at("quantity").get_to(value);
+      obj = detail::from_string<Q>(value);
    }
 }
