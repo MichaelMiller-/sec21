@@ -1,7 +1,11 @@
 #pragma once
 
+#include <sec21/structural_analysis/common.h>
 #include <sec21/structural_analysis/impl/geometry.h>
 #include <sec21/structural_analysis/impl/matrix_helper.h>
+
+#include <boost/math/special_functions/sin_pi.hpp>
+#include <boost/math/special_functions/cos_pi.hpp>
 
 namespace sec21::structural_analysis::impl
 {
@@ -29,9 +33,7 @@ namespace sec21::structural_analysis::impl
       if (it == std::end(sys.members))
          throw std::invalid_argument("invalid member descriptor"); //fmt::format("invalid member descriptor: {}"), id);
 
-      auto m = *it;
-      const auto EA = m.E * m.A; // [kN/m2] [m2]
-      const auto EA_over_l = EA / length(sys, m.id).value();    // m           
+      const auto kv = EA_over_l(it->E, it->A, length(sys, it->id)).value();
 
       using namespace boost::math;
       //! \note this approch (rad / pi) get better results -> so the minimal overhead is tolerable
@@ -53,10 +55,10 @@ namespace sec21::structural_analysis::impl
 
       // clang-format off
       const auto values = std::array{
-         (c * c) * EA_over_l,  (s * c) * EA_over_l, (-c * c) * EA_over_l, (-s * c) * EA_over_l,
-         (s * c) * EA_over_l,  (s * s) * EA_over_l, (-s * c) * EA_over_l, (-s * s) * EA_over_l,
-         (-c * c) * EA_over_l, (-s * c) * EA_over_l,  (c * c) * EA_over_l,  (s * c) * EA_over_l,
-         (-s * c) * EA_over_l, (-s * s) * EA_over_l,  (s * c) * EA_over_l,  (s * s) * EA_over_l,
+         (c * c) * kv,  (s * c) * kv, (-c * c) * kv, (-s * c) * kv,
+         (s * c) * kv,  (s * s) * kv, (-s * c) * kv, (-s * s) * kv,
+         (-c * c) * kv, (-s * c) * kv,  (c * c) * kv,  (s * c) * kv,
+         (-s * c) * kv, (-s * s) * kv,  (s * c) * kv,  (s * s) * kv,
       };
       // clang-format on
       return make_matrix(4, 4, std::begin(values), std::end(values));
