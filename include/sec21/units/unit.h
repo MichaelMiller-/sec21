@@ -8,29 +8,23 @@ namespace sec21::units
 {
    // a specific physical dimension
    template <typename Dimension, typename Ratio>
-   struct unit // : downcast_base<unit<Dimension, Ratio>>
+   struct unit
    {
       using dimension_t = Dimension;
       using ratio_t = Ratio;
-      //! \todo abbreviation? as template parameter std::string_view
    };
 
-
-   template <typename BaseType>
-   struct cast_helper_base 
+   template <typename BaseUnit, typename To>
+   struct cast_helper : BaseUnit 
    {
-      using base_t = BaseType;
-      friend auto cast_guide(cast_helper_base);
-   };
-
-   template <typename From, typename To>
-   struct cast_helper : From {
-      // friend auto cast_guide(typename downcast_helper::downcast_base) { return Target(); }
+      using BaseUnit::dimension_t;
+      using BaseUnit::ratio_t;
    };
 
    struct no_prefix;
    struct base_unit;
 
+   //! \todo remove
    template <typename Child, typename Dimension, typename Prefix = no_prefix>
    struct coherent_derived_unit : cast_helper<unit<Dimension, std::ratio<1>>, Child> {};
 
