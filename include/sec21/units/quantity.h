@@ -150,6 +150,12 @@ namespace sec21::units
       return Q1{ lhs.value() * rhs };
    }
 
+   template <Scalar S, Quantity Q1>
+   constexpr auto operator * (S rhs, Q1 const& lhs) 
+   {
+      return Q1{ lhs.value() * rhs };
+   }
+
    template <Quantity Q1, Quantity Q2> requires SameDimension<Q1, Q2>
    constexpr auto operator / (Q1 const& lhs, Q2 const& rhs)
    {
