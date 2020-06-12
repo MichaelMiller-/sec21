@@ -34,20 +34,6 @@ namespace sec21::structural_analysis
       std::optional<global_support_t> global_support{};
    };
 
-   template <typename T>
-   struct is_node : std::false_type {};
-
-   template <auto Dimension, typename Precision>
-   struct is_node<node<Dimension, Precision>> : std::true_type {};
-
-   template <typename T>
-   constexpr bool is_node_v = is_node<T>::value;
-
-   static_assert(is_node_v<node<2, float>>);
-   static_assert(is_node_v<node<2, double>>);
-   static_assert(is_node_v<int> == false);
-   // static_assert(std::is_trivial_v<node<2, float>>, "node is not trivial");
-
    template <typename InputIterator, typename OutputIterator>
    auto support_mask(InputIterator first, InputIterator last, OutputIterator out) -> OutputIterator
    {
