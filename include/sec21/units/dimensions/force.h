@@ -20,16 +20,19 @@ namespace sec21::units
    template <>
    struct abbreviation<newton>
    {
+      using type_t = newton;
       constexpr static std::string_view value{"N"};
    };
    template <>
    struct abbreviation<kilonewton>
    {
+      using type_t = kilonewton;
       constexpr static std::string_view value{"kN"};
    };
    template <>
    struct abbreviation<meganewton>
    {
+      using type_t = meganewton;
       constexpr static std::string_view value{"MN"};
    };   
 
