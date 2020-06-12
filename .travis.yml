@@ -46,6 +46,7 @@ before_install:
 - export CXX="${COMPILER}"
 - sudo apt-get -qq update
 - sudo apt-get -y install git
+- sudo apt-get -y install libopengl-dev
 - git clone https://github.com/Microsoft/vcpkg.git
 - cd vcpkg
 - sh bootstrap-vcpkg.sh
