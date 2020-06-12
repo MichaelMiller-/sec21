@@ -16,11 +16,11 @@ ExternalProject_Add(
 ## speed up the compiletime process
 add_library(catch_main STATIC catch_main.cpp)
 target_link_libraries(catch_main PRIVATE Catch2::Catch2)
+add_dependencies(catch_main ViennaCL-tests)
 
 function(test test)
    string(REPLACE "/" "_" tmp ${test})
    add_executable(test.${tmp} "${CMAKE_CURRENT_LIST_DIR}/${test}.cpp")
-   add_dependencies(test.${tmp} ViennaCL-tests)
 
    target_link_libraries(test.${tmp} PRIVATE Catch2::Catch2)
    # boost
