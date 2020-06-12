@@ -60,8 +60,6 @@ namespace sec21::structural_analysis
          const auto K_strich = impl::remove_from_matrix(K, not_supported_rows, supported_cols);
          const auto F_without_supports = impl::remove_from_vector(F, supported_rows);
 
-         system_result<System> result;
-
          // consider sanitiy checks:
          // F.size1() == K_without_supports.size1() == K_without_supports.size2()
          // F.size1() == K_strich.size2()
@@ -118,6 +116,8 @@ namespace sec21::structural_analysis
             std::end(not_supported_rows), 
             std::begin(verschiebungen));
 
+         system_result<System> result;
+
          // allocate space for the node results
          // std::transform(        
          //    std::begin(sys.nodes), 
@@ -172,14 +172,12 @@ namespace sec21::structural_analysis
             const auto alpha = impl::angle_to_x_axis(sys, m.id);
             //! \todo k1?
             const auto k1 = alpha < 0.0 ? -1.0 : 1.0;
-            //! \todo k2?
-            const auto k2 = 1;
 
             const auto N = (
                -std::cos(alpha) * X(delta_s).value() +
                -std::sin(alpha) * Y(delta_s).value() +
                 std::cos(alpha) * X(delta_e).value() +
-                std::sin(alpha) * Y(delta_e).value()) * k1 * kv * k2;
+                std::sin(alpha) * Y(delta_e).value()) * k1 * kv;
 
             //! \todo: ungenauigkeit in der berechung
             result.member[m.id].normal_force = N;
@@ -193,10 +191,6 @@ namespace sec21::structural_analysis
          return std::tuple{ true, result };
       }
    }
-
-   // Forward declaration
-   template <typename System>
-   struct loadcase;
 
    template <typename System>
    [[nodiscard]] auto solve(System const& sys, loadcase<System> const& load) // -> std::tuple<bool, system_result<typename System>>
