@@ -21,7 +21,7 @@ TEST_CASE("test loadcase", "[sec21][structural_analysis][loadcase]")
    {
       loadcase_t lf1;
       lf1.name = "LF1"s;
-      lf1.temperature_load.emplace_back(1, 30.0_K);
+      lf1.temperature_loads.emplace_back(loadcase_t::temperature_load_t{1, 30.0_K, 0.012});
 
       using namespace sec21;
       using value_t = units::quantity<units::newton, typename decltype(sys)::precision_t>;
