@@ -19,7 +19,6 @@
 //! \todo possible to implement a strong_type (percent) with a value range from 0...100%
 constexpr auto kDivergence{0.02};
 
-
 TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
 {
    using namespace sec21::structural_analysis;
@@ -979,13 +978,11 @@ TEST_CASE("example system 1.0 load from json", "[sec21][structural_analysis][spa
             std::back_inserter(flat_displacement),
             [](auto&& e) { return e.value(); });
       }
-
       // unit: millimeter [mm]
-      const auto expected = std::array{ 0.869117, 0.18, 1.049117, -0.54, 0.18, 0.0, 0.0, 0.0 };
+      const auto expected = std::array{ 0.0869117, 0.018, 0.1049117, -0.054, 0.018, 0.0, 0.0, 0.0 };
       REQUIRE(approx_equal(flat_displacement, expected, kDivergence));
    }
    {
-      // unit: newton [N]
       std::vector<double> copied_results{};
       std::transform(
          std::begin(result.member), 
@@ -993,6 +990,7 @@ TEST_CASE("example system 1.0 load from json", "[sec21][structural_analysis][spa
          std::back_inserter(copied_results), 
          [](auto&& m) { return m.second.normal_force.value(); });
 
+      // unit: newton [N]
       const auto expected = std::array{ 5'040.0, -15'120.0, 5'040.0, 5'040.0, 7'127.63635, -7'127.63635 };
       REQUIRE(approx_equal(copied_results, expected, kDivergence));
    }
