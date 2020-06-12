@@ -46,7 +46,6 @@ before_install:
 - export CXX="${COMPILER}"
 - sudo apt-get -qq update
 - sudo apt-get -y install git
-- sudo apt-get -y install libopengl-dev
 - git clone https://github.com/Microsoft/vcpkg.git
 - cd vcpkg
 - sh bootstrap-vcpkg.sh
@@ -62,11 +61,11 @@ before_install:
 - ./vcpkg install spdlog
 - ./vcpkg install sdl2
 - ./vcpkg install sdl2-image
-- ./vcpkg install glew
-- ./vcpkg install imgui
+# - ./vcpkg install glew
+# - ./vcpkg install imgui
 - ./vcpkg install entt
-- ./vcpkg install assimp
-- ./vcpkg install freetype
+# - ./vcpkg install assimp
+# - ./vcpkg install freetype
 - cd ..
 
 before_script:
@@ -74,7 +73,7 @@ before_script:
 
 script:
 - mkdir -p _build && cd _build
-- cmake -DENABLE_COVERAGE:BOOL=FALSE -DENABLE_PCH:BOOL=FALSE -DCMAKE_TOOLCHAIN_FILE=../vcpkg/scripts/buildsystems/vcpkg.cmake ..
+- cmake -DENABLE_COVERAGE:BOOL=FALSE -DENABLE_PCH:BOOL=FALSE -DENABLE_VIEWER:BOOL=FALSE -DCMAKE_TOOLCHAIN_FILE=../vcpkg/scripts/buildsystems/vcpkg.cmake ..
 - cmake --build . -- -j4
 - ctest -j2
 
