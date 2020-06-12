@@ -8,9 +8,8 @@
 #ifdef __cpp_lib_math_constants
    #include <numbers>
    //! \todo use
-#else 
-   #include <boost/math/constants/constants.hpp>
 #endif
+#include <boost/math/constants/constants.hpp>
 
 #include <boost/qvm/vec_traits_defaults.hpp>
 #include <boost/qvm/vec_operations.hpp>
@@ -82,7 +81,6 @@ namespace sec21::structural_analysis::impl
    [[nodiscard]] auto angle_to_x_axis(Position const& from, Position const& to) noexcept -> double
    {
       using namespace boost::qvm;
-      using namespace boost::math;
 
       const auto dir = to - from;
       decltype(dir) project_x{ X(dir) };
@@ -92,10 +90,10 @@ namespace sec21::structural_analysis::impl
 
       //! \todo approx
       if (m == 1)
-         return constants::half_pi<typename vec_traits<Position>::scalar_type>() * 0.5;
+         return boost::math::constants::half_pi<typename vec_traits<Position>::scalar_type>() * 0.5;
 
       if (0 == (l1 * l2))
-         return constants::half_pi<typename vec_traits<Position>::scalar_type>();
+         return boost::math::constants::half_pi<typename vec_traits<Position>::scalar_type>();
 
       auto k1 = 1;
       if (Y(dir) < 0)
