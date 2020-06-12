@@ -2,6 +2,8 @@
 
 #include <sec21/units.h>
 
+#include <nlohmann/json.hpp>
+
 #include <iomanip>
 #include <fstream>
 #include <limits>
@@ -129,6 +131,7 @@ TEST_CASE("SI units test", "[units]")
 
    // pressure
    STATIC_REQUIRE(10_N / 10_sq_m == 1_Pa);
+   STATIC_REQUIRE(1_kPa == 1000_Pa);
 
    // energy
    STATIC_REQUIRE(10_N * 10_m == 100_J);
@@ -182,7 +185,7 @@ TEST_CASE("constant quantities", "[sec21][units]")
 
    STATIC_REQUIRE(G == 9.80665_mps_sq);
 }
-TEST_CASE("nlohmann json reflection for units", "[sec21][serializer]")
+TEST_CASE("nlohmann json reflection for units", "[sec21][units]")
 {
    using namespace std::literals::string_literals;
    const auto temporary_test_file{"quantity.json"s};
@@ -211,13 +214,50 @@ TEST_CASE("nlohmann json reflection for units", "[sec21][serializer]")
 
       REQUIRE(q.value() == 5.12);
    }
+}
+
+namespace ns
+{
+   using namespace sec21;
+   struct example_values
+   {
+      units::quantity<units::meter, double> len;
+      units::quantity<units::square_meter, double> area;
+      units::quantity<units::kelvin, double> temperature;
+      units::quantity<units::kilopascal, double> pressure;
+   };
+
+   void to_json(nlohmann::json& j, example_values const& obj) {
+      j = nlohmann::json{
+         {"len", obj.len},
+         {"area", obj.area},
+         {"temperature", obj.temperature},
+         {"pressure", obj.pressure}
+      };
+   }
+   void from_json(nlohmann::json const& j, example_values& obj) 
+   {
+      j.at("len").get_to(obj.len);
+      j.at("area").get_to(obj.area);
+      j.at("temperature").get_to(obj.temperature);
+      j.at("pressure").get_to(obj.pressure);
+   }
+}
+TEST_CASE("test unit parser", "[sec21][units]")
+{
+   using namespace sec21::units::literals;
+   using nlohmann::json;
+
    SECTION("read testdata")
    {
       json j;
       std::ifstream ifs{"test_data_units.json"};
       ifs >> j;
-      auto q = j.get<quantity_t>();
+      const auto result = j.get<ns::example_values>();
 
-      REQUIRE(q.value() == -3.14);
-   }   
+      REQUIRE(result.len == -3.14_m);
+      REQUIRE(result.area.value() == 2.2);
+      REQUIRE(result.temperature == 480_K);
+      REQUIRE(result.pressure == 7000_Pa);
+   }  
 }

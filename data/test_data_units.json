@@ -1,3 +1,14 @@
 { 
-   "value": "-3.14_m"
+   "len" : {
+      "quantity": "-314_cm"
+   },
+   "area" : {
+      "quantity": "2.2_sq_m"
+   },
+   "temperature": {
+      "quantity": "480_K"
+   },
+   "pressure" : {
+      "quantity": "7.0_kPa"
+   }   
 }
