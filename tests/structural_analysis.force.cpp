@@ -1,9 +1,8 @@
-﻿#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
+﻿#include <catch.hpp>
 
 #include <sec21/structural_analysis/force.h>
 
-TEST_CASE("2D force", "[force]")
+TEST_CASE("2D force", "[sec21][structural_analysis][force]")
 {
    using namespace sec21::structural_analysis;
    using namespace sec21::units::literals;
@@ -46,7 +45,7 @@ TEST_CASE("2D force", "[force]")
    }
 }
 
-TEST_CASE("3D force", "[force]")
+TEST_CASE("3D force", "[sec21][structural_analysis][force]")
 {
    using namespace sec21::structural_analysis;
    using namespace sec21::units::literals;
