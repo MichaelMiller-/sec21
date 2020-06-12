@@ -43,11 +43,11 @@ TEST_CASE("example system 1.0 with temperature load", "[sec21][structural_analys
       [](auto&& m) { return m.second.normal_force.value(); });
 
    // unit: millimeter [mm]
-   REQUIRE(flat_displacement[0] == Approx(-5.4));
-   REQUIRE(flat_displacement[1] == Approx(-1.12).epsilon(kDivergence));
-   REQUIRE(flat_displacement[2] == Approx(4.28).epsilon(kDivergence));
-   REQUIRE(flat_displacement[3] == Approx(-1.12).epsilon(kDivergence));
-   REQUIRE(flat_displacement[4] == Approx(-1.12).epsilon(kDivergence));
+   REQUIRE(flat_displacement[0] == Approx(-0.54));
+   REQUIRE(flat_displacement[1] == Approx(-0.112).epsilon(kDivergence));
+   REQUIRE(flat_displacement[2] == Approx(0.428).epsilon(kDivergence));
+   REQUIRE(flat_displacement[3] == Approx(-0.112).epsilon(kDivergence));
+   REQUIRE(flat_displacement[4] == Approx(-0.112).epsilon(kDivergence));
 
    // unit: newton [N]
    REQUIRE(copied_results[0] == Approx(271'108).epsilon(kDivergence));
