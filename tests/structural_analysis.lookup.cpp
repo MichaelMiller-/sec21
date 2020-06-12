@@ -1,5 +1,4 @@
-﻿#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
+﻿#include <catch.hpp>
 
 #include <sec21/structural_analysis/impl/lookup.h>
 
@@ -7,7 +6,7 @@
 #include <algorithm>
 #include <array>
 
-TEST_CASE("row_to_col()", "[sec21][structural_analysis_impl][space_truss]")
+TEST_CASE("row_to_col()", "[sec21][structural_analysis_impl][lookup]")
 {
    using namespace sec21::structural_analysis::impl;
 
