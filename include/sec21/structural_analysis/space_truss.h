@@ -1,8 +1,8 @@
 ﻿#pragma once
 
+#include <sec21/structural_analysis/concepts.h>
 #include <sec21/structural_analysis/node.h>
 #include <sec21/structural_analysis/member.h>
-#include <sec21/structural_analysis/type_traits.h>
 
 #include <boost/outcome.hpp>
 
@@ -62,9 +62,6 @@ namespace sec21::structural_analysis
 
    //! \return handle type
    template <typename System> 
-#ifdef __cpp_concepts   
-   requires SpaceTruss<System>
-#endif
    auto add_node(
       System& sys,
       typename System::node_t node) noexcept -> outcome::std_result<typename System::node_descriptor_t>
@@ -82,9 +79,6 @@ namespace sec21::structural_analysis
    }
 
    template <typename System, typename... Args>
-#ifdef __cpp_concepts
-      requires SpaceTruss<System>
-#endif
    auto add_node(System& sys, Args &&... args) noexcept 
    {
       return add_node(sys, typename System::node_t{ std::forward<Args>(args)... });
@@ -92,9 +86,6 @@ namespace sec21::structural_analysis
 
    //! \todo 2019-04-15 check something like "system_traits" -> see graph_traits from boost
    template <typename System> //, typename... Args>
-#ifdef __cpp_concepts
-      requires SpaceTruss<System>
-#endif
    auto add_member(
       System& sys,
       typename System::node_descriptor_t from,
@@ -126,9 +117,6 @@ namespace sec21::structural_analysis
    }
 
    template <typename System, typename... Args>
-#ifdef __cpp_concepts
-      requires SpaceTruss<System>
-#endif   
    auto add_member(
       System& sys,
       typename System::node_descriptor_t from,
