@@ -16,6 +16,21 @@
 #include <utility>
 #include <algorithm>
 
+//! \todo remove
+template <typename Iterator>
+auto dump(Iterator first, Iterator last, std::string_view name)
+{
+   std::cout << name.data() << " n: "<< std::distance(first, last) << "\n(";
+   std::copy(first, last, std::ostream_iterator<typename std::iterator_traits<Iterator>::value_type>(std::cout, ", "));
+   std::cout << ")\n" << std::endl;
+}
+template <typename Sequence>
+auto dump(Sequence&& seq, std::string_view name)
+{
+   dump(std::begin(seq), std::end(seq), std::move(name));
+}
+
+
 //! \todo possible to implement a strong_type (percent) with a value range from 0...100%
 constexpr auto kDivergence{0.02};
 
@@ -582,7 +597,8 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       };
       expected *= EA_l1;
       // clang-format on
-      REQUIRE(approx_equal(sec21::flat_matrix(K_strich), expected, kDivergence));
+      const auto flattend_K = sec21::flat_matrix(K_strich);
+      REQUIRE(approx_equal(flattend_K, expected, kDivergence));
    }
    SECTION("solve")
    {
@@ -594,37 +610,60 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       auto [success, result] = solve(sys, lf1);
       REQUIRE(success == true);
 
-      // auto it = result.nodes.find(1);
-      // REQUIRE(it != std::end(result.nodes));
+      std::vector<double> flat_support_reaction{};
+      for (auto [k,v] : result.node) 
+      {
+         std::transform(
+            std::begin(v.support_reaction), 
+            std::end(v.support_reaction), 
+            std::back_inserter(flat_support_reaction),
+            [](auto&& e) { return e.value(); });
+      }
+
+      std::vector<double> flat_displacement{};
+      for (auto [k,v] : result.node) 
+      {
+         std::transform(
+            std::begin(v.displacement), 
+            std::end(v.displacement), 
+            std::back_inserter(flat_displacement),
+            [](auto&& e) { return e.value(); });
+      }
+
+      std::vector<double> flat_member_result{};
+      std::transform(
+         std::begin(result.member), 
+         std::end(result.member), 
+         std::back_inserter(flat_member_result),
+         [](auto&& e) { return e.second.normal_force.value(); });
 
       // unit: newton [N]
-      REQUIRE(X(result.node[n1.value()].support_reaction).value() == Approx(0.0));
-      REQUIRE(Y(result.node[n1.value()].support_reaction).value() == Approx(0.0));
-      REQUIRE(X(result.node[n2.value()].support_reaction).value() == Approx(0.0));
-      REQUIRE(Y(result.node[n2.value()].support_reaction).value() == Approx(0.0));
-      REQUIRE(X(result.node[n3.value()].support_reaction).value() == Approx(0.0));
-      REQUIRE(Y(result.node[n3.value()].support_reaction).value() == Approx(20'000.0));
-      REQUIRE(X(result.node[n4.value()].support_reaction).value() == Approx(-10'000.0));
-      REQUIRE(Y(result.node[n4.value()].support_reaction).value() == Approx(-10'000.0));
+      REQUIRE(flat_support_reaction[0] == Approx(0.0));
+      REQUIRE(flat_support_reaction[1] == Approx(0.0));
+      REQUIRE(flat_support_reaction[2] == Approx(0.0));
+      REQUIRE(flat_support_reaction[3] == Approx(0.0));
+      REQUIRE(flat_support_reaction[4] == Approx(0.0));
+      REQUIRE(flat_support_reaction[5] == Approx(20'000.0));
+      REQUIRE(flat_support_reaction[6] == Approx(-10'000.0));
+      REQUIRE(flat_support_reaction[7] == Approx(-10'000.0));
 
       // unit: millimeter [mm]
-      REQUIRE(X(result.node[n1.value()].displacement).value() == Approx(0.86).epsilon(kDivergence));
-      REQUIRE(Y(result.node[n1.value()].displacement).value() == Approx(0.178571));
-      REQUIRE(X(result.node[n2.value()].displacement).value() == Approx(1.04079));
-      REQUIRE(Y(result.node[n2.value()].displacement).value() == Approx(-0.535714));
-      REQUIRE(X(result.node[n3.value()].displacement).value() == Approx(0.178571));
-      REQUIRE(Y(result.node[n3.value()].displacement).value() == Approx(0.0));
-      REQUIRE(X(result.node[n4.value()].displacement).value() == Approx(0.0));
-      REQUIRE(Y(result.node[n4.value()].displacement).value() == Approx(0.0));
+      REQUIRE(flat_displacement[0] == Approx(0.86).epsilon(kDivergence));
+      REQUIRE(flat_displacement[1] == Approx(0.178571));
+      REQUIRE(flat_displacement[2] == Approx(1.04079));
+      REQUIRE(flat_displacement[3] == Approx(-0.535714));
+      REQUIRE(flat_displacement[4] == Approx(0.178571));
+      REQUIRE(flat_displacement[5] == Approx(0.0));
+      REQUIRE(flat_displacement[6] == Approx(0.0));
+      REQUIRE(flat_displacement[7] == Approx(0.0));
 
       // unit: newton [N])
-      REQUIRE(result.member[m1.value()].normal_force.value() == Approx(5'000));
-      REQUIRE(result.member[m2.value()].normal_force.value() == Approx(-15'000));
-      REQUIRE(result.member[m3.value()].normal_force.value() == Approx(5'000));
-      REQUIRE(result.member[m4.value()].normal_force.value() == Approx(5'000));
-      REQUIRE(result.member[m5.value()].normal_force.value() == Approx(7'071.0678118655));
-      REQUIRE(result.member[m6.value()].normal_force.value() == Approx(-7'071.0678118655));
-
+      REQUIRE(flat_member_result[0] == Approx(5'000));
+      REQUIRE(flat_member_result[1] == Approx(-15'000));
+      REQUIRE(flat_member_result[2] == Approx(5'000));
+      REQUIRE(flat_member_result[3] == Approx(5'000));
+      REQUIRE(flat_member_result[4] == Approx(7'071.0678118655));
+      REQUIRE(flat_member_result[5] == Approx(-7'071.0678118655));
       {
          std::ofstream ofs{"output_example_1_result.json"};
          nlohmann::json tmp = result;
@@ -816,33 +855,60 @@ TEST_CASE("example 1.1 with different node id's (N1 switched with N3 from exampl
       auto [success, result] = solve(sys, lf1);
       REQUIRE(success == true);
 
+      std::vector<double> flat_support_reaction{};
+      for (auto [k,v] : result.node) 
+      {
+         std::transform(
+            std::begin(v.support_reaction), 
+            std::end(v.support_reaction), 
+            std::back_inserter(flat_support_reaction),
+            [](auto&& e) { return e.value(); });
+      }
+
+      std::vector<double> flat_displacement{};
+      for (auto [k,v] : result.node) 
+      {
+         std::transform(
+            std::begin(v.displacement), 
+            std::end(v.displacement), 
+            std::back_inserter(flat_displacement),
+            [](auto&& e) { return e.value(); });
+      }
+
+      std::vector<double> flat_member_result{};
+      std::transform(
+         std::begin(result.member), 
+         std::end(result.member), 
+         std::back_inserter(flat_member_result),
+         [](auto&& e) { return e.second.normal_force.value(); });
+
       // unit: newton [N]
-      REQUIRE(X(result.node[n1.value()].support_reaction).value() == Approx(0.0));
-      REQUIRE(Y(result.node[n1.value()].support_reaction).value() == Approx(20'000.0));
-      REQUIRE(X(result.node[n2.value()].support_reaction).value() == Approx(0.0));
-      REQUIRE(Y(result.node[n2.value()].support_reaction).value() == Approx(0.0));
-      REQUIRE(X(result.node[n3.value()].support_reaction).value() == Approx(0.0));
-      REQUIRE(Y(result.node[n3.value()].support_reaction).value() == Approx(0.0));
-      REQUIRE(X(result.node[n4.value()].support_reaction).value() == Approx(-10'000.0));
-      REQUIRE(Y(result.node[n4.value()].support_reaction).value() == Approx(-10'000.0));
+      REQUIRE(flat_support_reaction[0] == Approx(0.0));
+      REQUIRE(flat_support_reaction[1] == Approx(20'000.0));
+      REQUIRE(flat_support_reaction[2] == Approx(0.0));
+      REQUIRE(flat_support_reaction[3] == Approx(0.0));
+      REQUIRE(flat_support_reaction[4] == Approx(0.0));
+      REQUIRE(flat_support_reaction[5] == Approx(0.0));
+      REQUIRE(flat_support_reaction[6] == Approx(-10'000.0));
+      REQUIRE(flat_support_reaction[7] == Approx(-10'000.0));
 
       // unit: millimeter [mm]
-      REQUIRE(X(result.node[n1.value()].displacement).value() == Approx(0.18).epsilon(kDivergence));
-      REQUIRE(Y(result.node[n1.value()].displacement).value() == Approx(0.0));
-      REQUIRE(X(result.node[n2.value()].displacement).value() == Approx(1.04).epsilon(kDivergence));
-      REQUIRE(Y(result.node[n2.value()].displacement).value() == Approx(-0.54).epsilon(kDivergence));
-      REQUIRE(X(result.node[n3.value()].displacement).value() == Approx(0.86).epsilon(kDivergence));
-      REQUIRE(Y(result.node[n3.value()].displacement).value() == Approx(0.18).epsilon(kDivergence));
-      REQUIRE(X(result.node[n4.value()].displacement).value() == Approx(0.0));
-      REQUIRE(Y(result.node[n4.value()].displacement).value() == Approx(0.0));
+      REQUIRE(flat_displacement[0] == Approx(0.18).epsilon(kDivergence));
+      REQUIRE(flat_displacement[1] == Approx(0.0));
+      REQUIRE(flat_displacement[2] == Approx(1.04).epsilon(kDivergence));
+      REQUIRE(flat_displacement[3] == Approx(-0.54).epsilon(kDivergence));
+      REQUIRE(flat_displacement[4] == Approx(0.86).epsilon(kDivergence));
+      REQUIRE(flat_displacement[5] == Approx(0.18).epsilon(kDivergence));
+      REQUIRE(flat_displacement[6] == Approx(0.0));
+      REQUIRE(flat_displacement[7] == Approx(0.0));
 
       // unit: newton [N])
-      REQUIRE(result.member[m1.value()].normal_force.value() == Approx(5'000));
-      REQUIRE(result.member[m2.value()].normal_force.value() == Approx(-15'000));
-      REQUIRE(result.member[m3.value()].normal_force.value() == Approx(5'000));
-      REQUIRE(result.member[m4.value()].normal_force.value() == Approx(5'000));
-      REQUIRE(result.member[m5.value()].normal_force.value() == Approx(7'071).epsilon(kDivergence));
-      REQUIRE(result.member[m6.value()].normal_force.value() == Approx(-7'071).epsilon(kDivergence));
+      REQUIRE(flat_member_result[0] == Approx(5'000));
+      REQUIRE(flat_member_result[1] == Approx(-15'000));
+      REQUIRE(flat_member_result[2] == Approx(5'000));
+      REQUIRE(flat_member_result[3] == Approx(5'000));
+      REQUIRE(flat_member_result[4] == Approx(7'071.0678118655));
+      REQUIRE(flat_member_result[5] == Approx(-7'071.0678118655));
    }
 }
 TEST_CASE("example system 1.2 with half load from example 1.0", "[sec21][structural_analysis][space_truss]")
@@ -911,33 +977,60 @@ TEST_CASE("example system 1.2 with half load from example 1.0", "[sec21][structu
       auto [success, result] = solve(sys, lf1);
       REQUIRE(success == true);
 
+      std::vector<double> flat_support_reaction{};
+      for (auto [k,v] : result.node) 
+      {
+         std::transform(
+            std::begin(v.support_reaction), 
+            std::end(v.support_reaction), 
+            std::back_inserter(flat_support_reaction),
+            [](auto&& e) { return e.value(); });
+      }
+
+      std::vector<double> flat_displacement{};
+      for (auto [k,v] : result.node) 
+      {
+         std::transform(
+            std::begin(v.displacement), 
+            std::end(v.displacement), 
+            std::back_inserter(flat_displacement),
+            [](auto&& e) { return e.value(); });
+      }
+
+      std::vector<double> flat_member_result{};
+      std::transform(
+         std::begin(result.member), 
+         std::end(result.member), 
+         std::back_inserter(flat_member_result),
+         [](auto&& e) { return e.second.normal_force.value(); });
+
       // unit: newton [N]
-      REQUIRE(X(result.node[n1.value()].support_reaction).value() == Approx(0.0));
-      REQUIRE(Y(result.node[n1.value()].support_reaction).value() == Approx(0.0));
-      REQUIRE(X(result.node[n2.value()].support_reaction).value() == Approx(0.0));
-      REQUIRE(Y(result.node[n2.value()].support_reaction).value() == Approx(0.0));
-      REQUIRE(X(result.node[n3.value()].support_reaction).value() == Approx(0.0));
-      REQUIRE(Y(result.node[n3.value()].support_reaction).value() == Approx(10'000.0));
-      REQUIRE(X(result.node[n4.value()].support_reaction).value() == Approx(-5'000.0));
-      REQUIRE(Y(result.node[n4.value()].support_reaction).value() == Approx(-5'000.0));
+      REQUIRE(flat_support_reaction[0] == Approx(0.0));
+      REQUIRE(flat_support_reaction[1] == Approx(0.0));
+      REQUIRE(flat_support_reaction[2] == Approx(0.0));
+      REQUIRE(flat_support_reaction[3] == Approx(0.0));
+      REQUIRE(flat_support_reaction[4] == Approx(0.0));
+      REQUIRE(flat_support_reaction[5] == Approx(10'000.0));
+      REQUIRE(flat_support_reaction[6] == Approx(-5'000.0));
+      REQUIRE(flat_support_reaction[7] == Approx(-5'000.0));
 
       // unit: millimeter [mm]
-      REQUIRE(X(result.node[n1.value()].displacement).value() == Approx(0.43).epsilon(kDivergence));
-      REQUIRE(Y(result.node[n1.value()].displacement).value() == Approx(0.09).epsilon(kDivergence));
-      REQUIRE(X(result.node[n2.value()].displacement).value() == Approx(0.52).epsilon(kDivergence));
-      REQUIRE(Y(result.node[n2.value()].displacement).value() == Approx(-0.27).epsilon(kDivergence));
-      REQUIRE(X(result.node[n3.value()].displacement).value() == Approx(0.09).epsilon(kDivergence));
-      REQUIRE(Y(result.node[n3.value()].displacement).value() == Approx(0.0));
-      REQUIRE(X(result.node[n4.value()].displacement).value() == Approx(0.0));
-      REQUIRE(Y(result.node[n4.value()].displacement).value() == Approx(0.0));
+      REQUIRE(flat_displacement[0] == Approx(0.43).epsilon(kDivergence));
+      REQUIRE(flat_displacement[1] == Approx(0.09).epsilon(kDivergence));
+      REQUIRE(flat_displacement[2] == Approx(0.52).epsilon(kDivergence));
+      REQUIRE(flat_displacement[3] == Approx(-0.27).epsilon(kDivergence));
+      REQUIRE(flat_displacement[4] == Approx(0.09).epsilon(kDivergence));
+      REQUIRE(flat_displacement[5] == Approx(0.0));
+      REQUIRE(flat_displacement[6] == Approx(0.0));
+      REQUIRE(flat_displacement[7] == Approx(0.0));
 
       // unit: newton [N])
-      REQUIRE(result.member[m1.value()].normal_force.value() == Approx(2'500));
-      REQUIRE(result.member[m2.value()].normal_force.value() == Approx(-7'500));
-      REQUIRE(result.member[m3.value()].normal_force.value() == Approx(2'500));
-      REQUIRE(result.member[m4.value()].normal_force.value() == Approx(2'500));
-      REQUIRE(result.member[m5.value()].normal_force.value() == Approx(3'535.53).epsilon(kDivergence));
-      REQUIRE(result.member[m6.value()].normal_force.value() == Approx(-3'535.53).epsilon(kDivergence));
+      REQUIRE(flat_member_result[0] == Approx(2'500));
+      REQUIRE(flat_member_result[1] == Approx(-7'500));
+      REQUIRE(flat_member_result[2] == Approx(2'500));
+      REQUIRE(flat_member_result[3] == Approx(2'500));
+      REQUIRE(flat_member_result[4] == Approx(3'535.53).epsilon(kDivergence));
+      REQUIRE(flat_member_result[5] == Approx(-3'535.53).epsilon(kDivergence));
    }
 }
 TEST_CASE("example system 1.0 load from json", "[sec21][structural_analysis][space_truss]")
