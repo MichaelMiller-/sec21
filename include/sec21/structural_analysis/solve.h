@@ -137,20 +137,24 @@ namespace sec21::structural_analysis
             std::inserter(result.node, std::end(result.node)),
             [&result](auto&& node){ return std::make_pair(node.id, typename decltype(result)::node_result{}); });
 
+         auto it = std::begin(result.node);
          for_each_chunk<dim>(
             std::begin(support_reactions), 
             std::end(support_reactions), 
-            [it = std::begin(result.node)](auto x, auto y) mutable 
+            //! \todo is not working with msvc: [it = std::begin(result.node)](auto x, auto y) mutable 
+            [&it](auto x, auto y)
             {
                using value_t = typename decltype(it->second.support_reaction)::value_type;
                it->second.support_reaction = { value_t{ x }, value_t{ y } };
                it++;
             });
 
+         it = std::begin(result.node);
          for_each_chunk<dim>(
             std::begin(displacements), 
             std::end(displacements), 
-            [it = std::begin(result.node)](auto x, auto y) mutable 
+            //! \todo is not working with msvc: [it = std::begin(result.node)](auto x, auto y) mutable 
+            [&it](auto x, auto y)
             {
                using value_t = typename decltype(it->second.displacement)::value_type;
                it->second.displacement = { value_t{ x }, value_t{ y } };
