@@ -14,7 +14,7 @@ namespace sec21
    auto max_drawdown(Iterator first, Iterator last)
    {
       using value_t = typename std::iterator_traits<Iterator>::value_type;
-      const size_t n = std::distance(first, last);
+      const auto n = static_cast<std::size_t>(std::distance(first, last));
  
       std::vector<value_t> maxs(n);
       std::partial_sum(first, last, std::begin(maxs), [](auto l, auto r) { return std::max(l, r); });
