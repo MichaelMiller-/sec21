@@ -22,7 +22,7 @@ TEST_CASE("example system 1.0 with temperature load", "[sec21][structural_analys
    using loadcase_t = loadcase<decltype(sys)>;
    loadcase_t lf1;
    lf1.name = "LF1"s;
-   lf1.temperature_load.emplace_back(1, 30.0_K);
+   lf1.temperature_loads.emplace_back(loadcase_t::temperature_load_t{1, 30.0_K, 0.012});
 
    auto [success, result] = solve(sys, lf1);
    REQUIRE(success == true);
