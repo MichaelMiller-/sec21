@@ -8,20 +8,6 @@
 
 namespace sec21::structural_analysis::impl
 {
-   
-   template <typename Iterator, typename F = boost::numeric::ublas::row_major>
-   [[nodiscard]] auto make_matrix(std::size_t m, std::size_t n, Iterator first, Iterator last)
-      -> boost::numeric::ublas::matrix<typename std::iterator_traits<Iterator>::value_type, F> 
-   {
-      if(m * n != std::distance(first, last)) {
-         throw std::invalid_argument("expected matrix size didn't match with sequence length");
-      }
-      using value_t = typename std::iterator_traits<Iterator>::value_type;
-      boost::numeric::ublas::unbounded_array<value_t> storage(m*n);
-      std::copy(first, last, storage.begin());
-      return boost::numeric::ublas::matrix<value_t>(m, n, storage);
-   }
-   
    template <typename T>
    //! \todo write test
    auto remove_from_matrix(boost::numeric::ublas::matrix<T> in, std::vector<Row> const& rows, std::vector<Col> const& cols)
@@ -67,7 +53,5 @@ namespace sec21::structural_analysis::impl
       }      
       return result;
    }
-
-
 } // namespace sec21::structural_analysis
 
