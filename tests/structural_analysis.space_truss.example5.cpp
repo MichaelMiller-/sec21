@@ -18,6 +18,9 @@ TEST_CASE("example system 5.0 load from json", "[sec21][structural_analysis][spa
 
    auto sys = sec21::load_from_json<space_truss>("example_5.json");
 
+   REQUIRE(not std::empty(sys.nodes));
+   REQUIRE(not std::empty(sys.members));
+
    SECTION("test geometry")
    {
       REQUIRE(impl::length(sys, 3) == 5.0_m);
@@ -25,6 +28,12 @@ TEST_CASE("example system 5.0 load from json", "[sec21][structural_analysis][spa
       REQUIRE(impl::length(sys, 5) == 3.0_m);
       REQUIRE(impl::length(sys, 6) == 3.0_m);
       REQUIRE(impl::length(sys, 13) == 4.0_m);
+   }
+   SECTION("E*A units from first member")
+   {
+      auto it = std::begin(sys.members);
+      auto EA = it->E * it->A;
+      REQUIRE(EA.value() == Approx(200000));
    }
    SECTION("solve")
    {
