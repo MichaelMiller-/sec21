@@ -18,73 +18,76 @@ namespace sec21::viewer
       return glm::length2(s1.position - s2.position) <= (s1.radius + s2.radius) * (s1.radius + s2.radius);
    }
 
-   namespace detail
+   inline auto closest_point(ray const& r, glm::vec3 const& pt)
+   { 
+      auto ab_square = glm::dot(r.dir, r.dir); 
+      auto AP = pt - r.origin; 
+      auto ap_dot_ab = glm::dot(AP, r.dir); 
+      // t is a projection param when we project vector AP onto AB 
+      auto t = ap_dot_ab / ab_square; 
+      // calculate the closest point 
+      return r.origin + (r.dir * t);
+   }
+
+   struct plane
    {
-      auto closest_point(ray const& r, glm::vec3 const& pt)
-      { 
-         auto ab_square = glm::dot(r.dir, r.dir); 
-         auto AP = pt - r.origin; 
-         auto ap_dot_ab = glm::dot(AP, r.dir); 
-         // t is a projection param when we project vector AP onto AB 
-         auto t = ap_dot_ab / ab_square; 
-         // calculate the closest point 
-         return r.origin + (r.dir * t);
+      using value_t = float;
+
+      // general plane equation: ax + by + cz = d
+      //! \todo check if it neccessary that a,b,c has to normalized. now there are
+      value_t a{};
+      value_t b{};
+      value_t c{};
+      value_t d{};
+
+      template <typename Point, typename Vector>
+      static plane from_point_and_normalized_dir(Point const& pt, Vector const& dir)
+      {
+         const auto d = glm::dot(pt, dir);
+         return { dir.x, dir.y, dir.z, d };
       }
 
-      struct plane
+      template <typename Point, typename Vector>
+      static plane from_point_and_normal(Point const& pt, Vector const& dir)
       {
-         using value_t = float;
-
-         // general plane equation: ax + by + cz = d
-         //! \todo check if it neccessary that a,b,c has to normalized. now there are
-         value_t a{};
-         value_t b{};
-         value_t c{};
-         value_t d{};
-
-         template <typename Point, typename Vector>
-         static plane from_point_and_normalized_dir(Point const& pt, Vector const& dir)
-         {
-            const auto d = glm::dot(pt, dir);
-            return { dir.x, dir.y, dir.z, d };
-         }
-
-         template <typename Point, typename Vector>
-         static plane from_point_and_normal(Point const& pt, Vector const& dir)
-         {
-            const auto coefficient = glm::normalize(dir);
-            const auto d = glm::dot(pt, coefficient);
-            return { coefficient.x, coefficient.y, coefficient.z, d };
-         }
-
-         template <typename Point>
-         static plane from_points(Point const& pt1, Point const& pt2, Point const& pt3)
-         {
-            const auto coefficient = glm::normalize(glm::cross(pt2 - pt1, pt3 - pt1));
-            return { coefficient.x, coefficient.y, coefficient.z, glm::dot(coefficient, pt1) };
-         }
-      };
-
-      inline auto signed_distance(plane const& p, glm::vec3 const& pt)
-      {
-         //! \todo assert(p.a == p.b == p.c != 0)
-         return glm::dot(glm::vec3{ p.a, p.b, p.c }, pt) - p.d;
+         const auto coefficient = glm::normalize(dir);
+         const auto d = glm::dot(pt, coefficient);
+         return { coefficient.x, coefficient.y, coefficient.z, d };
       }
-
-      enum class Face
-      {
-         Front,
-         Back
-      };
 
       template <typename Point>
-      auto classify(plane const&p, Point const& pt) noexcept -> Face
+      static plane from_points(Point const& pt1, Point const& pt2, Point const& pt3)
       {
-         if (signed_distance(p, pt) < 0)
-            return Face::Back;
-         return Face::Front;
+         const auto coefficient = glm::normalize(glm::cross(pt2 - pt1, pt3 - pt1));
+         return { coefficient.x, coefficient.y, coefficient.z, glm::dot(coefficient, pt1) };
       }
 
+      friend std::ostream& operator << (std::ostream& os, plane const& p) 
+      {
+         return os << "((" << p.a << ", " << p.b << ", " << p.c << ") " << p.d << ")";
+      }      
+   };
+
+   inline auto signed_distance(plane const& p, glm::vec3 const& pt)
+   {
+      //! \todo assert(p.a == p.b == p.c != 0)
+      return glm::dot(glm::vec3{ p.a, p.b, p.c }, pt) - p.d;
+   }
+
+   enum class Face
+   {
+      Front,
+      Back
+   };
+
+   template <typename Point>
+   auto classify(plane const&p, Point const& pt) noexcept -> Face
+   {
+      if (signed_distance(p, pt) < 0)
+         return Face::Back;
+      return Face::Front;
+   }
+#if 0
       inline auto planes_face_outside(aabb const& bbox) noexcept -> std::array<plane, 6>
       {
          return {
@@ -100,18 +103,17 @@ namespace sec21::viewer
       template <typename Point>
       bool is_inside(aabb const& bbox, Point const& pt) noexcept
       {
-         const auto pln = detail::planes_face_outside(bbox);
+         const auto pln = planes_face_outside(bbox);
          const auto n =  std::count_if(
             std::begin(pln), 
             std::end(pln), 
             [&pt](auto const& p) { return classify(p, pt) == Face::Front; });
          return n == 0;
       }
-   }
-
+#endif
    inline bool intersect(ray const& r, sphere const& s)
    {
-      const auto v = detail::closest_point(r, s.position);
+      const auto v = closest_point(r, s.position);
       const auto len = glm::distance(v, s.position);
       return len < s.radius;
    }
