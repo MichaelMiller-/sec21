@@ -7,8 +7,8 @@ namespace sec21::units
 {
    using temperature = dimension<exponent<base_dimension_temperature, 1>>;
 
-   struct kelvin : coherent_derived_unit<kelvin, temperature, si_tag> {};
-   //! \todo celsius : coherent_derived_unit<celsius, temperature, si_tag> {};
+   struct kelvin : derived_unit<kelvin, temperature, si_tag> {};
+   //! \todo celsius : derived_unit<celsius, temperature, si_tag> {};
 
    template <>
    struct abbreviation<kelvin>

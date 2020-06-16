@@ -9,7 +9,7 @@ namespace sec21::units
 {
    using area = dimension<exponent<base_dimension_length, 2>>;
 
-   struct square_meter : coherent_derived_unit<square_meter, area> {};
+   struct square_meter : derived_unit<square_meter, area, base_unit> {};
    struct square_millimeter : derived_unit<square_millimeter, area, std::micro> {};
    struct square_centimeter : derived_unit<square_centimeter, area, std::ratio<1, 10000>> {};
    struct square_kilometer : derived_unit<square_kilometer, area, std::mega> {};

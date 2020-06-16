@@ -8,7 +8,7 @@ namespace sec21::units
    using mass = dimension<exponent<base_dimension_mass, 1>>;
 
    // mass
-   struct kilogram : coherent_derived_unit<kilogram, mass, si_tag> {};
+   struct kilogram : derived_unit<kilogram, mass, si_tag> {};
    struct gram : derived_unit<gram, mass, std::milli> {};
    struct ton : derived_unit<ton, mass, std::kilo> {};
 

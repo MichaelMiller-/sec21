@@ -11,7 +11,7 @@ namespace sec21::units
       exponent<base_dimension_time, -3>,
       exponent<base_dimension_current, -1>>;   
 
-   struct volt : coherent_derived_unit<volt, voltage> {};
+   struct volt : derived_unit<volt, voltage, base_unit> {};
 
    inline namespace literals
    {

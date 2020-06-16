@@ -9,7 +9,7 @@ namespace sec21::units
    using substance = dimension<exponent<base_dimension_substance, 1>>;
 
    // units
-   struct mole : coherent_derived_unit<mole, substance, si_tag> {};
+   struct mole : derived_unit<mole, substance, si_tag> {};
    
    inline namespace literals
    {

@@ -7,7 +7,7 @@ namespace sec21::units
 {
    using velocity = dimension<exponent<base_dimension_length, 1>, exponent<base_dimension_time, -1>>;
 
-   struct meter_per_second : coherent_derived_unit<meter_per_second, velocity, si_tag> {};
+   struct meter_per_second : derived_unit<meter_per_second, velocity, si_tag> {};
    struct kilometer_per_hour : derived_unit<kilometer_per_hour, velocity, std::ratio<3600>> {};
 
    inline namespace literals

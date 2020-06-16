@@ -7,7 +7,7 @@ namespace sec21::units
 {
    using electric_charge = dimension<exponent<base_dimension_time, 1>, exponent<base_dimension_current, 1>>;
 
-   struct coulomb : coherent_derived_unit<coulomb, electric_charge> {};
+   struct coulomb : derived_unit<coulomb, electric_charge, base_unit> {};
 
    inline namespace literals
    {

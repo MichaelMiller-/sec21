@@ -12,7 +12,7 @@ namespace sec21::units
       exponent<base_dimension_time, -3>>;
    // clang-format on
 
-   struct watt : coherent_derived_unit<watt, power> {};
+   struct watt : derived_unit<watt, power, base_unit> {};
    struct milliwatt : derived_unit<milliwatt, power, std::milli> {};
    struct kilowatt : derived_unit<kilowatt, power, std::kilo> {};
    struct megawatt : derived_unit<megawatt, power, std::mega> {};

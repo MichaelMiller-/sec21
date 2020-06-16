@@ -13,7 +13,7 @@ namespace sec21::units
    // clang-format on
 
    // units
-   struct newton : coherent_derived_unit<newton, force> {};
+   struct newton : derived_unit<newton, force, base_unit> {};
    struct kilonewton : derived_unit<kilonewton, force, std::kilo> {};
    struct meganewton : derived_unit<meganewton, force, std::mega> {};
 

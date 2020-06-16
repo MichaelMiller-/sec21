@@ -12,7 +12,7 @@ namespace sec21::units
       exponent<base_dimension_time, -2>>;
    // clang-format on
 
-   struct joule : coherent_derived_unit<joule, energy> {};
+   struct joule : derived_unit<joule, energy, base_unit> {};
    struct millijoule : derived_unit<millijoule, energy, std::milli> {};
    struct kilojoule : derived_unit<kilojoule, energy, std::kilo> {};
    struct megajoule : derived_unit<megajoule, energy, std::mega> {};

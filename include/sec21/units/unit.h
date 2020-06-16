@@ -24,19 +24,12 @@ namespace sec21::units
    struct no_prefix;
    struct base_unit;
 
-   //! \todo remove
-   template <typename Child, typename Dimension, typename Prefix = no_prefix>
-   struct coherent_derived_unit : cast_helper<unit<Dimension, std::ratio<1>>, Child> {};
-
    template<typename Child, typename...>
    struct derived_unit;
 
    template <typename Child, typename Dimension>
-   struct derived_unit<Child, Dimension, base_unit> : cast_helper<unit<Dimension,  std::ratio<1>>, Child> {};
+   struct derived_unit<Child, Dimension, base_unit> : cast_helper<unit<Dimension, std::ratio<1>>, Child> {};
 
    template <typename Child, typename Dimension, typename Ratio>
    struct derived_unit<Child, Dimension, Ratio> : cast_helper<unit<Dimension, Ratio>, Child> {};
-   // or
-   // template <typename Child, typename Dimension, typename Ratio>
-   // struct derived_unit : cast_helper<unit<Dimension, Ratio>, Child> {};
 }

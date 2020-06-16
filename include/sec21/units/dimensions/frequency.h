@@ -7,7 +7,7 @@ namespace sec21::units
 {
    using frequency = dimension<exponent<base_dimension_time, -1>>;
 
-   struct hertz : coherent_derived_unit<hertz, frequency> {};
+   struct hertz : derived_unit<hertz, frequency, base_unit> {};
    struct millihertz : derived_unit<millihertz, frequency, std::milli> {};
    struct kilohertz : derived_unit<kilohertz, frequency, std::kilo> {};
    struct megahertz : derived_unit<megahertz, frequency, std::mega> {};

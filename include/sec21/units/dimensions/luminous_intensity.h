@@ -7,7 +7,7 @@ namespace sec21::units
 {
    using luminous_intensity = dimension<exponent<base_dimension_luminous_intensity, 1>>;
 
-   struct candela : coherent_derived_unit<candela, luminous_intensity, si_tag> {};
+   struct candela : derived_unit<candela, luminous_intensity, si_tag> {};
 
    inline namespace literals
    {

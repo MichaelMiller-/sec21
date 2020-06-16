@@ -7,7 +7,7 @@ namespace sec21::units
 {
    using volume = dimension<exponent<base_dimension_length, 3>>;
 
-   struct cubic_meter : coherent_derived_unit<cubic_meter, volume> {};
+   struct cubic_meter : derived_unit<cubic_meter, volume, base_unit> {};
    struct cubic_millimeter : derived_unit<cubic_millimeter, volume, std::milli> {};
    struct cubic_centimeter : derived_unit<cubic_centimeter, volume, std::centi> {};
    struct cubic_kilometer : derived_unit<cubic_kilometer, volume, std::kilo> {};

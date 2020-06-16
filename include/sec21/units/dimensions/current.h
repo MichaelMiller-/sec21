@@ -7,7 +7,7 @@ namespace sec21::units
 {
    using current = dimension<exponent<base_dimension_current, 1>>;
 
-   struct ampere : coherent_derived_unit<ampere, current, si_tag> {};
+   struct ampere : derived_unit<ampere, current, si_tag> {};
 
    inline namespace literals
    {

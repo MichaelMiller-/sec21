@@ -8,7 +8,7 @@ namespace sec21::units
    using time = dimension<exponent<base_dimension_time, 1>>;
 
    // time
-   struct second : coherent_derived_unit<second, time, si_tag> {};
+   struct second : derived_unit<second, time, si_tag> {};
    struct nanosecond : derived_unit<nanosecond, time, std::nano> {};
    struct microsecond : derived_unit<microsecond, time, std::micro> {};
    struct millisecond : derived_unit<millisecond, time, std::milli> {};
