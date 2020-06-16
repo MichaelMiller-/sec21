@@ -22,7 +22,7 @@ namespace sec21::numeric
    [[nodiscard]] auto make_matrix(std::size_t m, std::size_t n, T initial_value)
    {
       boost::numeric::ublas::unbounded_array<T, Allocator> storage(m * n, Allocator{});
-      std::fill_n(begin(storage), m * n, initial_value);
+      std::fill_n(storage.begin(), m * n, initial_value);
       return boost::numeric::ublas::matrix<T, F, decltype(storage)>(m, n, storage);
    }   
 } // namespace sec21::numeric

@@ -16,7 +16,7 @@ namespace sec21::numeric
       using const_iterator = std::allocator_traits<T>::const_pointer;
 
       template <typename Size>
-      constexpr auto allocate(Size n)
+      [[nodiscard]] constexpr auto allocate(Size n)
       {
          return obj.allocate(n);
       }
@@ -28,7 +28,7 @@ namespace sec21::numeric
       }
 
       template <typename U, typename Size>
-      void deallocate(U p, Size n)
+      void deallocate(U* p, Size n)
       {
          obj.deallocate(p, n);
       }
