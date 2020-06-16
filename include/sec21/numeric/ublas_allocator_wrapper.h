@@ -10,10 +10,10 @@ namespace sec21::numeric
    {
       T obj{};
 
-      using difference_type = std::allocator_traits<T>::difference_type;
-      using size_type = std::allocator_traits<T>::size_type;
-      using iterator = std::allocator_traits<T>::pointer;
-      using const_iterator = std::allocator_traits<T>::const_pointer;
+      using difference_type = typename std::allocator_traits<T>::difference_type;
+      using size_type = typename std::allocator_traits<T>::size_type;
+      using iterator = typename std::allocator_traits<T>::pointer;
+      using const_iterator = typename std::allocator_traits<T>::const_pointer;
 
       template <typename Size>
       [[nodiscard]] constexpr auto allocate(Size n)
