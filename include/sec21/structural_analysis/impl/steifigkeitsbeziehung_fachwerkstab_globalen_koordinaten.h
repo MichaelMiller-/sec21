@@ -1,11 +1,15 @@
 #pragma once
 
+#include <sec21/numeric/make_matrix.h>
 #include <sec21/structural_analysis/common.h>
 #include <sec21/structural_analysis/impl/geometry.h>
 #include <sec21/structural_analysis/impl/matrix_helper.h>
 
 #include <boost/math/special_functions/sin_pi.hpp>
 #include <boost/math/special_functions/cos_pi.hpp>
+
+#include <vector>
+#include <algorithm>
 
 namespace sec21::structural_analysis::impl
 {
@@ -18,11 +22,14 @@ namespace sec21::structural_analysis::impl
    //
 
    //! \todo rename
-   template <typename System>
+   template <typename Allocator, typename System>
    [[nodiscard]] auto steifigkeitsbeziehung_fachwerkstab_globalen_koordinaten(
       System const& sys,
       typename System::member_descriptor_t id)
    {
+      using precision_t = typename System::precision_t;
+      static_assert(std::is_same_v<typename std::allocator_traits<Allocator>::value_type, precision_t>);
+
       const auto angle = angle_to_x_axis(sys, id);
 
       auto it = std::find_if(
@@ -47,20 +54,30 @@ namespace sec21::structural_analysis::impl
          s = 0;
          c = 1;
       }
-      if (angle == constants::half_pi<typename System::precision_t>())
+      if (angle == constants::half_pi<precision_t>())
       {
          s = 1;
          c = 0;
       }
 
       // clang-format off
-      const auto values = std::array{
+      const auto values = std::vector<precision_t, Allocator>{
          (c * c) * kv,  (s * c) * kv, (-c * c) * kv, (-s * c) * kv,
          (s * c) * kv,  (s * s) * kv, (-s * c) * kv, (-s * s) * kv,
          (-c * c) * kv, (-s * c) * kv,  (c * c) * kv,  (s * c) * kv,
          (-s * c) * kv, (-s * s) * kv,  (s * c) * kv,  (s * s) * kv,
       };
       // clang-format on
-      return make_matrix(4, 4, std::begin(values), std::end(values));
+      return numeric::make_matrix<Allocator>(4, 4, std::begin(values), std::end(values));
+   }
+
+   template <typename System>
+   [[nodiscard]] auto steifigkeitsbeziehung_fachwerkstab_globalen_koordinaten(
+      System const& sys,
+      typename System::member_descriptor_t id)
+   {
+      using allocator_t = std::allocator<double>;
+
+      return steifigkeitsbeziehung_fachwerkstab_globalen_koordinaten<allocator_t>(sys, id);
    }
 }
