@@ -1,5 +1,5 @@
 find_package(Catch2 CONFIG REQUIRED)
-find_package(Boost 1.70 CONFIG REQUIRED)
+find_package(Boost 1.70 REQUIRED)
 find_package(OpenMP REQUIRED)
 
 ## TOOD:
