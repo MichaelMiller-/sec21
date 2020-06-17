@@ -1,13 +1,18 @@
 find_package(Catch2 CONFIG REQUIRED)
-find_package(Boost 1.70 REQUIRED)
+find_package(Boost 1.70 CONFIG REQUIRED)
 find_package(OpenMP REQUIRED)
+
+## TOOD:
+# configure_file(${PROJECT_SOURCE_DIR}/cmake/FindDebViennaCL.cmake.in FindDebViennaCL.cmake COPYONLY)
+# set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_BINARY_DIR})
+# find_package(DebViennaCL REQUIRED)
+# target_link_libraries(test.${tmp} PRIVATE DepViennaCL::DepViennaCL)
 
 include(ExternalProject)
 ExternalProject_Add(
    ViennaCL-tests
-   PREFIX tests
    URL https://sourceforge.net/projects/viennacl/files/1.7.x/ViennaCL-1.7.1.zip
-   CMAKE_ARGS -D BUILD_EXAMPLES=OFF
+   CMAKE_ARGS -Wno-dev -D BUILD_EXAMPLES=OFF
       -D ENABLE_OPENCL=OFF
       -D CMAKE_BUILD_TYPE=Release
       -D CMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/viennacl
@@ -23,17 +28,14 @@ function(test test)
    add_executable(test.${tmp} "${CMAKE_CURRENT_LIST_DIR}/${test}.cpp")
 
    target_link_libraries(test.${tmp} PRIVATE Catch2::Catch2)
-   # boost
-   target_include_directories(test.${tmp} PRIVATE ${Boost_INCLUDE_DIRS})
-   target_link_libraries(test.${tmp} PRIVATE ${Boost_LIBRARIES})
-   # openmp
+   target_link_libraries(test.${tmp} PRIVATE Boost::boost)
    target_link_libraries(test.${tmp} PRIVATE OpenMP::OpenMP_CXX)
-   target_compile_definitions(test.${tmp} PRIVATE VIENNACL_WITH_OPENMP)
    ## viennacl
+   target_compile_definitions(test.${tmp} PRIVATE VIENNACL_WITH_OPENMP)
    target_include_directories(test.${tmp} PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/viennacl/include")
 
    if (ENABLE_BENCHMARKS)
-      add_compile_definitions(CATCH_CONFIG_ENABLE_BENCHMARKING)
+      target_compile_definitions(test.${tmp} PRIVATE CATCH_CONFIG_ENABLE_BENCHMARKING)
    endif()
 
    include(CheckCXXCompilerFlag)
@@ -112,14 +114,15 @@ test("for_each_indexed")
 test("in_range")
 test("make_iota_array")
 test("math")
+test("numeric.make_matrix")
 test("numeric.make_vector")
 test("perfect.forwarding")
 test("projection_func")
 test("property_tree")
 test("resource")
-test("serializer")
 test("structural_analysis.axis")
 # test("structural_analysis.beam")
+test("structural_analysis.common")
 test("structural_analysis.force")
 test("structural_analysis.geometry")
 test("structural_analysis.loadcase")
