@@ -28,7 +28,11 @@ function(test test)
    add_executable(test.${tmp} "${CMAKE_CURRENT_LIST_DIR}/${test}.cpp")
 
    target_link_libraries(test.${tmp} PRIVATE Catch2::Catch2)
-   target_link_libraries(test.${tmp} PRIVATE Boost::boost)
+   ## TODO: error on travis gcc9: target_link_libraries(test.${tmp} PRIVATE Boost::boost)
+   # boost
+   target_include_directories(test.${tmp} PRIVATE ${Boost_INCLUDE_DIRS})
+   target_link_libraries(test.${tmp} PRIVATE ${Boost_LIBRARIES})
+
    target_link_libraries(test.${tmp} PRIVATE OpenMP::OpenMP_CXX)
    ## viennacl
    target_compile_definitions(test.${tmp} PRIVATE VIENNACL_WITH_OPENMP)
