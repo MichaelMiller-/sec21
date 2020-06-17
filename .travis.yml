@@ -49,12 +49,7 @@ before_install:
 - git clone https://github.com/Microsoft/vcpkg.git
 - cd vcpkg
 - sh bootstrap-vcpkg.sh
-- ./vcpkg install boost-mp11
-- ./vcpkg install boost-math
-- ./vcpkg install boost-qvm
-- ./vcpkg install boost-outcome
-- ./vcpkg install boost-ublas
-- ./vcpkg install boost-program-options
+- ./vcpkg install boost
 - ./vcpkg install catch2
 - ./vcpkg install glm
 - ./vcpkg install nlohmann-json
