@@ -19,7 +19,7 @@ TEST_CASE("add node to system", "[sec21][structural_analysis][space_truss][node]
    SECTION("add node with invalid id")
    {
       auto sys = space_truss{};
-      auto n1 = add_node(sys, { std::numeric_limits<std::size_t>::max() });
+      auto n1 = add_node(sys, { std::numeric_limits<decltype(sys)::node_t::descriptor_t>::max() });
 
       REQUIRE(static_cast<bool>(n1) == false);
    }
