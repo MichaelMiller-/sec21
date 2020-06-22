@@ -10,6 +10,7 @@ namespace sec21::numeric
    {
       T obj{};
 
+      using value_type =  typename std::allocator_traits<T>::value_type;
       using difference_type = typename std::allocator_traits<T>::difference_type;
       using size_type = typename std::allocator_traits<T>::size_type;
       using iterator = typename std::allocator_traits<T>::pointer;
@@ -24,7 +25,7 @@ namespace sec21::numeric
       template <typename U, typename... Args >
       constexpr void construct(U* p, Args &&... args)
       {
-         obj.construct(p, std::forward<Args>(args)...);
+         std::allocator_traits<T>::construct(obj, p, std::forward<Args>(args)...);
       }
 
       template <typename U, typename Size>
