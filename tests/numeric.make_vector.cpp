@@ -10,6 +10,7 @@
 
 using namespace sec21::numeric;
 
+#if 0
 TEST_CASE("create a vector from a std-sequence (vector)", "[sec21][numeric]") 
 {
    const auto input = std::vector{ 1, 3, 4, 6, 8, 9, 10, 11, 2 };
@@ -31,30 +32,30 @@ TEST_CASE("create a vector from a sequence with units", "[sec21][numeric]")
    REQUIRE(std::size(result) == std::size(expected));
    REQUIRE(std::equal(std::begin(result), std::end(result), std::begin(expected), std::end(expected)));
 }
-
-#if 0 // c++20
-TEST_CASE("create a vector from a std::pmr::vector", "[sec21][numeric]") 
+#endif
+TEST_CASE("create a vector from a std::pmr::vector and wrap allocator", "[sec21][numeric]") 
 {
    using namespace sec21::numeric;
 
    std::array<std::byte, 256> buffer; 
    std::pmr::monotonic_buffer_resource res(buffer.data(), size(buffer));
    std::pmr::vector<int> input{ { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, &res };
+   using alloc_t = decltype(input)::allocator_type;
+   using allocator_wrapper_t = ublas_allocator_wrapper<alloc_t>;
 
-   auto result = make_vector<int, decltype(input)::allocator_type>(begin(input), end(input));
+   auto result = make_vector<int, allocator_wrapper_t>(begin(input), end(input));
    REQUIRE(result.size() == std::size(input));
    REQUIRE(std::equal(std::begin(result), std::end(result), std::begin(input), std::end(input)));
 }
-#endif
-
 TEST_CASE("create a vector from a std::pmr::vector with allocator wrapper", "[sec21][numeric]") 
 {
    std::array<std::byte, 256> buffer; 
    std::pmr::monotonic_buffer_resource res(buffer.data(), size(buffer));
    std::pmr::vector<int> input{ { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, &res };
-
    using alloc_t = decltype(input)::allocator_type;
-   auto result = make_vector<int, ublas_allocator_wrapper<alloc_t>>(begin(input), end(input));
+   using allocator_wrapper_t = ublas_allocator_wrapper<alloc_t>;
+
+   auto result = make_vector<int, allocator_wrapper_t>(begin(input), end(input));
    REQUIRE(result.size() == std::size(input));
    REQUIRE(std::equal(std::begin(result), std::end(result), std::begin(input), std::end(input)));
 }
