@@ -37,6 +37,13 @@ TEST_CASE("create a matrix from a std::pmr::vector", "[sec21][numeric]")
    REQUIRE(result.size1() * result.size2() == std::size(input));
 }
 #endif
+TEST_CASE("create a matrix with dimension and initial value and wrap allocator", "[sec21][numeric]") 
+{
+   using allocator_wrapper_t = ublas_allocator_wrapper<std::allocator<int>>;
+
+   auto result = make_matrix<int, allocator_wrapper_t>(5, 3, {});
+   REQUIRE(result.size1() * result.size2() == 15);
+}
 TEST_CASE("create a matrix from a std::vector and wrap allocator", "[sec21][numeric]") 
 {
    const auto input = std::vector{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
