@@ -22,6 +22,17 @@ namespace sec21::structural_analysis
    };
 
    template <>
+   struct descriptor_traits<std::size_t>
+   {
+      using type_t = std::size_t;
+
+      static constexpr auto invalid() noexcept -> type_t
+      {
+         return std::numeric_limits<type_t>::max();
+      }
+   };
+
+   template <>
    struct descriptor_traits<std::string>
    {
       using type_t = std::string;
