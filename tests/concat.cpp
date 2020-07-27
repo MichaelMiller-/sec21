@@ -1,4 +1,3 @@
-#define CATCH_CONFIG_MAIN
 #include <catch.hpp>
 
 #include <sec21/concat.h>
@@ -9,14 +8,14 @@ struct foo
    int y{ 0 };
 };
 
-#include <ostream>
-
+// needed for catch output formater
 template <typename CharT, typename Traits>
-std::basic_ostream<CharT, Traits>& operator << (std::basic_ostream<CharT, Traits>& os, foo const& f) {
+std::basic_ostream<CharT, Traits>& operator << (std::basic_ostream<CharT, Traits>& os, foo const& f) 
+{
    return os << '(' << f.x << ", " << f.y << ")";
 }
 
-TEST_CASE("concat string-convertible objects", " [sec21][core]")
+TEST_CASE("concat string-convertible objects", "[sec21][core]")
 {
    using namespace sec21;
 
