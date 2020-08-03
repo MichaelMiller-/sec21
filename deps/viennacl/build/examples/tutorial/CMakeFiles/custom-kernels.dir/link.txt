@@ -1,1 +1,0 @@
-/usr/bin/c++    -rdynamic CMakeFiles/custom-kernels.dir/custom-kernels.cpp.o  -o custom-kernels 

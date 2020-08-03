@@ -1,1 +1,0 @@
-/usr/bin/c++    -rdynamic CMakeFiles/wrap-host-buffer.dir/wrap-host-buffer.cpp.o  -o wrap-host-buffer 

@@ -1,1 +1,0 @@
-/usr/bin/c++    -rdynamic CMakeFiles/matrix-free.dir/matrix-free.cpp.o  -o matrix-free 
