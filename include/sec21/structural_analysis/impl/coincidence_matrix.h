@@ -25,7 +25,7 @@ namespace sec21::structural_analysis::impl
 
       auto find_node = [&sys](auto const& id)
       {
-         const auto it = std::find_if(begin(sys.nodes), end(sys.nodes), [&id](auto&& e) { return id == e.id; });
+         const auto it = std::find_if(begin(sys.nodes), end(sys.nodes), [&id](auto&& e) { return id == e.name; });
          if (it == end(sys.nodes))
 #ifdef __cpp_lib_format
             throw std::runtime_error(std::format("coincidence_matrix: could not find node id {}", id));
@@ -49,11 +49,5 @@ namespace sec21::structural_analysis::impl
       result(2, (v * dim) + 0) = 1;
       result(3, (v * dim) + 1) = 1;
       return result;
-   }
-
-   template <SpaceTruss2D System>
-   [[nodiscard]] auto coincidence_matrix(System const& sys, typename System::member_descriptor_t id) 
-   {
-      return coincidence_matrix<std::allocator<int>>(sys, id);
    }
 }

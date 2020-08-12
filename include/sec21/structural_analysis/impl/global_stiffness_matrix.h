@@ -7,7 +7,7 @@ namespace sec21::structural_analysis::impl
 {
    //! \brief "globale" Systemsteifigkeitsmatrix (K_f) ohne Berücksichtigung der Auflagerbedingungen
    template <typename Allocator, typename System>
-   [[nodiscard]] auto global_stiffness_matrix(System const& sys) -> boost::numeric::ublas::matrix<typename System::precision_t>
+   [[nodiscard]] auto global_stiffness_matrix(System const& sys) 
    {
       using precision_t = typename System::precision_t;
 
@@ -19,14 +19,8 @@ namespace sec21::structural_analysis::impl
 
       //! \todo parallelize 
       for (auto const& member : sys.members)
-         result += stiffness_matrix<Allocator>(sys, member.id);
+         result += stiffness_matrix<Allocator>(sys, member.name);
 
       return result;
-   }
-
-   template <typename System>
-   [[nodiscard]] auto global_stiffness_matrix(System const& sys) -> boost::numeric::ublas::matrix<typename System::precision_t>
-   {
-      return global_stiffness_matrix<std::allocator<typename System::precision_t>>(sys);
    }
 }

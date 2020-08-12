@@ -18,29 +18,17 @@ namespace sec21::structural_analysis::impl
 
       using precision_t = typename System::precision_t;
       
-      const auto it = std::find_if(begin(sys.members), end(sys.members), [&id](auto && e) { return id == e.id; }); 
+      const auto it = std::find_if(begin(sys.members), end(sys.members), [&id](auto && e) { return id == e.name; }); 
       if (it == std::end(sys.members))
          throw std::runtime_error("stiffness_matrix: member not found");
 
       const auto n = std::size(sys.nodes) * dim;
       auto result = numeric::make_matrix<precision_t, Allocator>(n, n, 0);
-
-      // using allocator_t = numeric::ublas_allocator_wrapper<std::pmr::polymorphic_allocator<double>>;
-      using allocator_t = std::allocator<double>;
-
-      auto K = steifigkeitsbeziehung_fachwerkstab_globalen_koordinaten(sys, it->id);
-      auto Z = coincidence_matrix(sys, it->id);
-      ublas::matrix<precision_t> Z_transposed = ublas::trans(Z);
-      ublas::matrix<precision_t> K_1 = ublas::prod(Z_transposed, K);
-      //! \todo use opb_prod() or axpy_prod() -> benchmark
-      // ublas::opb_prod(ublas::prod(Z_transposed, K), Z, result, false);
+      auto K = steifigkeitsbeziehung_fachwerkstab_globalen_koordinaten<Allocator>(sys, it->name);
+      auto Z = coincidence_matrix<Allocator>(sys, it->name);
+      decltype(result) K_1 = ublas::prod(ublas::trans(Z), K);
+      
       result = ublas::prod(K_1, Z);
       return result;
    }
-   
-   template <typename System>
-   [[nodiscard]] auto stiffness_matrix(System const& sys, typename System::member_descriptor_t id) 
-   {
-      return stiffness_matrix<std::allocator<typename System::precision_t>>(sys, id);
-   }   
 }

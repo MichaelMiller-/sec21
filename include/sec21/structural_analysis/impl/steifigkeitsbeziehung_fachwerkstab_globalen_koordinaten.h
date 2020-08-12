@@ -3,7 +3,6 @@
 #include <sec21/numeric/make_matrix.h>
 #include <sec21/structural_analysis/common.h>
 #include <sec21/structural_analysis/impl/geometry.h>
-#include <sec21/structural_analysis/impl/matrix_helper.h>
 
 #include <boost/math/special_functions/sin_pi.hpp>
 #include <boost/math/special_functions/cos_pi.hpp>
@@ -35,12 +34,12 @@ namespace sec21::structural_analysis::impl
       auto it = std::find_if(
          std::begin(sys.members), 
          std::end(sys.members), 
-         [&id](auto&& m) { return m.id == id; });
+         [&id](auto&& m) { return m.name == id; });
 
       if (it == std::end(sys.members))
          throw std::invalid_argument("invalid member descriptor"); //fmt::format("invalid member descriptor: {}"), id);
 
-      const auto kv = EA_over_l(it->E, it->A, length(sys, it->id)).value();
+      const auto kv = EA_over_l(it->E, it->A, length(sys, it->name)).value();
 
       using namespace boost::math;
       //! \note this approch (rad / pi) get better results -> so the minimal overhead is tolerable
@@ -61,7 +60,7 @@ namespace sec21::structural_analysis::impl
       }
 
       // clang-format off
-      const auto values = std::vector<precision_t, Allocator>{
+      const auto values = {
          (c * c) * kv,  (s * c) * kv, (-c * c) * kv, (-s * c) * kv,
          (s * c) * kv,  (s * s) * kv, (-s * c) * kv, (-s * s) * kv,
          (-c * c) * kv, (-s * c) * kv,  (c * c) * kv,  (s * c) * kv,
@@ -69,15 +68,5 @@ namespace sec21::structural_analysis::impl
       };
       // clang-format on
       return numeric::make_matrix<Allocator>(4, 4, std::begin(values), std::end(values));
-   }
-
-   template <typename System>
-   [[nodiscard]] auto steifigkeitsbeziehung_fachwerkstab_globalen_koordinaten(
-      System const& sys,
-      typename System::member_descriptor_t id)
-   {
-      using allocator_t = std::allocator<double>;
-
-      return steifigkeitsbeziehung_fachwerkstab_globalen_koordinaten<allocator_t>(sys, id);
    }
 }
