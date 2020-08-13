@@ -32,7 +32,7 @@ TEST_CASE("add member to system", "[sec21][structural_analysis][space_truss]")
       REQUIRE(static_cast<bool>(n2) == true);
       REQUIRE(n2.value() == 2);
 
-      auto m1 = add_member(sys, n1.value(), n2.value(), { std::numeric_limits<std::size_t>::max(), 1.0, 1.0 });
+      auto m1 = add_member(sys, n1.value(), n2.value(), { std::numeric_limits<int>::max(), 1.0, 1.0 });
       REQUIRE(static_cast<bool>(m1) == false);
    }
    SECTION("add two member with the same id")
