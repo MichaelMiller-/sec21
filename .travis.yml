@@ -9,22 +9,18 @@ matrix:
       apt:
         update: true
         sources:
-          #- sourceline: 'ppa:mhier/libboost-latest'
           - ubuntu-toolchain-r-test
         packages:
           - g++-9
-          #- libboost-dev
-  # - os: linux
-  #   env: COMPILER=g++-10
-  #   addons:
-  #     apt:
-  #       update: true
-  #       sources:
-  #       #   #- sourceline: 'ppa:mhier/libboost-latest'
-  #         - ubuntu-toolchain-r-test
-  #       packages:
-  #         - g++-10
-          #- libboost-dev
+  - os: linux
+    env: COMPILER=g++-10
+    addons:
+      apt:
+        update: true
+        sources:
+          - ubuntu-toolchain-r-test
+        packages:
+          - g++-10
   # - os: linux
   #   env: COMPILER=clang++-9.0
   #   addons:
