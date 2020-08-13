@@ -104,134 +104,134 @@
     "members": [
         {
             "E": {
-                "quantity": "1.0_kPa"
+                "quantity": "200000.0_kPa"
             },
             "A": {
-                "quantity": "200000.0_sq_m"
+                "quantity": "1.0_sq_m"
             },
-            "id": 1
+            "name": 1
         },
         {
             "E": {
-                "quantity": "1.0_kPa"
+                "quantity": "200000.0_kPa"
             },
             "A": {
-                "quantity": "200000.0_sq_m"
+                "quantity": "1.0_sq_m"
             },
-            "id": 2
+            "name": 2
         },
         {
             "E": {
-                "quantity": "1.0_kPa"
+                "quantity": "200000.0_kPa"
             },
             "A": {
-                "quantity": "200000.0_sq_m"
+                "quantity": "1.0_sq_m"
             },
-            "id": 3
+            "name": 3
         },
         {
             "E": {
-                "quantity": "1.0_kPa"
+                "quantity": "200000.0_kPa"
             },
             "A": {
-                "quantity": "200000.0_sq_m"
+                "quantity": "1.0_sq_m"
             },
-            "id": 4
+            "name": 4
         },
         {
             "E": {
-                "quantity": "1.0_kPa"
+                "quantity": "200000.0_kPa"
             },
             "A": {
-                "quantity": "200000.0_sq_m"
+                "quantity": "1.0_sq_m"
             },
-            "id": 5
+            "name": 5
         },
         {
             "E": {
-                "quantity": "1.0_kPa"
+                "quantity": "200000.0_kPa"
             },
             "A": {
-                "quantity": "200000.0_sq_m"
+                "quantity": "1.0_sq_m"
             },
-            "id": 6
+            "name": 6
         },
         {
             "E": {
-                "quantity": "1.0_kPa"
+                "quantity": "200000.0_kPa"
             },
             "A": {
-                "quantity": "200000.0_sq_m"
+                "quantity": "1.0_sq_m"
             },
-            "id": 7
+            "name": 7
         },
         {
             "E": {
-                "quantity": "1.0_kPa"
+                "quantity": "200000.0_kPa"
             },
             "A": {
-                "quantity": "200000.0_sq_m"
+                "quantity": "1.0_sq_m"
             },
-            "id": 8
+            "name": 8
         },
         {
             "E": {
-                "quantity": "1.0_kPa"
+                "quantity": "200000.0_kPa"
             },
             "A": {
-                "quantity": "200000.0_sq_m"
+                "quantity": "1.0_sq_m"
             },
-            "id": 9
+            "name": 9
         },
         {
             "E": {
-                "quantity": "1.0_kPa"
+                "quantity": "200000.0_kPa"
             },
             "A": {
-                "quantity": "200000.0_sq_m"
+                "quantity": "1.0_sq_m"
             },
-            "id": 10
+            "name": 10
         },
         {
             "E": {
-                "quantity": "1.0_kPa"
+                "quantity": "200000.0_kPa"
             },
             "A": {
-                "quantity": "200000.0_sq_m"
+                "quantity": "1.0_sq_m"
             },
-            "id": 11
+            "name": 11
         },
         {
             "E": {
-                "quantity": "1.0_kPa"
+                "quantity": "200000.0_kPa"
             },
             "A": {
-                "quantity": "200000.0_sq_m"
+                "quantity": "1.0_sq_m"
             },
-            "id": 12
+            "name": 12
         },
         {
             "E": {
-                "quantity": "1.0_kPa"
+                "quantity": "200000.0_kPa"
             },
             "A": {
-                "quantity": "200000.0_sq_m"
+                "quantity": "1.0_sq_m"
             },
-            "id": 13
+            "name": 13
         },
         {
             "E": {
-                "quantity": "1.0_kPa"
+                "quantity": "200000.0_kPa"
             },
             "A": {
-                "quantity": "200000.0_sq_m"
+                "quantity": "1.0_sq_m"
             },
-            "id": 14
+            "name": 14
         }
     ],
     "nodes": [
         {
-            "id": 1,
+            "name": 1,
             "position": {
                 "x": 3.0,
                 "y": 0.0
@@ -242,7 +242,7 @@
             }
         },
         {
-            "id": 2,
+            "name": 2,
             "position": {
                 "x": 11.0,
                 "y": 0.0
@@ -253,7 +253,7 @@
             }
         },
         {
-            "id": 3,
+            "name": 3,
             "position": {
                 "x": 0.0,
                 "y": 5.0
@@ -261,7 +261,7 @@
             "global_support": null
         },
         {
-            "id": 4,
+            "name": 4,
             "position": {
                 "x": 3.0,
                 "y": 5.0
@@ -269,7 +269,7 @@
             "global_support": null
         },
         {
-            "id": 5,
+            "name": 5,
             "position": {
                 "x": 11.0,
                 "y": 5.0
@@ -277,7 +277,7 @@
             "global_support": null
         },
         {
-            "id": 6,
+            "name": 6,
             "position": {
                 "x": 14.0,
                 "y": 5.0
@@ -285,7 +285,7 @@
             "global_support": null
         },
         {
-            "id": 7,
+            "name": 7,
             "position": {
                 "x": 3.0,
                 "y": 8.0
@@ -293,7 +293,7 @@
             "global_support": null
         },
         {
-            "id": 8,
+            "name": 8,
             "position": {
                 "x": 7.0,
                 "y": 8.0
@@ -301,7 +301,7 @@
             "global_support": null
         },
         {
-            "id": 9,
+            "name": 9,
             "position": {
                 "x": 11.0,
                 "y": 8.0

@@ -80,7 +80,7 @@
             "A": {
                 "quantity": "65973.0_sq_m"
             },
-            "id": 1
+            "name": 1
         },
         {
             "E": {
@@ -89,7 +89,7 @@
             "A": {
                 "quantity": "65973.0_sq_m"
             },
-            "id": 2
+            "name": 2
         },
         {
             "E": {
@@ -98,7 +98,7 @@
             "A": {
                 "quantity": "65973.0_sq_m"
             },
-            "id": 3
+            "name": 3
         },
         {
             "E": {
@@ -107,7 +107,7 @@
             "A": {
                 "quantity": "65973.0_sq_m"
             },
-            "id": 4
+            "name": 4
         },
         {
             "E": {
@@ -116,7 +116,7 @@
             "A": {
                 "quantity": "65973.0_sq_m"
             },
-            "id": 5
+            "name": 5
         },
         {
             "E": {
@@ -125,7 +125,7 @@
             "A": {
                 "quantity": "65973.0_sq_m"
             },
-            "id": 6
+            "name": 6
         },
         {
             "E": {
@@ -134,7 +134,7 @@
             "A": {
                 "quantity": "65973.0_sq_m"
             },
-            "id": 7
+            "name": 7
         },
         {
             "E": {
@@ -143,7 +143,7 @@
             "A": {
                 "quantity": "65973.0_sq_m"
             },
-            "id": 8
+            "name": 8
         },
         {
             "E": {
@@ -152,7 +152,7 @@
             "A": {
                 "quantity": "65973.0_sq_m"
             },
-            "id": 9
+            "name": 9
         },
         {
             "E": {
@@ -161,12 +161,12 @@
             "A": {
                 "quantity": "65973.0_sq_m"
             },
-            "id": 10
+            "name": 10
         }
     ],
     "nodes": [
         {
-            "id": 1,
+            "name": 1,
             "position": {
                 "x": 0.0,
                 "y": 0.0
@@ -177,7 +177,7 @@
             }
         },
         {
-            "id": 2,
+            "name": 2,
             "position": {
                 "x": 10.0,
                 "y": 0.0
@@ -188,7 +188,7 @@
             }
         },
         {
-            "id": 3,
+            "name": 3,
             "position": {
                 "x": 0.0,
                 "y": 5.0
@@ -196,7 +196,7 @@
             "global_support": null
         },
         {
-            "id": 4,
+            "name": 4,
             "position": {
                 "x": 3.0,
                 "y": 5.0
@@ -204,7 +204,7 @@
             "global_support": null
         },
         {
-            "id": 5,
+            "name": 5,
             "position": {
                 "x": 7.0,
                 "y": 5.0
@@ -212,7 +212,7 @@
             "global_support": null
         },
         {
-            "id": 6,
+            "name": 6,
             "position": {
                 "x": 10.0,
                 "y": 5.0
@@ -220,7 +220,7 @@
             "global_support": null
         },        
         {
-            "id": 7,
+            "name": 7,
             "position": {
                 "x": 5.0,
                 "y": 7.0
