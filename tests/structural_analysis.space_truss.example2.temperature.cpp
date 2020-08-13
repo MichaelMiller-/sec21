@@ -2,11 +2,10 @@
 #include "approx_equal.h"
 
 #include <sec21/file_loader.h>
-#include <sec21/flat_matrix.h>
-#include <sec21/structural_analysis/space_truss.h>
 #include <sec21/structural_analysis/loadcase.h>
-#include <sec21/structural_analysis/system_result.h>
 #include <sec21/structural_analysis/solve.h>
+#include <sec21/structural_analysis/space_truss.h>
+#include <sec21/structural_analysis/system_result.h>
 
 #include <array>
 

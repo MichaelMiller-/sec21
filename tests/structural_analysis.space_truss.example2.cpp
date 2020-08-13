@@ -2,11 +2,12 @@
 #include "approx_equal.h"
 
 #include <sec21/file_loader.h>
-#include <sec21/flat_matrix.h>
-#include <sec21/structural_analysis/space_truss.h>
+#include <sec21/numeric/flatten.h>
+#include <sec21/numeric/ublas_allocator_wrapper.h>
 #include <sec21/structural_analysis/loadcase.h>
-#include <sec21/structural_analysis/system_result.h>
 #include <sec21/structural_analysis/solve.h>
+#include <sec21/structural_analysis/space_truss.h>
+#include <sec21/structural_analysis/system_result.h>
 
 #include <array>
 #include <valarray>
@@ -26,85 +27,91 @@ TEST_CASE("example system 2.0 load from json", "[sec21][structural_analysis][spa
 
    SECTION("coincidence matrix from member 1")
    {
-      auto Z = impl::coincidence_matrix(sys, 1);
+      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<double>>;
+      auto Z = impl::coincidence_matrix<allocator_t>(sys, 1);
       REQUIRE(Z.size1() == 4);
       REQUIRE(Z.size2() == 8);
-      //! \clang-format off
+      // clang-format off
       const auto expected = std::array{
          1, 0, 0, 0, 0, 0, 0, 0,
          0, 1, 0, 0, 0, 0, 0, 0,
          0, 0, 1, 0, 0, 0, 0, 0,
          0, 0, 0, 1, 0, 0, 0, 0,
       };
-      //! \clang-format on
-      REQUIRE(approx_equal(sec21::flat_matrix(Z), expected, kDivergence));
+      // clang-format on
+      REQUIRE(approx_equal(sec21::numeric::flatten(Z), expected, kDivergence));
    }
    SECTION("coincidence matrix from member 2")
    {
-      auto Z = impl::coincidence_matrix(sys, 2);
+      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<double>>;
+      auto Z = impl::coincidence_matrix<allocator_t>(sys, 2);
       REQUIRE(Z.size1() == 4);
       REQUIRE(Z.size2() == 8);
-      //! \clang-format off
+      // clang-format off
       const auto expected = std::array{
          1, 0, 0, 0, 0, 0, 0, 0,
          0, 1, 0, 0, 0, 0, 0, 0,
          0, 0, 0, 0, 1, 0, 0, 0,
          0, 0, 0, 0, 0, 1, 0, 0,
       };
-      //! \clang-format on
-      REQUIRE(approx_equal(sec21::flat_matrix(Z), expected, kDivergence));
+      // clang-format on
+      REQUIRE(approx_equal(sec21::numeric::flatten(Z), expected, kDivergence));
    }
    SECTION("coincidence matrix from member 3")
    {
-      auto Z = impl::coincidence_matrix(sys, 3);
+      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<double>>;
+      auto Z = impl::coincidence_matrix<allocator_t>(sys, 3);
       REQUIRE(Z.size1() == 4);
       REQUIRE(Z.size2() == 8);
-      //! \clang-format off
+      // clang-format off
       const auto expected = std::array{
          0, 0, 1, 0, 0, 0, 0, 0,
          0, 0, 0, 1, 0, 0, 0, 0,
          0, 0, 0, 0, 1, 0, 0, 0,
          0, 0, 0, 0, 0, 1, 0, 0,
       };
-      //! \clang-format on
-      REQUIRE(approx_equal(sec21::flat_matrix(Z), expected, kDivergence));
+      // clang-format on
+      REQUIRE(approx_equal(sec21::numeric::flatten(Z), expected, kDivergence));
    }
    SECTION("coincidence matrix from member 4")
    {
-      auto Z = impl::coincidence_matrix(sys, 4);
+      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<double>>;
+      auto Z = impl::coincidence_matrix<allocator_t>(sys, 4);
       REQUIRE(Z.size1() == 4);
       REQUIRE(Z.size2() == 8);
-      //! \clang-format off
+      // clang-format off
       const auto expected = std::array{
          0, 0, 1, 0, 0, 0, 0, 0,
          0, 0, 0, 1, 0, 0, 0, 0,
          0, 0, 0, 0, 0, 0, 1, 0,
          0, 0, 0, 0, 0, 0, 0, 1,
       };
-      //! \clang-format on
-      REQUIRE(approx_equal(sec21::flat_matrix(Z), expected, kDivergence));
+      // clang-format on
+      REQUIRE(approx_equal(sec21::numeric::flatten(Z), expected, kDivergence));
    }
    SECTION("coincidence matrix from member 5")
    {
-      auto Z = impl::coincidence_matrix(sys, 5);
+      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<double>>;
+      auto Z = impl::coincidence_matrix<allocator_t>(sys, 5);
       REQUIRE(Z.size1() == 4);
       REQUIRE(Z.size2() == 8);
-      //! \clang-format off
+      // clang-format off
       const auto expected = std::array{
          0, 0, 0, 0, 1, 0, 0, 0,
          0, 0, 0, 0, 0, 1, 0, 0,
          0, 0, 0, 0, 0, 0, 1, 0,
          0, 0, 0, 0, 0, 0, 0, 1,
       };
-      //! \clang-format on
-      REQUIRE(approx_equal(sec21::flat_matrix(Z), expected, kDivergence));
+      // clang-format on
+      REQUIRE(approx_equal(sec21::numeric::flatten(Z), expected, kDivergence));
    }
    SECTION("stiffness matrix from member 1")
    {
-      auto K = impl::stiffness_matrix(sys, 1);
+      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<double>>;
+      auto K = impl::stiffness_matrix<allocator_t>(sys, 1);
       REQUIRE(K.size1() == 8);
       REQUIRE(K.size2() == 8);
-      //! \clang-format off
+      // clang-format off
       auto expected = std::valarray{
          1.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
          0.0, 0.0,  0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -117,17 +124,18 @@ TEST_CASE("example system 2.0 load from json", "[sec21][structural_analysis][spa
       };
       const auto EA_l = 1000.0;
       expected *= EA_l;
-      //! \clang-format on
-      const auto flattend_K = sec21::flat_matrix(K);
+      // clang-format on
+      const auto flattend_K = sec21::numeric::flatten(K);
       REQUIRE(std::size(flattend_K) == std::size(expected));
       REQUIRE(approx_equal(flattend_K, expected, kDivergence));
    }
    SECTION("stiffness matrix from member 4")
    {
-      auto K = impl::stiffness_matrix(sys, 4);
+      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<double>>;
+      auto K = impl::stiffness_matrix<allocator_t>(sys, 4);
       REQUIRE(K.size1() == 8);
       REQUIRE(K.size2() == 8);
-      //! \clang-format off
+      // clang-format off
       auto expected = std::valarray{
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -140,8 +148,8 @@ TEST_CASE("example system 2.0 load from json", "[sec21][structural_analysis][spa
       };
       const auto EA_l = 1000.0;
       expected *= EA_l;
-      //! \clang-format on
-      const auto flattend_K = sec21::flat_matrix(K);
+      // clang-format on
+      const auto flattend_K = sec21::numeric::flatten(K);
       REQUIRE(std::size(flattend_K) == std::size(expected));
       REQUIRE(approx_equal(flattend_K, expected, kDivergence));
    }
