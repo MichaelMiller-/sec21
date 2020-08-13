@@ -56,6 +56,11 @@ namespace sec21::structural_analysis
       }
    };
 
+   template <typename Force = units::quantity<units::newton, double> >
+   struct member_result
+   {
+      Force normal_force{};
+   };
 
    template <typename System>
    struct system_result
@@ -71,6 +76,8 @@ namespace sec21::structural_analysis
       using displacement_t = units::quantity<units::millimeter, precision_t>;
       using force_t = units::quantity<units::newton, precision_t>;
 
+      using member_result_t = member_result<force_t>;
+
       struct node_result
       {
          std::array<displacement_t, dimension_v> displacement{};
@@ -78,20 +85,16 @@ namespace sec21::structural_analysis
          //! \todo or boost::qvm
          // boost::qvm::vec<displacement_t, dimension_v> displacement{};
       };
-      struct member_result
-      {
-         force_t normal_force{};
-      };
 
       //! \todo decide which approch
       std::map<node_descriptor_t, node_result> node;
-      std::map<member_descriptor_t, member_result> member;
+      std::map<member_descriptor_t, member_result_t> member;
 
       using node_result_t = node_result_2<node_descriptor_t, displacement_t, force_t, dimension_v>;
-      using member_result_t = member_result_2<member_descriptor_t, force_t>;
+      using member_result_set_t = member_result_2<member_descriptor_t, force_t>;
 
       std::set<node_result_t, node_result_transparent_comparator> nodes;
-      std::set<member_result_t> members;
+      std::set<member_result_set_t> members;
    };
 }
 

@@ -1,15 +1,14 @@
 #pragma once
 
 #include <type_traits>
-// #include <sec21/units.h>
 
 namespace sec21::structural_analysis
 {
    // forward declaration
-   //! \todo units::Scalar
-   template <auto Dimension, typename Precision>
+   template <auto Dimension, typename Descriptor, typename Precision>
    struct node;
 
+   template <typename Descriptor, typename Precision>
    struct member;
 
    struct space_truss;
@@ -18,17 +17,14 @@ namespace sec21::structural_analysis
    template <typename T>
    struct is_node : std::false_type {};
 
-   template <auto Dimension, typename Precision>
-   struct is_node<node<Dimension, Precision>> : std::true_type {};
-
-   // template <typename T>
-   // constexpr bool is_node_v = is_node<T>::value;
+   template <auto Dimension, typename Descriptor, typename Precision>
+   struct is_node<node<Dimension, Descriptor, Precision>> : std::true_type {};
 
    template <typename T>
-   struct is_member : std::is_same<T, member> {};
+   struct is_member : std::false_type {};
 
-   // template <typename T>
-   // constexpr bool is_member_v = is_member<T>::value;
+   template <typename Descriptor, typename Precision>
+   struct is_member<member<Descriptor, Precision>> : std::true_type {};
 
    template <typename T>
    struct is_space_truss : std::is_same<T, space_truss> {};

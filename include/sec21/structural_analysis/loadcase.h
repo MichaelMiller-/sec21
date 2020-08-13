@@ -11,7 +11,8 @@
 
 namespace sec21::structural_analysis
 {
-   template <SpaceTruss System>
+   // template <SpaceTruss System>
+   template <typename System>
    struct temperature_load
    {
       using member_descriptor_t = typename System::member_descriptor_t;
@@ -24,7 +25,8 @@ namespace sec21::structural_analysis
       precision_t alpha_t;
    };
 
-   template <SpaceTruss2D System>
+   //! \todo template <SpaceTruss2D System>
+   template <typename System>
    struct loadcase
    {
       static constexpr auto dimension_v = System::dimension_v;
@@ -37,36 +39,42 @@ namespace sec21::structural_analysis
 
       std::string name{};
       //! \todo could be a std::variant
-      std::vector<std::pair<node_descriptor_t, load_t>> node_load;
-      std::vector<temperature_load_t> temperature_loads;
+      //! \todo decide pair<id, load> or id inside load
+      std::vector<std::pair<node_descriptor_t, load_t>> node_load{};
+      std::vector<temperature_load_t> temperature_loads{};
    };
 
-   template <typename System, typename Unit>
-   auto add_node_load(System const& sys, loadcase<System> const& load, std::vector<Unit>& F)
+   //! \todo remove template parameter LoadPair
+   template <typename System, typename LoadPair, typename Iterator>
+   auto copy_load(System const& sys, LoadPair const& load, Iterator first)
    {
       constexpr auto dim = System::dimension_v;
-      //! \todo std::for_each(std::execution::par
-      for (auto const& lf : load.node_load)
-      {
-         const auto it = std::find_if(
-            begin(sys.nodes), 
-            end(sys.nodes), 
-            [id = lf.first](auto const& m){ return m.id == id; });
+      const auto it = std::find_if(
+         begin(sys.nodes), 
+         end(sys.nodes), 
+         [&load](auto const& m){ return m.name == load.first; });
 
-         if (it == end(sys.nodes))
-            throw std::invalid_argument("invalid node id");
+      if (it == end(sys.nodes))
+         throw std::invalid_argument("invalid node id");
 
-         const auto pos = std::distance(begin(sys.nodes), it) * dim;
+      const auto pos = std::distance(begin(sys.nodes), it) * dim;
 
-         auto output_iterator = std::begin(F);
-         std::advance(output_iterator, pos);
-
-         std::copy(begin(lf.second), end(lf.second), output_iterator);
-      }
+      std::advance(first, pos);
+      std::copy(begin(load.second), end(load.second), first);
    }
 
+   template <typename System, typename Unit, typename Allocator>
+   auto add_node_load(System const& sys, loadcase<System> const& load, std::vector<Unit, Allocator>& F)
+   {
+      // constexpr auto dim = System::dimension_v;
+      //! \todo std::for_each(std::execution::par
+      for (auto const& lf : load.node_load)
+         copy_load(sys, lf, std::begin(F));
+   }
+
+#if 0
    template <typename System, typename Unit>
-   auto add_temperature_load(System const& sys, loadcase<System> const& load, std::vector<Unit>& F)
+   [[deprecated]] auto add_temperature_load(System const& sys, loadcase<System> const& load, std::vector<Unit>& F)
    {
       constexpr auto dim = System::dimension_v;
       //! \todo std::for_each(std::execution::par
@@ -81,7 +89,6 @@ namespace sec21::structural_analysis
             throw std::invalid_argument("member id not found");
 
          const auto [s, e] = sys.coincidence_table.at(lf.member_id);
-         const auto equivalent_force = it->E * it->A * lf.delta_t * lf.alpha_t;
 
          const auto from = std::find_if(
             begin(sys.nodes), 
@@ -93,11 +100,13 @@ namespace sec21::structural_analysis
             end(sys.nodes), 
             [e](auto const& n){ return n.id == e; });
 
-         const auto d1 = std::distance(std::begin(sys.nodes), from);
-         const auto d2 = std::distance(std::begin(sys.nodes), to);
+         const auto d1 = std::distance(begin(sys.nodes), from);
+         const auto d2 = std::distance(begin(sys.nodes), to);
          //! \todo error handling
 
          const auto alpha = impl::angle_to_x_axis(*from, *to);
+
+         const auto equivalent_force = it->E * it->A * lf.delta_t * lf.alpha_t;
          //! \todo use unit system
          //! \todo use operator += 
          F[d1 * dim + 0] = std::cos(alpha) * -equivalent_force.value();
@@ -106,6 +115,56 @@ namespace sec21::structural_analysis
          F[d2 * dim + 1] = std::sin(alpha) * equivalent_force.value();
       }
    }
+#endif
+   template <typename System, typename Iterator>
+   auto add_temperature_load(System const& sys, loadcase<System> const& load, Iterator first)
+   {
+      constexpr auto dim = System::dimension_v;
+      //! \todo std::for_each(std::execution::par
+      for (auto const& lf : load.temperature_loads)
+      {
+         const auto it = std::find_if(
+            begin(sys.members), 
+            end(sys.members), 
+            [id = lf.member_id](auto const& m){ return m.name == id; });
+
+         if (it == std::end(sys.members))
+            throw std::invalid_argument("member id not found");
+
+         const auto [s, e] = sys.coincidence_table.at(lf.member_id);
+
+         const auto from = std::find_if(
+            begin(sys.nodes), 
+            end(sys.nodes), 
+            [s](auto const& n){ return n.name == s; });
+
+         const auto to = std::find_if(
+            begin(sys.nodes), 
+            end(sys.nodes), 
+            [e](auto const& n){ return n.name == e; });
+
+         //! \todo error handling
+         const auto alpha = impl::angle_to_x_axis(*from, *to);
+
+         const auto d1 = std::distance(begin(sys.nodes), from) * dim;
+         const auto d2 = std::distance(begin(sys.nodes), to) * dim;
+
+         const auto equivalent_force_unit = it->E * it->A * lf.delta_t * lf.alpha_t;
+         const auto equivalent_force = equivalent_force_unit.value();
+
+         auto first_node = first;
+         auto second_node = first;
+
+         //! \todo use unit system
+         //! \todo use operator += 
+         std::advance(first_node, d1);
+         *first_node++ = std::cos(alpha) * -equivalent_force;
+         *first_node   = std::sin(alpha) * -equivalent_force;
+         std::advance(second_node, d2);
+         *second_node++ = std::cos(alpha) * equivalent_force;
+         *second_node   = std::sin(alpha) * equivalent_force;
+      }
+   }   
 }
 
 #include <nlohmann/json.hpp>

@@ -3,6 +3,9 @@
 #include <sec21/structural_analysis/concepts.h>
 #include <sec21/structural_analysis/node.h>
 #include <sec21/structural_analysis/member.h>
+#include <sec21/structural_analysis/descriptor_traits.h>
+#include <sec21/structural_analysis/error_codes.h>
+#include <sec21/structural_analysis/cross_section.h>
 
 #include <boost/outcome.hpp>
 
@@ -21,11 +24,14 @@ namespace sec21::structural_analysis
    {
       static constexpr int dimension_v = 2;
 
+      using descriptor_t = int;
       //! \todo 2019-04-23 node and member as template parameter
       //! \todo 2019-04-27 precision_t als template parameter
       using precision_t = double;
-      using node_t = node<dimension_v>;
-      using member_t = member;
+      //! \todo node_descriptor == ->  template parameter
+      using node_t = node<dimension_v, descriptor_t, precision_t>;
+      //! \todo member descriptor == ->  template parameter
+      using member_t = member<descriptor_t>;
 
       using node_descriptor_t = node_t::descriptor_t;
       using member_descriptor_t = member_t::descriptor_t;
@@ -37,45 +43,22 @@ namespace sec21::structural_analysis
       std::map<member_descriptor_t, std::pair<node_descriptor_t, node_descriptor_t>>  coincidence_table{};
    };
 
-   inline namespace detail
-   {
-      template <typename T>
-      constexpr bool has_invalid_id(T const& v) noexcept 
-      {
-         //! \todo check via customization point
-         return v.id == std::numeric_limits<decltype(v.id)>::max();
-      }
-
-      //! \todo remove
-      template <typename Container, typename Descriptor>
-      constexpr auto get_element(Container const& c, Descriptor id) noexcept 
-      {
-         return std::find_if(std::begin(c), std::end(c), [&id](auto && e) { return id == e.id; });
-      }
-
-      template <typename Container, typename Descriptor>
-      constexpr bool valid_descriptor(Container&& c, Descriptor id) noexcept 
-      {
-         return std::find_if(std::begin(c), std::end(c), [&id](auto && e) { return id == e.id; }) != std::end(c);
-      }
-   }
-
    //! \return handle type
    template <typename System> 
    auto add_node(
       System& sys,
       typename System::node_t node) noexcept -> outcome::std_result<typename System::node_descriptor_t>
    {
-      if (detail::has_invalid_id(node))
-         //! \todo error_code::node_invalid_id
+      if (node.name == descriptor_traits<decltype(node.name)>::invalid())
+         // return error_code::invalid_node_name;
          return std::errc::invalid_argument;
 
-      if (detail::valid_descriptor(sys.nodes, node.id))
+      if (std::find_if(begin(sys.nodes), end(sys.nodes), [&](auto && e) { return node.name == e.name; }) != std::end(sys.nodes))
          //! \todo error_code::node_already_exists
          return std::errc::invalid_argument;
 
       const auto result = sys.nodes.emplace_back(std::move(node));
-      return result.id;
+      return result.name;
    }
 
    template <typename System, typename... Args>
@@ -84,7 +67,6 @@ namespace sec21::structural_analysis
       return add_node(sys, typename System::node_t{ std::forward<Args>(args)... });
    }
 
-   //! \todo 2019-04-15 check something like "system_traits" -> see graph_traits from boost
    template <typename System> //, typename... Args>
    auto add_member(
       System& sys,
@@ -92,28 +74,28 @@ namespace sec21::structural_analysis
       typename System::node_descriptor_t to,
       typename System::member_t member) noexcept -> outcome::std_result<typename System::member_descriptor_t>
    {
-      if (detail::has_invalid_id(member))
-         //! \todo error_code::invalid_id
+      if (member.name == descriptor_traits<typename System::member_descriptor_t>::invalid())
+         //! \todo error_code::invalid_descriptor
          return std::errc::invalid_argument;
 
-      const auto it_from = detail::get_element(sys.nodes, from);
-      const auto it_to = detail::get_element(sys.nodes, to);
+      const auto it_from = std::find_if(begin(sys.nodes), end(sys.nodes), [&from](auto && e) { return from == e.name; });
+      const auto it_to = std::find_if(begin(sys.nodes), end(sys.nodes), [&to](auto && e) { return to == e.name; });
 
       if (it_from == std::end(sys.nodes) || it_to == std::end(sys.nodes))
          //! \todo error_code::node_not_found
          return std::errc::invalid_argument;
 
-      if (detail::get_element(sys.members, member.id) != std::end(sys.members))
+      if (std::find_if(begin(sys.members), end(sys.members), [&member](auto && e) { return member.name == e.name; }) != end(sys.members))
          //! \todo error_code::member_already_exists
          return std::errc::invalid_argument;
 
       const auto result = sys.members.emplace_back(std::move(member));
 
-      sys.coincidence_table[result.id] = std::make_pair(from, to);
+      sys.coincidence_table[result.name] = std::make_pair(from, to);
          // std::distance<decltype(it_from)>(std::begin(sys.nodes), it_from),
          // std::distance<decltype(it_to)>(std::begin(sys.nodes), it_to));
 
-      return result.id;
+      return result.name;
    }
 
    template <typename System, typename... Args>
