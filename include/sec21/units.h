@@ -14,6 +14,7 @@
 #include <sec21/units/dimensions/mass.h>
 #include <sec21/units/dimensions/power.h>
 #include <sec21/units/dimensions/pressure.h>
+#include <sec21/units/dimensions/second_moment_of_area.h>
 #include <sec21/units/dimensions/substance.h>
 #include <sec21/units/dimensions/temperature.h>
 #include <sec21/units/dimensions/time.h>
