@@ -19,12 +19,14 @@ namespace sec21::units
    struct pascal : derived_unit<pascal, pressure, base_unit> {};
    struct kilopascal : derived_unit<kilopascal, pressure, std::kilo> {};
    struct megapascal : derived_unit<megapascal, pressure, std::mega> {};
+   struct gigapascal : derived_unit<gigapascal, pressure, std::giga> {};
 
    // stress
    struct newton_per_square_meter : derived_unit<pascal, pressure, base_unit> {};
+   struct newton_per_square_millimeter : derived_unit<pascal, pressure, std::mega> {};
    struct kilonewton_per_square_meter : derived_unit<newton_per_square_meter, pressure, std::kilo> {};
 
-   // struct psi : derived_unit<kilopascal, pressure, std::ratio<6.894757>> {};
+   //! \todo struct psi : derived_unit<kilopascal, pressure, std::ratio<6.894757>> {};
 
    template <>
    struct abbreviation<pascal>
@@ -44,13 +46,25 @@ namespace sec21::units
       using type_t = megapascal;
       constexpr static std::string_view value{"MPa"};
    };
+   template <>
+   struct abbreviation<gigapascal>
+   {
+      using type_t = gigapascal;
+      constexpr static std::string_view value{"GPa"};
+   };
    // stress
    template <>
    struct abbreviation<newton_per_square_meter>
    {
       using type_t = newton_per_square_meter;
       constexpr static std::string_view value{"N/sq_m"};
-   };   
+   };
+   template <>
+   struct abbreviation<newton_per_square_millimeter>
+   {
+      using type_t = newton_per_square_millimeter;
+      constexpr static std::string_view value{"N/sq_mm"};
+   };
    template <>
    struct abbreviation<kilonewton_per_square_meter>
    {
@@ -61,7 +75,16 @@ namespace sec21::units
    template <>
    struct type_info<pressure>
    {
-      using valid_types_t = std::tuple<pascal, kilopascal, megapascal, newton_per_square_meter, kilonewton_per_square_meter>;
+      // clang-format off
+      using valid_types_t = std::tuple<
+         pascal,
+         kilopascal,
+         megapascal,
+         gigapascal,
+         newton_per_square_meter,
+         newton_per_square_millimeter,
+         kilonewton_per_square_meter>;
+      // clang-format on
       constexpr static std::string_view name{"pressure"};
    };
 
@@ -76,9 +99,15 @@ namespace sec21::units
       constexpr auto operator "" _MPa(unsigned long long v) noexcept  { return quantity<megapascal, unsigned long long>{ v }; }
       constexpr auto operator "" _MPa(long double v) noexcept         { return quantity<megapascal, long double>{ v }; }
 
+      constexpr auto operator "" _GPa(unsigned long long v) noexcept  { return quantity<gigapascal, unsigned long long>{ v }; }
+      constexpr auto operator "" _GPa(long double v) noexcept         { return quantity<gigapascal, long double>{ v }; }
+
       // stress
       constexpr auto operator "" _N_per_sqm(unsigned long long v) noexcept  { return quantity<newton_per_square_meter, unsigned long long>{ v }; }
       constexpr auto operator "" _N_per_sqm(long double v) noexcept         { return quantity<newton_per_square_meter, long double>{ v }; }
+
+      constexpr auto operator "" _N_per_sqmm(unsigned long long v) noexcept  { return quantity<newton_per_square_millimeter, unsigned long long>{ v }; }
+      constexpr auto operator "" _N_per_sqmm(long double v) noexcept         { return quantity<newton_per_square_millimeter, long double>{ v }; }
 
       constexpr auto operator "" _kN_per_sqm(unsigned long long v) noexcept  { return quantity<kilonewton_per_square_meter, unsigned long long>{ v }; }
       constexpr auto operator "" _kN_per_sqm(long double v) noexcept         { return quantity<kilonewton_per_square_meter, long double>{ v }; }      
