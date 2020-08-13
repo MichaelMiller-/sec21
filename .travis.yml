@@ -52,8 +52,9 @@ before_install:
 - ./vcpkg install boost-math
 - ./vcpkg install boost-outcome
 - ./vcpkg install boost-program-options
-- ./vcpkg install boost-range
 - ./vcpkg install boost-qvm
+- ./vcpkg install boost-range
+- ./vcpkg install boost-ublas
 - ./vcpkg install catch2
 - ./vcpkg install glm
 - ./vcpkg install nlohmann-json
