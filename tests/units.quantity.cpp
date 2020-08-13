@@ -45,13 +45,8 @@ TEST_CASE("quantity test", "[sec21][units]")
    // assignment operator
 
    // static member functions
-   //! \todo
-   // STATIC_REQUIRE(quantity<example_unit, int>::zero().value() == 0);
    STATIC_REQUIRE(quantity<example_unit, int>::min().value() == std::numeric_limits<int>::lowest());
    STATIC_REQUIRE(quantity<example_unit, int>::max().value() == std::numeric_limits<int>::max());
-
-   //! \todo
-   // STATIC_REQUIRE(quantity<example_unit, double>::zero().value() == 0.0);
 
    STATIC_REQUIRE(quantity<example_unit, double>::min().value() == std::numeric_limits<double>::lowest());
    STATIC_REQUIRE(quantity<example_unit, double>::max().value() == std::numeric_limits<double>::max());
@@ -131,7 +126,15 @@ TEST_CASE("SI units test", "[units]")
 
    // pressure
    STATIC_REQUIRE(10_N / 10_sq_m == 1_Pa);
-   STATIC_REQUIRE(1_kPa == 1000_Pa);
+   STATIC_REQUIRE(1_kPa == 1'000_Pa);
+   STATIC_REQUIRE(1_MPa == 1'000'000_Pa);
+   STATIC_REQUIRE(1_GPa == 1'000'000'000_Pa);
+   STATIC_REQUIRE(1_N_per_sqm == 1_Pa);
+   STATIC_REQUIRE(1_N_per_sqmm == 1_MPa);
+
+   // second moment of area
+   STATIC_REQUIRE(1_m4 == 100'000'000_cm4);
+   STATIC_REQUIRE(1_m4 == 1'000'000'000'000_mm4);
 
    // energy
    STATIC_REQUIRE(10_N * 10_m == 100_J);
