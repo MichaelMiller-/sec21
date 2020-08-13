@@ -2,7 +2,6 @@
 
 #include <sec21/structural_analysis/concepts.h>
 #include <sec21/structural_analysis/node.h>
-// #include <sec21/structural_analysis/error_codes.h>
 #include <sec21/units/dimensions/length.h>
 
 #ifdef __cpp_lib_math_constants
@@ -35,10 +34,10 @@ namespace boost::qvm
 namespace sec21::structural_analysis::impl
 {
    template <auto Dimension, typename Precision>
-   [[nodiscard]] auto distance(node<Dimension, Precision> const& from, node<Dimension, Precision> const& to) -> Precision
+   [[nodiscard]] auto distance(node<Dimension, Precision> const& from, node<Dimension, Precision> const& to)
    {
       using namespace boost::qvm;
-      return { mag(to.position - from.position) };
+      return mag(to.position - from.position);
    }
 
    template <typename System>
@@ -49,12 +48,12 @@ namespace sec21::structural_analysis::impl
       const auto from = std::find_if(
          begin(sys.nodes), 
          end(sys.nodes), 
-         [s](auto const& n){ return n.id == s; });
+         [s](auto const& n){ return n.name == s; });
 
       const auto to = std::find_if(
          begin(sys.nodes), 
          end(sys.nodes), 
-         [e](auto const& n){ return n.id == e; });
+         [e](auto const& n){ return n.name == e; });
 
       if (from == end(sys.nodes) || to == end(sys.nodes))
          throw std::invalid_argument("invalid node reference");
@@ -118,12 +117,12 @@ namespace sec21::structural_analysis::impl
       const auto from = std::find_if(
          begin(sys.nodes), 
          end(sys.nodes), 
-         [s](auto const& n){ return n.id == s; });
+         [s](auto const& n){ return n.name == s; });
 
       const auto to = std::find_if(
          begin(sys.nodes), 
          end(sys.nodes), 
-         [e](auto const& n){ return n.id == e; });
+         [e](auto const& n){ return n.name == e; });
 
       if (from == end(sys.nodes) || to == end(sys.nodes))
          throw std::invalid_argument("invalid node reference");
