@@ -2,6 +2,7 @@
 
 #include <sec21/units.h>
 #include <sec21/strong_type.h>
+#include <sec21/structural_analysis/descriptor_traits.h>
 #include <sec21/structural_analysis/support.h>
 
 #include <type_traits>
@@ -11,7 +12,7 @@
 
 namespace sec21::structural_analysis
 {
-   template <auto Dimension, typename Precision = double>
+   template <auto Dimension, typename Descriptor = int, typename Precision = double>
    struct node
    {
       static_assert(Dimension == 2, "Only works in 2D just yet");
@@ -20,14 +21,14 @@ namespace sec21::structural_analysis
 
       constexpr static auto dimension_v = Dimension;
 
-      using descriptor_t = size_t;
+      using descriptor_t = Descriptor;
       using precision_t = Precision;
 
       using point_t = std::array<precision_t, dimension_v>;
       using global_support_t = support<dimension_v>;
 
-      //! \todo 2019-04-23 use strong_type
-      descriptor_t id{ std::numeric_limits<descriptor_t>::max() };
+      //! \brief unique name
+      descriptor_t name{ descriptor_traits<descriptor_t>::invalid() };
       //! \brief World Position
       point_t position{};
 
@@ -124,18 +125,18 @@ namespace nlohmann
 
 namespace sec21::structural_analysis
 {
-   template <auto Dimension, typename Precision>
-   void to_json(nlohmann::json& j, node<Dimension, Precision> const& obj) {
+   template <auto Dimension, typename Descriptor, typename Precision>
+   void to_json(nlohmann::json& j, node<Dimension, Descriptor, Precision> const& obj) {
       j = nlohmann::json{
-         {"id", obj.id},
+         {"name", obj.name},
          {"position", obj.position}, 
          {"global_support", obj.global_support}
       };
    }
-   template <auto Dimension, typename Precision>
-   void from_json(nlohmann::json const& j, node<Dimension, Precision>& obj) 
+   template <auto Dimension, typename Descriptor, typename Precision>
+   void from_json(nlohmann::json const& j, node<Dimension, Descriptor, Precision>& obj) 
    {
-      j.at("id").get_to(obj.id);
+      j.at("name").get_to(obj.name);
       j.at("position").get_to(obj.position);
       j.at("global_support").get_to(obj.global_support);
    }
