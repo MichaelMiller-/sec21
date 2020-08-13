@@ -46,8 +46,8 @@ namespace sec21::database
 
       const auto column_names = enclose(reflection, [](auto v)
       {
-        using value_t = decltype(v)::value_t;
-        using ops_t = decltype(v)::ops_t;
+        using value_t = typename decltype(v)::value_t;
+        using ops_t = typename decltype(v)::ops_t;
 
         std::string ops = " ";
         if constexpr (std::tuple_size_v<ops_t> > 0) {
