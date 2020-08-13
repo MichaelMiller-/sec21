@@ -84,5 +84,5 @@ TEST_CASE("example system 7.0 load from json", "[sec21][structural_analysis][spa
       std::ofstream ofs{"output_example_7_result.json"};
       nlohmann::json tmp = result;
       ofs << std::setw(4) << tmp;
-   }         
+   }
 }

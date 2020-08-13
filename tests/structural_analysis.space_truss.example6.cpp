@@ -1,12 +1,13 @@
-﻿#include <catch.hpp>
-#include "approx_equal.h"
+﻿#include "approx_equal.h"
+#include <catch.hpp>
 
-#include <sec21/flat_matrix.h>
 #include <sec21/file_loader.h>
-#include <sec21/structural_analysis/space_truss.h>
+#include <sec21/numeric/flatten.h>
+#include <sec21/numeric/ublas_allocator_wrapper.h>
 #include <sec21/structural_analysis/loadcase.h>
-#include <sec21/structural_analysis/system_result.h>
 #include <sec21/structural_analysis/solve.h>
+#include <sec21/structural_analysis/space_truss.h>
+#include <sec21/structural_analysis/system_result.h>
 
 #include <array>
 
@@ -52,30 +53,30 @@ TEST_CASE("example system 6.0 load from json", "[sec21][structural_analysis][spa
       auto result = impl::steifigkeitsbeziehung_fachwerkstab_globalen_koordinaten(sys, 3);
       REQUIRE(result.size1() == 4);
       REQUIRE(result.size2() == 4);
-      //! \clang-format off
+      // clang-format off
       const auto expected = std::array{
           0.49923, 0.33282,-0.49923,-0.33282,
           0.33282, 0.22188,-0.33282,-0.22188,
          -0.49923,-0.33282, 0.49923, 0.33282,     
          -0.33282,-0.22188, 0.33282, 0.22188
       };
-      //! \clang-format on
-      REQUIRE(approx_equal(sec21::flat_matrix(result), expected, kDivergence));
+      // clang-format on
+      REQUIRE(approx_equal(sec21::numeric::flatten(result), expected, kDivergence));
    }   
    SECTION("Steifigkeitsbeziehung vom Fachwerkstab 5 in globalen Koordinaten")
    {
       auto result = impl::steifigkeitsbeziehung_fachwerkstab_globalen_koordinaten(sys, 5);
       REQUIRE(result.size1() == 4);
       REQUIRE(result.size2() == 4);
-      //! \clang-format off
+      // clang-format off
       const auto expected = std::array{
           0.49923, 0.33282,-0.49923,-0.33282,
           0.33282, 0.22188,-0.33282,-0.22188,
          -0.49923,-0.33282, 0.49923, 0.33282,     
          -0.33282,-0.22188, 0.33282, 0.22188
       };
-      //! \clang-format on
-      REQUIRE(approx_equal(sec21::flat_matrix(result), expected, kDivergence));
+      // clang-format on
+      REQUIRE(approx_equal(sec21::numeric::flatten(result), expected, kDivergence));
    }
 #endif
 #if 0   
@@ -84,7 +85,7 @@ TEST_CASE("example system 6.0 load from json", "[sec21][structural_analysis][spa
       auto K = impl::stiffness_matrix(sys, 1);
       REQUIRE(K.size1() == 14);
       REQUIRE(K.size2() == 14);
-      //! \clang-format off
+      // clang-format off
       const auto expected = std::array{
          1,0,-1,0,0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -101,8 +102,8 @@ TEST_CASE("example system 6.0 load from json", "[sec21][structural_analysis][spa
          0,0,0,0,0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,0,0,0,0
       };
-      //! \clang-format on
-      const auto flattend_K = sec21::flat_matrix(K);
+      // clang-format on
+      const auto flattend_K = sec21::numeric::flatten(K);
       REQUIRE(std::size(flattend_K) == std::size(expected));
       REQUIRE(approx_equal(flattend_K, expected, kDivergence));
    }
@@ -111,7 +112,7 @@ TEST_CASE("example system 6.0 load from json", "[sec21][structural_analysis][spa
       auto K = impl::stiffness_matrix(sys, 2);
       REQUIRE(K.size1() == 14);
       REQUIRE(K.size2() == 14);
-      //! \clang-format off
+      // clang-format off
       const auto expected = std::array{
          0,0,0,0,0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -128,8 +129,8 @@ TEST_CASE("example system 6.0 load from json", "[sec21][structural_analysis][spa
          0,0,0,0,0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,0,0,0,0
       };
-      //! \clang-format on
-      const auto flattend_K = sec21::flat_matrix(K);
+      // clang-format on
+      const auto flattend_K = sec21::numeric::flatten(K);
       REQUIRE(std::size(flattend_K) == std::size(expected));
       REQUIRE(approx_equal(flattend_K, expected, kDivergence));
    }
@@ -156,7 +157,7 @@ TEST_CASE("example system 6.0 load from json", "[sec21][structural_analysis][spa
 //    (0,0,0,0,0,0,0,0,0,0,0,0,0,0))
 
       std::cout << "siffness matrix K:" << K << std::endl;
-      //! \clang-format off
+      // clang-format off
       const auto expected = std::array{
          0,0,0,0,0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -173,8 +174,8 @@ TEST_CASE("example system 6.0 load from json", "[sec21][structural_analysis][spa
          0,0,0,0,0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,0,0,0,0
       };
-      //! \clang-format on
-      const auto flattend_K = sec21::flat_matrix(K);
+      // clang-format on
+      const auto flattend_K = sec21::numeric::flatten(K);
       REQUIRE(std::size(flattend_K) == std::size(expected));
       REQUIRE(approx_equal(flattend_K, expected, kDivergence));
    }      
@@ -184,7 +185,7 @@ TEST_CASE("example system 6.0 load from json", "[sec21][structural_analysis][spa
       REQUIRE(K.size1() == 14);
       REQUIRE(K.size2() == 14);
       std::cout << "siffness matrix K:" << K << std::endl;
-      //! \clang-format off
+      // clang-format off
       const auto expected = std::array{
          0,0,0,0,0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -201,8 +202,8 @@ TEST_CASE("example system 6.0 load from json", "[sec21][structural_analysis][spa
          0,0,0,0,0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,0,0,0,0
       };
-      //! \clang-format on
-      const auto flattend_K = sec21::flat_matrix(K);
+      // clang-format on
+      const auto flattend_K = sec21::numeric::flatten(K);
       REQUIRE(std::size(flattend_K) == std::size(expected));
       REQUIRE(approx_equal(flattend_K, expected, kDivergence));
    }
@@ -213,7 +214,7 @@ TEST_CASE("example system 6.0 load from json", "[sec21][structural_analysis][spa
       REQUIRE(K.size2() == 14);
 
       std::cout << "siffness matrix K:" << K << std::endl;
-      //! \clang-format off
+      // clang-format off
       const auto expected = std::array{
          0,0,0,0,0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -230,8 +231,8 @@ TEST_CASE("example system 6.0 load from json", "[sec21][structural_analysis][spa
          0,0,0,0,0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,0,0,0,0
       };
-      //! \clang-format on
-      const auto flattend_K = sec21::flat_matrix(K);
+      // clang-format on
+      const auto flattend_K = sec21::numeric::flatten(K);
       REQUIRE(std::size(flattend_K) == std::size(expected));
       REQUIRE(approx_equal(flattend_K, expected, kDivergence));
    }      
@@ -240,7 +241,7 @@ TEST_CASE("example system 6.0 load from json", "[sec21][structural_analysis][spa
       auto K = impl::stiffness_matrix(sys, 6);
       REQUIRE(K.size1() == 14);
       REQUIRE(K.size2() == 14);
-      //! \clang-format off
+      // clang-format off
       const auto expected = std::array{
          0,0,0,0,0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -257,8 +258,8 @@ TEST_CASE("example system 6.0 load from json", "[sec21][structural_analysis][spa
          0,0,0,0,0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,-1,0,0,0,0,0,0,0,1
       };
-      //! \clang-format on
-      const auto flattend_K = sec21::flat_matrix(K);
+      // clang-format on
+      const auto flattend_K = sec21::numeric::flatten(K);
       REQUIRE(std::size(flattend_K) == std::size(expected));
       REQUIRE(approx_equal(flattend_K, expected, kDivergence));
    }      
@@ -267,7 +268,7 @@ TEST_CASE("example system 6.0 load from json", "[sec21][structural_analysis][spa
       auto K = impl::stiffness_matrix(sys, 7);
       REQUIRE(K.size1() == 14);
       REQUIRE(K.size2() == 14);
-      //! \clang-format off
+      // clang-format off
       const auto expected = std::array{
          0,0,0,0,0,0,0,0,0,0,0,0,0,0,
          0,1,0,0,0,0,0,0,0,-1,0,0,0,0,
@@ -284,8 +285,8 @@ TEST_CASE("example system 6.0 load from json", "[sec21][structural_analysis][spa
          0,0,0,0,0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,0,0,0,0
       };
-      //! \clang-format on
-      const auto flattend_K = sec21::flat_matrix(K);
+      // clang-format on
+      const auto flattend_K = sec21::numeric::flatten(K);
       REQUIRE(std::size(flattend_K) == std::size(expected));
       REQUIRE(approx_equal(flattend_K, expected, kDivergence));
    }      
@@ -296,7 +297,7 @@ TEST_CASE("example system 6.0 load from json", "[sec21][structural_analysis][spa
       REQUIRE(K.size2() == 14);
 
       std::cout << "siffness matrix K:" << K << std::endl;
-      //! \clang-format off
+      // clang-format off
       const auto expected = std::array{
          0,0,0,0,0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -313,8 +314,8 @@ TEST_CASE("example system 6.0 load from json", "[sec21][structural_analysis][spa
          0,0,0,0,0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,0,0,0,0
       };
-      //! \clang-format on
-      const auto flattend_K = sec21::flat_matrix(K);
+      // clang-format on
+      const auto flattend_K = sec21::numeric::flatten(K);
       REQUIRE(std::size(flattend_K) == std::size(expected));
       REQUIRE(approx_equal(flattend_K, expected, kDivergence));
    }      
@@ -323,7 +324,7 @@ TEST_CASE("example system 6.0 load from json", "[sec21][structural_analysis][spa
       auto K = impl::stiffness_matrix(sys, 9);
       REQUIRE(K.size1() == 14);
       REQUIRE(K.size2() == 14);
-      //! \clang-format off
+      // clang-format off
       const auto expected = std::array{
          0,0,0,0,0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -340,8 +341,8 @@ TEST_CASE("example system 6.0 load from json", "[sec21][structural_analysis][spa
          0,0,0,0,0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,0,0,0,0
       };
-      //! \clang-format on
-      const auto flattend_K = sec21::flat_matrix(K);
+      // clang-format on
+      const auto flattend_K = sec21::numeric::flatten(K);
       REQUIRE(std::size(flattend_K) == std::size(expected));
       REQUIRE(approx_equal(flattend_K, expected, kDivergence));
    }      
@@ -352,7 +353,7 @@ TEST_CASE("example system 6.0 load from json", "[sec21][structural_analysis][spa
       REQUIRE(K.size2() == 14);
 
       std::cout << "siffness matrix K:" << K << std::endl;
-      //! \clang-format off
+      // clang-format off
       const auto expected = std::array{
          0,0,0,0,0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -369,8 +370,8 @@ TEST_CASE("example system 6.0 load from json", "[sec21][structural_analysis][spa
          0,0,0,0,0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,0,0,0,0
       };
-      //! \clang-format on
-      const auto flattend_K = sec21::flat_matrix(K);
+      // clang-format on
+      const auto flattend_K = sec21::numeric::flatten(K);
       REQUIRE(std::size(flattend_K) == std::size(expected));
       REQUIRE(approx_equal(flattend_K, expected, kDivergence));
    }      
@@ -379,7 +380,7 @@ TEST_CASE("example system 6.0 load from json", "[sec21][structural_analysis][spa
       auto K = impl::stiffness_matrix(sys, 11);
       REQUIRE(K.size1() == 14);
       REQUIRE(K.size2() == 14);
-      //! \clang-format off
+      // clang-format off
       const auto expected = std::array{
          0,0,0,0,0,0,0,0,0,0,0,0,0,0,
          0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -396,42 +397,45 @@ TEST_CASE("example system 6.0 load from json", "[sec21][structural_analysis][spa
          0,0,0,0,0,0,0,0,0,0,-1,0,1,0,
          0,0,0,0,0,0,0,0,0,0,0,0,0,0
       };
-      //! \clang-format on
-      const auto flattend_K = sec21::flat_matrix(K);
+      // clang-format on
+      const auto flattend_K = sec21::numeric::flatten(K);
       REQUIRE(std::size(flattend_K) == std::size(expected));
       REQUIRE(approx_equal(flattend_K, expected, kDivergence));
    }
 #endif
    SECTION("coincidence matrix from member 1")
    {
-      auto Z = impl::coincidence_matrix(sys, 1);
+      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<double>>;
+      auto Z = impl::coincidence_matrix<allocator_t>(sys, 1);
       REQUIRE(Z.size1() == 4);
       REQUIRE(Z.size2() == 14);
-      //! \clang-format off
+      // clang-format off
       const auto expected = std::array{
          1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
          0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
          0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
          0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
       };
-      //! \clang-format on
-      REQUIRE(approx_equal(sec21::flat_matrix(Z), expected, kDivergence));
-   }    
+      // clang-format on
+      REQUIRE(approx_equal(sec21::numeric::flatten(Z), expected, kDivergence));
+   }
+#if 0
    SECTION("coincidence matrix from member 6")
    {
       auto Z = impl::coincidence_matrix(sys, 6);
       REQUIRE(Z.size1() == 4);
       REQUIRE(Z.size2() == 14);
-      //! \clang-format off
+      // clang-format off
       const auto expected = std::array{
          0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
          0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 
          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 
          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1
       };
-      //! \clang-format on
-      REQUIRE(approx_equal(sec21::flat_matrix(Z), expected, kDivergence)); 
+      // clang-format on
+      REQUIRE(approx_equal(sec21::numeric::flatten(Z), expected, kDivergence)); 
    }
+#endif
    SECTION("solve")
    {
       auto load = sec21::load_from_json<loadcase<decltype(sys)>>("example_6_load.json");
@@ -440,29 +444,19 @@ TEST_CASE("example system 6.0 load from json", "[sec21][structural_analysis][spa
       REQUIRE(success == true);
 
       std::vector<double> flat_support_reaction{};
-      for (auto [k,v] : result.node) 
-      {
-         std::transform(
-            std::begin(v.support_reaction), 
-            std::end(v.support_reaction), 
-            std::back_inserter(flat_support_reaction),
-            [](auto&& e) { return e.value(); });
+      for (auto [k, v] : result.node) {
+         std::transform(std::begin(v.support_reaction), std::end(v.support_reaction),
+                        std::back_inserter(flat_support_reaction), [](auto&& e) { return e.value(); });
       }
 
       std::vector<double> flat_displacement{};
-      for (auto [k,v] : result.node) 
-         std::transform(
-            std::begin(v.displacement), 
-            std::end(v.displacement), 
-            std::back_inserter(flat_displacement),
-            [](auto&& e) { return e.value(); });
+      for (auto [k, v] : result.node)
+         std::transform(std::begin(v.displacement), std::end(v.displacement), std::back_inserter(flat_displacement),
+                        [](auto&& e) { return e.value(); });
 
       std::vector<double> copied_results{};
-      std::transform(
-         std::begin(result.member), 
-         std::end(result.member), 
-         std::back_inserter(copied_results), 
-         [](auto&& m) { return m.second.normal_force.value(); });
+      std::transform(std::begin(result.member), std::end(result.member), std::back_inserter(copied_results),
+                     [](auto&& m) { return m.second.normal_force.value(); });
 
       // unit: newton [N]
       REQUIRE(flat_support_reaction[0] == Approx(0.0));
@@ -494,6 +488,6 @@ TEST_CASE("example system 6.0 load from json", "[sec21][structural_analysis][spa
          std::ofstream ofs{"output_example_6_result.json"};
          nlohmann::json tmp = result;
          ofs << std::setw(4) << tmp;
-      }         
+      }
    }
 }
