@@ -5,7 +5,6 @@
 #include <sec21/structural_analysis/member.h>
 #include <sec21/structural_analysis/descriptor_traits.h>
 #include <sec21/structural_analysis/error_codes.h>
-#include <sec21/structural_analysis/cross_section.h>
 
 #include <boost/outcome.hpp>
 
