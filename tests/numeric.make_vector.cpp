@@ -33,32 +33,20 @@ TEST_CASE("create a vector from a sequence with units", "[sec21][numeric]")
    REQUIRE(std::equal(std::begin(result), std::end(result), std::begin(expected), std::end(expected)));
 }
 #endif
-TEST_CASE("create a vector from a std::pmr::vector and wrap allocator", "[sec21][numeric]") 
-{
-   using namespace sec21::numeric;
 
-   std::array<std::byte, 256> buffer; 
-   std::pmr::monotonic_buffer_resource res(buffer.data(), size(buffer));
-   std::pmr::vector<int> input{ { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, &res };
-   using alloc_t = decltype(input)::allocator_type;
-   using allocator_wrapper_t = ublas_allocator_wrapper<alloc_t>;
-
-   auto result = make_vector<int, allocator_wrapper_t>(begin(input), end(input));
-   REQUIRE(result.size() == std::size(input));
-   REQUIRE(std::equal(std::begin(result), std::end(result), std::begin(input), std::end(input)));
-}
 TEST_CASE("create a vector from a std::pmr::vector with allocator wrapper", "[sec21][numeric]") 
 {
    std::array<std::byte, 256> buffer; 
    std::pmr::monotonic_buffer_resource res(buffer.data(), size(buffer));
    std::pmr::vector<int> input{ { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, &res };
-   using alloc_t = decltype(input)::allocator_type;
-   using allocator_wrapper_t = ublas_allocator_wrapper<alloc_t>;
 
-   auto result = make_vector<int, allocator_wrapper_t>(begin(input), end(input));
+   using allocator_wrapper_t = ublas_allocator_wrapper<decltype(input)::allocator_type>;
+   auto result = make_vector<allocator_wrapper_t>(begin(input), end(input), [](auto const& e){ return e; });
+
    REQUIRE(result.size() == std::size(input));
    REQUIRE(std::equal(std::begin(result), std::end(result), std::begin(input), std::end(input)));
 }
+
 #if 0
 TEST_CASE("create a vector from a pmr::sequence with units", "[sec21][numeric]") 
 {
