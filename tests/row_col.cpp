@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <array>
 #include <vector>
+#include <numeric>
 
 TEST_CASE("row_to_col function", "[sec21][core]")
 {
