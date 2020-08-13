@@ -29,7 +29,7 @@ TEST_CASE("test loadcase", "[sec21][structural_analysis][loadcase]")
       std::vector<value_t> F(std::size(sys.nodes) * dim);
       REQUIRE(std::size(F) == 8);
 
-      add_temperature_load(sys, lf1, F);
+      add_temperature_load(sys, lf1, begin(F));
 
       const auto expected = std::array{ -302'400.0_N, 0.0_N, 302'400.0_N, 0.0_N, 0.0_N, 0.0_N, 0.0_N, 0.0_N };
       REQUIRE(std::size(F) == std::size(expected));
@@ -53,4 +53,24 @@ TEST_CASE("test loadcase", "[sec21][structural_analysis][loadcase]")
       REQUIRE(std::size(F) == std::size(expected));
       REQUIRE(std::equal(std::begin(F), std::end(F), std::begin(expected)));
    }
+   SECTION("create vector F from multiply node loads")
+   {
+      loadcase_t lf1;
+      lf1.name = "LF1"s;
+      lf1.node_load.push_back({ 2, { 10.0_kN, -10.0_kN}});
+      lf1.node_load.push_back({ 4, {  5.0_kN,  4.0_kN}});
+      lf1.node_load.push_back({ 1, { -7.0_kN,  7.0_kN}});
+
+      using namespace sec21;
+      using value_t = units::quantity<units::newton, typename decltype(sys)::precision_t>;
+
+      std::vector<value_t> F(std::size(sys.nodes) * dim);
+      REQUIRE(std::size(F) == 8);
+
+      add_node_load(sys, lf1, F);
+
+      const auto expected = std::array{ -7000.0_N, 7000.0_N, 10'000.0_N, -10'000.0_N, 0.0_N, 0.0_N, 5000.0_N, 4000.0_N };
+      REQUIRE(std::size(F) == std::size(expected));
+      REQUIRE(std::equal(std::begin(F), std::end(F), std::begin(expected)));
+   }   
 }
