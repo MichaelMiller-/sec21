@@ -68,6 +68,11 @@ namespace sec21::units
       {
          return std::numeric_limits<value_t>::max();
       }
+
+      friend std::ostream& operator << (std::ostream& os, quantity<Unit, T> const& v)
+      {
+         return os << v.value(); // to_string(v);
+      }      
    };
 
    template <Quantity Q1, Quantity Q2> requires SameDimension<Q1, Q2>
@@ -111,6 +116,14 @@ namespace sec21::units
    {
       return Q1{ lhs.value() + Q1{ rhs }.value() };
    }
+
+#if 0
+   template <Quantity Q1, Scalar S>
+   constexpr auto operator + (Q1 const& lhs, S const& rhs) noexcept
+   {
+      return Q1{ lhs.value() + rhs };
+   }
+#endif
 
    template <Quantity Q1, Quantity Q2> requires SameDimension<Q1, Q2>
    constexpr auto operator - (Q1 const& lhs, Q2 const& rhs) noexcept
@@ -212,11 +225,7 @@ namespace sec21::units
       return ss.str();
    }
 
-   template <typename Unit, typename T>
-   auto operator << (std::ostream& os, quantity<Unit, T> const& v) -> std::ostream&
-   {
-      return os << v.value(); // to_string(v);
-   }
+
 }
 
 #include <nlohmann/json.hpp>
