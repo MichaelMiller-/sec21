@@ -1,40 +1,31 @@
 #pragma once
 
 #include <sec21/enclose.h>
+#include <sec21/database/column.h>
 #include <sec21/database/column_type.h>
 
 #include <sstream>
 #include <string_view>
 #include <tuple>
 #include <iomanip>
+#include <type_traits>
 
 namespace sec21::database
 {
-#if 0
-   template <typename T>
-   auto select()
+   template <typename T, typename... Columns> requires std::conjunction_v<is_column<Columns>...>
+   auto select(std::tuple<Columns...> cols)
    {
-      constexpr auto reflection = table<T>::metainfo();
-      constexpr auto N = std::tuple_size_v<decltype(reflection)>;
+      constexpr auto N = std::tuple_size_v<decltype(cols)>;
       static_assert(N > 0);
-      //! \todo could be more like enclose()
-      const auto column_names = detail::concat(
-         [](auto const& v) { return std::string{ v.name } + ","; },
-         reflection,
-         std::make_index_sequence<N>{});
 
+      const auto column_names = enclose(cols, [](auto const& v){ return v.name; }, ",", {}, {});
       return std::string{"SELECT "} + column_names + std::string{" FROM "} + table<T>::name;
    }
-#endif
+
    template <typename T>
    auto select()
    {
-      constexpr auto reflection = table<T>::metainfo();
-      constexpr auto N = std::tuple_size_v<decltype(reflection)>;
-      static_assert(N > 0);
-
-      const auto column_names = enclose(reflection, [](auto const& v){ return v.name; }, ",", {}, {});
-      return std::string{"SELECT "} + column_names + std::string{" FROM "} + table<T>::name;
+      return select<T>(table<T>::metainfo());
    }
 
    template <typename T>
