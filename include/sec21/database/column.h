@@ -19,4 +19,16 @@ namespace sec21::database
       using ops_t = std::tuple<Ops...>;
       const std::string_view name{};
    };
+
+   template <typename T>
+   struct is_column : std::false_type {};
+
+   template <typename T, typename... Ops>
+   struct is_column<column<T, Ops...>> : std::true_type {};
+
+   //! \todo implement tests
+   // static_assert(is_column<column<int>>::value == true);
+   // static_assert(is_column<column<int, primary_key>>::value == true);
+   // static_assert(is_column<column<int, primary_key, not_null>>::value == true);
+   // static_assert(is_column<int>::value == false);   
 }
