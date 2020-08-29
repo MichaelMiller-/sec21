@@ -25,18 +25,6 @@ set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
 
-##############
-## TODO
-if (NOT ${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
-## 
-
-
-
-
-# option(${PROJECT_NAME}_USE_FANCY_NEW_CLASS "whether or not to use fancy new class" ON)
-# option(${PROJECT_NAME}_DEBUG_MODE "whether or not debug mode is activated" OFF)
-
-
 ## header-only library
 add_library(${PROJECT_NAME} INTERFACE)
 
@@ -88,24 +76,23 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/config.h DESTINATION ${include_dest})
 
 option(ENABLE_PCH "Enable Precompiled Headers" OFF)
 if (ENABLE_PCH)
-   target_precompile_headers(sec21 INTERFACE <vector> <string> <map> <utility> <algorithm>)
+   target_precompile_headers(sec21 INTERFACE <vector> <string> <map> <utility> <algorithm> <numeric>)
 endif()
 
 option(ENABLE_TESTS "Enable tests" ON)
 option(ENABLE_BENCHMARKS "Enable benchmarks" OFF)
-option(ENABLE_DATABASE_SERIALIZER "Enable database serlializer" ON)
+option(ENABLE_DATABASE_SERIALIZER "Enable database serlializer" OFF)
 option(ENABLE_VIEWER "Enable system viewer" OFF)
-option(ENABLE_WEB_INTERFACE "Enable web interface" ON)
+option(ENABLE_WEB_INTERFACE "Enable web interface" OFF)
 option(ENABLE_PLOTTER "Enable plotter" OFF)
 option(ENABLE_COLLECT "Enable collect" OFF)
 option(ENABLE_SCRIPT_INTERFACE "Enable script interface" OFF)
-option(ENABLE_EXPERIMENTAL "Enable experimental mode" ON)
+option(ENABLE_EXPERIMENTAL "Enable experimental mode" OFF)
 
 if (ENABLE_BENCHMARKS)
    message(STATUS "Benchmarks enabled")
    configure_file("${CMAKE_HOME_DIRECTORY}/data/benchmark_example.json" "${PROJECT_BINARY_DIR}/benchmark_example.json" COPYONLY)
    configure_file("${CMAKE_HOME_DIRECTORY}/data/benchmark_example_load.json" "${PROJECT_BINARY_DIR}/benchmark_example_load.json" COPYONLY)
-   # configure_file(${CMAKE_SOURCE_DIR}/benchmarks.sqlite3 ${CMAKE_BINARY_DIR}/benchmarks.sqlite3 COPYONLY)
    add_subdirectory(benchmarks)
 endif()
 
@@ -115,13 +102,13 @@ if (ENABLE_WEB_INTERFACE)
 endif()   
 
 if (ENABLE_DATABASE_SERIALIZER)
-   message(STATUS "Wt DBO database serializer is enabled")
+   message(STATUS "Database serializer is enabled")
    add_subdirectory(database-serializer)
 endif()
 
 if (ENABLE_VIEWER)
    message(STATUS "OpenGL system viewer is enabled")
-  #  add_subdirectory(viewer)
+   add_subdirectory(viewer)
 endif()
 
 if (ENABLE_PLOTTER)
@@ -151,7 +138,6 @@ if (ENABLE_TESTS)
    add_subdirectory(tests)
 endif()
 
-
 ## copy optional data 
 if(EXISTS "${PROJECT_SOURCE_DIR}/data/cp_gen.sh")
    configure_file("${PROJECT_SOURCE_DIR}/data/cp_gen.sh" "${PROJECT_BINARY_DIR}/cp_gen.sh" COPYONLY)
@@ -163,19 +149,3 @@ endif()
 set(tool_dest "bin")
 set(include_dest "include/my_library-${MY_LIBRARY_VERSION}")
 set(main_lib_dest "lib/my_library-${MY_LIBRARY_VERSION}")
-
-# TODO:gcc10 allocator: add_subdirectory(esbp)
-add_subdirectory(reflect)
-add_subdirectory(worker)
-# add_subdirectory(libpreload)
-add_subdirectory(viewer_sfml)
-
-add_subdirectory(esbp)
-
-endif() ## end Emscripten
-
-
-if (${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
-   message(STATUS "######### emscriten build")
-   add_subdirectory(webviewer)
-endif()
