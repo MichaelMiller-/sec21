@@ -1,0 +1,6 @@
+
+// generated config.h
+
+#define LIBRARY_VERSION_MAJOR @sec21_VERSION_MAJOR@
+#define LIBRARY_VERSION_MINOR @sec21_VERSION_MINOR@
+
