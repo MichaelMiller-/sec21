@@ -32,17 +32,17 @@ namespace sec21::viewer
       const auto bounding_volume = sphere{ pos, radius };
 
       auto entity = registry.create();
-      registry.assign<node_tag>(entity);
-      registry.assign<selectable>(entity);
+      registry.emplace<node_tag>(entity);
+      registry.emplace<selectable>(entity);
       //! \todo assign text
       //! \todo assign bounding box or bounding volume
-      registry.assign<sphere>(entity, bounding_volume);
-      registry.assign<aabb>(entity, bbox);
-      registry.assign<vertex_buffer_id>(entity, handle_vertexbuffer_sphere);
-      registry.assign<position>(entity, pos);
-      registry.assign<model_transformation>(entity, detail::node_transformation(pos, radius));
-      registry.assign<material>(entity, ruby);
-      registry.assign<viewable>(entity, true);
+      registry.emplace<sphere>(entity, bounding_volume);
+      registry.emplace<aabb>(entity, bbox);
+      registry.emplace<vertex_buffer_id>(entity, handle_vertexbuffer_sphere);
+      registry.emplace<position>(entity, pos);
+      registry.emplace<model_transformation>(entity, detail::node_transformation(pos, radius));
+      registry.emplace<material>(entity, ruby);
+      registry.emplace<viewable>(entity, true);
    }
 
    template <typename T>
@@ -54,12 +54,12 @@ namespace sec21::viewer
    void make_displaced_node(entt::registry& registry, float radius, glm::vec3 const& pos)
    {
       auto entity = registry.create();
-      registry.assign<node_tag>(entity);
-      registry.assign<displacement_tag>(entity);
-      registry.assign<vertex_buffer_id>(entity, handle_vertexbuffer_sphere);
-      registry.assign<position>(entity, pos);
-      registry.assign<model_transformation>(entity, detail::node_transformation(pos, radius));
-      registry.assign<material>(entity, emerald);
-      registry.assign<viewable>(entity, false);	
+      registry.emplace<node_tag>(entity);
+      registry.emplace<displacement_tag>(entity);
+      registry.emplace<vertex_buffer_id>(entity, handle_vertexbuffer_sphere);
+      registry.emplace<position>(entity, pos);
+      registry.emplace<model_transformation>(entity, detail::node_transformation(pos, radius));
+      registry.emplace<material>(entity, emerald);
+      registry.emplace<viewable>(entity, false);	
    }
 }

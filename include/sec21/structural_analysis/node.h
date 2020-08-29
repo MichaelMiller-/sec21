@@ -65,6 +65,7 @@ namespace sec21::structural_analysis
 
 namespace nlohmann 
 {
+   //! \todo move to extra header
    template <typename T>
    struct adl_serializer<std::array<T, 2>> 
    {
@@ -84,6 +85,7 @@ namespace nlohmann
       }
    };
 
+   //! \todo move to extra header
    template <typename T>
    struct adl_serializer<std::optional<T>> 
    {

@@ -5,6 +5,8 @@
 
 #include <nlohmann/json.hpp>
 
+#include <iomanip>
+
 namespace sec21
 {
    namespace archive
@@ -20,11 +22,17 @@ namespace sec21
          {}
 
          template <typename U, std::enable_if_t<!reflection::is_registered_v<std::decay_t<U>>, int> = 0>
+#ifdef __cpp_conditional_explicit
+         explicit(!reflection::is_registered_v<std::decay_t<T>>)
+#endif
          void write(std::string_view name, U const& u) {
             j[name.data()] = u;
          }
 
          template <typename U, std::enable_if_t<reflection::is_registered_v<std::decay_t<U>>, int> = 0>
+#ifdef __cpp_conditional_explicit
+         explicit(reflection::is_registered_v<std::decay_t<T>>)
+#endif
          void write(std::string_view name, U const& u) 
          {
             j[name.data()] = nlohmann::json::object();

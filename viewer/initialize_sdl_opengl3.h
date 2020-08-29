@@ -3,11 +3,37 @@
 #include "preferences.h"
 
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
 #include <GL/glew.h>
 #include <SDL2/SDL_opengl.h>
 
 #include <spdlog/spdlog.h>
+
+template <>
+struct std::default_delete<SDL_Window> 
+{
+	default_delete() = default;
+
+	template <class U, class = std::enable_if_t<std::is_convertible_v<U*, SDL_Window*>>>
+	constexpr default_delete(default_delete<U>) noexcept {}
+	
+	void operator()(SDL_Window* p) const noexcept 
+	{ 
+		spdlog::debug("destroy SDL window pointer");
+		SDL_DestroyWindow(p);
+	}
+};
+
+template <SDL_EventType Id>
+struct sdl_event_impl 
+{
+	static constexpr auto id = Id;
+
+	SDL_Event data{};
+
+	explicit sdl_event_impl(SDL_Event const& data) noexcept 
+		: data{ data }
+	{}
+};
 
 namespace sec21::viewer
 {
@@ -16,9 +42,9 @@ namespace sec21::viewer
 		static constexpr std::string_view version{"#version 140"};
 	};
 
-	auto initialize_sdl_opengl3(preferences settings = {}) -> std::tuple<SDL_Window*, SDL_GLContext>
+	auto initialize_sdl_opengl3(preferences settings = {}) -> std::tuple<std::unique_ptr<SDL_Window>, SDL_GLContext>
 	{
-		spdlog::info("initialize SDL");
+		spdlog::info("initialize SDL/OpenGL window");
 		if (SDL_Init(SDL_INIT_VIDEO) < 0)
 			throw std::runtime_error(fmt::format("SDL could not initialize! SDL Error: {}", SDL_GetError()));
 
@@ -58,6 +84,6 @@ namespace sec21::viewer
 		if (SDL_GL_SetSwapInterval(1) < 0)
 			spdlog::warn("Warning: Unable to set VSync! SDL Error {}", SDL_GetError());
 
-		return { window, context };
+		return { std::unique_ptr<SDL_Window>(window), context };
 	}
 }

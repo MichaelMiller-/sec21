@@ -34,26 +34,34 @@ namespace ImGui
 		return true;		
 	}
 
-	bool Combo(const char* label, int* index, std::vector<std::string>& values)
+	bool Combo(std::string_view label, int* index, std::vector<std::string>& values)
 	{
 		if (values.empty())
 			return false;
 
-		return Combo(label, index, getter<std::vector<std::string>>, static_cast<void*>(&values), static_cast<int>(values.size()));
+		return Combo(label.data(), index, getter<std::vector<std::string>>, static_cast<void*>(&values), static_cast<int>(values.size()));
 	}
 
-	bool ListBox(const char* label, int* index, std::vector<std::string>& values)
+	bool ListBox(std::string_view label, int* index, std::vector<std::string>& values)
 	{
 		if (values.empty())
 			return false;
 
 		return ListBox(
-			label, 
+			label.data(), 
 			index, 
 			getter<std::vector<std::string>>, 
 			static_cast<void*>(&values), 
 			static_cast<int>(size(values)));
 	}
+
+#if 0
+	template <typename... Args>
+	void Text(std::string_view format, Args &&... args)
+	{
+		ImGui::TextUnformated(std::format(format, std::forward<Args>(args)...));
+	}
+#endif
 } // namespace ImGui
 
 namespace sec21::viewer
@@ -111,9 +119,6 @@ namespace sec21::viewer
 		auto view = registry.view<debug_data>();
 		const auto& active_debug_data = view.get(*view.begin());		
 
-		auto settings_view = registry.view<preferences>();
-		auto& active_settings = settings_view.get(*settings_view.begin());
-
 		auto input_data_view = registry.view<input_data>();
 		const auto& active_input_data = input_data_view.get(*input_data_view.begin());	
 
@@ -125,41 +130,7 @@ namespace sec21::viewer
 		ImGui_ImplSDL2_NewFrame(window);
 		ImGui::NewFrame();
 
-		auto selected_entites_view = registry.view<selectable>();
-		for (auto entity : selected_entites_view)
-		{
-			if (selected_entites_view.get<selectable>(entity).selected)
-			{
-				static bool p_open = true;
-				auto window_pos = ImVec2{ 
-					static_cast<float>(active_input_data.mouse_position.x), 
-					static_cast<float>(active_input_data.mouse_position.y) };
-
-				//! \todo 
-				ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always);
-				ImGui::SetNextWindowBgAlpha(popup_window_decoration); // Transparent background
-				if (ImGui::Begin("Properties", &p_open, ImGuiWindowFlags_NoMove))
-				{
-					ImGui::Text("Mouse Position: <invalid>");
-				}
-				ImGui::End();
-			}
-		}
-
-		// auto selected_entites_view = registry.view<selectable, load_tag, >();
-		// for (auto entity : selected_entites_view)
-		// {
-		// 	static auto open = true;
-		// 	// ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always);
-		// 	// ImGui::SetNextWindowBgAlpha(popup_window_decoration); // Transparent background
-		// 	if (ImGui::Begin("Properties", &open, ImGuiWindowFlags_NoMove))
-		// 	{
-		// 		ImGui::Text("Value: "); 
-		// 		ImGui::SameLine(); if (ImGui::Button("Edit")) { dispatcher.trigger<event_new_node>({ node_x_pos, node_y_pos, 0.0 }); }
-		// 	}
-		// 	ImGui::End();
-		// }
-
+		///
 		ImGui::ShowDemoWindow();
 		ImGui::ShowMetricsWindow();
 
@@ -185,7 +156,7 @@ namespace sec21::viewer
 			ImGui::EndMainMenuBar();
 		}
 
-		debug_overlay();
+		// debug_overlay();
 
 		ImGui::Begin("sec21::viewer debug window");
 		{
@@ -201,11 +172,9 @@ namespace sec21::viewer
 			static int current_load = 0;
 			if (ImGui::Combo("Loads", &current_load, loads))
 			{
-				dispatcher.trigger<event_load_model_load>(
-					files[static_cast<std::size_t>(current_file)],
-					loads[static_cast<std::size_t>(current_load)]);
+				dispatcher.trigger<event_load_model_load>(loads[static_cast<std::size_t>(current_load)]);
 			}
-
+#if 0
 			if (ImGui::CollapsingHeader("Visibility"))
 			{		
 				ImGui::Checkbox("show nodes", &active_settings.show_nodes);
@@ -214,6 +183,7 @@ namespace sec21::viewer
 				ImGui::Checkbox("show deformation", &active_settings.show_deformation);
 				ImGui::Checkbox("show load", &active_settings.show_load);
 			}
+#endif			
 			if (ImGui::CollapsingHeader("Camera"))
 			{			
 				ImGui::PushItemWidth(60);

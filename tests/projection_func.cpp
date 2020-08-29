@@ -1,13 +1,12 @@
-#define _SILENCE_CXX17_UNCAUGHT_EXCEPTION_DEPRECATION_WARNING
 #define CATCH_CONFIG_MAIN
-#include "catch.hpp"
+#include <catch.hpp>
 
 #include <vector>
 #include <algorithm>
 
 #include <sec21/projection_func.h>
 
-TEST_CASE("projection wrapper function", "[core]")
+TEST_CASE("projection wrapper function", "[sec21][core]")
 {
    using namespace sec21;
 
@@ -44,5 +43,21 @@ TEST_CASE("projection wrapper function", "[core]")
          std::end(expected),
          // only member foo::a is needed for this test
          [](auto const& lhs, auto const& rhs){ return lhs.a == rhs.a; }) == true);
+   }
+   SECTION("find example")
+   {
+      std::vector<foo> input{
+        { 1, 3.12 },
+        { 4, 3.12 },
+        { 5, 76.7 },
+        { 3, 7.2 },
+        { 2, 0.82 }
+      };
+
+      auto it = std::find_if(std::begin(input), std::end(input), projection{ std::equal_to{}, &foo::a, 5 }); 
+
+      REQUIRE(it != std::end(input));
+      REQUIRE(it->a == 5);
+      REQUIRE(it->b == Approx(76.7));
    }
 }

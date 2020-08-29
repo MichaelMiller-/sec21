@@ -42,6 +42,12 @@ static constexpr auto jade = material{
 	.specular{ 0.316228f, 0.316228f, 0.316228f },
 	.shininess{ 0.1f }
 };
+static constexpr auto chrome = material{
+	.ambient{ 0.25f, 0.25f, 0.25f },
+	.diffuse{ 0.4f, 0.4f, 0.4f },
+	.specular{ 0.774597f, 0.774597f, 0.774597f},
+	.shininess{ 0.6f }
+};
 #else
 static constexpr auto green_plastic = material{
 	{ 0.0f, 0.0f, 0.0f },

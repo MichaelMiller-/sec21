@@ -8,8 +8,6 @@ find_program(CCACHE ccache)
 if(CCACHE)
   message(STATUS "using ccache")
   set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE})
-else()
-  message(WARNING "ccache not found")
 endif()
 
 # Generate compile_commands.json to make it easier to work with clang based tools

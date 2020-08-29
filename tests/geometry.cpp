@@ -10,6 +10,7 @@
 #include <boost/geometry/geometries/register/point.hpp>
 #include <boost/geometry/geometries/adapted/std_array.hpp>
 
+#define GLM_FORCE_CXX17
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>               // vec4, bvec4, dvec4, ivec4 and uvec4
@@ -51,7 +52,7 @@ namespace sec21
 
 // Customisation points - register all kind of point classes (third party, legacay, own types, ...)
 //
-BOOST_GEOMETRY_REGISTER_STD_ARRAY_CS(boost::geometry::cs::cartesian);
+BOOST_GEOMETRY_REGISTER_STD_ARRAY_CS(boost::geometry::cs::cartesian)
 //
 BOOST_GEOMETRY_REGISTER_POINT_2D(glm::vec2, float, boost::geometry::cs::cartesian, x, y)
 BOOST_GEOMETRY_REGISTER_POINT_2D(sec21::user_point, double, boost::geometry::cs::cartesian, x, y)
@@ -90,6 +91,7 @@ namespace sec21
    }
 
 }
+
 #pragma warning(push)
 #pragma warning(disable:4201)
 #include <glm/ext/matrix_transform.hpp> // perspective, translate, rotate
@@ -120,10 +122,16 @@ namespace sec21
    };
 
    template <typename Vector, typename Angle>
+   auto rotate_around_x_axis(transformation<Vector, Angle>& transform, Angle angle) noexcept 
+   {
+      transform.alpha = angle;
+   }
+
+   template <typename Vector, typename Angle>
    auto rotate_z_axis(transformation<Vector, Angle>& transform, Angle angle) noexcept 
    {
       transform.gamma = angle;
-   };
+   }
 
    struct coordinate_system
    {
@@ -196,10 +204,10 @@ TEST_CASE("geometry", "[core]")
 
    transformation_t c1{ {0,0,0}, 0.f, 0.f, 0.f };
 
-   rotate_z_axis(c1, pi<float>());
+   rotate_around_x_axis(c1, pi<float>());
 
    auto p1 = to_coordinate_system(input, c1);
    REQUIRE(p1.x == Approx(0.125));
    REQUIRE(p1.y == Approx(0.77));
-   REQUIRE(p1.z == Approx(1.0));
+   REQUIRE(p1.z == Approx(-1.0));
 }

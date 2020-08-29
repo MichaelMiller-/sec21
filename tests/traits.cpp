@@ -1,5 +1,5 @@
 ﻿#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
+#include <catch.hpp>
 
 #include <tuple>
 #include <string>
@@ -38,7 +38,7 @@ static_assert(!is_instance_of_v<std::tuple, std::vector<int>>, "should be false"
 static_assert(!is_instance_of_v<std::vector, std::tuple<int, double>>, "should be false");
 
 
-TEST_CASE("traits", "[compilation-only]") 
+TEST_CASE("traits", "[sec21][traits]") 
 {
    SUCCEED("Nothing to test. Compiletime-Tests");
 }

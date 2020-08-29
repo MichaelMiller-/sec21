@@ -53,17 +53,17 @@ namespace sec21::viewer
       const auto bounding_volume = sphere{ p0, scale };
 
       auto entity = registry.create();
-      registry.assign<load_tag>(entity);
-      registry.assign<selectable>(entity);
+      registry.emplace<load_tag>(entity);
+      registry.emplace<selectable>(entity);
       //! \todo assign text
       //! \todo assign bounding box or bounding volume
-      registry.assign<sphere>(entity, bounding_volume);
-      registry.assign<aabb>(entity);
-      registry.assign<vertex_buffer_id>(entity, handle_vertexbuffer_arrow);
-      registry.assign<position>(entity, pos);
-      registry.assign<model_transformation>(entity, detail::arrow_transformation(scale, pos, dir));
-      registry.assign<material>(entity, ruby);
-      registry.assign<viewable>(entity, true);
+      registry.emplace<sphere>(entity, bounding_volume);
+      registry.emplace<aabb>(entity);
+      registry.emplace<vertex_buffer_id>(entity, handle_vertexbuffer_arrow);
+      registry.emplace<position>(entity, pos);
+      registry.emplace<model_transformation>(entity, detail::arrow_transformation(scale, pos, dir));
+      registry.emplace<material>(entity, ruby);
+      registry.emplace<viewable>(entity, true);
    }
 
    template <typename T, typename Direction>

@@ -109,6 +109,8 @@ namespace sec21::viewer
          bool normalized{ false };
       };
 
+      using attribute_t = attribute;
+
       std::uint32_t vertex_count{ 0 };
       std::uint32_t index_count{ 0 };
 
@@ -135,7 +137,7 @@ namespace sec21::viewer
          glBindVertexArray(vao);
       }
 
-      template <typename RenderPrimitive>
+      template <typename RenderPrimitive = triangles>
       void draw() const noexcept
       {
          if (index_count == 0)
@@ -161,6 +163,7 @@ namespace sec21::viewer
             instance->vertex_count = static_cast<decltype(instance->vertex_count)>(std::distance(first, last));
             // instance->ptr = std::addressof(*first);
             auto n = static_cast<GLsizeiptr>(std::distance(first, last));
+            auto m = static_cast<GLsizeiptr>(sizeof(value_t));
 
             glGenVertexArrays(1, &instance->vao);
             glGenBuffers(1, &instance->vbo);
@@ -168,11 +171,7 @@ namespace sec21::viewer
 
             glBindVertexArray(instance->vao);
             glBindBuffer(GL_ARRAY_BUFFER, instance->vbo);
-            glBufferData(
-               GL_ARRAY_BUFFER, 
-               n * sizeof(value_t), 
-               std::addressof(*first), 
-               GL_STATIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, n * m, std::addressof(*first), GL_STATIC_DRAW);
 
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, instance->ebo);
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizeiptr>(idx.size() * sizeof(unsigned int)), std::addressof(idx[0]), GL_STATIC_DRAW);
@@ -214,6 +213,8 @@ namespace sec21::viewer
          template <typename... Args>
          builder& attribute(Args &&... args)
          {
+            // using att_t = typename decltype(instance)::attribute_t;
+            // using value_t = typename att_t::value_t;
             instance->attributes.push_back({ std::forward<Args>(args)... });
             return *this;
          }

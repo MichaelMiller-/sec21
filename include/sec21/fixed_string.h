@@ -5,27 +5,16 @@
 namespace sec21
 {
    //! \brief compile time string
-   //! probably be a part of C++20
    //! see: http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2018/p0732r0.pdf
-   //!
-   template <typename CharT, size_t N>
+   template <auto N>
    struct fixed_string
    {
-      CharT data[N];
+      static_assert(N > 0);
+      char data[N + 1]{};
 
-      constexpr fixed_string(const CharT (&str)[N]) {
+      constexpr fixed_string(const char (&str)[N]) {
          std::copy(str, str + N, data);
       }
-
-      constexpr auto operator[](size_t i) const noexcept { 
-         return data[i]; 
-      }
-
-      constexpr size_t size() const noexcept { 
-         return N; 
-      }
+      constexpr operator char const*() const { return data; }
    };
-
-   template <typename CharT, size_t N>
-   fixed_string(const CharT (&str)[N]) -> fixed_string<CharT, N>;
 }

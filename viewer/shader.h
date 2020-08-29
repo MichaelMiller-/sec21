@@ -131,8 +131,8 @@ namespace sec21::viewer
 		GLuint vertex_shader_id{ 0 };
 		GLuint fragment_shader_id{ 0 };
 
-		std::map<std::string, GLuint> m_fileVertexShaders;
-		std::map<std::string, GLuint> m_fileFragmentShaders;
+		std::map<std::string, GLuint> m_fileVertexShaders{};
+		std::map<std::string, GLuint> m_fileFragmentShaders{};
 
 	private:
 		//! \todo is spdlog noexcept? -> so this method can also be noexcept

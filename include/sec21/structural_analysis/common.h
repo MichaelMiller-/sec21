@@ -1,7 +1,6 @@
 #pragma once
 
 #include <sec21/units/quantity.h>
-#include <sec21/structural_analysis/concepts.h>
 
 namespace sec21::structural_analysis
 {

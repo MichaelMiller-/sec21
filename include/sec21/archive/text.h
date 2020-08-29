@@ -37,7 +37,10 @@ namespace sec21
 namespace sec21
 {
    //! \brief serializer that works with sec21::reflection classes
-   template <typename Archive, typename T, std::enable_if_t<reflection::is_registered_v<std::decay_t<T>>, int> = 0>
+   template <typename Archive, typename T> //, std::enable_if_t<reflection::is_registered_v<std::decay_t<T>>, int> = 0>
+#ifdef __cpp_conditional_explicit
+   explicit(reflection::is_registered_v<std::decay_t<T>>)
+#endif
    void serialize(Archive& ar, T&& t)
    {
       reflection::for_each_member<std::decay_t<T>>([&](auto const& member) 
@@ -48,6 +51,9 @@ namespace sec21
 
    //! \brief deserializer that works with sec21::reflection classes
    template <typename Archive, typename T, std::enable_if_t<reflection::is_registered_v<std::decay_t<T>>, int> = 0>
+#ifdef __cpp_conditional_explicit
+   explicit(reflection::is_registered_v<std::decay_t<T>>)
+#endif
    void deserialize(Archive& ar, T&& t)
    {
       //static_assert(std::is_default_constructible_v<T>, "Type T has to be default-constructible");

@@ -52,21 +52,21 @@ namespace sec21::viewer
    {
       {
          auto entity = registry.create();
-         registry.assign<axis_tag>(entity);
-         registry.assign<vertex_buffer_id>(entity, handle_vertexbuffer_arrow);
-         registry.assign<position>(entity, glm::vec3{ 0.0, 0.0, 0.0, });
-         registry.assign<model_transformation>(entity, detail::axis_transformation(0.1f, { 0.0, 0.0, 0.0, }, { 1.0, 0.0, 0.0 }));
-         registry.assign<material>(entity, ruby);
-         registry.assign<viewable>(entity, true);
+         registry.emplace<axis_tag>(entity);
+         registry.emplace<vertex_buffer_id>(entity, handle_vertexbuffer_arrow);
+         registry.emplace<position>(entity, glm::vec3{ 0.0, 0.0, 0.0, });
+         registry.emplace<model_transformation>(entity, detail::axis_transformation(0.1f, { 0.0, 0.0, 0.0, }, { 1.0, 0.0, 0.0 }));
+         registry.emplace<material>(entity, ruby);
+         registry.emplace<viewable>(entity, true);
       }
       {
          auto entity = registry.create();
-         registry.assign<axis_tag>(entity);
-         registry.assign<vertex_buffer_id>(entity, handle_vertexbuffer_arrow);
-         registry.assign<position>(entity, glm::vec3{ 0.0, 0.0, 0.0, });
-         registry.assign<model_transformation>(entity, detail::axis_transformation(0.1f, { 0.0, 0.0, 0.0, }, { 0.0, 1.0, 0.0 }));
-         registry.assign<material>(entity, emerald);
-         registry.assign<viewable>(entity, true);
+         registry.emplace<axis_tag>(entity);
+         registry.emplace<vertex_buffer_id>(entity, handle_vertexbuffer_arrow);
+         registry.emplace<position>(entity, glm::vec3{ 0.0, 0.0, 0.0, });
+         registry.emplace<model_transformation>(entity, detail::axis_transformation(0.1f, { 0.0, 0.0, 0.0, }, { 0.0, 1.0, 0.0 }));
+         registry.emplace<material>(entity, emerald);
+         registry.emplace<viewable>(entity, true);
       }
       //! \todo z-axis
       // {

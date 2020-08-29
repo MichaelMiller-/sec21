@@ -242,6 +242,19 @@ TEST_CASE("std::exchange", "[features]")
    // A -> B; A <- B; std::swap()
    REQUIRE(x == 4);
    REQUIRE(y == 2);
+
+   // class widget
+   // {
+   //    int i{ 0 };
+   //    std::string s{};
+   //    std::unique_ptr<int> pi{ nullptr };
+   // public:
+   //    widget(widget&& w) = default;
+   //    widget(widget&& w)
+   //    : i { std::move(w.i) }
+   //    , s { std::move(w.s) }
+   //    , pi { std::exchange(w.pi, nullptr) } // it pi == int*
+   // };
 #else
    WARN("std::exchange is not supported");
 #endif
@@ -358,3 +371,71 @@ TEST_CASE("Uniform container erasure", "[features]")
    WARN("Uniform container erasure is not supported");
 #endif
 }
+
+// #include <vector>
+// #include <string>
+// #include <memory_resource>
+
+// #include <boost/core/demangle.hpp>
+// #include <iostream>
+// template <typename T>
+// inline auto demangle() -> std::string
+// {
+//     return boost::core::demangle(typeid(T).name());
+// }
+// template <typename T>
+// inline void print_type(std::string name)
+// {
+//     std::cout << name << ": " << demangle<T>() << std::endl;
+// }
+
+#if 0
+// //!  AA == AllocatorAware Type; well know idiom
+class Student
+{
+   std::pmr::string m_name;
+   std::pmr::string m_email;
+   std::pmr::vector<int> m_grades;
+public:
+   using allocater_type = std::pmr::polymorphic_allocator<>;
+
+   explicit Student(allocater_type alloc = {}) 
+      : m_name{"", alloc}
+      , m_email{ "", alloc }
+      , m_grades{ alloc }
+   {}
+
+   Student(std::string_view name, std::string email, allocater_type alloc = {})
+      : m_name{ name, alloc }
+      , m_email{ email, alloc }
+      , m_grades{ alloc }
+   {}
+
+   Student(Student const& rhs, allocater_type alloc)
+      : m_name{ rhs.name, alloc}
+      , m_email{ rhs.m_email, alloc }
+      , m_grades{  rhs.m_grades, alloc }
+   {}
+
+   Student(Student&&) = default;
+   Student(Student&& rhs, allocater_type alloc)
+      : m_name{ std::move(rhs.name), alloc}
+      , m_email{ std::move(rhs.m_email), alloc }
+      , m_grades{  std::move(rhs.m_grades), alloc }
+   {}
+
+   ~Student() = default;
+
+   Student& operator = (Student const&) = default;
+   Student& operator = (Student &&) = default;
+};
+#endif
+
+// int main()
+// {
+
+//     Student s1{ "foo", "bar@dot.org" }; //, std::pmr::polymorphic_allocator<Student>{} };
+//     print_type<decltype(s1)>("s1");
+
+//     return 32;
+// }

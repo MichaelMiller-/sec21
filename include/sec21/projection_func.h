@@ -26,4 +26,27 @@ namespace sec21
          return std::invoke(m_function, std::invoke(m_projection, std::forward<Args>(args))...);
       }
    };
+
+   template <typename Function, typename Projection, typename T>
+   class projection
+   {
+      Function    m_function;
+      Projection  m_projection;
+      T m_t;
+
+   public:
+      projection() = delete;
+
+      explicit projection(Function function, Projection projection, T t) noexcept
+         : m_function{ std::move(function) }
+         , m_projection{ std::move(projection) }
+         , m_t{ std::move(t) }
+      {}
+
+      template <typename... Args>
+      decltype(auto) operator() (Args &&... args) const 
+      {
+         return std::invoke(m_function, std::invoke(m_projection, std::forward<Args>(args))... , m_t);
+      }
+   };   
 }

@@ -1,5 +1,9 @@
 #pragma once
 
+#include <SDL2/SDL.h>
+#include <GL/glew.h>
+#include <SDL2/SDL_opengl.h>
+
 #include <spdlog/spdlog.h>
 
 namespace sec21::viewer
@@ -51,4 +55,24 @@ namespace sec21::viewer
       // } std::cout << std::endl;
       // std::cout << std::endl;
    }
+
+	auto enable_opengl_debug_output()
+	{
+		//! \todo test
+		GLint flags{ 0 };
+		if (SDL_GL_GetAttribute(SDL_GL_CONTEXT_FLAGS, &flags) != 0)
+			spdlog::error("failed to retrieve OpenGL context");
+
+		if (flags & GL_CONTEXT_FLAG_DEBUG_BIT)
+		{
+			spdlog::debug("enable OpenGL debug output");
+			glEnable(GL_DEBUG_OUTPUT);
+			glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+			glDebugMessageCallback(debug_output_opengl, nullptr);
+			glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+			//! \todo only get error messages from OpenGL
+			// glDebugMessageControl(GL_DEBUG_SOURCE_API, GL_DEBUG_TYPE_ERROR, GL_DEBUG_SEVERITY_HIGH, 0, nullptr, GL_TRUE);
+		}
+		spdlog::debug("OpenGL debug output flag not available");
+	}   
 } // sec21::viewer

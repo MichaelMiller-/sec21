@@ -2,16 +2,6 @@ cmake_minimum_required(VERSION 3.1)
 
 project(viewer)
 
-find_package(SDL2 CONFIG REQUIRED)
-# find_package(sdl2-image CONFIG REQUIRED)
-find_package(GLEW CONFIG REQUIRED)
-find_package(glm CONFIG REQUIRED)
-find_package(spdlog CONFIG REQUIRED) 
-find_package(nlohmann_json CONFIG REQUIRED)
-find_package(imgui CONFIG REQUIRED)
-find_package(EnTT CONFIG REQUIRED)
-# find_package(freetype CONFIG REQUIRED)
-
 set("${PROJECT_NAME}_VERSION_MAJOR" 0)
 set("${PROJECT_NAME}_VERSION_MINOR" 1)
 
@@ -45,6 +35,32 @@ set(SOURCES "viewer.cpp" ${IMGUI_SOURCES})
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
+include(CheckCXXCompilerFlag)
+if (MSVC_VERSION GREATER_EQUAL "1900")
+   CHECK_CXX_COMPILER_FLAG("/std:c++latest" _cpp_latest_flag_supported)
+   if (_cpp_latest_flag_supported)
+      target_compile_options(${PROJECT_NAME} PRIVATE "/std:c++latest")
+   endif()
+   target_compile_options(${PROJECT_NAME} PRIVATE "/permissive-")
+endif()
+
+if (CMAKE_COMPILER_IS_GNUCXX)
+   CHECK_CXX_COMPILER_FLAG("-fconcepts" _cpp_concepts_supported)
+   if (_cpp_concepts_supported)
+      target_compile_options(${PROJECT_NAME} PRIVATE "-fconcepts")
+   endif()
+endif()
+
+find_package(SDL2 CONFIG REQUIRED) 
+# find_package(sdl2-image CONFIG REQUIRED)
+find_package(GLEW CONFIG REQUIRED)
+find_package(glm CONFIG REQUIRED)
+find_package(spdlog CONFIG REQUIRED) 
+find_package(nlohmann_json CONFIG REQUIRED)
+find_package(imgui CONFIG REQUIRED)
+find_package(EnTT CONFIG REQUIRED)
+# find_package(freetype CONFIG REQUIRED)
+
 target_compile_definitions(${PROJECT_NAME} PRIVATE IMGUI_IMPL_OPENGL_LOADER_GLEW)
 # target_compile_definitions(${PROJECT_NAME} PRIVATE GLM_FORCE_MESSAGES)
 
@@ -59,6 +75,21 @@ target_link_libraries(${PROJECT_NAME} PRIVATE GLEW::GLEW)
 target_link_libraries(${PROJECT_NAME} PRIVATE glm)
 target_link_libraries(${PROJECT_NAME} PRIVATE nlohmann_json nlohmann_json::nlohmann_json)
 target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog spdlog::spdlog_header_only)
+
+include(ExternalProject)
+ExternalProject_Add(
+   BoostSML
+   GIT_REPOSITORY https://github.com/boost-ext/sml
+   CMAKE_ARGS -Wno-dev 
+      -D SML_BUILD_BENCHMARKS=OFF
+      -D SML_BUILD_DOCS=OFF
+      -D SML_BUILD_EXAMPLES=OFF 
+      -D SML_BUILD_TESTS=OFF 
+      -D CMAKE_BUILD_TYPE=Release
+      -D CMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/boostsml
+)
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/boostsml/include")
+
 target_link_libraries(${PROJECT_NAME} PUBLIC sec21)
 
 ## todo: CPack

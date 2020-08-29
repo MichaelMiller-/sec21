@@ -51,16 +51,16 @@ namespace sec21::viewer
       const auto bounding_volume = sphere{ mid, 0.3f };
 
       auto entity = registry.create();
-      registry.assign<member_tag>(entity);
-      registry.assign<selectable>(entity);
+      registry.emplace<member_tag>(entity);
+      registry.emplace<selectable>(entity);
       //! \todo assign text
       //! \todo assign bounding box or bounding volume
-      registry.assign<sphere>(entity, bounding_volume);
-      registry.assign<aabb>(entity, bbox);
-      registry.assign<vertex_buffer_id>(entity, handle_vertexbuffer_cylinder);
-      registry.assign<model_transformation>(entity, detail::member_transformation(from, to, radius));
-      registry.assign<material>(entity, chrome);
-      registry.assign<viewable>(entity, true);
+      registry.emplace<sphere>(entity, bounding_volume);
+      registry.emplace<aabb>(entity, bbox);
+      registry.emplace<vertex_buffer_id>(entity, handle_vertexbuffer_cylinder);
+      registry.emplace<model_transformation>(entity, detail::member_transformation(from, to, radius));
+      registry.emplace<material>(entity, chrome);
+      registry.emplace<viewable>(entity, true);
    }
 
    template <typename T>
@@ -76,12 +76,12 @@ namespace sec21::viewer
    void make_displaced_member(entt::registry& registry, float radius, glm::vec3 const& from, glm::vec3 const& to)
    {
       auto entity = registry.create();
-      registry.assign<member_tag>(entity);
-      registry.assign<displacement_tag>(entity);
-      registry.assign<vertex_buffer_id>(entity, handle_vertexbuffer_cylinder);
-      registry.assign<model_transformation>(entity, detail::member_transformation(from, to, radius));
-      registry.assign<material>(entity, jade);
-      registry.assign<viewable>(entity, false);
+      registry.emplace<member_tag>(entity);
+      registry.emplace<displacement_tag>(entity);
+      registry.emplace<vertex_buffer_id>(entity, handle_vertexbuffer_cylinder);
+      registry.emplace<model_transformation>(entity, detail::member_transformation(from, to, radius));
+      registry.emplace<material>(entity, jade);
+      registry.emplace<viewable>(entity, false);
    }
 
    // template <typename CoordinateType, typename CoordinateSystem>

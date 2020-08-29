@@ -69,25 +69,3 @@ namespace nlohmann
       }
    };
 }
-//! \todo force could be only a unit type plus adapter or function like from_xy(X, Y) -> untis::quantity<units::kilonewton, double>
-
-//! \todo qvm adaper   
-// namespace boost::qvm 
-// {
-//    template <auto N>
-//    struct vec_traits<sec21::structural_analysis::force_t<N>> : vec_traits_defaults<sec21::structural_analysis::force_t<N>, T, N> 
-//    {
-//       using scalar_type = T;
-
-//       template <int I>
-//       static inline scalar_type& write_element(std::array<T, N>& v) 
-//       {
-//          return std::get<I>(v);
-//       }
-
-//       // static inline scalar_type & write_element_idx(int i, point_t& v) 
-//       // {
-//       //    return v.a[i];
-//       // } //optional
-//    };
-// }

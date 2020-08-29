@@ -2,7 +2,7 @@
 
 namespace sec21
 {
-   struct log
+   struct empty_logger
    {
       template <typename... Args>
       static void info(Args &&... args) {};
