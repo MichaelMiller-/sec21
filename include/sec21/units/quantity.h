@@ -38,27 +38,18 @@ namespace sec21::units
          : m_value{ static_cast<T>(u) }
       {}
 
-      template <Quantity Q>
-      requires SameDimension<quantity<Unit, T>, Q>
+      template <Quantity Q> requires SameDimension<quantity<Unit, T>, Q>
       constexpr quantity(Q const& q) noexcept
          : m_value{ quantity_cast<quantity>(q).value() }
       {}
 
-      constexpr auto value() const noexcept {
+      [[nodiscard]] constexpr auto value() const noexcept {
          return m_value;
       }
 
-      constexpr auto operator - () const noexcept {
+      [[nodiscard]] constexpr auto operator - () const noexcept {
          return quantity(-value());
       }
-
-      //[[nodiscard]] static constexpr quantity zero() noexcept {
-      //   //! \todo 
-      //   return {};
-      //}
-      //// quantity equal to 1 expressed in a specific Rep
-      ////! \todo 
-      //[[nodiscard]] static constexpr quantity one() noexcept;
 
       [[nodiscard]] static constexpr quantity min() noexcept
       {
@@ -265,12 +256,6 @@ namespace sec21::units
          using fn = typename U::ratio_t;
       };
 
-      template <typename T>
-      auto to_abbreviation(T) { return abbreviation<T>::value; }
-
-      template <typename T>
-      auto convert_ratio(T) { return T::num / double{ T::den }; }
-
       template <Quantity Q>
       auto from_string(std::string const& input) -> Q
       {
@@ -284,9 +269,8 @@ namespace sec21::units
 
          using T1 = boost::mp11::mp_transform_q<quoted_to_ratio, decltype(valid_types)>;
 
-         //! \todo: c++20 feature is not working with msvc
-         // constexpr auto to_abbreviation = []<typename T>(T){ return abbreviation<T>::value; };
-         // constexpr auto convert_ratio = []<typename T>(T){ return T::num / double{ T::den }; };
+         constexpr auto to_abbreviation = []<typename T>(T){ return abbreviation<T>::value; };
+         constexpr auto convert_ratio = []<typename T>(T){ return T::num / double{ T::den }; };
 
          const auto valid_abbreviations = std::apply([&](auto... n){ return std::array{ to_abbreviation(n)... }; }, valid_types);
          const auto matching_ratios = std::apply([&](auto... n){ return std::array{ convert_ratio(n)... }; }, T1{});
