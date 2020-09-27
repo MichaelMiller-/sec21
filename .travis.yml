@@ -4,15 +4,6 @@ dist: bionic
 matrix:
   include:
   - os: linux
-    env: COMPILER=g++-9
-    addons:
-      apt:
-        update: true
-        sources:
-          - ubuntu-toolchain-r-test
-        packages:
-          - g++-9
-  - os: linux
     env: COMPILER=g++-10
     addons:
       apt:
@@ -21,14 +12,6 @@ matrix:
           - ubuntu-toolchain-r-test
         packages:
           - g++-10
-  # - os: linux
-  #   env: COMPILER=clang++-9.0
-  #   addons:
-  #     apt:
-  #       packages:
-  #       - clang-9.0
-  #       sources:
-  #       - llvm-toolchain-bionic-9
   # - os: linux
   #   env: COMPILER=clang++-10.0
   #   addons:
