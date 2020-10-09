@@ -338,7 +338,7 @@ TEST_CASE("math constants", "[features]")
 // library feature: c++20
 TEST_CASE("shift elements in a range", "[features]")
 {
-#ifdef __cpp_lib_shift && !defined(_MSC_VER)
+#ifdef __cpp_lib_shift
    std::vector<int> result{ 1, 2, 3, 4, 5 };
    auto it = std::shift_left(std::begin(result), std::end(result), 2);
 
