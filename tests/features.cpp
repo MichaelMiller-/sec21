@@ -310,52 +310,52 @@ TEST_CASE("linear interpolation", "[features]")
 }
 
 // library feature: c++20
-// TEST_CASE("starts_with and end_with", "[features]")
-// {
-// #ifdef __cpp_lib_starts_ends_with && !defined(_MSC_VER)
-//    std::string_view input = "Hello World";
+TEST_CASE("starts_with and ends_with", "[features]")
+{
+#ifdef __cpp_lib_starts_ends_with
+   std::string_view input = "Hello World";
 
-//    REQUIRE(input.starts_with("H"));
-//    REQUIRE(input.starts_with("Hello"));
-//    REQUIRE(input.end_with("d"));
-//    REQUIRE(input.end_with("World"));
-// #else
-//    WARN("starts_with() and ends_with() is not supported");
-// #endif
-// }
+   REQUIRE(input.starts_with("H"));
+   REQUIRE(input.starts_with("Hello"));
+   REQUIRE(input.ends_with("d"));
+   REQUIRE(input.ends_with("World"));
+#else
+   WARN("starts_with() and ends_with() is not supported");
+#endif
+}
 
-// #ifdef __cpp_lib_math_constants
-//    #include <numbers>
-// #endif
-// // library feature: c++20
-// TEST_CASE("math constants", "[features]")
-// {
-// #ifdef __cpp_lib_math_constants
-//    STATIC_REQUIRE(std::numbers::pi == Approx(3.14));
-// #else
-//    WARN("math constants are not available");
-// #endif
-// }
+#ifdef __cpp_lib_math_constants
+   #include <numbers>
+#endif
+// library feature: c++20
+TEST_CASE("math constants", "[features]")
+{
+#ifdef __cpp_lib_math_constants
+   REQUIRE(std::numbers::pi == Approx(3.14159));
+#else
+   WARN("math constants are not available");
+#endif
+}
 
 // library feature: c++20
-// TEST_CASE("shift elements in a range", "[features]")
-// {
-// #ifdef __cpp_lib_shift && !defined(_MSC_VER)
-//    std::vector<int> result{ 1, 2, 3, 4, 5 };
-//    auto it = std::shift_left(std::begin(result), std::end(result), 2);
+TEST_CASE("shift elements in a range", "[features]")
+{
+#ifdef __cpp_lib_shift && !defined(_MSC_VER)
+   std::vector<int> result{ 1, 2, 3, 4, 5 };
+   auto it = std::shift_left(std::begin(result), std::end(result), 2);
 
-//    std::vector<int> expected1{ 3, 4, 5, 4, 5 };
-//    REQUIRE(std::size(result) == std::size(expected1));
-//    REQUIRE(std::equal(std::begin(result), std::end(result), std::begin(expected1)));
+   std::vector<int> expected1{ 3, 4, 5, 4, 5 };
+   REQUIRE(std::size(result) == std::size(expected1));
+   REQUIRE(std::equal(std::begin(result), std::end(result), std::begin(expected1)));
 
-//    result.erase(it, std::end(result))
-//    std::vector<int> expected2{ 3, 4, 5 };
-//    REQUIRE(std::size(result) == std::size(expected2));
-//    REQUIRE(std::equal(std::begin(result), std::end(result), std::begin(expected2)));
-// #else
-//    WARN("math constants are not available");
-// #endif
-// }
+   result.erase(it, std::end(result));
+   std::vector<int> expected2{ 3, 4, 5 };
+   REQUIRE(std::size(result) == std::size(expected2));
+   REQUIRE(std::equal(std::begin(result), std::end(result), std::begin(expected2)));
+#else
+   WARN("math constants are not available");
+#endif
+}
 
 // library feature: c++20
 TEST_CASE("Uniform container erasure", "[features]")
@@ -371,71 +371,3 @@ TEST_CASE("Uniform container erasure", "[features]")
    WARN("Uniform container erasure is not supported");
 #endif
 }
-
-// #include <vector>
-// #include <string>
-// #include <memory_resource>
-
-// #include <boost/core/demangle.hpp>
-// #include <iostream>
-// template <typename T>
-// inline auto demangle() -> std::string
-// {
-//     return boost::core::demangle(typeid(T).name());
-// }
-// template <typename T>
-// inline void print_type(std::string name)
-// {
-//     std::cout << name << ": " << demangle<T>() << std::endl;
-// }
-
-#if 0
-// //!  AA == AllocatorAware Type; well know idiom
-class Student
-{
-   std::pmr::string m_name;
-   std::pmr::string m_email;
-   std::pmr::vector<int> m_grades;
-public:
-   using allocater_type = std::pmr::polymorphic_allocator<>;
-
-   explicit Student(allocater_type alloc = {}) 
-      : m_name{"", alloc}
-      , m_email{ "", alloc }
-      , m_grades{ alloc }
-   {}
-
-   Student(std::string_view name, std::string email, allocater_type alloc = {})
-      : m_name{ name, alloc }
-      , m_email{ email, alloc }
-      , m_grades{ alloc }
-   {}
-
-   Student(Student const& rhs, allocater_type alloc)
-      : m_name{ rhs.name, alloc}
-      , m_email{ rhs.m_email, alloc }
-      , m_grades{  rhs.m_grades, alloc }
-   {}
-
-   Student(Student&&) = default;
-   Student(Student&& rhs, allocater_type alloc)
-      : m_name{ std::move(rhs.name), alloc}
-      , m_email{ std::move(rhs.m_email), alloc }
-      , m_grades{  std::move(rhs.m_grades), alloc }
-   {}
-
-   ~Student() = default;
-
-   Student& operator = (Student const&) = default;
-   Student& operator = (Student &&) = default;
-};
-#endif
-
-// int main()
-// {
-
-//     Student s1{ "foo", "bar@dot.org" }; //, std::pmr::polymorphic_allocator<Student>{} };
-//     print_type<decltype(s1)>("s1");
-
-//     return 32;
-// }
