@@ -155,11 +155,12 @@ TEST_CASE("Designated initializer", "[features]")
 {
 #ifdef __cpp_designated_initializers
    S s1{ 
-      .j = 1, 
       .i = 42, 
+      .j = 1, 
       .k = [](auto v) { return v * v; }(4)
    };
 
+   REQUIRE(s1.name.empty());
    REQUIRE(s1.i == 42);
    REQUIRE(s1.j == 1);
    REQUIRE(s1.k == 16);
