@@ -1,34 +1,51 @@
 #pragma once
 
+#include <sec21/fixed_string.h>
+
 #include <tuple>
 #include <string_view>
 
 namespace sec21::database
 {
    struct primary_key {
-      static inline constexpr auto value = "PRIMARY KEY";
+      static constexpr inline auto value = "PRIMARY KEY";
    };
    struct not_null {
-      static inline constexpr auto value = "NOT NULL";
+      static constexpr inline auto value = "NOT NULL";
+   };
+   struct unique {
+      static constexpr inline auto value = "UNIQUE";
    };
 
-   template <typename T, typename... Ops>
-   struct column
+
+   struct column_base {};
+
+   template <fixed_string Name, typename Class, typename T, T Class::*ptr, typename... Constraints>
+   struct column : column_base
    {
+      using class_t = Class;    
       using value_t = T;
-      using ops_t = std::tuple<Ops...>;
-      const std::string_view name{};
+      using member_ptr_t = value_t class_t::*;    
+      using constraints_t = std::tuple<Constraints...>;
+
+      static constexpr std::string_view name{ Name };
+
+      static auto& get(Class& obj) noexcept
+      {
+         return obj.*ptr;
+      }
+      static auto get(Class const& obj) noexcept
+      {
+         return obj.*ptr;
+      }
    };
 
    template <typename T>
-   struct is_column : std::false_type {};
+   struct is_column : std::is_base_of<column_base, T> {};
 
-   template <typename T, typename... Ops>
-   struct is_column<column<T, Ops...>> : std::true_type {};
+   template <typename T>
+   inline constexpr bool is_column_v = is_column<T>::value;
 
-   //! \todo implement tests
-   // static_assert(is_column<column<int>>::value == true);
-   // static_assert(is_column<column<int, primary_key>>::value == true);
-   // static_assert(is_column<column<int, primary_key, not_null>>::value == true);
-   // static_assert(is_column<int>::value == false);   
+   template<typename T>
+   concept Column = is_column_v<T>;
 }
