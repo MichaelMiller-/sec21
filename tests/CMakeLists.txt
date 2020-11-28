@@ -2,12 +2,6 @@ find_package(Catch2 CONFIG REQUIRED)
 find_package(Boost 1.70 REQUIRED)
 find_package(OpenMP REQUIRED)
 
-## TOOD:
-# configure_file(${PROJECT_SOURCE_DIR}/cmake/FindDebViennaCL.cmake.in FindDebViennaCL.cmake COPYONLY)
-# set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_BINARY_DIR})
-# find_package(DebViennaCL REQUIRED)
-# target_link_libraries(test.${tmp} PRIVATE DepViennaCL::DepViennaCL)
-
 include(ExternalProject)
 ExternalProject_Add(
    ViennaCL-tests
@@ -23,76 +17,38 @@ add_library(catch_main STATIC catch_main.cpp)
 target_link_libraries(catch_main PRIVATE Catch2::Catch2)
 add_dependencies(catch_main ViennaCL-tests)
 
-function(test test)
-   string(REPLACE "/" "_" tmp ${test})
-   add_executable(test.${tmp} "${CMAKE_CURRENT_LIST_DIR}/${test}.cpp")
+function(test filename)
+   project(test.${filename})
+   add_executable(${PROJECT_NAME} "${PROJECT_SOURCE_DIR}/${filename}.cpp")
 
-   target_link_libraries(test.${tmp} PRIVATE Catch2::Catch2)
-   ## TODO: error on travis gcc9: target_link_libraries(test.${tmp} PRIVATE Boost::boost)
-   # boost
-   # target_include_directories(test.${tmp} PRIVATE ${Boost_INCLUDE_DIRS})
-   # target_link_libraries(test.${tmp} PRIVATE ${Boost_LIBRARIES})
-   target_link_libraries(test.${tmp} INTERFACE Boost::boost)
-   target_link_libraries(test.${tmp} PRIVATE OpenMP::OpenMP_CXX)
+   target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
+
+   target_link_libraries(${PROJECT_NAME} INTERFACE Boost::boost)
+   target_link_libraries(${PROJECT_NAME} PRIVATE OpenMP::OpenMP_CXX)
    ## viennacl
-   target_compile_definitions(test.${tmp} PRIVATE VIENNACL_WITH_OPENMP)
-   target_include_directories(test.${tmp} PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/viennacl/include")
+   target_compile_definitions(${PROJECT_NAME} PRIVATE VIENNACL_WITH_OPENMP)
+   target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/viennacl/include")
 
-   if (ENABLE_BENCHMARKS)
-      target_compile_definitions(test.${tmp} PRIVATE CATCH_CONFIG_ENABLE_BENCHMARKING)
-   endif()
-
-   include(CheckCXXCompilerFlag)
-   ## platform specific
-   ##
-   if (MSVC_VERSION GREATER_EQUAL "1900")
-      CHECK_CXX_COMPILER_FLAG("/std:c++latest" _cpp_latest_flag_supported)
-      if (_cpp_latest_flag_supported)
-         target_compile_options(test.${tmp} PRIVATE "/std:c++latest")
-      endif()
-      target_compile_options(test.${tmp} PRIVATE "/permissive-")
-   endif()
-   
-   if (CMAKE_COMPILER_IS_GNUCXX)
-      CHECK_CXX_COMPILER_FLAG("-fconcepts" _cpp_concepts_supported)
-      if (_cpp_concepts_supported)
-         target_compile_options(test.${tmp} PRIVATE "-fconcepts")
-      endif()
-   endif()
-
-   if (CMAKE_COMPILER_IS_GNUCXX)
-      CHECK_CXX_COMPILER_FLAG("--fcoroutines-ts:" _cpp_coroutines_supported)
-
-      target_link_libraries(test.${tmp} PRIVATE "-lstdc++fs")
-
-      # -msse4.2
-      # -mavx
-      # -mavx2
-      if (ENABLE_EXPERIMENTAL)
-         add_compile_options("-march=sandybridge")
-      endif()
-   endif()
-
-   target_link_libraries(test.${tmp} PRIVATE catch_main)
-   target_link_libraries(test.${tmp} PUBLIC sec21)
+   target_link_libraries(${PROJECT_NAME} PRIVATE catch_main)
+   target_link_libraries(${PROJECT_NAME} PUBLIC sec21)
    
    foreach(ARG ${ARGN})
       string(LENGTH "${ARG}" length_data_file)
       if(length_data_file)
-         message(STATUS "copy configure file: ${PROJECT_SOURCE_DIR}/data/${ARG}")
-         configure_file("${PROJECT_SOURCE_DIR}/data/${ARG}" "${PROJECT_BINARY_DIR}/${ARG}" COPYONLY)
+         message(STATUS "copy configure file: ${CMAKE_SOURCE_DIR}/data/${ARG}")
+         configure_file("${CMAKE_SOURCE_DIR}/data/${ARG}" "${PROJECT_BINARY_DIR}/${ARG}" COPYONLY)
       endif()
    endforeach()   
 
    add_test(
-      NAME test.${tmp} 
-      COMMAND "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test.${tmp}"
+      NAME ${PROJECT_NAME} 
+      COMMAND "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_NAME}"
       WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
 endfunction()
 
 ## copy optional data 
-if(EXISTS "${PROJECT_SOURCE_DIR}/data/cp_results.sh")
-   configure_file("${PROJECT_SOURCE_DIR}/data/cp_results.sh" "${PROJECT_BINARY_DIR}/cp_results.sh" COPYONLY)
+if(EXISTS "${CMAKE_SOURCE_DIR}/data/cp_results.sh")
+   configure_file("${CMAKE_SOURCE_DIR}/data/cp_results.sh" "${PROJECT_BINARY_DIR}/cp_results.sh" COPYONLY)
 endif()
 
 ## unit tests via catch (alphabetical order)
