@@ -8,6 +8,16 @@
 #include <iostream>
 #include <tuple>
 
+// begin-snippet: db.user.example
+struct user
+{
+   std::string name{};
+   std::string password{};
+   int karma{};
+   double cash{}; 
+};
+// end-snippet
+
 namespace sec21::database
 {
    template <>
@@ -25,161 +35,152 @@ namespace sec21::database
    {
       static constexpr inline auto name = "REAL";
    };
-}
 
-struct user
-{
-   std::string name{};
-   std::string password{};
-   int karma{};
-};
-
-#include <sec21/is_iterator.h>
-#include <sec21/database/query.h>
-
-namespace sec21::database
-{
+   // begin-snippet: db.user.reflection
    template <>
    struct table<user>
    {
-      // using type_t = user;
       static constexpr inline auto name = "user";
 
-      static constexpr auto metainfo() noexcept { return std::tuple{
-             column<int, primary_key, not_null>{"id"},
-             column<std::string, not_null>{"name"},
-             column<std::string, not_null>{"password"},
-             column<int>{"karma"},
-         }; }
-
-      template <typename... Ts>
-      //! \todo argument is declval(table())
-      static constexpr auto dispatch(std::tuple<Ts...> const& tuple) noexcept
+      struct columns
       {
-         return {std::get<2>(tuple), std::get<3>(tuple)};
-      }
+         using name = column<"name", user, std::string, &user::name, primary_key, not_null>;
+         using password = column<"password", user, std::string, &user::password, not_null>;
+         using karma = column<"karma", user, int, &user::karma>;
+         using cash = column<"cash", user, double, &user::cash>;
+      };
+
+      using metainfo = std::tuple<
+         columns::name,
+         columns::password,
+         columns::karma,
+         columns::cash>;
    };
+   // end-snippet
 } // namespace sec21::database
+
+TEST_CASE("concat column constraints", "[sec21][database]")
+{
+   using namespace sec21::database;
+
+   SECTION("empty list")
+   {
+      using input_t = std::tuple<>;
+      constexpr auto indices = std::make_index_sequence<std::tuple_size_v<input_t>>{};
+
+      std::stringstream ss;
+      detail::concat_constraints<input_t>(ss, indices);
+
+      REQUIRE(std::empty(ss.str()));
+   }
+   SECTION("list with one element")
+   {
+      using input_t = std::tuple<not_null>;
+      constexpr auto indices = std::make_index_sequence<std::tuple_size_v<input_t>>{};
+
+      std::stringstream ss;
+      detail::concat_constraints<input_t>(ss, indices);
+      //! \todo leading whitespace is kind of awkward
+      REQUIRE(ss.str() == " NOT NULL");
+   }
+   SECTION("list with two elements")
+   {
+      using input_t = std::tuple<primary_key, not_null>;
+      constexpr auto indices = std::make_index_sequence<std::tuple_size_v<input_t>>{};
+
+      std::stringstream ss;
+      detail::concat_constraints<input_t>(ss, indices);
+      //! \todo leading whitespace is kind of awkward
+      REQUIRE(ss.str() == " PRIMARY KEY NOT NULL");
+   }
+}
+
+TEST_CASE("test detail implementation", "[sec21][database]")
+{
+   using namespace sec21::database;
+
+   user obj{.name = "John Doe", .password = "hidden", .karma = 42, .cash = 3.14};
+
+   using reflection_t = table<decltype(obj)>::metainfo;
+   constexpr auto indices = std::make_index_sequence<std::tuple_size_v<reflection_t>>{};
+
+   SECTION("column_names")
+   {
+      std::stringstream ss;
+      detail::column_names<reflection_t>(ss, indices);
+
+      REQUIRE(ss.str() == R"(name,password,karma,cash)");
+   }
+   SECTION("embraced_column_names")
+   {
+      std::stringstream ss;
+      detail::embraced_column_names<reflection_t>(ss, indices);
+
+      REQUIRE(ss.str() == R"((name,password,karma,cash))");
+   }
+   SECTION("escape value from colum0")
+   {
+      using colum_t = std::tuple_element_t<0, reflection_t>;
+      std::stringstream ss;
+      detail::escape_value_if_necessary<colum_t>(ss, obj);
+
+      REQUIRE(ss.str() == R"('John Doe')");
+   }
+   SECTION("escape value from colum1")
+   {
+      using colum_t = std::tuple_element_t<1, reflection_t>;
+      std::stringstream ss;
+      detail::escape_value_if_necessary<colum_t>(ss, obj);
+
+      REQUIRE(ss.str() == R"('hidden')");
+   }
+   SECTION("escape value from colum2")
+   {
+      using colum_t = std::tuple_element_t<2, reflection_t>;
+      std::stringstream ss;
+      detail::escape_value_if_necessary<colum_t>(ss, obj);
+
+      REQUIRE(ss.str() == R"(42)");
+   }
+   SECTION("escape value from colum3")
+   {
+      using colum_t = std::tuple_element_t<3, reflection_t>;
+      std::stringstream ss;
+      detail::escape_value_if_necessary<colum_t>(ss, obj);
+
+      REQUIRE(ss.str() == R"(3.14)");
+   }
+   SECTION("embraced_row_values")
+   {
+      std::stringstream ss;
+      detail::embraced_row_values<reflection_t>(ss, obj, indices);
+
+      REQUIRE(ss.str() == R"(('John Doe','hidden',42,3.14))");
+   }   
+}
 
 TEST_CASE("test database queries from type: user", "[sec21][database]")
 {
-   user obj{.name = "John Doe", .password = "geheim", .karma = 42};
+   using namespace sec21::database;
 
-   SECTION("select all members")
-   {
-      const auto result = sec21::database::select<decltype(obj)>();
-      REQUIRE(result == "SELECT id,name,password,karma FROM user");
-   }
    SECTION("create table")
    {
-      const auto result = sec21::database::create_table<decltype(obj)>();
-      REQUIRE(result ==  "CREATE TABLE user(id INT PRIMARY KEY NOT NULL,name TEXT NOT NULL,password TEXT NOT NULL,karma INT );");
+      const auto result = create_table<user>();
+      REQUIRE(result == "CREATE TABLE user(name TEXT PRIMARY KEY NOT NULL,password TEXT NOT NULL,karma INT,cash REAL);");
    }
-}
-
-namespace ns
-{
-   struct foo
+   SECTION("insert values into table")
    {
-      double value;
-   };
-}
+      // begin-snippet: db.insert
+      user obj{.name = "John Doe", .password = "hidden", .karma = 42, .cash = 3.14};
+      const auto result = insert_into(obj);
 
-namespace sec21::database 
-{
-   template <>
-   struct table<ns::foo>
-   {
-      // using type_t = user;
-      static constexpr inline auto name = "foo";
-
-      static constexpr auto metainfo() noexcept { return std::tuple{
-            column<double, not_null>{"value"},
-         }; }
-
-      template <typename... Ts>
-      //! \todo argument is declval(table())
-      static constexpr auto dispatch(std::tuple<Ts...> const& tuple) noexcept
-      {
-         return {std::get<0>(tuple)};
-      }
-   };
-} // namespace sec21::database
-
-TEST_CASE("test database queries from type: ns::foo", "[sec21][database]")
-{
-   ns::foo obj{.value=3.14};
-
+      REQUIRE(result == R"(INSERT INTO user (name,password,karma,cash) VALUES ('John Doe','hidden',42,3.14);)");
+      // end-snippet
+   }
    SECTION("select all members")
    {
-      const auto result = sec21::database::select<decltype(obj)>();
-      REQUIRE(result == "SELECT value FROM foo");
-   }
-   SECTION("create table")
-   {
-      const auto result = sec21::database::create_table<decltype(obj)>();
-      REQUIRE(result == "CREATE TABLE foo(value REAL NOT NULL);");
+      const auto result = select<user>();
+
+      REQUIRE(result == "SELECT name,password,karma,cash FROM user");
    }
 }
-// namespace sec21::structural_analysis
-//{
-//   template <typename Descriptor, typename Precision = double>
-//   struct material
-//   {
-//      using descriptor_t = Descriptor;
-//      using precision_t = Precision;
-//      using e_modul_t = units::quantity<units::gigapascal, precision_t>;
-//      using g_modul_t = units::quantity<units::gigapascal, precision_t>;
-//      using second_moment_of_area_t = units::quantity<units::meters_to_the_fourth_power, precision_t>;
-//
-//      //! \brief unique name
-//      descriptor_t name{ descriptor_traits<descriptor_t>::invalid() };
-//      //! \brief
-//      e_modul_t E{};
-//      //! \brief DE: Flächenträgheitsmoment
-//      second_moment_of_area_t I{};
-//      //! \brief DE: Schubmodul
-//      g_modul_t G{};
-//   };
-//} // namespace sec21::structural_analysis
-
-/*
- *    sqlite3 *db;
-    char *err_msg = 0;
-    sqlite3_stmt *res;
-
-    int rc = sqlite3_open("test.db", &db);
-
-    if (rc != SQLITE_OK) {
-
-        fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
-        sqlite3_close(db);
-
-        return 1;
-    }
-
-    char *sql = "SELECT Id, Name FROM Cars WHERE Id = ?";
-
-    rc = sqlite3_prepare_v2(db, sql, -1, &res, 0);
-
-    if (rc == SQLITE_OK) {
-
-        sqlite3_bind_int(res, 1, 3);
-    } else {
-
-        fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
-    }
-
-    int step = sqlite3_step(res);
-
-    if (step == SQLITE_ROW) {
-
-        printf("%s: ", sqlite3_column_text(res, 0));
-        printf("%s\n", sqlite3_column_text(res, 1));
-
-    }
-
-    sqlite3_finalize(res);
-    sqlite3_close(db);
- *
- */

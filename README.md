@@ -5,6 +5,7 @@ Linux [![Build Status](https://travis-ci.org/MichaelMiller-/sec21.svg?branch=mas
 **sec21** is a collection of useful functions and classes.
 - [Units](#Units)
 - [Eventsystem](#Eventsystem)
+- [SQL Database Wrapper](include/sec21/database/README.md)
 
 Examples 
 - [Viewer](#Viewer)
@@ -12,7 +13,7 @@ Examples
 ---------------------------------------
 ## Units
 
-Modern header-only library for [dimensional analysis](https://en.wikipedia.org/wiki/Dimensional_analysis) are inspired by [Boost](https://www.boost.org)-Units and the example from Boost-MPL. Only one header is required to use the library.
+Modern header-only library for [dimensional analysis](https://en.wikipedia.org/wiki/Dimensional_analysis) is inspired by [Boost](https://www.boost.org)-Units and Boost-MPL. Only a single header has to be included in order to use the library.
 ```
 #include <sec21/units.h>
 ```
