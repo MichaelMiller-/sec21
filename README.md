@@ -8,7 +8,7 @@ Linux [![Build Status](https://travis-ci.org/MichaelMiller-/sec21.svg?branch=mas
 - [SQL Database Wrapper](include/sec21/database/README.md)
 
 Examples 
-- [Viewer](#Viewer)
+- [Viewer](viewer/README.md)
 
 ---------------------------------------
 ## Units
@@ -60,9 +60,4 @@ The backend should also be able to convert the events provided by the eventsyste
 
 ### Dependencies
 - [nlohmann/json](https://github.com/nlohmann/json)
-
-
----------------------------------------
-## Viewer
-The Viewer has it's own [description](viewer/README.md)
 
