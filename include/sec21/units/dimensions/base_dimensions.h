@@ -1,6 +1,7 @@
 #pragma once
 
 #include <sec21/units/dimension.h>
+#include <sec21/units/unit.h>
 
 namespace sec21::units
 {
