@@ -33,7 +33,7 @@ namespace sec21::units
    template <typename... Exponents>
    struct is_dimension<dimension<Exponents...>> : std::true_type {};
 
-   // concepts
+#ifdef __cpp_concepts
    template <typename T>
    concept Scalar = std::is_scalar<T>::value;
 
@@ -51,4 +51,5 @@ namespace sec21::units
 
    template <typename T, typename U>
    concept SameDimension = std::is_same<to_dimension_t<T>, to_dimension_t<U>>::value;
+#endif   
 }

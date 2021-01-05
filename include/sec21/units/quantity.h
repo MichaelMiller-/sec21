@@ -33,6 +33,7 @@ namespace sec21::units
 
       quantity() = default;
 
+#ifdef __cpp_concepts
       template <Scalar U> // requires std::is_nothrow_convertible<U, T>
       constexpr quantity(U u) noexcept
          : m_value{ static_cast<T>(u) }
@@ -42,6 +43,7 @@ namespace sec21::units
       constexpr quantity(Q const& q) noexcept
          : m_value{ quantity_cast<quantity>(q).value() }
       {}
+#endif
 
       [[nodiscard]] constexpr auto value() const noexcept {
          return m_value;
@@ -66,6 +68,7 @@ namespace sec21::units
       }      
    };
 
+#ifdef __cpp_concepts
    template <Quantity Q1, Quantity Q2> requires SameDimension<Q1, Q2>
    constexpr bool operator == (Q1 const& lhs, Q2 const& rhs) noexcept
    {
@@ -215,8 +218,7 @@ namespace sec21::units
       ss << obj.value() << '_' << abbreviation<typename Q::dimension_t>::value;
       return ss.str();
    }
-
-
+#endif
 }
 
 #include <nlohmann/json.hpp>
