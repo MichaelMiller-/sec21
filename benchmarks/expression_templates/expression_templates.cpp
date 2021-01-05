@@ -49,6 +49,31 @@ namespace conventional
    }
 }
 
+namespace conventional::raw_loop
+{
+   tridiagonal operator + (tridiagonal const& lhs, tridiagonal const& rhs)
+   {
+      tridiagonal result;
+      result.values.resize(std::size(lhs.values));
+      for (auto i = 0; i < std::size(lhs.values); ++i)
+      {
+         result.values[i] = lhs.values[i] + rhs.values[i];
+      }
+      return result;
+   }
+
+   tridiagonal operator * (double const& lhs, tridiagonal const& rhs)
+   {
+      tridiagonal result{ rhs };
+      result.values.resize(std::size(rhs.values));
+      for (auto i = 0; i < std::size(rhs.values); ++i)
+      {
+         result.values[i] = rhs.values[i] * lhs;
+      }
+      return result;
+   }
+}
+
 namespace expression_template
 {
    struct base_expression {};
@@ -130,6 +155,8 @@ namespace expression_template
    }
 }
 
+
+
 std::string today()
 {
    auto const now = std::chrono::system_clock::now();
@@ -157,9 +184,14 @@ int main()
 
    const nonius::benchmark benchmarks[] = 
    {
-      nonius::benchmark("conventional", [&] { 
+      nonius::benchmark("conventional STL", [&] { 
          using namespace conventional;
          A = 0.77 * (a * A + b * B); 
+         return A;
+      }),
+      nonius::benchmark("conventional RawLoops", [&] {
+         using namespace conventional::raw_loop;
+         A = 0.77 * (a * A + b * B);
          return A;
       }),
       nonius::benchmark("use expression templates", [&] {
