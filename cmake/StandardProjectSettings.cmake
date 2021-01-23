@@ -1,11 +1,6 @@
 
-set(CMAKE_CXX_STANDARD 20)
-# output directory
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
-
-
-find_program(CCACHE ccache)
-if(CCACHE)
+find_program(CCACHE_FOUND ccache)
+if(CCACHE_FOUND)
   message(STATUS "using ccache")
   set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE})
 endif()
