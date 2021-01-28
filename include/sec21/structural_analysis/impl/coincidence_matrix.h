@@ -12,16 +12,16 @@
 
 namespace sec21::structural_analysis::impl
 {
-   // template <typename System>
-   // [[nodiscard]] auto coincidence_matrix(System const& sys, typename System::beam_t const& m)
-   //    -> boost::numeric::ublas::matrix<int>
-   // {}
-
+#ifdef __cpp_concepts
    template <typename Allocator, SpaceTruss2D System>
+#else   
+   template <typename Allocator, typename System>
+#endif
    [[nodiscard]] auto coincidence_matrix(System const& sys, typename System::member_descriptor_t id)
    {
+      static_assert(System::node_t::dimension_v == 2, "Only works with 2D system");
+
       constexpr auto dim = System::node_t::dimension_v;
-      // static_assert(System::node_t::dimension_v == 2, "Only works with 2D system");
 
       auto find_node = [&sys](auto const& id)
       {
