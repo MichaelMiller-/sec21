@@ -39,7 +39,7 @@
     ],
     "members": [
         {
-            "A":  {
+            "A": {
                 "quantity": "5_sq_cm"
             },
             "E": {
@@ -48,7 +48,7 @@
             "name": 1
         },
         {
-            "A":  {
+            "A": {
                 "quantity": "5_sq_cm"
             },
             "E": {
@@ -57,7 +57,7 @@
             "name": 2
         },
         {
-            "A":  {
+            "A": {
                 "quantity": "5_sq_cm"
             },
             "E": {
@@ -66,7 +66,7 @@
             "name": 3
         },
         {
-            "A":  {
+            "A": {
                 "quantity": "5_sq_cm"
             },
             "E": {
@@ -75,7 +75,7 @@
             "name": 4
         },
         {
-            "A":  {
+            "A": {
                 "quantity": "5_sq_cm"
             },
             "E": {
