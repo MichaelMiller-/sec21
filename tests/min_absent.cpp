@@ -1,32 +1,11 @@
 #include <catch.hpp>
 
-#include <algorithm>
-
-namespace sec21
-{
-    template <std::forward_iterator Iterator, typename T = std::iter_value_t<Iterator>>
-    constexpr auto min_absent(Iterator first, Iterator last, T initial = {}) noexcept
-    {
-        using difference_t = decltype(initial - initial);
-        while (last != first)
-        {
-            auto const half = (std::distance(first, last) + 1) / 2;
-            T const m = initial + static_cast<difference_t>(half);
-            auto const pos = std::partition(first, last, [&](auto const &x) { return x < m; });
-            if (pos == std::next(first, half))
-            {
-                first = pos;
-                initial = m;
-            }
-            else
-                last = pos;
-        }
-        return initial;
-    }
-} // namespace sec21
+#include <sec21/min_absent.h>
 
 TEST_CASE("find the next absent element missing in a sorted sequence", "[sec21][core]")
 {
+    using namespace sec21;
+
     SECTION("empty sequence")
     {
         std::vector<int> in{};
