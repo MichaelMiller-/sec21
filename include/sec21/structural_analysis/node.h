@@ -1,6 +1,5 @@
 #pragma once
 
-#include <sec21/units.h>
 #include <sec21/strong_type.h>
 #include <sec21/structural_analysis/descriptor_traits.h>
 #include <sec21/structural_analysis/support.h>
@@ -35,6 +34,7 @@ namespace sec21::structural_analysis
       std::optional<global_support_t> global_support{};
    };
 
+   //! \brief generates a list of supports per node and direction 
    template <typename InputIterator, typename OutputIterator>
    auto support_mask(InputIterator first, InputIterator last, OutputIterator out) -> OutputIterator
    {
