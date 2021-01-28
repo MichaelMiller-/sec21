@@ -4,6 +4,7 @@
 #include <array>
 
 #include <sec21/structural_analysis/node.h>
+#include <sec21/units.h>
 
 using namespace sec21::structural_analysis;
 
