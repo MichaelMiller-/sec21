@@ -5,6 +5,8 @@
 #include <sec21/numeric/ublas_allocator_wrapper.h>
 #include <sec21/structural_analysis/loadcase.h>
 #include <sec21/structural_analysis/solve.h>
+#include <sec21/structural_analysis/node.h>
+#include <sec21/structural_analysis/member.h>
 #include <sec21/structural_analysis/space_truss.h>
 #include <sec21/structural_analysis/system_result.h>
 #include <sec21/units.h>
@@ -17,7 +19,11 @@ TEST_CASE("example 1.1 with different node id's (N1 switched with N3 from exampl
    using namespace sec21::structural_analysis;
    using namespace sec21::units::literals;
 
-   auto sys = space_truss{};
+   using member_t = member<int, double>;
+   using node_t = node<2, int, double>;
+   using space_truss_t = space_truss<node_t, member_t>;
+
+   auto sys = space_truss_t{};
    using precision_t = decltype(sys)::precision_t;
 
    using precision_t = decltype(sys)::precision_t;
