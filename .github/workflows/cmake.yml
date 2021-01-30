@@ -20,7 +20,10 @@ jobs:
     - name: Setup Dependencies
       shell: bash
       run: git clone https://github.com/Microsoft/vcpkg.git && cd vcpkg
-      #run: sh bootstrap-vcpkg.sh
+      
+    - name: Build vcpkg
+      shell: bash
+      run: sh bootstrap-vcpkg.sh
       #run: ./vcpkg install boost-core
 
     - name: Create Build Environment
