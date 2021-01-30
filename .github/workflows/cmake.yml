@@ -23,7 +23,7 @@ jobs:
       
     - name: Build vcpkg
       shell: bash
-      run: sh bootstrap-vcpkg.sh
+      run: bootstrap-vcpkg.sh
       #run: ./vcpkg install boost-core
 
     - name: Create Build Environment
