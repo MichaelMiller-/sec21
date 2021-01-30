@@ -19,10 +19,9 @@ jobs:
       
     - name: Setup Dependencies
       shell: bash
-      run: git clone https://github.com/Microsoft/vcpkg.git
-      run: cd vcpkg
-      run: sh bootstrap-vcpkg.sh
-      run: ./vcpkg install boost-core
+      run: git clone https://github.com/Microsoft/vcpkg.git && cd vcpkg
+      #run: sh bootstrap-vcpkg.sh
+      #run: ./vcpkg install boost-core
 
     - name: Create Build Environment
       # Some projects don't allow in-source building, so create a separate build directory
