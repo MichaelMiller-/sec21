@@ -17,18 +17,27 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       
-    - name: Setup Dependencies
+    - name: Install Dependencies
       shell: bash
       run: |
         git clone https://github.com/Microsoft/vcpkg.git 
         cd vcpkg
-        ls
-        ./bootstrap-vcpkg.sh
-      
-    - name: Install Dependencies
-      shell: bash
-      run: |
+        ./vcpkg/bootstrap-vcpkg.sh
         ./vcpkg install boost-core
+        ./vcpkg install boost-core
+        ./vcpkg install boost-function-types 
+        ./vcpkg install boost-geometry
+        ./vcpkg install boost-hana
+        ./vcpkg install boost-math
+        ./vcpkg install boost-outcome
+        ./vcpkg install boost-program-options
+        ./vcpkg install boost-qvm
+        ./vcpkg install boost-range
+        ./vcpkg install boost-ublas
+        ./vcpkg install catch2
+        ./vcpkg install glm
+        ./vcpkg install nlohmann-json
+        ./vcpkg install spdlog
 
     - name: Create Build Environment
       # Some projects don't allow in-source building, so create a separate build directory
