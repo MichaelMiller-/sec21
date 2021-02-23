@@ -24,7 +24,6 @@ jobs:
         cd vcpkg
         ./bootstrap-vcpkg.sh
         ./vcpkg install boost-core
-        ./vcpkg install boost-core
         ./vcpkg install boost-function-types 
         ./vcpkg install boost-geometry
         ./vcpkg install boost-hana
