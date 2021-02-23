@@ -124,7 +124,11 @@ struct increment_alphabet
    }
 };
 
-using alhpabet_t = strong_type<std::string, struct alhpabet_tag, increment_alphabet, policy::compare>;
+using alhpabet_t = strong_type<
+   std::string, 
+   struct alhpabet_tag, 
+   increment_alphabet, 
+   policy::compare>;
 
 alhpabet_t obj{ "Z" };
 ++obj;
