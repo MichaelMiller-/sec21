@@ -19,12 +19,11 @@ jobs:
       
     - name: Setup Dependencies
       shell: bash
-      run: git clone https://github.com/Microsoft/vcpkg.git && cd vcpkg
+      run: |
+        git clone https://github.com/Microsoft/vcpkg.git 
+        cd vcpkg
+        bootstrap-vcpkg.sh
       
-    - name: Build vcpkg
-      shell: bash
-      run: bootstrap-vcpkg.sh
-
     - name: Install Dependencies
       shell: bash
       run: |
