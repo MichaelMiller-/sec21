@@ -44,10 +44,12 @@ namespace sec21::units
 
 #ifdef __cpp_concepts
       template <Quantity Q> requires SameDimension<quantity<Unit, T>, Q>
+#else
+      template <typename Q, std::enable_if_t<has_same_dimension<quantity<Unit, T>, Q>::value, bool> = true>
+#endif
       constexpr quantity(Q const& q) noexcept
          : m_value{ quantity_cast<quantity>(q).value() }
       {}
-#endif
 
       [[nodiscard]] constexpr auto value() const noexcept {
          return m_value;
@@ -114,14 +116,6 @@ namespace sec21::units
    {
       return Q1{ lhs.value() + Q1{ rhs }.value() };
    }
-
-#if 0
-   template <Quantity Q1, Scalar S>
-   constexpr auto operator + (Q1 const& lhs, S const& rhs) noexcept
-   {
-      return Q1{ lhs.value() + rhs };
-   }
-#endif
 
    template <Quantity Q1, Quantity Q2> requires SameDimension<Q1, Q2>
    constexpr auto operator - (Q1 const& lhs, Q2 const& rhs) noexcept
@@ -232,9 +226,6 @@ namespace sec21::units
 
 namespace sec21::units
 {
-   template <typename Unit>
-   struct abbreviation;
-
    namespace detail
    {
       inline auto split(std::string const& input)
@@ -265,7 +256,11 @@ namespace sec21::units
          using fn = typename U::ratio_t;
       };
 
-      template <Quantity Q>
+#ifdef __cpp_concepts      
+      template <Quantity Q> 
+#else
+      template <typename Q, std::enable_if_t<is_quantity<Q>::value, bool> = true>
+#endif
       auto from_string(std::string const& input) -> Q
       {
          auto [value, unit] = split(input);
@@ -304,7 +299,11 @@ namespace sec21::units
       };
    }
 
+#ifdef __cpp_concepts
    template <Quantity Q>
+#else
+   template <typename Q, std::enable_if_t<is_quantity<Q>::value, bool> = true>
+#endif
    void from_json(nlohmann::json const& j, Q& obj) 
    {
       std::string value;
