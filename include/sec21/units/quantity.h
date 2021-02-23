@@ -34,11 +34,15 @@ namespace sec21::units
       quantity() = default;
 
 #ifdef __cpp_concepts
-      template <Scalar U> // requires std::is_nothrow_convertible<U, T>
-      constexpr quantity(U u) noexcept
+      template <Scalar U>
+#else
+      template <typename U, std::enable_if_t<std::is_scalar<U>::value, bool> = true>
+#endif
+      constexpr quantity(U u) noexcept(std::is_nothrow_convertible<U, T>::value)
          : m_value{ static_cast<T>(u) }
       {}
 
+#ifdef __cpp_concepts
       template <Quantity Q> requires SameDimension<quantity<Unit, T>, Q>
       constexpr quantity(Q const& q) noexcept
          : m_value{ quantity_cast<quantity>(q).value() }
@@ -228,6 +232,9 @@ namespace sec21::units
 
 namespace sec21::units
 {
+   template <typename Unit>
+   struct abbreviation;
+
    namespace detail
    {
       inline auto split(std::string const& input)
