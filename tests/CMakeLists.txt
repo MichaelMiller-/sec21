@@ -1,6 +1,7 @@
 find_package(Catch2 CONFIG REQUIRED)
 find_package(Boost 1.70 REQUIRED)
 find_package(OpenMP REQUIRED)
+find_package(fmt REQUIRED)
 
 include(ExternalProject)
 ExternalProject_Add(
@@ -25,6 +26,7 @@ function(test filename)
 
    target_link_libraries(${PROJECT_NAME} INTERFACE Boost::boost)
    target_link_libraries(${PROJECT_NAME} PRIVATE OpenMP::OpenMP_CXX)
+   target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt-header-only)
    ## viennacl
    target_compile_definitions(${PROJECT_NAME} PRIVATE VIENNACL_WITH_OPENMP)
    target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/viennacl/include")
@@ -56,6 +58,7 @@ endif()
 test("access")
 test("any_of")
 test("all_of")
+test("alphabet")
 test("bit_pattern")
 test("cache")
 test("concat")
