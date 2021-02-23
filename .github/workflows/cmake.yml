@@ -22,7 +22,8 @@ jobs:
       run: |
         git clone https://github.com/Microsoft/vcpkg.git 
         cd vcpkg
-        bootstrap-vcpkg.sh
+        ls
+        ./bootstrap-vcpkg.sh
       
     - name: Install Dependencies
       shell: bash
