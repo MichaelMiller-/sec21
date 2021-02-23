@@ -22,7 +22,7 @@ jobs:
       run: |
         git clone https://github.com/Microsoft/vcpkg.git 
         cd vcpkg
-        ./vcpkg/bootstrap-vcpkg.sh
+        ./bootstrap-vcpkg.sh
         ./vcpkg install boost-core
         ./vcpkg install boost-core
         ./vcpkg install boost-function-types 
