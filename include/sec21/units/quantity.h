@@ -38,7 +38,10 @@ namespace sec21::units
 #else
       template <typename U, std::enable_if_t<std::is_scalar<U>::value, bool> = true>
 #endif
-      constexpr quantity(U u) noexcept(std::is_nothrow_convertible<U, T>::value)
+      constexpr quantity(U u) 
+#ifdef __cpp_lib_is_nothrow_convertible      
+      noexcept(std::is_nothrow_convertible<U, T>::value)
+#endif      
          : m_value{ static_cast<T>(u) }
       {}
 
