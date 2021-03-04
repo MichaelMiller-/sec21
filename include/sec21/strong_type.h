@@ -14,10 +14,16 @@ namespace sec21
       underlying_t value{};
    public:
       constexpr strong_type() = default;
-      constexpr explicit strong_type(T const& t) noexcept(std::is_nothrow_copy_constructible<T>::value)
+      constexpr explicit strong_type(T const& t)
+#ifdef __cpp_lib_is_nothrow_convertible
+      noexcept(std::is_nothrow_copy_constructible<T>::value)
+#endif      
          : value{ t }
       {}
-      constexpr explicit strong_type(T&& t) noexcept(std::is_nothrow_move_constructible<T>::value)
+      constexpr explicit strong_type(T&& t)
+#ifdef __cpp_lib_is_nothrow_convertible
+      noexcept(std::is_nothrow_move_constructible<T>::value)
+#endif      
          : value{ std::move(t) }
       {}
 
