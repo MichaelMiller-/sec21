@@ -1,19 +1,6 @@
 #include <catch.hpp>
 
-#include <sec21/strong_type.h>
-#include <sec21/policy/compare.h>
-#include <sec21/policy/print.h>
-#include <sec21/policy/increment_alphabet.h>
-
-namespace sec21
-{
-   using alphabet_t = strong_type<
-      std::string, 
-      struct alphabet_tag, 
-      policy::increment_alphabet, 
-      policy::compare,
-      policy::print>;
-}
+#include <sec21/alphabet.h>
 
 TEST_CASE("alphabet strong_type", "[sec21][core]")
 {
