@@ -15,17 +15,13 @@
 #include <sec21/structural_analysis/impl/lookup.h>
 #include <sec21/structural_analysis/impl/geometry.h>
 #include <sec21/structural_analysis/impl/global_stiffness_matrix.h>
+//! \todo backend as template parameter
+#include <sec21/structural_analysis/solver/backend/viennacl.h>
 
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/matrix_proxy.hpp>
-#include <boost/numeric/ublas/io.hpp>
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wignored-attributes"
-   #include <viennacl/vector.hpp>
-   #include <viennacl/matrix.hpp>
-   #include <viennacl/linalg/lu.hpp>
-#pragma GCC diagnostic pop
+//! \todo consider: <boost/numeric/ublas/opencl/operation.hpp>
+#include <boost/numeric/ublas/operation.hpp>
 
 #include <string_view>
 #include <array>
@@ -36,33 +32,7 @@ namespace sec21::structural_analysis
 {
    namespace impl
    {
-#if 0      
-      template <typename System>
-      [[nodiscard]] auto supported_indicies(System const &sys) noexcept
-      {
-         auto lookup = impl::make_lookup(sys, impl::Row{0});
-
-         std::vector<bool> mask{};
-         support_mask(std::begin(sys.nodes), std::end(sys.nodes), std::back_inserter(mask));
-
-         decltype(lookup) supported_rows{};
-         decltype(lookup) not_supported_rows{};
-
-         partition_lookup(
-            std::begin(lookup), 
-            std::end(lookup),
-            std::begin(mask), 
-            std::end(mask),
-            std::back_inserter(supported_rows),
-            std::back_inserter(not_supported_rows));
-
-         const auto supported_cols = impl::row_to_col(std::begin(supported_rows), std::end(supported_rows));
-
-         return std::tuple{ supported_rows, supported_cols };
-      }
-#endif
-
-      template <typename System, typename Allocator>
+      template <typename Solver, typename System, typename Allocator>
       [[nodiscard]] auto solve(
          System const &sys, 
          boost::numeric::ublas::matrix<typename System::precision_t, boost::numeric::ublas::row_major, Allocator> K,
@@ -102,42 +72,17 @@ namespace sec21::structural_analysis
          using namespace boost::numeric;
          using namespace viennacl::linalg;
 
-         viennacl::vector<precision_t> vcl_rhs(F_without_supports.size());
-         //! \todo names
-         viennacl::vector<precision_t> vcl_result_gl1(K_without_supports.size2());
-         viennacl::matrix<precision_t> vcl_matrix(K_without_supports.size1(), K_without_supports.size2());
-         viennacl::copy(F_without_supports, vcl_rhs);
-         viennacl::copy(K_without_supports, vcl_matrix);
+         const auto verschiebungen = Solver::displacement(K_without_supports, F_without_supports);
 
-         vcl_result_gl1 = solve(vcl_matrix, vcl_rhs, viennacl::linalg::upper_tag{});
-         vcl_result_gl1 = solve(vcl_matrix, vcl_rhs, viennacl::linalg::lower_tag{});
-         lu_factorize(vcl_matrix);
-         lu_substitute(vcl_matrix, vcl_rhs);
-
-         std::vector<precision_t> verschiebungen(K_without_supports.size1());
-         viennacl::copy(std::begin(vcl_rhs), std::end(vcl_rhs), std::begin(verschiebungen));
-
-         ublas::vector<precision_t, allocator_t> auflagerreaktionen(K_strich.size1());
-
-         viennacl::vector<precision_t> vcl_u(std::size(verschiebungen));
-         viennacl::vector<precision_t> vcl_result(std::size(auflagerreaktionen));
-         viennacl::matrix<precision_t> vcl_A(K_strich.size1(), K_strich.size2());
-
-         viennacl::copy(verschiebungen, vcl_u);
-         viennacl::copy(K_strich, vcl_A);
-
-         vcl_result = viennacl::linalg::prod(vcl_A, vcl_u);
-         viennacl::copy(std::begin(vcl_result), std::end(vcl_result), std::begin(auflagerreaktionen));
+         //! \todo fix Allocator template arugment
+         boost::numeric::ublas::vector<precision_t> auflagerreaktionen(K_strich.size1());
+         boost::numeric::ublas::axpy_prod(K_strich, verschiebungen, auflagerreaktionen, false);
 
          const auto n = std::distance(std::begin(sys.nodes), std::end(sys.nodes));
          constexpr auto dim = System::dimension_v;
-         std::array<std::byte, 8192> buffer; 
-         std::pmr::monotonic_buffer_resource res{ buffer.data(), size(buffer) };
-         std::pmr::vector<precision_t> support_reactions{ n * dim, &res };
-         std::pmr::vector<precision_t> displacements{ n * dim, &res };
 
-         // std::vector<precision_t> support_reactions(n * dim);
-         // std::vector<precision_t> displacements(n * dim);
+         std::vector<precision_t> support_reactions(n * dim);
+         std::vector<precision_t> displacements(n * dim);
 
          //! \todo could be only on zip() call -> benchmark
          zip(
@@ -152,19 +97,6 @@ namespace sec21::structural_analysis
             std::begin(verschiebungen));
 
          system_result<System> result;
-
-         // allocate space for the node results
-         // std::transform(        
-         //    std::begin(sys.nodes), 
-         //    std::end(sys.nodes),
-         //    std::inserter(result.nodes, std::end(result.nodes)),
-         //    [](auto&& node){ return { node.id, {}, {} }; });
-
-         // std::transform(        
-         //    std::begin(sys.members), 
-         //    std::end(sys.members),
-         //    std::inserter(result.members, std::end(result.members)),
-         //    [&result](auto&& member){ return typename decltype(result)::node_result_t{ }; });
 
          std::transform(        
             std::begin(sys.nodes), 
@@ -218,8 +150,6 @@ namespace sec21::structural_analysis
                 std::cos(alpha) * X(delta_e).value() +
                 std::sin(alpha) * Y(delta_e).value()) * k1 * kv;
 
-            result.member[m.name].normal_force = N;
-
             result.members.insert({ m.name, N });
          }
 
@@ -233,6 +163,7 @@ namespace sec21::structural_analysis
       }
    }
 
+   //! \todo solver template argument -> forward
    template <typename System>
    [[nodiscard]] auto solve(System const& sys, loadcase<System> const& load)
    {
@@ -269,6 +200,6 @@ namespace sec21::structural_analysis
 
       //! \todo return std::optional or boost::outcome
       //! \todo process(solve) -> post_process(sys, result)
-      return impl::solve(sys, K, F);
+      return impl::solve<solver::backend::viennacl_impl>(sys, K, F);
    }   
 }
