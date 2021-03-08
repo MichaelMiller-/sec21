@@ -40,8 +40,8 @@ namespace sec21::structural_analysis
    };
 
    template <typename T>
-   inline constexpr bool has_equal_name(T const& lhs, T const& rhs) 
-   //! \todo enable: noexcept(noexcept(std::declval<T>().name == std::declval<T>().name))
+   inline constexpr bool equal_name(T const& lhs, T const& rhs) 
+   noexcept(noexcept(std::declval<T>().name == std::declval<T>().name))
    {
       return lhs.name == rhs.name;
    }
@@ -51,15 +51,16 @@ namespace sec21::structural_analysis
       System& sys,
       typename System::node_t node) noexcept -> outcome::std_result<typename System::node_descriptor_t>
    {
+#if 0      
       if (node.name == descriptor_traits<decltype(node.name)>::invalid())
          // return error_code::invalid_node_name;
          return std::errc::invalid_argument;
+#endif
 
-      //! \todo fails to compile with gcc10.1
-      //! \todo reason is possible the noexcept specifier
-      //! \todo std::any_of(begin(nodes), end(nodes), std::bind(has_equal_name<typename System::node_t>, _1, node));
+      // std::bind cannot bind a noexcept function
+      const auto compare_name = [&node](auto n){ return equal_name(n, node); };
 
-      if (std::any_of(begin(sys.nodes), end(sys.nodes), std::bind(has_equal_name<typename System::node_t>, std::placeholders::_1, node)))
+      if (std::any_of(begin(sys.nodes), end(sys.nodes), compare_name))
          //! \todo error_code::node_already_exists
          return std::errc::invalid_argument;
 
@@ -81,9 +82,11 @@ namespace sec21::structural_analysis
       typename System::node_descriptor_t to,
       typename System::member_t member) noexcept -> outcome::std_result<typename System::member_descriptor_t>
    {
+#if 0      
       if (member.name == descriptor_traits<typename System::member_descriptor_t>::invalid())
          //! \todo error_code::invalid_descriptor
          return std::errc::invalid_argument;
+#endif
 
       const auto it_from = std::find_if(begin(sys.nodes), end(sys.nodes), [&from](auto && e) { return from == e.name; });
       const auto it_to = std::find_if(begin(sys.nodes), end(sys.nodes), [&to](auto && e) { return to == e.name; });
@@ -92,7 +95,10 @@ namespace sec21::structural_analysis
          //! \todo error_code::node_not_found
          return std::errc::invalid_argument;
 
-      if (std::any_of(begin(sys.members), end(sys.members), std::bind(has_equal_name<typename System::member_t>, std::placeholders::_1, member)))
+      // std::bind cannot bind a noexcept function
+      const auto compare_name = [&member](auto m){ return equal_name(m, member); };
+
+      if (std::any_of(begin(sys.members), end(sys.members), compare_name))
          //! \todo error_code::member_already_exists
          return std::errc::invalid_argument;
 
