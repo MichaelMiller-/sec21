@@ -51,11 +51,9 @@ namespace sec21::structural_analysis
       System& sys,
       typename System::node_t node) noexcept -> outcome::std_result<typename System::node_descriptor_t>
    {
-#if 0      
       if (node.name == descriptor_traits<decltype(node.name)>::invalid())
          // return error_code::invalid_node_name;
          return std::errc::invalid_argument;
-#endif
 
       // std::bind cannot bind a noexcept function
       const auto compare_name = [&node](auto n){ return equal_name(n, node); };
@@ -82,11 +80,9 @@ namespace sec21::structural_analysis
       typename System::node_descriptor_t to,
       typename System::member_t member) noexcept -> outcome::std_result<typename System::member_descriptor_t>
    {
-#if 0      
       if (member.name == descriptor_traits<typename System::member_descriptor_t>::invalid())
          //! \todo error_code::invalid_descriptor
          return std::errc::invalid_argument;
-#endif
 
       const auto it_from = std::find_if(begin(sys.nodes), end(sys.nodes), [&from](auto && e) { return from == e.name; });
       const auto it_to = std::find_if(begin(sys.nodes), end(sys.nodes), [&to](auto && e) { return to == e.name; });
