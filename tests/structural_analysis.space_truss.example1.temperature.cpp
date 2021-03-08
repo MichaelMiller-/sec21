@@ -43,10 +43,10 @@ TEST_CASE("example system 1.0 with temperature load", "[sec21][structural_analys
 
    std::vector<double> copied_results{};
    std::transform(
-      std::begin(result.member), 
-      std::end(result.member), 
+      std::begin(result.members), 
+      std::end(result.members), 
       std::back_inserter(copied_results), 
-      [](auto&& m) { return m.second.normal_force.value(); });
+      [](auto&& m) { return m.normal_force.value(); });
 
    // unit: millimeter [mm]
    REQUIRE(flat_displacement[0] == Approx(-0.54));

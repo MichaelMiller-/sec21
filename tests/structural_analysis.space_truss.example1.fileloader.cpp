@@ -60,10 +60,10 @@ TEST_CASE("example system 1.0 load from json", "[sec21][structural_analysis][spa
    {
       std::vector<double> copied_results{};
       std::transform(
-         std::begin(result.member), 
-         std::end(result.member), 
+         std::begin(result.members), 
+         std::end(result.members), 
          std::back_inserter(copied_results), 
-         [](auto&& m) { return m.second.normal_force.value(); });
+         [](auto&& m) { return m.normal_force.value(); });
 
       // unit: newton [N]
       const auto expected = std::array{ 5'040.0, -15'120.0, 5'040.0, 5'040.0, 7'127.63635, -7'127.63635 };

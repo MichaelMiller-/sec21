@@ -108,10 +108,10 @@ TEST_CASE("example 1.1 with different node id's (N1 switched with N3 from exampl
       REQUIRE(Z.size2() == 8);
       //! \clang-format off
       const auto expected = std::array{
-         0, 0, 0, 0, 1, 0, 0, 0,
-         0, 0, 0, 0, 0, 1, 0, 0,
-         0, 0, 1, 0, 0, 0, 0, 0,
-         0, 0, 0, 1, 0, 0, 0, 0,
+         0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0,
+         0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0,
       };
       //! \clang-format on
       REQUIRE(approx_equal(sec21::numeric::flatten(Z), expected, kDivergence));
@@ -124,10 +124,10 @@ TEST_CASE("example 1.1 with different node id's (N1 switched with N3 from exampl
       REQUIRE(Z.size2() == 8);
       //! \clang-format off
       const auto expected = std::array{
-         1, 0, 0, 0, 0, 0, 0, 0,
-         0, 1, 0, 0, 0, 0, 0, 0,
-         0, 0, 1, 0, 0, 0, 0, 0,
-         0, 0, 0, 1, 0, 0, 0, 0,
+         1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0,
       };
       //! \clang-format on
       REQUIRE(approx_equal(sec21::numeric::flatten(Z), expected, kDivergence));
@@ -140,10 +140,10 @@ TEST_CASE("example 1.1 with different node id's (N1 switched with N3 from exampl
       REQUIRE(Z.size2() == 8);
       //! \clang-format off
       const auto expected = std::array{
-         0, 0, 0, 0, 0, 0, 1, 0,
-         0, 0, 0, 0, 0, 0, 0, 1,
-         1, 0, 0, 0, 0, 0, 0, 0,
-         0, 1, 0, 0, 0, 0, 0, 0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+         1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
       };
       //! \clang-format on
       REQUIRE(approx_equal(sec21::numeric::flatten(Z), expected, kDivergence));
@@ -156,10 +156,10 @@ TEST_CASE("example 1.1 with different node id's (N1 switched with N3 from exampl
       REQUIRE(Z.size2() == 8);
       //! \clang-format off
       const auto expected = std::array{
-         0, 0, 0, 0, 0, 0, 1, 0,
-         0, 0, 0, 0, 0, 0, 0, 1,
-         0, 0, 0, 0, 1, 0, 0, 0,
-         0, 0, 0, 0, 0, 1, 0, 0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+         0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0,
       };
       //! \clang-format on
       REQUIRE(approx_equal(sec21::numeric::flatten(Z), expected, kDivergence));
@@ -172,10 +172,10 @@ TEST_CASE("example 1.1 with different node id's (N1 switched with N3 from exampl
       REQUIRE(Z.size2() == 8);
       //! \clang-format off
       const auto expected = std::array{
-         0, 0, 0, 0, 0, 0, 1, 0,
-         0, 0, 0, 0, 0, 0, 0, 1,
-         0, 0, 1, 0, 0, 0, 0, 0,
-         0, 0, 0, 1, 0, 0, 0, 0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+         0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0,
       };
       //! \clang-format on
       REQUIRE(approx_equal(sec21::numeric::flatten(Z), expected, kDivergence));
@@ -188,10 +188,10 @@ TEST_CASE("example 1.1 with different node id's (N1 switched with N3 from exampl
       REQUIRE(Z.size2() == 8);
       //! \clang-format off
       const auto expected = std::array{
-         1, 0, 0, 0, 0, 0, 0, 0,
-         0, 1, 0, 0, 0, 0, 0, 0,
-         0, 0, 0, 0, 1, 0, 0, 0,
-         0, 0, 0, 0, 0, 1, 0, 0,
+         1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0,
       };
       //! \clang-format on
       REQUIRE(approx_equal(sec21::numeric::flatten(Z), expected, kDivergence));
@@ -226,10 +226,10 @@ TEST_CASE("example 1.1 with different node id's (N1 switched with N3 from exampl
 
       std::vector<double> flat_member_result{};
       std::transform(
-         std::begin(result.member), 
-         std::end(result.member), 
+         std::begin(result.members), 
+         std::end(result.members), 
          std::back_inserter(flat_member_result),
-         [](auto&& e) { return e.second.normal_force.value(); });
+         [](auto&& e) { return e.normal_force.value(); });
 
       // unit: newton [N]
       REQUIRE(flat_support_reaction[0] == Approx(0.0));

@@ -48,10 +48,10 @@ TEST_CASE("example system 2.0 with temperature load", "[sec21][structural_analys
 
    std::vector<double> copied_results{};
    std::transform(
-      std::begin(result.member), 
-      std::end(result.member), 
+      std::begin(result.members), 
+      std::end(result.members), 
       std::back_inserter(copied_results), 
-      [](auto&& m) { return m.second.normal_force.value(); });
+      [](auto&& m) { return m.normal_force.value(); });
 
    // unit: newton [N]
    // REQUIRE(flat_support_reaction[0] == Approx(3'000.0));

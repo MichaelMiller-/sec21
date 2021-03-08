@@ -106,10 +106,10 @@ TEST_CASE("example system 1.2 with half load from example 1.0", "[sec21][structu
 
       std::vector<double> flat_member_result{};
       std::transform(
-         std::begin(result.member), 
-         std::end(result.member), 
+         std::begin(result.members), 
+         std::end(result.members), 
          std::back_inserter(flat_member_result),
-         [](auto&& e) { return e.second.normal_force.value(); });
+         [](auto&& e) { return e.normal_force.value(); });
 
       // unit: newton [N]
       REQUIRE(flat_support_reaction[0] == Approx(0.0));

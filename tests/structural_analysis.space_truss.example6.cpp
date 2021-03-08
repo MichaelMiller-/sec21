@@ -417,10 +417,10 @@ TEST_CASE("example system 6.0 load from json", "[sec21][structural_analysis][spa
       REQUIRE(Z.size2() == 14);
       // clang-format off
       const auto expected = std::array{
-         1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-         0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-         0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-         0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+         1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+         0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+         0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+         0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
       };
       // clang-format on
       REQUIRE(approx_equal(sec21::numeric::flatten(Z), expected, kDivergence));
@@ -461,8 +461,8 @@ TEST_CASE("example system 6.0 load from json", "[sec21][structural_analysis][spa
                         [](auto&& e) { return e.value(); });
 
       std::vector<double> copied_results{};
-      std::transform(std::begin(result.member), std::end(result.member), std::back_inserter(copied_results),
-                     [](auto&& m) { return m.second.normal_force.value(); });
+      std::transform(std::begin(result.members), std::end(result.members), std::back_inserter(copied_results),
+                     [](auto&& m) { return m.normal_force.value(); });
 
       // unit: newton [N]
       REQUIRE(flat_support_reaction[0] == Approx(0.0));

@@ -63,7 +63,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    auto m5 = add_member(sys, 4, 2, {5, 0.004, 21'000'000});
    auto m6 = add_member(sys, 3, 1, {6, 0.004, 21'000'000});
 
-   const auto EA_l1 = 28'000;
+   const auto EA_l1 = 28'000.0;
    const auto EA_l2 = 19'798.98987;
 
    REQUIRE(static_cast<bool>(m1) == true);
@@ -147,10 +147,10 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       /// Fy2            0  0  0  0      v2
       ///
       auto expected = std::valarray{
-         1, 0,-1, 0,
-         0, 0, 0, 0,
-        -1, 0, 1, 0,
-         0, 0, 0, 0
+         1.0, 0.0,-1.0, 0.0,
+         0.0, 0.0, 0.0, 0.0,
+        -1.0, 0.0, 1.0, 0.0,
+         0.0, 0.0, 0.0, 0.0,
       };
       expected *= EA_l1;
       // clang-format on
@@ -173,10 +173,10 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       /// Fy2            0 -1  0  1      v2
       ///
       auto expected = std::valarray{
-         0, 0, 0, 0,
-         0, 1, 0,-1,
-         0, 0, 0, 0,
-         0,-1, 0, 1
+         0.0, 0.0, 0.0, 0.0,
+         0.0, 1.0, 0.0,-1.0,
+         0.0, 0.0, 0.0, 0.0,
+         0.0,-1.0, 0.0, 1.0,
       };
       expected *= EA_l1;
       // clang-format on
@@ -199,10 +199,10 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       /// Fy3            0  0  0  0      v3
       ///
       auto expected = std::valarray{
-         1, 0,-1, 0,
-         0, 0, 0, 0,
-        -1, 0, 1, 0,
-         0, 0, 0, 0
+         1.0, 0.0,-1.0, 0.0,
+         0.0, 0.0, 0.0, 0.0,
+        -1.0, 0.0, 1.0, 0.0,
+         0.0, 0.0, 0.0, 0.0,
       };
       expected *= EA_l1;
       // clang-format on
@@ -225,10 +225,10 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       /// Fy4            0  -1  0  1     v4
       ///
       auto expected = std::valarray{
-         0, 0, 0, 0,
-         0, 1, 0,-1,
-         0, 0, 0, 0,
-         0,-1, 0, 1
+         0.0, 0.0, 0.0, 0.0,
+         0.0, 1.0, 0.0,-1.0,
+         0.0, 0.0, 0.0, 0.0,
+         0.0,-1.0, 0.0, 1.0,
       };
       expected *= EA_l1;
       // clang-format on
@@ -279,10 +279,10 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       REQUIRE(Z.size2() == 8);
       // clang-format off
       const auto expected = std::array{
-         1, 0, 0, 0, 0, 0, 0, 0,
-         0, 1, 0, 0, 0, 0, 0, 0,
-         0, 0, 1, 0, 0, 0, 0, 0,
-         0, 0, 0, 1, 0, 0, 0, 0,
+         1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0,
       };
       // clang-format on
       REQUIRE(approx_equal(numeric::flatten(Z), expected, kDivergence));
@@ -296,10 +296,10 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       REQUIRE(Z.size2() == 8);
       // clang-format off
       const auto expected = std::array{
-         0, 0, 0, 0, 1, 0, 0, 0,
-         0, 0, 0, 0, 0, 1, 0, 0,
-         0, 0, 1, 0, 0, 0, 0, 0,
-         0, 0, 0, 1, 0, 0, 0, 0,
+         0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0,
+         0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0,
       };
       // clang-format on
       REQUIRE(approx_equal(numeric::flatten(Z), expected, kDivergence));
@@ -313,10 +313,10 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       REQUIRE(Z.size2() == 8);
       // clang-format off
       const auto expected = std::array{
-         0, 0, 0, 0, 0, 0, 1, 0,
-         0, 0, 0, 0, 0, 0, 0, 1,
-         0, 0, 0, 0, 1, 0, 0, 0,
-         0, 0, 0, 0, 0, 1, 0, 0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+         0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0,
       };
       // clang-format on
       REQUIRE(approx_equal(numeric::flatten(Z), expected, kDivergence));
@@ -330,10 +330,10 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       REQUIRE(Z.size2() == 8);
       // clang-format off
       const auto expected = std::array{
-         0, 0, 0, 0, 0, 0, 1, 0,
-         0, 0, 0, 0, 0, 0, 0, 1,
-         1, 0, 0, 0, 0, 0, 0, 0,
-         0, 1, 0, 0, 0, 0, 0, 0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+         1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
       };
       // clang-format on
       REQUIRE(approx_equal(numeric::flatten(Z), expected, kDivergence));
@@ -347,10 +347,10 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       REQUIRE(Z.size2() == 8);
       // clang-format off
       const auto expected = std::array{
-         0, 0, 0, 0, 0, 0, 1, 0,
-         0, 0, 0, 0, 0, 0, 0, 1,
-         0, 0, 1, 0, 0, 0, 0, 0,
-         0, 0, 0, 1, 0, 0, 0, 0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+         0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0,
       };
       // clang-format on
       REQUIRE(approx_equal(numeric::flatten(Z), expected, kDivergence));
@@ -364,10 +364,10 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       REQUIRE(Z.size2() == 8);
       // clang-format off
       const auto expected = std::array{
-         0, 0, 0, 0, 1, 0, 0, 0,
-         0, 0, 0, 0, 0, 1, 0, 0,
-         1, 0, 0, 0, 0, 0, 0, 0,
-         0, 1, 0, 0, 0, 0, 0, 0,
+         0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0,
+         1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
       };
       // clang-format on
       REQUIRE(approx_equal(numeric::flatten(Z), expected, kDivergence));
@@ -642,8 +642,8 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       }
 
       std::vector<double> flat_member_result{};
-      std::transform(std::begin(result.member), std::end(result.member), std::back_inserter(flat_member_result),
-                     [](auto&& e) { return e.second.normal_force.value(); });
+      std::transform(std::begin(result.members), std::end(result.members), std::back_inserter(flat_member_result),
+                     [](auto&& e) { return e.normal_force.value(); });
 
       // unit: newton [N]
       REQUIRE(flat_support_reaction[0] == Approx(0.0));
