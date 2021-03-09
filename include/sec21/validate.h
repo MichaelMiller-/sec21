@@ -19,7 +19,7 @@ namespace sec21
       template<typename...Ts, typename Function, size_t... Is>
       auto transform(std::tuple<Ts...> const& inputs, Function function, std::index_sequence<Is...>)
       {
-         return std::tuple<std::result_of_t<Function(Ts)>...>{function(std::get<Is>(inputs))...};
+         return std::tuple<std::invoke_result_t<Function, Ts>...>{function(std::get<Is>(inputs))...};
       }
 
       template<typename... Ts, typename Function>
