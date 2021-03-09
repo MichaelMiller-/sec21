@@ -6,6 +6,7 @@
 #include <tuple>
 #include <variant>
 #include <string_view>
+#include <optional>
 
 namespace sec21
 {
