@@ -6,6 +6,7 @@
 #include <functional>
 #include <tuple>
 #include <variant>
+#include <optional>
 
 // begin-snippet: validate.user.action
 struct action1 {};
