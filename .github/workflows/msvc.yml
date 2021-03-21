@@ -1,0 +1,40 @@
+name: MSVC
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  CTEST_OUTPUT_ON_FAILURE: 1
+
+jobs:
+
+  VS2019:
+    runs-on: windows-2019
+
+    strategy:
+      matrix:
+        config: [Debug, Release]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Configure
+      run: |
+        cmake -Bbuild -DCMAKE_BUILD_TYPE=${{matrix.config}} .
+
+    - name: Build
+      run: >
+        cmake --build build --config ${{matrix.config}}
+        --target unit_test_runner -j4
+
+        cmake --build build --config ${{matrix.config}}
+        --target single_header_tester -j4
+
+    - name: Test
+      working-directory: ${{runner.workspace}}/build    
+      run: ctest --build-config ${{matrix.config}}
