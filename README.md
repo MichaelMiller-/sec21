@@ -15,7 +15,7 @@ Examples
 ---------------------------------------
 ## Units
 
-Modern header-only library for [dimensional analysis](https://en.wikipedia.org/wiki/Dimensional_analysis) is inspired by [Boost](https://www.boost.org)-Units and Boost-MPL. Only a single header has to be included in order to use the library.
+This modern header-only library for [dimensional analysis](https://en.wikipedia.org/wiki/Dimensional_analysis) is inspired by [Boost](https://www.boost.org)-Units and Boost-MPL. Only a single header has to be included to use the library.
 ```
 #include <sec21/units.h>
 ```
