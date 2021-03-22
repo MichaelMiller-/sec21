@@ -181,14 +181,18 @@ namespace sec21::units
       return Q1{ lhs.value() - Q1{ rhs }.value() };
    }
 
+
 #ifdef __cpp_concepts
    template <Quantity Q1, Quantity Q2> requires SameDimension<Q1, Q2>
 #else
    template <
       typename Q1, 
       typename Q2, 
-      std::enable_if_t<has_same_dimension<Q1, Q2>::value, bool> = true>
-#endif
+      std::enable_if_t<
+         is_quantity<Q1>::value && 
+         is_quantity<Q2>::value && 
+         has_same_dimension<Q1, Q2>::value, bool> = true>
+#endif      
    constexpr auto operator * (Q1 const& lhs, Q2 const& rhs) 
    {
       using vt = decltype(lhs.value() * rhs.value());
@@ -210,7 +214,10 @@ namespace sec21::units
    template <
       typename Q1, 
       typename Q2, 
-      std::enable_if_t<is_quantity<Q1>::value && is_quantity<Q2>::value, bool> = true>
+      std::enable_if_t<
+         is_quantity<Q1>::value && 
+         is_quantity<Q2>::value && 
+         has_same_dimension<Q1, Q2>::value == false, bool> = true>
 #endif
    constexpr auto operator * (Q1 const& lhs, Q2 const& rhs) 
    {
@@ -253,7 +260,10 @@ namespace sec21::units
    template <
       typename Q1, 
       typename Q2, 
-      std::enable_if_t<has_same_dimension<Q1, Q2>::value, bool> = true>
+      std::enable_if_t<
+         is_quantity<Q1>::value && 
+         is_quantity<Q2>::value && 
+         has_same_dimension<Q1, Q2>::value, bool> = true>
 #endif
    constexpr auto operator / (Q1 const& lhs, Q2 const& rhs)
    {
@@ -267,7 +277,10 @@ namespace sec21::units
    template <
       typename Q1, 
       typename Q2, 
-      std::enable_if_t<is_quantity<Q1>::value && is_quantity<Q2>::value, bool> = true>
+      std::enable_if_t<
+         is_quantity<Q1>::value && 
+         is_quantity<Q2>::value && 
+         has_same_dimension<Q1, Q2>::value == false, bool> = true>
 #endif
    [[nodiscard]] constexpr auto operator / (Q1 const& lhs, Q2 const& rhs)
    {
@@ -322,21 +335,10 @@ namespace sec21::units
 
    template <typename T>
    struct abbreviation {};
-
-#ifdef __cpp_concepts
-   template <Quantity Q>
-#else
-   template <typename Q, std::enable_if_t<is_quantity<Q>::value, bool> = true>
-#endif
-   auto to_string(Q const& obj) -> std::string
-   {
-      std::stringstream ss;
-      ss << obj.value() << '_' << abbreviation<typename Q::dimension_t>::value;
-      return ss.str();
-   }
 }
 
 #include <nlohmann/json.hpp>
+#include <boost/algorithm/string/split.hpp>
 #include <boost/lexical_cast.hpp>
 #include <tuple>
 #include <string_view>
@@ -347,7 +349,6 @@ namespace sec21::units
    {
       inline auto split(std::string const& input)
       {
-         //! \todo use cptr regex
          const std::string delimiter = "_";    
          auto pos = input.find(delimiter);
          if (pos == std::string::npos)
@@ -378,9 +379,9 @@ namespace sec21::units
 #else
       template <typename Q, std::enable_if_t<is_quantity<Q>::value, bool> = true>
 #endif
-      auto from_string(std::string const& input) -> Q
+      auto from_string(std::string_view input) -> Q
       {
-         auto [value, unit] = split(input);
+         auto [value, unit] = split(std::string{input});
 
          using dim_t = typename Q::dimension_t;
          using unit_t = typename Q::unit_t;
@@ -390,16 +391,23 @@ namespace sec21::units
 
          using T1 = boost::mp11::mp_transform_q<quoted_to_ratio, decltype(valid_types)>;
 
+#if __cpp_generic_lambdas > 201304
          constexpr auto to_abbreviation = []<typename T>(T){ return abbreviation<T>::value; };
          constexpr auto convert_ratio = []<typename T>(T){ return T::num / double{ T::den }; };
-
+#else
+         constexpr auto to_abbreviation = [](auto v){ return abbreviation<decltype(v)>::value; };
+         constexpr auto convert_ratio = [](auto v){ 
+            using T = decltype(v);
+            return T::num / double{ T::den };
+         };
+#endif
          const auto valid_abbreviations = std::apply([&](auto... n){ return std::array{ to_abbreviation(n)... }; }, valid_types);
          const auto matching_ratios = std::apply([&](auto... n){ return std::array{ convert_ratio(n)... }; }, T1{});
          static_assert(std::size(valid_abbreviations) == std::size(matching_ratios));
 
          const auto it = std::find(begin(valid_abbreviations), end(valid_abbreviations), unit);
          if (it == end(valid_abbreviations))
-            throw std::runtime_error("Couldn't match input quantity with valid dimension type. invalid dimension: " + unit);
+            throw std::runtime_error("Couldn't match input quantity with valid dimension type. Invalid dimension: " + unit);
 
          const auto d = std::distance(begin(valid_abbreviations), it);
          const auto k = R1::num / double{ R1::den };
