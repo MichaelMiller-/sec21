@@ -22,7 +22,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-      working-directory: ${{runner.workspace}}
 
     - name: Install Dependencies
       shell: bash
@@ -47,11 +46,11 @@ jobs:
         vcpkg install spdlog
 
     - name: Create Build Environment
-      run: cmake -E make_directory ${{runner.workspace}}/build
+      run: cmake -E make_directory build
 
     - name: Configure CMake
       shell: bash
-      working-directory: ${{runner.workspace}}/build
+      working-directory: build
       run: cmake -DCMAKE_BUILD_TYPE=${{matrix.config}} -DCMAKE_TOOLCHAIN_FILE=${{runner.workspace}}/vcpkg/scripts/buildsystems/vcpkg.cmake ..
 
     - name: Build
@@ -63,5 +62,5 @@ jobs:
         --target single_header_tester -j4
 
     - name: Test
-      working-directory: ${{runner.workspace}}/build
+      working-directory: build
       run: ctest --build-config ${{matrix.config}}
