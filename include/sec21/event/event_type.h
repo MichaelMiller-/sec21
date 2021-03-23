@@ -6,6 +6,8 @@
 
 namespace sec21::event
 {
+#if __cpp_nontype_template_args >= 201911L
+
    struct event_type_base {};
 
    template <typename Source, fixed_string Name>
@@ -39,4 +41,6 @@ namespace sec21::event
 
    template <typename Source>
    using moved = event_type<Source, "moved">;
+
+#endif   
 }
