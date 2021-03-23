@@ -1,8 +1,11 @@
 #pragma once
 
 #include <functional>
-#include <concepts>
+#ifdef __cpp_concepts
+   #include <concepts>
+#endif
 
+//! \todo replace with https://en.cppreference.com/w/cpp/experimental/lib_extensions_3
 namespace sec21
 {
    //! \brief scope guard for cleanup and other actions that always happen
