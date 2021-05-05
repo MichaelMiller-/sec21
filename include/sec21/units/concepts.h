@@ -46,10 +46,7 @@ namespace sec21::units
    template <typename T>
    concept Quantity = is_quantity<T>::value;
 
-   template <Quantity T>
-   using to_dimension_t = dimension<typename T::dimension_t>;
-
    template <typename T, typename U>
-   concept SameDimension = std::is_same<to_dimension_t<T>, to_dimension_t<U>>::value;
+   concept SameDimension = std::is_same<dimension<typename T::dimension_t>, dimension<typename U::dimension_t>>::value;
 #endif   
 }
