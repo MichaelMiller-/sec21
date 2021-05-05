@@ -3,6 +3,8 @@
 
 #include <sec21/structural_analysis/loadcase.h>
 #include <sec21/structural_analysis/solve.h>
+#include <sec21/structural_analysis/node.h>
+#include <sec21/structural_analysis/member.h>
 #include <sec21/structural_analysis/space_truss.h>
 #include <sec21/structural_analysis/system_result.h>
 #include <sec21/units.h>
@@ -17,7 +19,11 @@ TEST_CASE("example system 1.2 with half load from example 1.0", "[sec21][structu
    using namespace sec21::structural_analysis;
    using namespace sec21::units::literals;
 
-   auto sys = space_truss{};
+   using member_t = member<int, double>;
+   using node_t = node<2, int, double>;
+   using space_truss_t = space_truss<node_t, member_t>;
+
+   auto sys = space_truss_t{};
 
    using precision_t = decltype(sys)::precision_t;
    using node_t = decltype(sys)::node_t;
@@ -100,10 +106,10 @@ TEST_CASE("example system 1.2 with half load from example 1.0", "[sec21][structu
 
       std::vector<double> flat_member_result{};
       std::transform(
-         std::begin(result.member), 
-         std::end(result.member), 
+         std::begin(result.members), 
+         std::end(result.members), 
          std::back_inserter(flat_member_result),
-         [](auto&& e) { return e.second.normal_force.value(); });
+         [](auto&& e) { return e.normal_force.value(); });
 
       // unit: newton [N]
       REQUIRE(flat_support_reaction[0] == Approx(0.0));

@@ -1,0 +1,60 @@
+name: MSVC
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+env:
+  CTEST_OUTPUT_ON_FAILURE: 1
+
+jobs:
+
+  VS2019:
+    runs-on: windows-2019
+
+    strategy:
+      matrix:
+        config: [Debug, Release]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install Dependencies
+      run: |
+        git clone https://github.com/Microsoft/vcpkg.git 
+        cd vcpkg
+        bootstrap-vcpkg.bat
+        vcpkg install boost-core
+        vcpkg install boost-function-types 
+        vcpkg install boost-geometry
+        vcpkg install boost-hana
+        vcpkg install boost-math
+        vcpkg install boost-outcome
+        vcpkg install boost-program-options
+        vcpkg install boost-qvm
+        vcpkg install boost-range
+        vcpkg install boost-ublas
+        vcpkg install catch2
+        vcpkg install glm
+        vcpkg install nlohmann-json
+        vcpkg install spdlog
+
+    - name: Create Build Environment
+      run: cmake -E make_directory build
+
+    - name: Configure CMake
+      shell: bash
+      working-directory: build
+      run: cmake -DCMAKE_BUILD_TYPE=${{matrix.config}} -DCMAKE_TOOLCHAIN_FILE="$GITHUB_WORKSPACE\vcpkg\scripts\buildsystems\vcpkg.cmake" ..
+
+    - name: Build
+      working-directory: build
+      run: cmake --config ${{matrix.config}} -j4
+
+    - name: Test
+      working-directory: build
+      run: ctest --build-config ${{matrix.config}}

@@ -27,7 +27,9 @@ namespace sec21
    }
 
    template <typename Iterator>
+#ifdef __cpp_concepts   
    requires std::is_same_v<typename std::iterator_traits<Iterator>::value_type, row>
+#endif
    auto row_to_col(Iterator first, Iterator last) noexcept
    {
       std::vector<col> result;

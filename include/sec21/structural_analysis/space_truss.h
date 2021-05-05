@@ -1,8 +1,6 @@
 ﻿#pragma once
 
 #include <sec21/structural_analysis/concepts.h>
-#include <sec21/structural_analysis/node.h>
-#include <sec21/structural_analysis/member.h>
 #include <sec21/structural_analysis/descriptor_traits.h>
 #include <sec21/structural_analysis/error_codes.h>
 
@@ -19,21 +17,20 @@ namespace sec21::structural_analysis
 
    //! \brief Datencontainer für das Stabwerkssystem
    //! \brief A space frame truss is a N-dimensional framework of members pinned at their ends
+   template <typename Node, typename Member>
    struct space_truss
    {
-      static constexpr int dimension_v = 2;
+      static_assert(
+         std::is_same_v<typename Node::precision_t, typename Member::precision_t>,
+         "Precision should be the same");
 
-      using descriptor_t = int;
-      //! \todo 2019-04-23 node and member as template parameter
-      //! \todo 2019-04-27 precision_t als template parameter
-      using precision_t = double;
-      //! \todo node_descriptor == ->  template parameter
-      using node_t = node<dimension_v, descriptor_t, precision_t>;
-      //! \todo member descriptor == ->  template parameter
-      using member_t = member<descriptor_t>;
+      static constexpr int dimension_v = Node::dimension_v;
 
-      using node_descriptor_t = node_t::descriptor_t;
-      using member_descriptor_t = member_t::descriptor_t;
+      using node_t = Node;
+      using member_t = Member;
+      using precision_t = typename node_t::precision_t;
+      using node_descriptor_t = typename node_t::descriptor_t;
+      using member_descriptor_t = typename member_t::descriptor_t;
 
       std::optional<std::string> description{};
       std::vector<node_t> nodes{};
@@ -42,7 +39,13 @@ namespace sec21::structural_analysis
       std::map<member_descriptor_t, std::pair<node_descriptor_t, node_descriptor_t>>  coincidence_table{};
    };
 
-   //! \return handle type
+   template <typename T>
+   inline constexpr bool equal_name(T const& lhs, T const& rhs) 
+   noexcept(noexcept(std::declval<T>().name == std::declval<T>().name))
+   {
+      return lhs.name == rhs.name;
+   }
+
    template <typename System> 
    auto add_node(
       System& sys,
@@ -52,7 +55,10 @@ namespace sec21::structural_analysis
          // return error_code::invalid_node_name;
          return std::errc::invalid_argument;
 
-      if (std::find_if(begin(sys.nodes), end(sys.nodes), [&](auto && e) { return node.name == e.name; }) != std::end(sys.nodes))
+      // std::bind cannot bind a noexcept function
+      const auto compare_name = [&node](auto n){ return equal_name(n, node); };
+
+      if (std::any_of(begin(sys.nodes), end(sys.nodes), compare_name))
          //! \todo error_code::node_already_exists
          return std::errc::invalid_argument;
 
@@ -66,7 +72,8 @@ namespace sec21::structural_analysis
       return add_node(sys, typename System::node_t{ std::forward<Args>(args)... });
    }
 
-   template <typename System> //, typename... Args>
+
+   template <typename System>
    auto add_member(
       System& sys,
       typename System::node_descriptor_t from,
@@ -84,15 +91,16 @@ namespace sec21::structural_analysis
          //! \todo error_code::node_not_found
          return std::errc::invalid_argument;
 
-      if (std::find_if(begin(sys.members), end(sys.members), [&member](auto && e) { return member.name == e.name; }) != end(sys.members))
+      // std::bind cannot bind a noexcept function
+      const auto compare_name = [&member](auto m){ return equal_name(m, member); };
+
+      if (std::any_of(begin(sys.members), end(sys.members), compare_name))
          //! \todo error_code::member_already_exists
          return std::errc::invalid_argument;
 
       const auto result = sys.members.emplace_back(std::move(member));
 
       sys.coincidence_table[result.name] = std::make_pair(from, to);
-         // std::distance<decltype(it_from)>(std::begin(sys.nodes), it_from),
-         // std::distance<decltype(it_to)>(std::begin(sys.nodes), it_to));
 
       return result.name;
    }
@@ -112,7 +120,8 @@ namespace sec21::structural_analysis
 
 namespace sec21::structural_analysis
 {
-   void to_json(nlohmann::json& j, space_truss const& obj) 
+   template <typename Descriptor, typename Precision>
+   void to_json(nlohmann::json& j, space_truss<Descriptor, Precision> const& obj) 
    {
       j = nlohmann::json{
          {"description", obj.description},
@@ -122,7 +131,8 @@ namespace sec21::structural_analysis
       };
    }
 
-   void from_json(nlohmann::json const& j, space_truss& obj) 
+   template <typename Descriptor, typename Precision>
+   void from_json(nlohmann::json const& j, space_truss<Descriptor, Precision>& obj) 
    {
       j.at("description").get_to(obj.description);
       j.at("nodes").get_to(obj.nodes);

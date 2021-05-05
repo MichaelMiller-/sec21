@@ -34,16 +34,25 @@ namespace sec21::units
       quantity() = default;
 
 #ifdef __cpp_concepts
-      template <Scalar U> // requires std::is_nothrow_convertible<U, T>
-      constexpr quantity(U u) noexcept
+      template <Scalar U>
+#else
+      template <typename U, std::enable_if_t<std::is_scalar<U>::value, bool> = true>
+#endif
+      constexpr quantity(U u) 
+#ifdef __cpp_lib_is_nothrow_convertible      
+      noexcept(std::is_nothrow_convertible<U, T>::value)
+#endif      
          : m_value{ static_cast<T>(u) }
       {}
 
+#ifdef __cpp_concepts
       template <Quantity Q> requires SameDimension<quantity<Unit, T>, Q>
+#else
+      template <typename Q, std::enable_if_t<has_same_dimension<quantity<Unit, T>, Q>::value, bool> = true>
+#endif
       constexpr quantity(Q const& q) noexcept
          : m_value{ quantity_cast<quantity>(q).value() }
       {}
-#endif
 
       [[nodiscard]] constexpr auto value() const noexcept {
          return m_value;
@@ -70,62 +79,120 @@ namespace sec21::units
 
 #ifdef __cpp_concepts
    template <Quantity Q1, Quantity Q2> requires SameDimension<Q1, Q2>
+#else
+   template <
+      typename Q1, 
+      typename Q2, 
+      std::enable_if_t<has_same_dimension<Q1, Q2>::value, bool> = true>
+#endif
    constexpr bool operator == (Q1 const& lhs, Q2 const& rhs) noexcept
    {
       return lhs.value() == Q1{ rhs }.value();
    }
 
+#ifdef __cpp_concepts
    template <Quantity Q1, Quantity Q2> requires SameDimension<Q1, Q2>
+#else
+   template <
+      typename Q1, 
+      typename Q2, 
+      std::enable_if_t<has_same_dimension<Q1, Q2>::value, bool> = true>
+#endif
    constexpr bool operator != (Q1 const& lhs, Q2 const& rhs) noexcept
    {
       return !(lhs == rhs);
    }
 
+#ifdef __cpp_concepts
    template <Quantity Q1, Quantity Q2> requires SameDimension<Q1, Q2>
+#else
+   template <
+      typename Q1, 
+      typename Q2, 
+      std::enable_if_t<has_same_dimension<Q1, Q2>::value, bool> = true>
+#endif
    constexpr bool operator < (Q1 const& lhs, Q2 const& rhs) noexcept
    {
       return lhs.value() < Q1{ rhs }.value();
    }
 
+#ifdef __cpp_concepts
    template <Quantity Q1, Quantity Q2> requires SameDimension<Q1, Q2>
+#else
+   template <
+      typename Q1, 
+      typename Q2, 
+      std::enable_if_t<has_same_dimension<Q1, Q2>::value, bool> = true>
+#endif
    constexpr bool operator <= (Q1 const& lhs, Q2 const& rhs) noexcept
    {
       return !(rhs < lhs);
    }
 
+#ifdef __cpp_concepts
    template <Quantity Q1, Quantity Q2> requires SameDimension<Q1, Q2>
+#else
+   template <
+      typename Q1, 
+      typename Q2, 
+      std::enable_if_t<has_same_dimension<Q1, Q2>::value, bool> = true>
+#endif
    constexpr bool operator > (Q1 const& lhs, Q2 const& rhs) noexcept
    {
       return rhs < lhs;
    }
 
+#ifdef __cpp_concepts
    template <Quantity Q1, Quantity Q2> requires SameDimension<Q1, Q2>
+#else
+   template <
+      typename Q1, 
+      typename Q2, 
+      std::enable_if_t<has_same_dimension<Q1, Q2>::value, bool> = true>
+#endif
    constexpr bool operator >= (Q1 const& lhs, Q2 const& rhs) noexcept
    {
       return !(lhs < rhs);
    }
 
+#ifdef __cpp_concepts
    template <Quantity Q1, Quantity Q2> requires SameDimension<Q1, Q2>
+#else
+   template <
+      typename Q1, 
+      typename Q2, 
+      std::enable_if_t<has_same_dimension<Q1, Q2>::value, bool> = true>
+#endif
    constexpr auto operator + (Q1 const& lhs, Q2 const& rhs) noexcept
    {
       return Q1{ lhs.value() + Q1{ rhs }.value() };
    }
 
-#if 0
-   template <Quantity Q1, Scalar S>
-   constexpr auto operator + (Q1 const& lhs, S const& rhs) noexcept
-   {
-      return Q1{ lhs.value() + rhs };
-   }
-#endif
-
+#ifdef __cpp_concepts
    template <Quantity Q1, Quantity Q2> requires SameDimension<Q1, Q2>
+#else
+   template <
+      typename Q1, 
+      typename Q2, 
+      std::enable_if_t<has_same_dimension<Q1, Q2>::value, bool> = true>
+#endif
    constexpr auto operator - (Q1 const& lhs, Q2 const& rhs) noexcept
    {
       return Q1{ lhs.value() - Q1{ rhs }.value() };
    }
 
+
+#ifdef __cpp_concepts
    template <Quantity Q1, Quantity Q2> requires SameDimension<Q1, Q2>
+#else
+   template <
+      typename Q1, 
+      typename Q2, 
+      std::enable_if_t<
+         is_quantity<Q1>::value && 
+         is_quantity<Q2>::value && 
+         has_same_dimension<Q1, Q2>::value, bool> = true>
+#endif      
    constexpr auto operator * (Q1 const& lhs, Q2 const& rhs) 
    {
       using vt = decltype(lhs.value() * rhs.value());
@@ -141,7 +208,17 @@ namespace sec21::units
       return rt{ v1 * v2 };
    }
 
+#ifdef __cpp_concepts
    template <Quantity Q1, Quantity Q2>
+#else
+   template <
+      typename Q1, 
+      typename Q2, 
+      std::enable_if_t<
+         is_quantity<Q1>::value && 
+         is_quantity<Q2>::value && 
+         has_same_dimension<Q1, Q2>::value == false, bool> = true>
+#endif
    constexpr auto operator * (Q1 const& lhs, Q2 const& rhs) 
    {
       using vt = decltype(lhs.value() * rhs.value());
@@ -151,26 +228,60 @@ namespace sec21::units
       return rt{ lhs.value() * rhs.value() };
    }
 
+#ifdef __cpp_concepts
    template <Quantity Q1, Scalar S>
+#else
+   template <
+      typename Q1, 
+      typename S, 
+      std::enable_if_t<is_quantity<Q1>::value && std::is_scalar<S>::value, bool> = true>
+#endif
    constexpr auto operator * (Q1 const& lhs, S rhs) 
    {
       return Q1{ lhs.value() * rhs };
    }
 
+#ifdef __cpp_concepts
    template <Scalar S, Quantity Q1>
+#else
+   template <
+      typename S, 
+      typename Q1, 
+      std::enable_if_t<is_quantity<Q1>::value && std::is_scalar<S>::value, bool> = true>
+#endif
    constexpr auto operator * (S rhs, Q1 const& lhs) 
    {
       return Q1{ lhs.value() * rhs };
    }
 
+#ifdef __cpp_concepts
    template <Quantity Q1, Quantity Q2> requires SameDimension<Q1, Q2>
+#else
+   template <
+      typename Q1, 
+      typename Q2, 
+      std::enable_if_t<
+         is_quantity<Q1>::value && 
+         is_quantity<Q2>::value && 
+         has_same_dimension<Q1, Q2>::value, bool> = true>
+#endif
    constexpr auto operator / (Q1 const& lhs, Q2 const& rhs)
    {
       // [[expects: rhs != 0]]
       return lhs.value() / Q1{ rhs }.value();
    }
 
+#ifdef __cpp_concepts
    template <Quantity Q1, Quantity Q2>
+#else
+   template <
+      typename Q1, 
+      typename Q2, 
+      std::enable_if_t<
+         is_quantity<Q1>::value && 
+         is_quantity<Q2>::value && 
+         has_same_dimension<Q1, Q2>::value == false, bool> = true>
+#endif
    [[nodiscard]] constexpr auto operator / (Q1 const& lhs, Q2 const& rhs)
    {
       // [[expects: rhs != 0]]
@@ -185,15 +296,29 @@ namespace sec21::units
       return rt{ lhs.value() / rhs.value() };
    }
 
-   template <Quantity Q, Scalar T>
-   [[nodiscard]] constexpr auto operator / (Q const& lhs, T rhs) -> Q
+#ifdef __cpp_concepts
+   template <Quantity Q, Scalar S>
+#else
+   template <
+      typename Q, 
+      typename S, 
+      std::enable_if_t<is_quantity<Q>::value && std::is_scalar<S>::value, bool> = true>
+#endif
+   [[nodiscard]] constexpr auto operator / (Q const& lhs, S rhs) -> Q
    {
       // [[expects: rhs != 0]]
       return { lhs.value() / rhs };
    }
 
-   template <Scalar T, Quantity Q>
-   [[nodiscard]] constexpr auto operator / (T lhs, Q const& rhs)
+#ifdef __cpp_concepts
+   template <Scalar S, Quantity Q>
+#else
+   template <
+      typename Q, 
+      typename S, 
+      std::enable_if_t<is_quantity<Q>::value && std::is_scalar<S>::value, bool> = true>
+#endif   
+   [[nodiscard]] constexpr auto operator / (S lhs, Q const& rhs)
    {
       // [[expects: rhs != quantity<U2, T2>(0)]]
       using vt = decltype(lhs / rhs.value());
@@ -210,18 +335,10 @@ namespace sec21::units
 
    template <typename T>
    struct abbreviation {};
-
-   template <Quantity Q>
-   auto to_string(Q const& obj) -> std::string
-   {
-      std::stringstream ss;
-      ss << obj.value() << '_' << abbreviation<typename Q::dimension_t>::value;
-      return ss.str();
-   }
-#endif
 }
 
 #include <nlohmann/json.hpp>
+#include <boost/algorithm/string/split.hpp>
 #include <boost/lexical_cast.hpp>
 #include <tuple>
 #include <string_view>
@@ -232,7 +349,6 @@ namespace sec21::units
    {
       inline auto split(std::string const& input)
       {
-         //! \todo use cptr regex
          const std::string delimiter = "_";    
          auto pos = input.find(delimiter);
          if (pos == std::string::npos)
@@ -258,10 +374,14 @@ namespace sec21::units
          using fn = typename U::ratio_t;
       };
 
-      template <Quantity Q>
-      auto from_string(std::string const& input) -> Q
+#ifdef __cpp_concepts      
+      template <Quantity Q> 
+#else
+      template <typename Q, std::enable_if_t<is_quantity<Q>::value, bool> = true>
+#endif
+      auto from_string(std::string_view input) -> Q
       {
-         auto [value, unit] = split(input);
+         auto [value, unit] = split(std::string{input});
 
          using dim_t = typename Q::dimension_t;
          using unit_t = typename Q::unit_t;
@@ -271,16 +391,23 @@ namespace sec21::units
 
          using T1 = boost::mp11::mp_transform_q<quoted_to_ratio, decltype(valid_types)>;
 
+#if __cpp_generic_lambdas > 201304
          constexpr auto to_abbreviation = []<typename T>(T){ return abbreviation<T>::value; };
          constexpr auto convert_ratio = []<typename T>(T){ return T::num / double{ T::den }; };
-
+#else
+         constexpr auto to_abbreviation = [](auto v){ return abbreviation<decltype(v)>::value; };
+         constexpr auto convert_ratio = [](auto v){ 
+            using T = decltype(v);
+            return T::num / double{ T::den };
+         };
+#endif
          const auto valid_abbreviations = std::apply([&](auto... n){ return std::array{ to_abbreviation(n)... }; }, valid_types);
          const auto matching_ratios = std::apply([&](auto... n){ return std::array{ convert_ratio(n)... }; }, T1{});
          static_assert(std::size(valid_abbreviations) == std::size(matching_ratios));
 
          const auto it = std::find(begin(valid_abbreviations), end(valid_abbreviations), unit);
          if (it == end(valid_abbreviations))
-            throw std::runtime_error("Couldn't match input quantity with valid dimension type. invalid dimension: " + unit);
+            throw std::runtime_error("Couldn't match input quantity with valid dimension type. Invalid dimension: " + unit);
 
          const auto d = std::distance(begin(valid_abbreviations), it);
          const auto k = R1::num / double{ R1::den };
@@ -297,7 +424,11 @@ namespace sec21::units
       };
    }
 
+#ifdef __cpp_concepts
    template <Quantity Q>
+#else
+   template <typename Q, std::enable_if_t<is_quantity<Q>::value, bool> = true>
+#endif
    void from_json(nlohmann::json const& j, Q& obj) 
    {
       std::string value;

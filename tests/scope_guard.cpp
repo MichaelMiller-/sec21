@@ -2,7 +2,7 @@
 
 #include <sec21/scope_guard.h>
 
-TEST_CASE("increment value in scope guard", "[sec21][core]")
+TEST_CASE("increment a value in scope guard", "[sec21][core]")
 {
    int i = 5;
    {

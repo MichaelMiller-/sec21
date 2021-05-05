@@ -1,0 +1,3 @@
+#define VERSION_MAJOR @editor.backend_VERSION_MAJOR@
+#define VERSION_MINOR @editor.backend_VERSION_MINOR@
+

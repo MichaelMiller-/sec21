@@ -2,6 +2,8 @@
 #include "approx_equal.h"
 
 #include <sec21/file_loader.h>
+#include <sec21/structural_analysis/node.h>
+#include <sec21/structural_analysis/member.h>
 #include <sec21/structural_analysis/space_truss.h>
 #include <sec21/structural_analysis/loadcase.h>
 #include <sec21/structural_analysis/system_result.h>
@@ -16,7 +18,11 @@ TEST_CASE("example system 7.0 load from json", "[sec21][structural_analysis][spa
    using namespace sec21::structural_analysis;
    using namespace sec21::units::literals;
 
-   auto sys = sec21::load_from_json<space_truss>("example_7.json");
+   using member_t = member<int, double>;
+   using node_t = node<2, int, double>;
+   using space_truss_t = space_truss<node_t, member_t>;
+
+   auto sys = sec21::load_from_json<space_truss_t>("example_7.json");
    auto load = sec21::load_from_json<loadcase<decltype(sys)>>("example_7_load.json");
 
    auto [success, result] = solve(sys, load);
@@ -42,10 +48,10 @@ TEST_CASE("example system 7.0 load from json", "[sec21][structural_analysis][spa
 
    std::vector<double> copied_results{};
    std::transform(
-      std::begin(result.member), 
-      std::end(result.member), 
+      std::begin(result.members), 
+      std::end(result.members), 
       std::back_inserter(copied_results), 
-      [](auto&& m) { return m.second.normal_force.value(); });
+      [](auto&& m) { return m.normal_force.value(); });
 
    // unit: newton [N]
    REQUIRE(flat_support_reaction[0] == Approx(0.0));

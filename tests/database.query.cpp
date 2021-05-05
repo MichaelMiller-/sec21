@@ -8,6 +8,42 @@
 #include <iostream>
 #include <tuple>
 
+TEST_CASE("concat column constraints", "[sec21][database]")
+{
+   using namespace sec21::database;
+
+   SECTION("empty list")
+   {
+      using input_t = std::tuple<>;
+      constexpr auto indices = std::make_index_sequence<std::tuple_size_v<input_t>>{};
+
+      std::stringstream ss;
+      detail::concat_constraints<input_t>(ss, indices);
+
+      REQUIRE(std::empty(ss.str()));
+   }
+   SECTION("list with one element")
+   {
+      using input_t = std::tuple<not_null>;
+      constexpr auto indices = std::make_index_sequence<std::tuple_size_v<input_t>>{};
+
+      std::stringstream ss;
+      detail::concat_constraints<input_t>(ss, indices);
+      //! \todo leading whitespace is kind of awkward
+      REQUIRE(ss.str() == " NOT NULL");
+   }
+   SECTION("list with two elements")
+   {
+      using input_t = std::tuple<primary_key, not_null>;
+      constexpr auto indices = std::make_index_sequence<std::tuple_size_v<input_t>>{};
+
+      std::stringstream ss;
+      detail::concat_constraints<input_t>(ss, indices);
+      //! \todo leading whitespace is kind of awkward
+      REQUIRE(ss.str() == " PRIMARY KEY NOT NULL");
+   }
+}
+
 // begin-snippet: db.user.example
 struct user
 {
@@ -17,6 +53,8 @@ struct user
    double cash{}; 
 };
 // end-snippet
+
+#if __cpp_nontype_template_args >= 201911L
 
 namespace sec21::database
 {
@@ -59,47 +97,15 @@ namespace sec21::database
    // end-snippet
 } // namespace sec21::database
 
-TEST_CASE("concat column constraints", "[sec21][database]")
-{
-   using namespace sec21::database;
-
-   SECTION("empty list")
-   {
-      using input_t = std::tuple<>;
-      constexpr auto indices = std::make_index_sequence<std::tuple_size_v<input_t>>{};
-
-      std::stringstream ss;
-      detail::concat_constraints<input_t>(ss, indices);
-
-      REQUIRE(std::empty(ss.str()));
-   }
-   SECTION("list with one element")
-   {
-      using input_t = std::tuple<not_null>;
-      constexpr auto indices = std::make_index_sequence<std::tuple_size_v<input_t>>{};
-
-      std::stringstream ss;
-      detail::concat_constraints<input_t>(ss, indices);
-      //! \todo leading whitespace is kind of awkward
-      REQUIRE(ss.str() == " NOT NULL");
-   }
-   SECTION("list with two elements")
-   {
-      using input_t = std::tuple<primary_key, not_null>;
-      constexpr auto indices = std::make_index_sequence<std::tuple_size_v<input_t>>{};
-
-      std::stringstream ss;
-      detail::concat_constraints<input_t>(ss, indices);
-      //! \todo leading whitespace is kind of awkward
-      REQUIRE(ss.str() == " PRIMARY KEY NOT NULL");
-   }
-}
-
 TEST_CASE("test detail implementation", "[sec21][database]")
 {
    using namespace sec21::database;
 
+#ifdef __cpp_designated_initializers
    user obj{.name = "John Doe", .password = "hidden", .karma = 42, .cash = 3.14};
+#else
+   user obj{"John Doe", "hidden", 42, 3.14};
+#endif
 
    using reflection_t = table<decltype(obj)>::metainfo;
    constexpr auto indices = std::make_index_sequence<std::tuple_size_v<reflection_t>>{};
@@ -171,7 +177,11 @@ TEST_CASE("test database queries from type: user", "[sec21][database]")
    SECTION("insert values into table")
    {
       // begin-snippet: db.insert
+#ifdef __cpp_designated_initializers
       user obj{.name = "John Doe", .password = "hidden", .karma = 42, .cash = 3.14};
+#else
+      user obj{"John Doe", "hidden", 42, 3.14};
+#endif      
       const auto result = insert_into(obj);
 
       REQUIRE(result == R"(INSERT INTO user (name,password,karma,cash) VALUES ('John Doe','hidden',42,3.14);)");
@@ -184,3 +194,4 @@ TEST_CASE("test database queries from type: user", "[sec21][database]")
       REQUIRE(result == "SELECT name,password,karma,cash FROM user");
    }
 }
+#endif

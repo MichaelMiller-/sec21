@@ -72,50 +72,6 @@ namespace sec21::structural_analysis
          copy_load(sys, lf, std::begin(F));
    }
 
-#if 0
-   template <typename System, typename Unit>
-   [[deprecated]] auto add_temperature_load(System const& sys, loadcase<System> const& load, std::vector<Unit>& F)
-   {
-      constexpr auto dim = System::dimension_v;
-      //! \todo std::for_each(std::execution::par
-      for (auto const& lf : load.temperature_loads)
-      {
-         const auto it = std::find_if(
-            begin(sys.members), 
-            end(sys.members), 
-            [id = lf.member_id](auto const& m){ return m.id == id; });
-
-         if (it == std::end(sys.members))
-            throw std::invalid_argument("member id not found");
-
-         const auto [s, e] = sys.coincidence_table.at(lf.member_id);
-
-         const auto from = std::find_if(
-            begin(sys.nodes), 
-            end(sys.nodes), 
-            [s](auto const& n){ return n.id == s; });
-
-         const auto to = std::find_if(
-            begin(sys.nodes), 
-            end(sys.nodes), 
-            [e](auto const& n){ return n.id == e; });
-
-         const auto d1 = std::distance(begin(sys.nodes), from);
-         const auto d2 = std::distance(begin(sys.nodes), to);
-         //! \todo error handling
-
-         const auto alpha = impl::angle_to_x_axis(*from, *to);
-
-         const auto equivalent_force = it->E * it->A * lf.delta_t * lf.alpha_t;
-         //! \todo use unit system
-         //! \todo use operator += 
-         F[d1 * dim + 0] = std::cos(alpha) * -equivalent_force.value();
-         F[d1 * dim + 1] = std::sin(alpha) * -equivalent_force.value();
-         F[d2 * dim + 0] = std::cos(alpha) * equivalent_force.value();
-         F[d2 * dim + 1] = std::sin(alpha) * equivalent_force.value();
-      }
-   }
-#endif
    template <typename System, typename Iterator>
    auto add_temperature_load(System const& sys, loadcase<System> const& load, Iterator first)
    {

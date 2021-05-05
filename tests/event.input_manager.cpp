@@ -1,5 +1,7 @@
 #include <catch.hpp>
 
+#if __cpp_nontype_template_args >= 201911L
+
 #include <sec21/event/input_manager.h>
 
 class test_backend
@@ -55,3 +57,5 @@ TEST_CASE("simulate some events", "[sec21][event]")
       REQUIRE(std::holds_alternative<time_elapsed>(result));
    }
 }
+
+#endif

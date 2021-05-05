@@ -10,7 +10,7 @@ namespace sec21::event
 {
    struct mouse_button
    {
-      static constexpr std::string_view name{ "mouse" };
+      static constexpr std::string_view name{ "mouse button" };
 
       int button{};
       mouse position{};

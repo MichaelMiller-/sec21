@@ -6,7 +6,7 @@ namespace sec21
    //! https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern
    //
    template <typename T, template<typename> typename Crtp>
-   struct crtp
+   [[deprecated]] struct crtp
    {
       T& self() noexcept { return static_cast<T&>(*this); }
 

@@ -46,6 +46,8 @@ namespace sec21::database
    template <typename T>
    inline constexpr bool is_column_v = is_column<T>::value;
 
+#ifdef __cpp_concepts
    template<typename T>
    concept Column = is_column_v<T>;
+#endif   
 }

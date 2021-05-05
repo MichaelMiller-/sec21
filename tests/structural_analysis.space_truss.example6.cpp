@@ -6,6 +6,8 @@
 #include <sec21/numeric/ublas_allocator_wrapper.h>
 #include <sec21/structural_analysis/loadcase.h>
 #include <sec21/structural_analysis/solve.h>
+#include <sec21/structural_analysis/node.h>
+#include <sec21/structural_analysis/member.h>
 #include <sec21/structural_analysis/space_truss.h>
 #include <sec21/structural_analysis/system_result.h>
 
@@ -18,7 +20,11 @@ TEST_CASE("example system 6.0 load from json", "[sec21][structural_analysis][spa
    using namespace sec21::structural_analysis;
    using namespace sec21::units::literals;
 
-   auto sys = sec21::load_from_json<space_truss>("example_6.json");
+   using member_t = member<int, double>;
+   using node_t = node<2, int, double>;
+   using space_truss_t = space_truss<node_t, member_t>;
+
+   auto sys = sec21::load_from_json<space_truss_t>("example_6.json");
 
    SECTION("test geometry")
    {
@@ -411,10 +417,10 @@ TEST_CASE("example system 6.0 load from json", "[sec21][structural_analysis][spa
       REQUIRE(Z.size2() == 14);
       // clang-format off
       const auto expected = std::array{
-         1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-         0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-         0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-         0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+         1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+         0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+         0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+         0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
       };
       // clang-format on
       REQUIRE(approx_equal(sec21::numeric::flatten(Z), expected, kDivergence));
@@ -455,8 +461,8 @@ TEST_CASE("example system 6.0 load from json", "[sec21][structural_analysis][spa
                         [](auto&& e) { return e.value(); });
 
       std::vector<double> copied_results{};
-      std::transform(std::begin(result.member), std::end(result.member), std::back_inserter(copied_results),
-                     [](auto&& m) { return m.second.normal_force.value(); });
+      std::transform(std::begin(result.members), std::end(result.members), std::back_inserter(copied_results),
+                     [](auto&& m) { return m.normal_force.value(); });
 
       // unit: newton [N]
       REQUIRE(flat_support_reaction[0] == Approx(0.0));

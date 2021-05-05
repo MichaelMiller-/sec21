@@ -15,51 +15,23 @@ namespace sec21::structural_analysis
       Descriptor id{};
       std::array<Displacement, Dimension> displacement{};
       std::array<Force, Dimension> support_reaction{};
+
+      constexpr bool operator < (node_result_2 const& rhs) const noexcept
+      {
+         return id < rhs.id;
+      }      
    };   
 
-   struct node_result_transparent_comparator
-   {
-      using is_transparent = void;
-
-      template <typename Descriptor, typename Displacement, typename Force, auto Dimension>
-      bool operator()(
-         node_result_2<Descriptor, Displacement, Force, Dimension> const& lhs, 
-         node_result_2<Descriptor, Displacement, Force, Dimension> const& rhs) const noexcept
-      {
-         return lhs.id < rhs.id;
-      }
-      template <typename Descriptor, typename Displacement, typename Force, auto Dimension>
-      bool operator()(
-         Descriptor const& lhs, 
-         node_result_2<Descriptor, Displacement, Force, Dimension> const& rhs) const noexcept
-      {
-         return lhs < rhs.id;
-      }
-      template <typename Descriptor, typename Displacement, typename Force, auto Dimension>
-      bool operator()(
-         node_result_2<Descriptor, Displacement, Force, Dimension> const& lhs, 
-         Descriptor const& rhs) const noexcept
-      {
-         return lhs.id < rhs;
-      }
-   };
-   
    template <typename Descriptor, typename Force = units::quantity<units::newton, double> >
-   struct member_result_2
+   struct member_result
    {
       Descriptor id{};
       Force normal_force{};
 
-      constexpr bool operator < (member_result_2 const& rhs) const
+      constexpr bool operator < (member_result const& rhs) const noexcept
       {
          return id < rhs.id;
       }
-   };
-
-   template <typename Force = units::quantity<units::newton, double> >
-   struct member_result
-   {
-      Force normal_force{};
    };
 
    template <typename System>
@@ -76,8 +48,6 @@ namespace sec21::structural_analysis
       using displacement_t = units::quantity<units::millimeter, precision_t>;
       using force_t = units::quantity<units::newton, precision_t>;
 
-      using member_result_t = member_result<force_t>;
-
       struct node_result
       {
          std::array<displacement_t, dimension_v> displacement{};
@@ -88,17 +58,15 @@ namespace sec21::structural_analysis
 
       //! \todo decide which approch
       std::map<node_descriptor_t, node_result> node;
-      std::map<member_descriptor_t, member_result_t> member;
 
       using node_result_t = node_result_2<node_descriptor_t, displacement_t, force_t, dimension_v>;
-      using member_result_set_t = member_result_2<member_descriptor_t, force_t>;
+      using member_result_set_t = member_result<member_descriptor_t, force_t>;
 
-      std::set<node_result_t, node_result_transparent_comparator> nodes;
+      std::set<node_result_t> nodes;
       std::set<member_result_set_t> members;
    };
 }
 
-//! \todo temporary; guard with a define or move to extra file
 #include <nlohmann/json.hpp>
 
 namespace sec21::structural_analysis
@@ -122,7 +90,7 @@ namespace sec21::structural_analysis
 
    // 
    template <typename Descriptor, typename Force>
-   void to_json(nlohmann::json& j, member_result_2<Descriptor, Force> const& obj) 
+   void to_json(nlohmann::json& j, member_result<Descriptor, Force> const& obj) 
    {
       j = nlohmann::json{
          {"id", obj.id},
@@ -131,7 +99,7 @@ namespace sec21::structural_analysis
    }
 
    template <typename Descriptor, typename Force>
-   void from_json(nlohmann::json const& j, member_result_2<Descriptor, Force>& obj) 
+   void from_json(nlohmann::json const& j, member_result<Descriptor, Force>& obj) 
    {
       j.at("id").get_to(obj.id);
       j.at("normal_force").get_to(obj.normal_force);

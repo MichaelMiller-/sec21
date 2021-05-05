@@ -85,7 +85,7 @@ namespace sec21::database
    template <typename Table>
    auto create_table()
    {
-      using reflection_t = table<Table>::metainfo;
+      using reflection_t = typename table<Table>::metainfo;
       constexpr auto indices = std::make_index_sequence<std::tuple_size_v<reflection_t>>{};
 
       std::stringstream out;
@@ -98,7 +98,7 @@ namespace sec21::database
    template <typename Row>
    auto insert_into(Row const& row)
    {
-      using reflection_t = table<Row>::metainfo;
+      using reflection_t = typename table<Row>::metainfo;
       constexpr auto indices = std::make_index_sequence<std::tuple_size_v<reflection_t>>{};
 
       std::stringstream out;
@@ -114,7 +114,7 @@ namespace sec21::database
    template <typename Table>
    auto select()
    {
-      using reflection_t = table<Table>::metainfo;
+      using reflection_t = typename table<Table>::metainfo;
       constexpr auto indices = std::make_index_sequence<std::tuple_size_v<reflection_t>>{};
 
       std::stringstream out;

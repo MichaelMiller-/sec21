@@ -5,8 +5,8 @@
 #include <sec21/event/time_elapsed.h>
 #include <sec21/event/mouse.h>
 #include <sec21/event/mouse_button.h>
+#include <sec21/event/mouse_wheel.h>
 #include <sec21/event/key.h>
-
 #include <variant>
 
 namespace sec21::event
@@ -19,6 +19,7 @@ namespace sec21::event
       pressed<mouse_button>,
       released<mouse_button>,
       moved<mouse>,
+      mouse_wheel,
       pressed<key>, 
       released<key>
    >;

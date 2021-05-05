@@ -1,6 +1,9 @@
 ﻿#include <catch.hpp>
 
 #include <sec21/strong_type.h>
+#include <sec21/policy/integer_arithmetic.h>
+#include <sec21/policy/compare.h>
+#include <sec21/policy/print.h>
 
 #include <sstream>
 
@@ -8,9 +11,15 @@ TEST_CASE("test strong types", "[sec21][core]")
 {
    using namespace sec21;
 
-   using width_t = strong_type<int, struct width_tag, integer_arithmetic, compare, print>;
+   using width_t = strong_type<
+      int, 
+      struct width_tag, 
+      policy::integer_arithmetic, 
+      policy::compare, 
+      policy::print>;
    using T = width_t::underlying_t;
 
+   static_assert(std::is_same_v<T, underlying_type<width_t>>);
    static_assert(is_strong_type<int>::value == false);
    static_assert(is_strong_type<width_t>::value == true);
    static_assert(is_strong_type_v<int> == false);
@@ -114,7 +123,7 @@ struct mix_addition
 };
 // also possible
 //template <typename T>
-//using mix_addition = sec21::mixed_addition<T, OtherType>;
+//using mix_addition = sec21::policy::mixed_addition<T, OtherType>;
 
 using type2_t = sec21::strong_type<int, struct tag2, mix_addition>;
 
