@@ -1,0 +1,2 @@
+#define VERSION_MAJOR @orm_compiler_VERSION_MAJOR@
+#define VERSION_MINOR @orm_compiler_VERSION_MINOR@
