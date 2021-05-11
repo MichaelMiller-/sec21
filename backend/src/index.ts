@@ -12,14 +12,28 @@ import { AppRoutes } from "./routes";
 // entities
 import { StructuralPoint } from "./entity/StructuralPoint";
 import { Project } from "./entity/Project";
+import { Material } from "./entity/Material";
+import { CrossSection } from "./entity/CrossSection";
 
 const PORT = Number(process.env.PORT) || 3003;
+// const OPTIONS: ConnectionOptions = {
+//     type: "sqlite",
+//     database: process.env.DATABASE_NAME,
+//     logging: true,
+//     synchronize: true
+//     entities: [Project, StructuralPoint],
+// };
+
 const OPTIONS: ConnectionOptions = {
-    type: "sqlite",
-    database: process.env.DATABASE_NAME,
-    entities: [Project, StructuralPoint],
+    type: "postgres",
+    host: process.env.DATABASE_HOST!,
+    port: Number(process.env.DATABASE_PORT),
+    username: process.env.DATABASE_USERNAME!,
+    password: process.env.DATABASE_PASSWORD!,
+    database: process.env.DATABASE_NAME!,
     logging: true,
-    synchronize: true
+    synchronize: true,
+    entities: [Project, StructuralPoint, Material, CrossSection],
 };
 
 createConnection(OPTIONS).then(async connection => {
