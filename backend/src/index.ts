@@ -16,30 +16,38 @@ import { Material } from "./entity/Material";
 import { CrossSection } from "./entity/CrossSection";
 
 const PORT = Number(process.env.PORT) || 3003;
-// const OPTIONS: ConnectionOptions = {
-//     type: "sqlite",
-//     database: process.env.DATABASE_NAME,
-//     logging: true,
-//     synchronize: true
-//     entities: [Project, StructuralPoint],
-// };
-
 const OPTIONS: ConnectionOptions = {
-    type: "postgres",
-    host: process.env.DATABASE_HOST!,
-    port: Number(process.env.DATABASE_PORT),
-    username: process.env.DATABASE_USERNAME!,
-    password: process.env.DATABASE_PASSWORD!,
-    database: process.env.DATABASE_NAME!,
+    type: "sqlite",
+    database: process.env.DATABASE_NAME,
     logging: true,
     synchronize: true,
     entities: [Project, StructuralPoint, Material, CrossSection],
 };
 
+// const OPTIONS: ConnectionOptions = {
+//     type: "postgres",
+//     host: process.env.DATABASE_HOST!,
+//     port: Number(process.env.DATABASE_PORT),
+//     username: process.env.DATABASE_USERNAME!,
+//     password: process.env.DATABASE_PASSWORD!,
+//     database: process.env.DATABASE_NAME!,
+//     logging: true,
+//     synchronize: true,
+//     entities: [Project, StructuralPoint, Material, CrossSection],
+// };
+
 createConnection(OPTIONS).then(async connection => {
     // create express app
     const app = express();
     app.use(bodyParser.json());
+
+    app.use(function (req, res, next) {
+        res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+        res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+        // res.setHeader('Access-Control-Allow-Credentials', true);
+        next();
+    });    
 
     // register all application routes
     AppRoutes.forEach(route => {
