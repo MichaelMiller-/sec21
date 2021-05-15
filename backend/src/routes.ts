@@ -4,8 +4,10 @@ import { listStructuralPoints } from "./controller/ListStructuralPoints"
 import { addStructuralPoint } from "./controller/AddStructuralPoint";
 import { listMaterials } from "./controller/ListMaterials";
 import { listCrossSections } from "./controller/ListCrossSections";
+import { getProject } from "./controller/GetProject";
 import { getMaterial } from "./controller/GetMaterial";
 import { getCrossSection } from "./controller/GetCrossSection";
+import { deleteStructuralPoint } from "./controller/DeleteStructuralPoint";
 
 export const AppRoutes = [
     {
@@ -37,6 +39,16 @@ export const AppRoutes = [
         path: "/structuralpoints/:id",
         method: "post",
         action: addStructuralPoint
+    },
+    {
+        path: "/structuralpoint/:id",
+        method: "delete",
+        action: deleteStructuralPoint
+    },
+    {
+        path: "/project/:id",
+        method: "get",
+        action: getProject
     },
     {
         path: "/material/:id",
