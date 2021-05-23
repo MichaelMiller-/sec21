@@ -22,7 +22,7 @@ jobs:
 
       - name: Install Compiler
         run: |
-          sudo apt install clang-10.0
+          sudo apt install clang
           sudo pip install gcovr
           
       - name: Install Dependencies
@@ -54,8 +54,8 @@ jobs:
         shell: bash
         working-directory: ${{runner.workspace}}/build
         run: |
-          export CC=`which clang-10.0`
-          export CXX=`which clang++-10.0`
+          export CC=`which clang`
+          export CXX=`which clang++`
           cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{matrix.config}} -DCMAKE_TOOLCHAIN_FILE=${{runner.workspace}}/vcpkg/scripts/buildsystems/vcpkg.cmake
 
       - name: Build
