@@ -15,21 +15,25 @@ namespace sec21::units
    };
 
    template <typename BaseUnit, typename To>
-   struct cast_helper : BaseUnit 
+   struct cast_helper : BaseUnit
    {
-      using BaseUnit::dimension_t;
-      using BaseUnit::ratio_t;
+      using typename BaseUnit::dimension_t;
+      using typename BaseUnit::ratio_t;
    };
 
    struct no_prefix;
    struct base_unit;
 
-   template<typename Child, typename...>
+   template <typename Child, typename...>
    struct derived_unit;
 
    template <typename Child, typename Dimension>
-   struct derived_unit<Child, Dimension, base_unit> : cast_helper<unit<Dimension, std::ratio<1>>, Child> {};
+   struct derived_unit<Child, Dimension, base_unit> : cast_helper<unit<Dimension, std::ratio<1>>, Child>
+   {
+   };
 
    template <typename Child, typename Dimension, typename Ratio>
-   struct derived_unit<Child, Dimension, Ratio> : cast_helper<unit<Dimension, Ratio>, Child> {};
-}
+   struct derived_unit<Child, Dimension, Ratio> : cast_helper<unit<Dimension, Ratio>, Child>
+   {
+   };
+} // namespace sec21::units
