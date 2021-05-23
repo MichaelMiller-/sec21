@@ -1,6 +1,5 @@
 # sec21
-
-Linux [![Build Status](https://travis-ci.org/MichaelMiller-/sec21.svg?branch=master)](https://travis-ci.org/MichaelMiller-/sec21)  Windows [![Build status](https://ci.appveyor.com/api/projects/status/4s6bg4yexj0cna45?svg=true)](https://ci.appveyor.com/project/MichaelMiller-/sec21)
+[![GCC](https://github.com/MichaelMiller-/sec21/actions/workflows/gcc.yml/badge.svg)](https://github.com/MichaelMiller-/sec21/actions/workflows/gcc.yml) [![Clang](https://github.com/MichaelMiller-/sec21/actions/workflows/clang.yml/badge.svg)](https://github.com/MichaelMiller-/sec21/actions/workflows/clang.yml) [![MSVC](https://github.com/MichaelMiller-/sec21/actions/workflows/msvc.yml/badge.svg)](https://github.com/MichaelMiller-/sec21/actions/workflows/msvc.yml)
 
 **sec21** is a collection of useful functions and classes.
 - [Units](#Units)
