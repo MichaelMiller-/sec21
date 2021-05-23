@@ -14,27 +14,32 @@ import { StructuralPoint } from "./entity/StructuralPoint";
 import { Project } from "./entity/Project";
 import { Material } from "./entity/Material";
 import { CrossSection } from "./entity/CrossSection";
+import { PointAction } from "./entity/PointAction";
+import { LoadCase } from "./entity/LoadCase";
+import { LoadGroup } from "./entity/LoadGroup";
+import { CurveMember } from "./entity/CurveMember";
+import { PointSupport } from "./entity/PointSupport";
 
 const PORT = Number(process.env.PORT) || 3003;
-const OPTIONS: ConnectionOptions = {
-    type: "sqlite",
-    database: process.env.DATABASE_NAME,
-    logging: true,
-    synchronize: true,
-    entities: [Project, StructuralPoint, Material, CrossSection],
-};
-
 // const OPTIONS: ConnectionOptions = {
-//     type: "postgres",
-//     host: process.env.DATABASE_HOST!,
-//     port: Number(process.env.DATABASE_PORT),
-//     username: process.env.DATABASE_USERNAME!,
-//     password: process.env.DATABASE_PASSWORD!,
-//     database: process.env.DATABASE_NAME!,
+//     type: "sqlite",
+//     database: process.env.DATABASE_NAME,
 //     logging: true,
 //     synchronize: true,
 //     entities: [Project, StructuralPoint, Material, CrossSection],
 // };
+
+const OPTIONS: ConnectionOptions = {
+    type: "postgres",
+    host: process.env.DATABASE_HOST!,
+    port: Number(process.env.DATABASE_PORT),
+    username: process.env.DATABASE_USERNAME!,
+    password: process.env.DATABASE_PASSWORD!,
+    database: process.env.DATABASE_NAME!,
+    logging: true,
+    synchronize: true,
+    entities: [Project, StructuralPoint, Material, CrossSection, LoadGroup, LoadCase, PointAction, CurveMember, PointSupport],
+};
 
 createConnection(OPTIONS).then(async connection => {
     // create express app
@@ -47,7 +52,7 @@ createConnection(OPTIONS).then(async connection => {
         res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
         // res.setHeader('Access-Control-Allow-Credentials', true);
         next();
-    });    
+    });
 
     // register all application routes
     AppRoutes.forEach(route => {
