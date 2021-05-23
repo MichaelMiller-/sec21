@@ -17,6 +17,6 @@ export class CrossSection {
    @Column()
    area: number;
 
-   @ManyToOne(type => Project, project => project.materials)
+   @ManyToOne(type => Project, project => project.crossSections)
    project: Project;
 }
