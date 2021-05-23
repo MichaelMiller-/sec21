@@ -370,3 +370,23 @@ TEST_CASE("Uniform container erasure", "[features]")
    WARN("Uniform container erasure is not supported");
 #endif
 }
+
+
+
+/*
+void Compute(int &) { } // example function
+
+template <typename T, typename = void>
+struct is_compute_available : std::false_type {};
+
+template <typename T>
+struct is_compute_available<T,
+           std::void_t<decltype(Compute(std::declval<T>())) >>
+               : std::true_type {};
+
+static_assert(is_compute_available<int&>::value);
+static_assert(!is_compute_available<double&>::value);
+
+//! \todo is (or can be) replaced by "Design By Introspection in C++20 (concepts + if constexpr)"
+ if constexpr (requires { Compute(int&); }) {
+*/

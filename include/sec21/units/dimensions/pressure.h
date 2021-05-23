@@ -10,12 +10,15 @@
 namespace sec21::units
 {
    // clang-format off
+   // begin-snippet: units_pressure_dimension
    using pressure = dimension<
       exponent<base_dimension_length, -1>,
       exponent<base_dimension_mass, 1>, 
       exponent<base_dimension_time, -2>>;
+   // end-snippet
    // clang-format on
 
+   // begin-snippet: units_pressure_hierachie
    struct pascal : derived_unit<pascal, pressure, base_unit> {};
    struct kilopascal : derived_unit<kilopascal, pressure, std::kilo> {};
    struct megapascal : derived_unit<megapascal, pressure, std::mega> {};
@@ -27,6 +30,7 @@ namespace sec21::units
    struct kilonewton_per_square_meter : derived_unit<newton_per_square_meter, pressure, std::kilo> {};
 
    //! \todo struct psi : derived_unit<kilopascal, pressure, std::ratio<6.894757>> {};
+   // end-snippet
 
    template <>
    struct abbreviation<pascal>

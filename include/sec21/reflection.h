@@ -119,14 +119,13 @@ namespace sec21::reflection
 #include <functional>
 #include <boost/core/demangle.hpp>
 #include <iostream>
-#include <optional>
 template <typename T>
 inline auto name() -> std::string
 {
     return boost::core::demangle(typeid(T).name());
 }
 template <typename T>
-inline void print_type(std::string n)
+inline void print_type(std::string_view n)
 {
     std::cout << n << ": " << name<T>() << std::endl;
 }

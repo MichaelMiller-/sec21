@@ -86,7 +86,7 @@ TEST_CASE("quantity test", "[sec21][units]")
    STATIC_REQUIRE(1'000_m >= 1_km);
    STATIC_REQUIRE(1'000_m <= 1_km);
 }
-TEST_CASE("SI units test", "[units]")
+TEST_CASE("SI units test", "[sec21][units]")
 {
    using namespace sec21::units;
 

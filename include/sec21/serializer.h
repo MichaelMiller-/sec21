@@ -12,12 +12,12 @@ namespace sec21
    {
       reflection::for_each_member<std::decay_t<T>>([&](auto const& member) 
       {
-         // static_assert(reflection::is_registered_v<std::decay_t<decltype(member)>>, "wtf ser");
+         using value_t = typename std::decay_t<decltype(member)>::value_t;
 
-         // if constexpr (reflection::is_registered_v<std::decay_t<decltype(member)>>)
-         //    serialize(ar, member);
-         // else
-            ar.write(member.name(), member.get(t));
+         if constexpr (reflection::is_registered_v<value_t>)
+            serialize<Archive, value_t>(ar, member.get(t));
+
+         ar.write(member.name(), member.get(t));
       });
    }
 
@@ -27,8 +27,11 @@ namespace sec21
    {
       reflection::for_each_member<std::decay_t<T>>([&](auto const& member) 
       {
-         // static_assert(reflection::is_registered_v<std::decay_t<member>>, "wtf");
-         ar.read(member.name(), member.get(t));
+#if 0
+         std::decay_t<decltype(member)>::value_t tmp{};
+         ar.read(member.name(), tmp);
+         member.set(t, tmp);
+#endif
       });
    }    
 }

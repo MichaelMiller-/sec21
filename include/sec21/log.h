@@ -2,6 +2,7 @@
 
 namespace sec21
 {
+   //! \todo remove file
    struct empty_logger
    {
       template <typename... Args>

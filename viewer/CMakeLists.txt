@@ -28,12 +28,12 @@ configure_file("${CMAKE_HOME_DIRECTORY}/data/example_7_load.json" "${PROJECT_BIN
 # configure_file("${CMAKE_HOME_DIRECTORY}/data/example_6_result.json" "${PROJECT_BINARY_DIR}/example_6_result.json" COPYONLY)
 # configure_file("${CMAKE_HOME_DIRECTORY}/data/example_7_result.json" "${PROJECT_BINARY_DIR}/example_7_result.json" COPYONLY)
 
-include_directories("${PROJECT_BINARY_DIR}")
-
 set(IMGUI_SOURCES "imgui_impl/imgui_impl_sdl.h" "imgui_impl/imgui_impl_sdl.cpp" "imgui_impl/imgui_impl_opengl3.h" "imgui_impl/imgui_impl_opengl3.cpp")
 set(SOURCES "viewer.cpp" ${IMGUI_SOURCES})
 
 add_executable(${PROJECT_NAME} ${SOURCES})
+
+target_include_directories(${PROJECT_NAME} PRIVATE "${PROJECT_BINARY_DIR}")
 
 include(CheckCXXCompilerFlag)
 if (MSVC_VERSION GREATER_EQUAL "1900")

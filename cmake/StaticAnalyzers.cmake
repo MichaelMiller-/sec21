@@ -27,11 +27,11 @@ if(ENABLE_CLANG_TIDY)
   endif()
 endif()
 
-if(ENABLE_CLANG_TIDY)
-  message(SEND_ERROR "TODO")
+#if(ENABLE_CLANG_TIDY)
+#message(SEND_ERROR "TODO")
 # TODO
 # -fanalyzer -Wanalyzer-too-complex
 # -fanalyzer-verbosity=4
 # -fdump-analyzer-state-purge
 # -fdump-analyzer-supergraph
-endif()
+## #endif()
