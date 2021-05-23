@@ -1,0 +1,46 @@
+#pragma once
+
+#define SAFTY_GUARD_PROJECT_NAME ${PROJECT_NAME}
+#ifndef SAFTY_GUARD_PROJECT_NAME
+   #error "variable $PROJECT_NAME is not set";
+#endif
+#undef SAFTY_GUARD_PROJECT_NAME
+
+#include <nonius/nonius.h++>
+
+#include <string>
+#include <sstream>
+#include <chrono>
+#include <array>
+
+namespace detail
+{
+   std::string today()
+   {
+      auto const now = std::chrono::system_clock::now();
+      auto const tt = std::chrono::system_clock::to_time_t(now);
+
+      std::stringstream ss;
+      ss << std::put_time(std::localtime(&tt), "%Y-%m-%d");
+      return ss.str();
+   }
+}
+
+template <auto N>
+auto benchmark_runner(std::array<nonius::benchmark, N> values)
+{
+   //! \todo generate SQL table statement
+   //! \todo append to SQL table
+   nonius::configuration cfg;
+   cfg.output_file = detail::today() + "_${PROJECT_NAME}.html";
+
+   nonius::go(cfg, std::begin(values), std::end(values), nonius::html_reporter{});
+   //! \todo possible send to http entpoint
+   //nonius::go(cfg, std::begin(benchmarks), std::end(benchmarks), nonius::csv_reporter());
+}
+
+template <typename... Args>
+auto benchmark_runner(Args &&... args)
+{
+   return benchmark_runner(std::array{ std::forward<Args>(args)... });
+}

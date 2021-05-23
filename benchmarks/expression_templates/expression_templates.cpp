@@ -1,8 +1,7 @@
-#include <nonius/nonius.h++>
+#include "generated_boilerplate.h"
 
 #include <tuple>
 #include <vector>
-#include <chrono>
 
 struct tridiagonal
 {
@@ -156,24 +155,10 @@ namespace expression_template
 }
 
 
-
-std::string today()
-{
-   auto const now = std::chrono::system_clock::now();
-   auto const tt = std::chrono::system_clock::to_time_t(now);
-
-   std::stringstream ss;
-   ss << std::put_time(std::localtime(&tt), "%Y-%m-%d");
-   return ss.str();
-}
-
 //! \todo save benchmark results to a persistent database 
 
 int main() 
 {
-   nonius::configuration cfg;
-   cfg.output_file = today() + "_expression_templates.html";
-   
    double a{ 1.23 };
    double b{ 3.14 };
 
@@ -182,8 +167,7 @@ int main()
 
    // const auto expected = std::vector{ 3.36, 6.73, 10.09, 13.46, 16.82, 20.19, 23.55, 26.92, 30.28 };
 
-   const nonius::benchmark benchmarks[] = 
-   {
+   benchmark_runner(
       nonius::benchmark("conventional STL", [&] { 
          using namespace conventional;
          A = 0.77 * (a * A + b * B); 
@@ -198,11 +182,8 @@ int main()
          using namespace expression_template;
          A = 0.77 * (a * A + b * B);
          return A;
-      }),
-   };
-
-   nonius::go(cfg, std::begin(benchmarks), std::end(benchmarks), nonius::html_reporter{});
-   //nonius::go(cfg, std::begin(benchmarks), std::end(benchmarks), nonius::csv_reporter());
+      })
+   );
 
    return 0;
 }

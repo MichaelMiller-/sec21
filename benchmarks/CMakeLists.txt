@@ -1,1 +1,3 @@
 add_subdirectory(expression_templates)
+add_subdirectory(structural_analysis.solve)
+add_subdirectory(structural_analysis.space_struss.solver.backend)
