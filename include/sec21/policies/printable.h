@@ -7,6 +7,7 @@
 
 namespace sec21
 {
+#if 0
    template <typename T>
    struct printable : crtp<T, printable>
    {
@@ -25,4 +26,16 @@ namespace sec21
       object.print(os);
       return os;
    }
+#else
+   template <typename T>
+   struct printable
+   {
+      template <typename CharT, typename Traits>
+      friend auto& operator << (std::basic_ostream<CharT, Traits>& os, T const& t) noexcept
+      {
+         using type = underlying_type<T>;
+         return os << static_cast<type const&>(t);
+      }
+   };
+#endif
 }

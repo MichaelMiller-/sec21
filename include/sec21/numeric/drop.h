@@ -62,13 +62,13 @@ namespace sec21::numeric
       using namespace boost::numeric;
       ublas::vector<T, Allocator> result(input.size() - size(rows));
 
-      auto it = begin(result);
+      auto first = begin(result);
       for (decltype(input.size()) i = 0; i < input.size(); ++i) {
          if (auto it = std::find(begin(rows), end(rows), row{i}); it != end(rows))
             continue;
 
-         *it = input[i];
-         ++it;
+         *first = input[i];
+         ++first;
       }
       return result;
    }

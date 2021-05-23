@@ -17,7 +17,7 @@ namespace sec21::units
    struct base_dimension_less : std::bool_constant<D1::name < D2::name> {};
 
    template <typename D1, typename D2>
-   constexpr bool base_dimension_less_v = base_dimension_less<D1, D2>::value;
+   inline constexpr bool base_dimension_less_v = base_dimension_less<D1, D2>::value;
 
 
    template <typename Base>
@@ -50,10 +50,10 @@ namespace sec21::units
 
 
    template <typename E1, typename E2>
-   struct same_dimension : std::is_same<typename E1::dimension_t, typename E2::dimension_t> {};
+   using same_dimension = std::is_same<dimension<typename E1::dimension_t>, dimension<typename E2::dimension_t>>;
 
    template <typename E1, typename E2>
-   constexpr bool same_dimension_v = same_dimension<E1, E2>::value;
+   inline constexpr bool same_dimension_v = same_dimension<E1, E2>::value;
 
 
    template <typename E1, typename E2>

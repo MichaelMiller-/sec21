@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.1)
+project(benchmark.expression_templates VERSION 0.0.1 LANGUAGES CXX)
 
-project(benchmark.expression_templates)
 add_executable(${PROJECT_NAME} expression_templates.cpp)
 
 configure_file("${CMAKE_SOURCE_DIR}/benchmarks/boilerplate.h.in" "${PROJECT_BINARY_DIR}/generated_boilerplate.h")

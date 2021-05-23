@@ -8,6 +8,7 @@ namespace sec21::units
    using temperature = dimension<exponent<base_dimension_temperature, 1>>;
 
    struct kelvin : derived_unit<kelvin, temperature, si_tag> {};
+   // 1 grad celsius == 274.15 K
    //! \todo celsius : derived_unit<celsius, temperature, si_tag> {};
 
    template <>

@@ -24,7 +24,7 @@ namespace sec21
 
       auto operator[] (Key key) const {
          //! \todo what if key is not found?
-         return proxy<return_type>(storage.find(key)->second);
+         return proxy<return_type>{ storage.find(key)->second };
       }
 
    private:
@@ -38,8 +38,6 @@ namespace sec21
       struct proxy
       {
          value_type v;
-
-         explicit proxy(value_type t) : v{ t } { }
 
          template <typename... Args>
          auto operator()(Args &&... args)
