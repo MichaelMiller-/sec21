@@ -42,6 +42,7 @@ jobs:
         vcpkg install glm
         vcpkg install nlohmann-json
         vcpkg install spdlog
+        vcpkg install eigen3
 
     - name: Create Build Environment
       run: cmake -E make_directory build
