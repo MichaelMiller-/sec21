@@ -5,6 +5,7 @@
 
 namespace sec21::structural_analysis
 {
+   [[deprecated]] 
    enum class Support
    {
       // reaction only in the y-axis

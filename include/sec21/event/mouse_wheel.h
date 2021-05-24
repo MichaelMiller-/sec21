@@ -8,7 +8,7 @@ namespace sec21::event
 {
    struct mouse_wheel
    {
-      static constexpr std::string_view name{ "mouse wheel" };
+      static constexpr std::string_view name{ "mousewheel" };
 
       //! \brief the amount scrolled horizontally, positive to the right and negative to the left
       int x{};

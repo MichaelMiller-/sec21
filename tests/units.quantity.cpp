@@ -2,12 +2,6 @@
 
 #include <sec21/units.h>
 
-#include <nlohmann/json.hpp>
-
-#include <iomanip>
-#include <fstream>
-#include <limits>
-
 TEST_CASE("quantity cast", "[sec21][units]")
 {
    using namespace sec21::units;
@@ -181,6 +175,7 @@ TEST_CASE("SI units test", "[sec21][units]")
    // STATIC_REQUIRE(10_km * 10_km * 10_km == 1000_cub_km);
    //STATIC_REQUIRE(1_cub_m == 1'000'000_cub_cm);
 }
+
 TEST_CASE("constant quantities", "[sec21][units]")
 {
    using namespace sec21::units::constants;
@@ -188,6 +183,12 @@ TEST_CASE("constant quantities", "[sec21][units]")
 
    STATIC_REQUIRE(G == 9.80665_mps_sq);
 }
+
+#ifdef SEC21_UNITS_JSON_SERIALIZER
+
+#include <fstream>
+#include <iomanip>
+
 TEST_CASE("nlohmann json reflection for units", "[sec21][units]")
 {
    using namespace std::literals::string_literals;
@@ -264,3 +265,5 @@ TEST_CASE("test unit parser", "[sec21][units]")
       REQUIRE(result.pressure == 7000_Pa);
    }  
 }
+
+#endif

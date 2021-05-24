@@ -1,7 +1,11 @@
 #pragma once
 
-// disable non MPL2 compatible features, or in other words disable the features which are still under the LGPL.
-// #define EIGEN_MPL2_ONLY
+#include <sec21/numeric/flatten.h>
+#include <sec21/numeric/make_vector.h>
+
+#include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/matrix_proxy.hpp>
+
 #include <Eigen/Dense>
 
 #include <vector>
@@ -16,7 +20,7 @@ namespace sec21::structural_analysis::solver::backend
          Eigen::Matrix<Precision, Eigen::Dynamic, 1> const& F) -> Eigen::Matrix<Precision, Eigen::Dynamic, 1>
       {
          if (std::size(K) != std::pow(std::size(F), 2))
-            throw std::invalid_argument("size did not match");
+            throw std::invalid_argument("size mismatch");
 
          const auto lu = Eigen::FullPivLU<Eigen::MatrixXd>(K);
          return lu.solve(F);
@@ -28,15 +32,26 @@ namespace sec21::structural_analysis::solver::backend
          std::vector<Precision, Allocator> const& F) -> std::vector<Precision, Allocator>
       {
          if (std::size(K) != std::pow(std::size(F), 2))
-            throw std::invalid_argument("size did not match");
+            throw std::invalid_argument("size mismatch");
 
-            //! \todo consider alignment
+         //! \todo consider alignment
          const Eigen::MatrixXd kk = Eigen::Map<const Eigen::MatrixXd>(K.data(), F.size(), F.size());
          const Eigen::VectorXd ff = Eigen::Map<const Eigen::VectorXd, Eigen::Unaligned>(F.data(), F.size());
 
          const auto result = displacement(kk, ff);
 
-         return{ result.data(), result.data() + result.cols() * result.rows() };
+         return { result.data(), result.data() + result.cols() * result.rows() };
       }
+
+      template <typename Precision, typename Allocator>
+      [[nodiscard]] static auto displacement(
+         boost::numeric::ublas::matrix<Precision, boost::numeric::ublas::row_major, Allocator> K,
+         boost::numeric::ublas::vector<Precision, Allocator> F) -> boost::numeric::ublas::vector<Precision, Allocator>
+      {
+         const auto ff = std::vector<Precision>{F.begin(), F.end()};
+         const auto result = displacement(numeric::flatten(K), ff);
+         using T = typename decltype(result)::allocator_type;
+         return numeric::make_vector<T>(std::begin(result), std::end(result));
+      }      
    };
 }

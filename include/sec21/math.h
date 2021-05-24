@@ -23,7 +23,11 @@ namespace sec21
    }
 
    //! \brief
+#ifdef __cpp_concepts   
+   template <std::floating_point Arithmetic, std::floating_point... Args>
+#else
    template <typename Arithmetic, typename... Args>
+#endif   
    decltype(auto) fmin(Arithmetic v, Args &&... args)
    {
       auto result{ v };

@@ -15,8 +15,6 @@
 #include <sec21/structural_analysis/impl/lookup.h>
 #include <sec21/structural_analysis/impl/geometry.h>
 #include <sec21/structural_analysis/impl/global_stiffness_matrix.h>
-//! \todo backend as template parameter
-#include <sec21/structural_analysis/solver/backend/viennacl.h>
 
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/matrix_proxy.hpp>
@@ -55,8 +53,8 @@ namespace sec21::structural_analysis
             std::back_inserter(not_supported_rows));
 
          const auto supported_cols = row_to_col(std::begin(supported_rows), std::end(supported_rows));
-         // const auto [supported_rows, supported_cols] = supported_indicies(sys);
 
+         //! \todo use std::vector
          const auto K_without_supports = numeric::drop(numeric::drop(K, supported_rows), supported_cols);
          const auto K_strich = numeric::drop(numeric::drop(K, not_supported_rows), supported_cols);
          const auto F_without_supports = numeric::drop(F, supported_rows);
@@ -69,12 +67,9 @@ namespace sec21::structural_analysis
          using precision_t = typename System::precision_t;
          using allocator_t = Allocator;
 
-         using namespace boost::numeric;
-         using namespace viennacl::linalg;
-
          const auto verschiebungen = Solver::displacement(K_without_supports, F_without_supports);
 
-         //! \todo fix Allocator template arugment
+         //! \todo fix Allocator template argument
          boost::numeric::ublas::vector<precision_t> auflagerreaktionen(K_strich.size1());
          boost::numeric::ublas::axpy_prod(K_strich, verschiebungen, auflagerreaktionen, false);
 
@@ -163,8 +158,7 @@ namespace sec21::structural_analysis
       }
    }
 
-   //! \todo solver template argument -> forward
-   template <typename System>
+   template <typename Solver, typename System>
    [[nodiscard]] auto solve(System const& sys, loadcase<System> const& load)
    {
       using precision_t = typename System::precision_t;
@@ -187,7 +181,7 @@ namespace sec21::structural_analysis
       //! \todo parallelize K and F
       auto K = impl::global_stiffness_matrix<allocator_t>(sys);
 
-      std::vector<value_t> action_on_structure(size(sys.nodes) * dim);
+      std::vector<value_t> action_on_structure(std::size(sys.nodes) * dim);
       add_node_load(sys, load, action_on_structure);
       //! \todo add_node_load(sys, load, begin(action_on_structure));
       add_temperature_load(sys, load, begin(action_on_structure));
@@ -200,6 +194,6 @@ namespace sec21::structural_analysis
 
       //! \todo return std::optional or boost::outcome
       //! \todo process(solve) -> post_process(sys, result)
-      return impl::solve<solver::backend::viennacl_impl>(sys, K, F);
+      return impl::solve<Solver>(sys, K, F);
    }   
 }

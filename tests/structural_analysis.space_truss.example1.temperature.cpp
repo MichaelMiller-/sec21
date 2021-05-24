@@ -8,6 +8,7 @@
 #include <sec21/structural_analysis/loadcase.h>
 #include <sec21/structural_analysis/system_result.h>
 #include <sec21/structural_analysis/solve.h>
+#include <sec21/structural_analysis/solver/backend/viennacl.h>
 
 TEST_CASE("example system 1.0 with temperature load", "[sec21][structural_analysis][space_truss]")
 {
@@ -30,7 +31,7 @@ TEST_CASE("example system 1.0 with temperature load", "[sec21][structural_analys
    lf1.name = "LF1"s;
    lf1.temperature_loads.emplace_back(loadcase_t::temperature_load_t{1, 30.0_K, 0.012});
 
-   auto [success, result] = solve(sys, lf1);
+   auto [success, result] = solve<solver::backend::viennacl_impl>(sys, lf1);
    REQUIRE(success == true);
 
    std::vector<double> flat_displacement{};

@@ -7,6 +7,10 @@
 
 namespace sec21::database
 {
+   //! \brief PostgreSQL keyword
+   struct serial {
+      static constexpr inline auto value = "SERIAL";
+   };   
    struct primary_key {
       static constexpr inline auto value = "PRIMARY KEY";
    };

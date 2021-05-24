@@ -220,10 +220,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] const char** argv)
       >;
       using session_t = websocket::session<controller_t>;
 
+#if 0
 		websocket::server<session_t> srv({address, port});
 		const auto exit_code = std::invoke(srv);
-
 		spdlog::info("exit code {}", exit_code);
+#endif
+
 	}
 	catch (std::exception &ex)
 	{

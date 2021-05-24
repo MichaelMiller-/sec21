@@ -1,15 +1,15 @@
 #pragma once
 
-#include "tags.h"
-#include "material.h"
-#include "handles.h"
-#include "model_transform.h"
-#include "vertex_buffer_id.h"
-#include "position.h"
-#include "viewable.h"
-#include "selectable.h"
 #include "aabb.h"
+#include "handles.h"
+#include "material.h"
+#include "model_transform.h"
+#include "position.h"
+#include "selectable.h"
 #include "sphere.h"
+#include "tags.h"
+#include "vertex_buffer_id.h"
+#include "viewable.h"
 
 #include <entt/entt.hpp>
 
@@ -24,12 +24,12 @@ namespace sec21::viewer
          result = glm::scale(result, glm::vec3(radius, radius, radius));
          return result;
       }
-   } // detail
-   
+   } // namespace detail
+
    void make_node(entt::registry& registry, float radius, glm::vec3 const& pos)
    {
-      const auto bbox = aabb{ pos - radius, pos + radius };
-      const auto bounding_volume = sphere{ pos, radius };
+      const auto bbox = aabb{pos - radius, pos + radius};
+      const auto bounding_volume = sphere{pos, radius};
 
       auto entity = registry.create();
       registry.emplace<node_tag>(entity);
@@ -46,10 +46,10 @@ namespace sec21::viewer
    }
 
    template <typename T>
-   void make_node(entt::registry& registry, float radius, std::array<T, 2> const& pos)
+   void make_node(entt::registry& registry, float radius, std::array<T, 2> pos)
    {
-      make_node(registry, radius, glm::vec3{ std::get<0>(pos), std::get<1>(pos), 0.0 });
-   }   
+      make_node(registry, radius, glm::vec3{std::get<0>(pos), std::get<1>(pos), 0.0});
+   }
 
    void make_displaced_node(entt::registry& registry, float radius, glm::vec3 const& pos)
    {
@@ -60,6 +60,6 @@ namespace sec21::viewer
       registry.emplace<position>(entity, pos);
       registry.emplace<model_transformation>(entity, detail::node_transformation(pos, radius));
       registry.emplace<material>(entity, emerald);
-      registry.emplace<viewable>(entity, false);	
+      registry.emplace<viewable>(entity, false);
    }
-}
+} // namespace sec21::viewer

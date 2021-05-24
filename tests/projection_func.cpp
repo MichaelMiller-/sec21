@@ -1,4 +1,3 @@
-#define CATCH_CONFIG_MAIN
 #include <catch.hpp>
 
 #include <vector>
@@ -16,19 +15,19 @@ TEST_CASE("projection wrapper function", "[sec21][core]")
       double b;
    };
 
-   SECTION("simple test")
+   std::vector<foo> input{
+      { 1, 3.12 },
+      { 4, 3.12 },
+      { 5, 76.7 },
+      { 3, 7.2 },
+      { 2, 0.82 }
+   };
+
+   SECTION("sort example")
    {
-      std::vector<foo> result{
-        { 1, 3.12 },
-        { 4, 3.12 },
-        { 5, 76.7 },
-        { 3, 7.2 },
-        { 2, 0.82 }
-      };
+      std::sort(std::begin(input), std::end(input), projection_func{ std::less{}, &foo::a });
 
-      std::sort(std::begin(result), std::end(result), projection_func{ std::less{}, &foo::a });
-
-      const std::vector<foo> expected{
+      decltype(input) const expected{
         { 1, 3.12 },
         { 2, 0.82 },
         { 3, 7.2 },
@@ -37,8 +36,8 @@ TEST_CASE("projection wrapper function", "[sec21][core]")
       };
 
       REQUIRE(std::equal(
-         std::begin(result), 
-         std::end(result), 
+         std::begin(input), 
+         std::end(input), 
          std::begin(expected), 
          std::end(expected),
          // only member foo::a is needed for this test
@@ -46,15 +45,7 @@ TEST_CASE("projection wrapper function", "[sec21][core]")
    }
    SECTION("find example")
    {
-      std::vector<foo> input{
-        { 1, 3.12 },
-        { 4, 3.12 },
-        { 5, 76.7 },
-        { 3, 7.2 },
-        { 2, 0.82 }
-      };
-
-      auto it = std::find_if(std::begin(input), std::end(input), projection{ std::equal_to{}, &foo::a, 5 }); 
+      auto const it = std::find_if(std::begin(input), std::end(input), projection{ std::equal_to{}, &foo::a, 5 }); 
 
       REQUIRE(it != std::end(input));
       REQUIRE(it->a == 5);

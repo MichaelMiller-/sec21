@@ -1,30 +1,19 @@
-## TODO: OpenMP Support is improved if cmake version is greater then 3.9
 cmake_minimum_required(VERSION 3.9)
+project(sec21 
+   VERSION 0.0.1
+   DESCRIPTION "sec21::workspace"
+)
 
-project(sec21 CXX)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(SEC21_CMAKE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+
+if (${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
+   message(STATUS "Emscpriten build")
+   add_subdirectory(workspace)
+   # add_subdirectory(webviewer)
+else()   
+
 include(${SEC21_CMAKE_PATH}/StandardProjectSettings.cmake)
-
-set(${PROJECT_NAME}_VERSION_MAJOR 0 CACHE STRING "major version" FORCE)
-set(${PROJECT_NAME}_VERSION_MINOR 1 CACHE STRING "minor version" FORCE)
-set(${PROJECT_NAME}_VERSION_PATCH 0 CACHE STRING "patch version" FORCE)
-set(
-    ${PROJECT_NAME}_VERSION 
-    ${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_PATCH} 
-    CACHE STRING "version" 
-    FORCE)
-
-## target_compile_features(myTarget PUBLIC cxx_std_11)
-
-# if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.11.0")
-#    file(GLOB_RECURSE header_files CONFIGURE_DEPENDS ${header_path}/*.h)
-# else()
-#    file(GLOB header_files ${header_path}/**.h)
-# endif()
-
-set(Boost_USE_STATIC_LIBS ON)
-set(Boost_USE_MULTITHREADED ON)
-set(Boost_USE_STATIC_RUNTIME OFF)
 
 ## header-only library
 add_library(${PROJECT_NAME} INTERFACE)
@@ -34,10 +23,16 @@ add_library(${PROJECT_NAME} INTERFACE)
   #include(${SEC21_CMAKE_PATH}/sec21Targets.cmake)
 #endif()
 
-# configure_file(${PROJECT_SOURCE_DIR}/cmake/FindDebViennaCL.cmake FindDebViennaCL.cmake COPYONLY)
-# set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_BINARY_DIR})
-# # ## todo: use config
-# find_package(DebViennaCL REQUIRED)
+# target_compile_definitions(${PROJECT_NAME}
+#    INTERFACE
+#   PRIVATE $<$<COMPILE_LANG_AND_ID:CXX,AppleClang,Clang>:COMPILING_CXX_WITH_CLANG>
+#           $<$<COMPILE_LANG_AND_ID:CXX,Intel>:COMPILING_CXX_WITH_INTEL>
+#           $<$<COMPILE_LANG_AND_ID:CXX,GNU>:COMPILING_CXX_WITH_GNU>
+# )
+
+set(Boost_USE_STATIC_LIBS ON)
+set(Boost_USE_MULTITHREADED ON)
+# set(Boost_USE_STATIC_RUNTIME OFF)
 
 find_package(Boost 1.70 REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
@@ -45,14 +40,6 @@ find_package(nlohmann_json CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME} INTERFACE Boost::boost)
 target_link_libraries(${PROJECT_NAME} INTERFACE nlohmann_json nlohmann_json::nlohmann_json)
 target_include_directories(${PROJECT_NAME} SYSTEM INTERFACE include)
-
-# TARGETS_EXPORT_NAME
-# target_include_directories(${PROJECT_NAME} PUBLIC
-#                        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include> # for headers when building
-#                         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}> # for config_impl.hpp when building
-#                        $<INSTALL_INTERFACE:${include_dest}> # for client in install mode
-#                        $<INSTALL_INTERFACE:${lib_dest}> # for config_impl.hpp in install mode)
-# )
 
 include(${SEC21_CMAKE_PATH}/CompilerWarnings.cmake)
 set_project_warnings(${PROJECT_NAME})
@@ -65,37 +52,53 @@ enable_doxygen()
 
 include(${SEC21_CMAKE_PATH}/StaticAnalyzers.cmake)
 
-configure_file("${PROJECT_SOURCE_DIR}/include/sec21/config.h.in" "${CMAKE_CURRENT_BINARY_DIR}/config.h")
-
-option(ENABLE_PCH "Enable Precompiled Headers" OFF)
-if (ENABLE_PCH)
-   target_precompile_headers(sec21 INTERFACE <vector> <string> <map> <utility> <algorithm> <numeric>)
+if (CMAKE_CXX_INCLUDE_WHAT_YOU_USE)
+   message(ERROR "IWYU is found")
 endif()
 
-option(ENABLE_TESTS "Enable tests" OFF)
-option(ENABLE_BENCHMARKS "Enable benchmarks" ON)
-option(ENABLE_DATABASE_SERIALIZER "Enable database serlializer" OFF)
+if (CMAKE_CXX_LINK_LIBRARY_FILE_FLAG)
+   message(ERROR "llff is found")
+endif()
+# find_program(CMAKE_CXX_INCLUDE_WHAT_YOU_USE NAMES iwyu)
+# if (CMAKE_CXX_INCLUDE_WHAT_YOU_USE)
+#    message(STATUS "*include what you use* is enabled")
+# endif()
+
+# find_program(CMAKE_LINK_WHAT_YOU_USE NAMES lwyu)
+# if (CMAKE_LINK_WHAT_YOU_USE)
+#    message(STATUS "*link what you use* is enabled")
+# endif()
+
+
+## SEC21_PURE
+# target_compile_definitions();
+
+## TODO replace with c++ modules
+option(ENABLE_PCH "Enable Precompiled Headers" OFF)
+if (ENABLE_PCH)
+   target_precompile_headers(${PROJECT_NAME} INTERFACE <vector> <string> <map> <utility> <algorithm> <numeric>)
+endif()
+
+option(ENABLE_TESTS "Enable tests" ON)
+option(ENABLE_EDITOR "Enable web editor" OFF)
+option(ENABLE_BENCHMARKS "Enable benchmarks" OFF)
 option(ENABLE_VIEWER "Enable system viewer" OFF)
 option(ENABLE_WEB_INTERFACE "Enable web interface" OFF)
 option(ENABLE_PLOTTER "Enable plotter" OFF)
 option(ENABLE_COLLECT "Enable collect" OFF)
 option(ENABLE_SCRIPT_INTERFACE "Enable script interface" OFF)
 option(ENABLE_EXPERIMENTAL "Enable experimental mode" OFF)
+option(ENABLE_DEVTOOLS "tools needed for the development process" OFF)
 
 if (ENABLE_BENCHMARKS)
    message(STATUS "Benchmarks enabled")
-#   add_subdirectory(benchmarks)
+   add_subdirectory(benchmarks)
 endif()
 
 if (ENABLE_WEB_INTERFACE)
    message(STATUS "Wt Web interface is enabled")
    add_subdirectory(portal)
 endif()   
-
-if (ENABLE_DATABASE_SERIALIZER)
-   message(STATUS "Database serializer is enabled")
-   add_subdirectory(database-serializer)
-endif()
 
 if (ENABLE_VIEWER)
    message(STATUS "OpenGL system viewer is enabled")
@@ -117,7 +120,10 @@ if (ENABLE_SCRIPT_INTERFACE)
    add_subdirectory(scripting)
 endif()  
 
-add_subdirectory(orm_compiler)
+if (ENABLE_EDITOR)
+   message(STATUS "Webeditor is enabled")
+   add_subdirectory(editor)
+endif()
 
 ## TODO
 # if (ENABLE_FUZZING)
@@ -125,201 +131,138 @@ add_subdirectory(orm_compiler)
 #    add_subdirectory(fuzz_tests)
 # endif()  
 
-#if (ENABLE_TESTS)
-#   include(CTest)
-#   enable_testing()
-#   add_subdirectory(tests)
-#endif()
 
-## copy optional data 
-if(EXISTS "${PROJECT_SOURCE_DIR}/data/cp_gen.sh")
-   configure_file("${PROJECT_SOURCE_DIR}/data/cp_gen.sh" "${PROJECT_BINARY_DIR}/cp_gen.sh" COPYONLY)
+if (ENABLE_TESTS)
+   include(CTest)
+   enable_testing()
+   add_subdirectory(tests)
 endif()
 
 
+
+include(CheckLanguage)
+check_language(CUDA)
+if(CMAKE_CUDA_COMPILER)
+enable_language(CUDA)
+lse()
+message(STATUS "No CUDA compiler found")
+endif()
+
+add_subdirectory(orm_compiler)
+
+## WORK IN PROGRESS
+# add_subdirectory(integration_test_sqlite3_backend)
+# add_subdirectory(worker)
+# add_subdirectory(http_connection)
+# add_subdirectory(controller)
+# add_subdirectory(resttest)
+# add_subdirectory(runtime_enviroment)
+# add_subdirectory(que)
+# add_subdirectory(esbp)
+# add_subdirectory(udf)
+# add_subdirectory(pmr)
+# add_subdirectory(polymorphism)
 # add_subdirectory(worker)
 # add_subdirectory(kraken)
 # add_subdirectory(allocator_awareness)
 # add_subdirectory(translate)
 # add_subdirectory(webapp)
-## TODO: was working: add_subdirectory(websocket_client)
-add_subdirectory(mesh_processing)
-add_subdirectory(library1)
-add_subdirectory(library1_test)
-add_subdirectory(runtime_plugin_system) ## servlet like / runtimesystem
-add_subdirectory(compiletime1)
-add_subdirectory(compiletime2)
-add_subdirectory(example_json)
 
+
+## 
+##
+add_custom_target(
+   ## TODO: name schema for custom targets
+   dependency_graph
+   COMMAND ${CMAKE_COMMAND} "--graphviz=${PROJECT_NAME}-dependency-graph.dot" .
+   WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+   COMMENT "Generate dependency graph: ${PROJECT_NAME}-dependency-graph.dot"
+   VERBATIM)
+
+## installation
+##
+# TODO: investigate: include(GNUInstallDirs)
+install(TARGETS ${CMAKE_PROJECT_NAME}
+   RUNTIME DESTINATION bin
+   LIBRARY DESTINATION lib
+   ARCHIVE DESTINATION lib)
+
+set(CPACK_PACKAGE_NAME ${PROJECT_NAME})
+set(CPACK_PACKAGE_VENDOR "PlanungsbÃ¼ro Michael Miller")
+set(CPACK_VERBATIM_VARIABLES true)
+set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
+set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
+set(CPACK_PACKAGE_CONTACT "info@pb-miller.de")
+
+## rpm 
+##
+## https://nebula-graph.io/posts/packaging-with-cpack-in-nebula-graph/
+## TODO: set(CMAKE_RPM_PACKAGE_GROUP ${PROJECT_NAME})
+# set(CMAKE_RPM_PACKAGE_LICENSE "TODO")
+
+## dep 
+##
+set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
+## TODO: automate with:
+# objdump -p bin/rte | grep NEEDED
+#   NEEDED               libpthread.so.0
+#   NEEDED               libstdc++.so.6
+#   NEEDED               libm.so.6
+#   NEEDED               libgcc_s.so.1
+#   NEEDED               libc.so.6
+#   NEEDED               ld-linux-x86-64.so.2
+# set(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.3.1-6), libgcc1 (>= 1:3.4.2-12)")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.33)")
+
+## PKGBUILD 
+##
+configure_file(${PROJECT_SOURCE_DIR}/PKGBUILD.in ${PROJECT_BINARY_DIR}/PKGBUILD.generated @ONLY)
+configure_file(${PROJECT_SOURCE_DIR}/generate_pkgbuild.sh.in ${PROJECT_BINARY_DIR}/generate_pkgbuild.sh @ONLY)
+
+# add_custom_command(
+#    OUTPUT "package.checksum"
+#    COMMAND ${CMAKE_COMMAND} -E sha512sum "${PROJECT_NAME}-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}-Linux.tar.gz" > package.checksum.generated
+#    COMMAND cut --delimiter=\" \" -f 1 package.checksum.generated > package.checksum
+#    COMMAND sed -e "s/GENERATED_HASH_LIST/sdfsd\$\(cat package.checksum\)/" PKGBUILD.generated > PKGBUILD
+#    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+#    COMMENT "Write package checksum"
+# )
+
+# add_custom_command(
+#    OUTPUT VERSION
+#    COMMAND ${CMAKE_COMMAND} -E echo "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}" > VERSION
+#    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+#    COMMENT "Write version file")
+# install(FILES "${PROJECT_BINARY_DIR}/VERSION" DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+include(CPack)
+
+add_custom_target(
+   packages
+   ## todo: code duplication -> solve with dependencies
+   COMMAND ${CMAKE_COMMAND} -E echo "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}" > VERSION
+   COMMAND cpack
+   ## run makepkg for ArchLinux
+   COMMAND sh generate_pkgbuild.sh
+   COMMAND makepkg -f
+   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+   VERBATIM
+   COMMENT "Make installation packages"
+)
+## -C "Release" -G "STGZ;TGZ"
+## cpack -"C Release -G STGZ;TGZ;DEB"
 
 ##
-##  
-## Deep CMake for Library Authors - Craig Scott - CppCon 2019
+## TODO: copy dockerfile 
+# add_custom_target(
+#    docker
+# )
 
+## copy optional data
+## 
+if(EXISTS "${PROJECT_SOURCE_DIR}/data/cp_gen.sh")
+   configure_file(${PROJECT_SOURCE_DIR}/data/cp_gen.sh ${PROJECT_BINARY_DIR}/cp_gen.sh COPYONLY)
+endif()
 
-
-#ary(Foo ...)
-# Make override a feature requirement only if available
-#target_compile_features(Foo PUBLIC
-# $<$<COMPILE_FEATURES:cxx_override>:cxx_override>
-#)
-# Define the foo_OVERRIDE symbol so it provides the
-# override keyword if available or empty otherwise
-#target_compile_definitions(Foo PUBLIC
-# $<$<COMPILE_FEATURES:cxx_override>:-Dfoo_OVERRIDE=override>
-# $<$<NOT:$<COMPILE_FEATURES:cxx_override>>:-Dfoo_OVERRIDE>
-#)
-
-#include(WriteCompilerDetectionHeader)
-#write_compiler_detection_header(
-# FILE foo_compiler_detection.h
-# PREFIX foo
-# COMPILERS GNU Clang MSVC Intel
-# FEATURES cxx_override
-# cxx_final
-# cxx_nullptr
-# cxx_rvalue_references
-#)
-
-#include "foo_compiler_detection.h"
-#class MyClass foo_FINAL : public Base
-#{
-#public:
-#if foo_COMPILER_CXX_RVALUE_REFERENCES
-# MyClass(MyClass&& c);
-#endif
-# void func1() foo_OVERRIDE;
-# void func2(int* p = foo_NULLPTR);
-#};
-
-
-# Aliases to the above with special names
-#add_library(BagOfBeans::MyRealThings ALIAS MyRealThings)
-#add_library(BagOfBeans::OtherThings ALIAS OtherThings)
-# Pull in imported targets from an installed package.
-# See details in Chapter 23: Finding Things
-#find_package(BagOfBeans REQUIRED)
-# Define an executable that links to the imported
-# library from the installed package
-#add_executable(EatLunch main.cpp ...)
-#target_link_libraries(EatLunch PRIVATE
-# BagOfBeans::MyRealThings
-#)
-
-
-# Now the library has been split in two, so define
-# an interface library with the old name to effectively
-# forward on the link dependency to the new libraries
-#add_library(ComputeAlgoA SHARED ...)
-#add_library(ComputeAlgoB SHARED ...)
-#add_library(DeepCompute INTERFACE)
-#target_link_libraries(DeepCompute INTERFACE
-# ComputeAlgoA
-# ComputeAlgoB
-#)
-
-
-
-#execute_process(COMMAND runSomeScript
-# RESULT_VARIABLE result)
-#if(result)
-# message(FATAL_ERROR "runSomeScript failed: ${result}")
-#endif()
-
-
-#set(BAR "Some \"quoted\" value")
-#configure_file(quoting.txt.in quoting.txt)
-#configure_file(quoting.txt.in quoting_escaped.txt ESCAPE_QUOTES)
-
-
-# Generate unique files for all but Release
-#file(GENERATE
-# OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/outFile-$<CONFIG>.txt
-# INPUT ${CMAKE_CURRENT_SOURCE_DIR}/input.txt.in
-# CONDITION $<NOT:$<CONFIG:Release>>
-#)
-
-#cmake_minimum_required(VERSION 3.0)
-#include(projectVersionDetails.cmake)
-#project(FooBar VERSION ${FooBar_VER})
-#find_package(Git REQUIRED)
-#execute_process(
-# COMMAND ${GIT_EXECUTABLE} rev-list -1 HEAD projectVersionDetails.cmake
-# RESULT_VARIABLE result
-# OUTPUT_VARIABLE lastChangeHash
-# OUTPUT_STRIP_TRAILING_WHITESPACE
-#)
-#if(result)
-# message(FATAL_ERROR "Failed to get hash of last change: ${result}")
-#endif()
-#execute_process(
-# COMMAND ${GIT_EXECUTABLE} rev-list ${lastChangeHash}..HEAD
-# RESULT_VARIABLE result
-# OUTPUT_VARIABLE hashList
-# OUTPUT_STRIP_TRAILING_WHITESPACE
-#)
-
-#if(result)
-# message(FATAL_ERROR "Failed to get list of git hashes: ${result}")
-#endif()
-#string(REGEX REPLACE "[\n\r]+" ";" hashList "${hashList}")
-#list(LENGTH hashList FooBar_COMMITS_SINCE_VERSION_CHANGE)
-#configure_file(foobar_version.cpp.in foobar_version.cpp @ONLY)
-# Targets, etc....
-#include "foobar_version.h"
-#std::string getFooBarVersion()
-#{
-# return "@FooBar_VERSION@";
-#}
-#unsigned getFooBarVersionMajor()
-#{
-# return @FooBar_VERSION_MAJOR@;
-#}
-#unsigned getFooBarVersionMinor()
-#{
-# return @FooBar_VERSION_MINOR@ +0;
-#}
-#unsigned getFooBarVersionPatch()
-#{
-# return @FooBar_VERSION_PATCH@ +0;
-#}
-#unsigned getFooBarVersionTweak()
-#{
-# return @FooBar_VERSION_TWEAK@ +0;
-#}
-
-##
-#add_library(MyStuff SHARED source1.cpp ...)
-#set_target_properties(MyStuff PROPERTIES
-# VERSION 2.4.3
-# SOVERSION 2
-#)
-
-##
-#add_library(Networking net.cpp)
-#set_target_properties(Networking PROPERTIES
-# COMPATIBLE_INTERFACE_BOOL SSL_SUPPORT
-# INTERFACE_SSL_SUPPORT YES
-#)
-#add_library(Util util.cpp)
-#set_target_properties(Util PROPERTIES
-# COMPATIBLE_INTERFACE_BOOL SSL_SUPPORT
-# INTERFACE_SSL_SUPPORT YES
-#)
-#add_executable(MyApp myapp.cpp)
-#target_link_libraries(MyApp PRIVATE Networking Util)
-#target_compile_definitions(MyApp PRIVATE
-# $<$<BOOL:$<TARGET_PROPERTY:SSL_SUPPORT>>:HAVE_SSL>
-#)
-
-#####
-#add_library(Foo ...)
-# Conditionally add -fcode-hoisting option using variables
-#if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 7)
-# target_compile_options(Foo PRIVATE -fcode-hoisting)
-#endif()
-# Same thing using generator expressions instead
-#set(isGNU $<CXX_COMPILER_ID:GNU>)
-#set(newEnough $<VERSION_GREATER_EQUAL:$<CXX_COMPILER_VERSION>,7>)
-#target_compile_options(Foo PRIVATE $<$<AND:${isGNU},${newEnough}>:-fcode-hoisting>)
-
+endif()

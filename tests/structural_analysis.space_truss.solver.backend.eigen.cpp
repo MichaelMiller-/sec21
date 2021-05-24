@@ -33,7 +33,7 @@ TEST_CASE("Eigen displacement() implementation", "[sec21][structural_analysis][s
 
    REQUIRE(approx_equal(begin(result), end(result), begin(expected), 0.001));
 }
-TEST_CASE("Eigen displacement() implementation with std::vector as parameter", "[sec21][structural_analysis][solver][eigen]") 
+TEST_CASE("Eigen displacement() implementation with std::vector interface", "[sec21][structural_analysis][solver][eigen]") 
 {
    const auto K = std::vector<double>{
       37899.5,-9899.49,-28000,0.0,-9899.49,
@@ -47,6 +47,30 @@ TEST_CASE("Eigen displacement() implementation with std::vector as parameter", "
    const auto result = eigen::displacement(K, F);
    const auto expected = std::array{0.862219, 0.178571, 1.04079, -0.535714, 0.178571};
 
+   REQUIRE(approx_equal(begin(result), end(result), begin(expected), 0.001));
+}
+TEST_CASE("Eigen displacement() implementation with boost::ublas interface", "[sec21][structural_analysis][solver][vienacl]") 
+{
+   using precision_t = double;
+
+   const auto input_K = std::vector<precision_t>{
+      37899.5,-9899.49,-28000,0.0,-9899.49,
+         -9899.49, 37899.5,0.0, 0.0, 9899.49,
+      -28000, 0.0, 37899.5, 9899.49, 0.0,
+         0.0,     0.0, 9899.49, 37899.5,     0.0,
+      -9899.49, 9899.49,     0.0,     0.0, 37899.5
+   };
+   const auto input_F = std::vector<precision_t>{0.0,0.0,10000.0,-10000.0,0.0};
+
+   using allocator_t = decltype(input_F)::allocator_type;
+
+   const auto K = sec21::numeric::make_matrix<allocator_t>(5, 5, begin(input_K), end(input_K));
+   const auto F = sec21::numeric::make_vector<allocator_t>(begin(input_F), end(input_F));
+
+   const auto result = eigen::displacement(K, F);
+   const auto expected = std::array{0.862219, 0.178571, 1.04079, -0.535714, 0.178571};
+
+   REQUIRE(size(result) == size(expected));
    REQUIRE(approx_equal(begin(result), end(result), begin(expected), 0.001));
 }
 TEST_CASE("Eigen support_reactions() implementation", "[sec21][structural_analysis][solver][eigen]") 

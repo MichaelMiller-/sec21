@@ -3,6 +3,8 @@
 #include <sec21/database/column.h>
 #include <sec21/database/column_type.h>
 
+#include <fmt/format.h>
+
 #include <sstream>
 #include <string_view>
 #include <tuple>
@@ -116,12 +118,15 @@ namespace sec21::database
    {
       using reflection_t = typename table<Table>::metainfo;
       constexpr auto indices = std::make_index_sequence<std::tuple_size_v<reflection_t>>{};
-
+#if 1
       std::stringstream out;
       out << "SELECT ";
       detail::column_names<reflection_t>(out, indices);
       out << " FROM ";
       out << table<Table>::name;
       return out.str();
+#else
+      return fmt::format("SELECT {} FROM {}", detail::column_names<reflection_t>(out, indices), table<Table>::name);
+#endif      
    }
 }

@@ -73,7 +73,7 @@ namespace sec21::event
                   events = obj;
                   matched = true;
                }
-               catch (std::exception const& ex)
+               catch (std::exception)
                {
                   // ignore parse error and try the next type in the variant
                }

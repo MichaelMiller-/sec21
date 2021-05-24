@@ -9,7 +9,6 @@ namespace sec21::numeric
    template <typename T, typename Allocator>
    [[nodiscard]] auto
    flatten(boost::numeric::ublas::matrix<T, boost::numeric::ublas::row_major, Allocator> input) noexcept
-      -> std::vector<T>
    {
       std::vector<T> result(input.size1() * input.size2(), {});
       const auto data = input.data();

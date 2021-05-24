@@ -3,22 +3,28 @@
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/matrix_proxy.hpp>
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wignored-attributes"
-   #include <viennacl/vector.hpp>
-   #include <viennacl/matrix.hpp>
-   #include <viennacl/linalg/lu.hpp>
-#pragma GCC diagnostic pop
+#ifdef __clang__
+
+#else
+// #pragma GCC diagnostic push
+// #pragma GCC diagnostic ignored "-Wignored-attributes"
+
+// #pragma GCC diagnostic pop
+#endif
+#include <viennacl/linalg/lu.hpp>
+#include <viennacl/matrix.hpp>
+#include <viennacl/vector.hpp>
 
 namespace sec21::structural_analysis::solver::backend
 {
-   //! name clashing with namespace "viennacl". 
+   //! name clashing with namespace "viennacl".
    struct viennacl_impl
    {
       template <typename Precision, typename Allocator>
-      [[nodiscard]] static auto displacement(
-         boost::numeric::ublas::matrix<Precision, boost::numeric::ublas::row_major, Allocator> K,
-         boost::numeric::ublas::vector<Precision, Allocator> F) -> boost::numeric::ublas::vector<Precision, Allocator>
+      [[nodiscard]] static auto
+      displacement(boost::numeric::ublas::matrix<Precision, boost::numeric::ublas::row_major, Allocator> K,
+                   boost::numeric::ublas::vector<Precision, Allocator> F)
+         -> boost::numeric::ublas::vector<Precision, Allocator>
       {
          using namespace viennacl::linalg;
          using precision_t = Precision;
@@ -43,7 +49,7 @@ namespace sec21::structural_analysis::solver::backend
       [[nodiscard]] static auto support_reactions(
          boost::numeric::ublas::matrix<Precision, boost::numeric::ublas::row_major, Allocator> K,
          boost::numeric::ublas::vector<Precision, Allocator> displacements) //! \todo -> std::vector<Precision>
-      {      
+      {
          using namespace viennacl::linalg;
          using precision_t = Precision;
 
@@ -63,4 +69,4 @@ namespace sec21::structural_analysis::solver::backend
          return result;
       }
    };
-}
+} // namespace sec21::structural_analysis::solver::backend

@@ -8,6 +8,7 @@
 #include <sec21/structural_analysis/member.h>
 #include <sec21/structural_analysis/space_truss.h>
 #include <sec21/structural_analysis/system_result.h>
+#include <sec21/structural_analysis/solver/backend/viennacl.h>
 
 #include <array>
 
@@ -25,7 +26,7 @@ TEST_CASE("example system 2.0 with temperature load", "[sec21][structural_analys
    auto sys = sec21::load_from_json<space_truss_t>("example_2.json");
    auto load = sec21::load_from_json<loadcase<decltype(sys)>>("example_2_temperature_load.json");
 
-   auto [success, result] = solve(sys, load);
+   auto [success, result] = solve<solver::backend::viennacl_impl>(sys, load);
    REQUIRE(success == true);
 
    std::vector<double> flat_support_reaction{};

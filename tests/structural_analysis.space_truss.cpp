@@ -13,6 +13,8 @@
 #include <sec21/structural_analysis/space_truss.h>
 #include <sec21/structural_analysis/system_result.h>
 #include <sec21/units.h>
+#include <sec21/structural_analysis/solver/backend/viennacl.h>
+#include <sec21/structural_analysis/solver/backend/eigen.h>
 
 #include <algorithm>
 #include <array>
@@ -626,7 +628,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       loadcase_t lf1;
       lf1.node_load.emplace_back(2, loadcase_t::load_t{{10.0_kN, -10.0_kN}});
 
-      auto [success, result] = solve(sys, lf1);
+      auto [success, result] = solve<solver::backend::viennacl_impl>(sys, lf1);
       REQUIRE(success == true);
 
       std::vector<double> flat_support_reaction{};
@@ -677,5 +679,59 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
          nlohmann::json tmp = result;
          ofs << std::setw(4) << tmp;
       }
+   }
+   SECTION("solve with eigen backend")
+   {
+      using namespace sec21;
+
+      loadcase_t lf1;
+      lf1.node_load.emplace_back(2, loadcase_t::load_t{{10.0_kN, -10.0_kN}});
+
+      auto [success, result] = solve<solver::backend::eigen>(sys, lf1);
+      REQUIRE(success == true);
+
+      std::vector<double> flat_support_reaction{};
+      for (auto [k, v] : result.node) {
+         std::transform(std::begin(v.support_reaction), std::end(v.support_reaction),
+                        std::back_inserter(flat_support_reaction), [](auto&& e) { return e.value(); });
+      }
+
+      std::vector<double> flat_displacement{};
+      for (auto [k, v] : result.node) {
+         std::transform(std::begin(v.displacement), std::end(v.displacement), std::back_inserter(flat_displacement),
+                        [](auto&& e) { return e.value(); });
+      }
+
+      std::vector<double> flat_member_result{};
+      std::transform(std::begin(result.members), std::end(result.members), std::back_inserter(flat_member_result),
+                     [](auto&& e) { return e.normal_force.value(); });
+
+      // unit: newton [N]
+      REQUIRE(flat_support_reaction[0] == Approx(0.0));
+      REQUIRE(flat_support_reaction[1] == Approx(0.0));
+      REQUIRE(flat_support_reaction[2] == Approx(0.0));
+      REQUIRE(flat_support_reaction[3] == Approx(0.0));
+      REQUIRE(flat_support_reaction[4] == Approx(0.0));
+      REQUIRE(flat_support_reaction[5] == Approx(20'000.0));
+      REQUIRE(flat_support_reaction[6] == Approx(-10'000.0));
+      REQUIRE(flat_support_reaction[7] == Approx(-10'000.0));
+
+      // unit: millimeter [mm]
+      REQUIRE(flat_displacement[0] == Approx(0.86).epsilon(kDivergence));
+      REQUIRE(flat_displacement[1] == Approx(0.178571));
+      REQUIRE(flat_displacement[2] == Approx(1.04079));
+      REQUIRE(flat_displacement[3] == Approx(-0.535714));
+      REQUIRE(flat_displacement[4] == Approx(0.178571));
+      REQUIRE(flat_displacement[5] == Approx(0.0));
+      REQUIRE(flat_displacement[6] == Approx(0.0));
+      REQUIRE(flat_displacement[7] == Approx(0.0));
+
+      // unit: newton [N])
+      REQUIRE(flat_member_result[0] == Approx(5'000));
+      REQUIRE(flat_member_result[1] == Approx(-15'000));
+      REQUIRE(flat_member_result[2] == Approx(5'000));
+      REQUIRE(flat_member_result[3] == Approx(5'000));
+      REQUIRE(flat_member_result[4] == Approx(7'071.0678118655));
+      REQUIRE(flat_member_result[5] == Approx(-7'071.0678118655));
    }
 }

@@ -54,7 +54,7 @@ struct user
 };
 // end-snippet
 
-#if __cpp_nontype_template_args >= 201911L
+// #if __cpp_nontype_template_args >= 201911L
 
 namespace sec21::database
 {
@@ -86,7 +86,7 @@ namespace sec21::database
          using password = column<"password", user, std::string, &user::password, not_null>;
          using karma = column<"karma", user, int, &user::karma>;
          using cash = column<"cash", user, double, &user::cash>;
-      };
+     };
 
       using metainfo = std::tuple<
          columns::name,
@@ -194,4 +194,161 @@ TEST_CASE("test database queries from type: user", "[sec21][database]")
       REQUIRE(result == "SELECT name,password,karma,cash FROM user");
    }
 }
+// #endif
+
+struct example
+{
+   std::string name{};
+   int karma{};
+   std::array<double,2> position{};
+   double cash{}; 
+};
+
+namespace sec21::database
+{
+   template <>
+   struct table<example>
+   {
+      static constexpr inline auto name = "example";
+
+      struct columns
+      {
+         struct name {
+            using value_t = std::string;
+            using constraints_t = std::tuple<serial, primary_key>;
+            static constexpr inline auto column_name = "name";
+            static value_t get(example const& obj) { return obj.name; } 
+         };
+         struct pos_x {
+            using value_t = double;
+            using constraints_t = std::tuple<>;
+            static constexpr inline auto column_name = "pos_x";
+            static value_t get(example const& obj) { return std::get<0>(obj.position); } 
+         };        
+         struct pos_y {
+            using value_t = double;
+            using constraints_t = std::tuple<>;
+            static constexpr inline auto column_name = "pos_y";
+            static value_t get(example const& obj) { return std::get<1>(obj.position); } 
+         };        
+         struct cash {
+            using value_t = double;
+            using constraints_t = std::tuple<>;
+            static constexpr inline auto column_name = "cash";
+            static value_t get(example const& obj) { return obj.cash; }
+         }; 
+         struct karma {
+            using value_t = int;
+            using constraints_t = std::tuple<>;
+            static constexpr inline auto column_name = "karma";
+            static value_t get(example const& obj) { return obj.karma; }           
+         };
+      };
+      using metainfo = std::tuple<
+         columns::name,
+         columns::karma,
+         columns::pos_x,
+         columns::pos_y,
+         columns::cash>;
+   };
+} // namespace sec21::database
+
+#include <fmt/format.h>
+#include <fmt/ranges.h>
+
+namespace v2
+{
+#if 1 
+   template<typename...Ts, typename Function, size_t... Is>
+   constexpr auto transform_impl(std::tuple<Ts...> const& inputs, Function function, std::index_sequence<Is...>)
+   {
+      return std::tuple<std::result_of_t<Function(Ts)>...>{function(std::get<Is>(inputs))...};
+   }
+
+   template<typename... Ts, typename Function>
+   constexpr auto transform(std::tuple<Ts...> const& inputs, Function function)
+   {
+      return transform_impl(inputs, function, std::make_index_sequence<sizeof...(Ts)>{});
+   }
+#else
+   template <typename Tuple, typename Callable, size_t... Is>
+   [[nodiscard]] auto transform(Tuple const& inputs, Callable&& func, std::index_sequence<Is...> = {})
+   {
+      if (std::tuple_size<Tuple>::value == sizeof...(Is)) {
+         // return {std::get<Is>(t)...};
+         return std::tuple<std::result_of_t<Callable(std::tuple_element<Is>::type)>>{function(std::get<Is>(inputs))...};
+      }
+      return transform(inputs, std::forward<Callable>(func), std::make_index_sequence<std::tuple_size<Tuple>::value>{});
+   }
 #endif
+   template <typename Table>
+   auto column_names()
+   {
+      constexpr auto names = transform(Table{}, [](auto v){ return decltype(v)::column_name; });
+      return fmt::format("{}", fmt::join(names, ","));
+   }
+
+   template <typename Row>
+   auto insert_into(Row const& row)
+   {
+      using reflection_t = typename sec21::database::table<Row>::metainfo;
+
+      const auto values = transform(reflection_t{}, [obj = row](auto v)
+      { 
+         if constexpr (std::is_convertible_v<typename decltype(v)::value_t, std::string>) {
+               return fmt::format("'{}'", decltype(v)::get(obj));
+         }
+         return decltype(v)::get(obj); 
+      });
+      return fmt::format("INSERT INTO {} ({}) VALUES ({});",
+         sec21::database::table<Row>::name,
+         column_names<reflection_t>(),
+         fmt::join(values, ","));
+   }
+
+   template <typename Table>
+   auto create_table()
+   {
+      using reflection_t = typename sec21::database::table<Table>::metainfo;
+
+      const auto types = transform(reflection_t{}, [](auto v)
+      { 
+         constexpr auto constrains = transform(typename decltype(v)::constraints_t{}, [](auto y){ 
+            return decltype(y)::value; 
+         });
+
+         return fmt::format("{} {} {}", 
+               decltype(v)::column_name, 
+               sec21::database::column_type<typename decltype(v)::value_t>::name,
+               fmt::join(constrains, " ")
+         );
+      });
+      return fmt::format("CREATE TABLE {}({});", sec21::database::table<Table>::name, fmt::join(types, ","));
+   }
+}
+
+TEST_CASE("test example", "[sec21][database]")
+{
+   using namespace sec21::database;
+
+   example obj{ "foo", 42, { 3.14, 1.23 }, 22500 };
+
+   using reflection_t = table<decltype(obj)>::metainfo;
+
+   SECTION("column names")
+   {
+      const auto result = v2::column_names<reflection_t>();
+      const std::string expected = R"(name,karma,pos_x,pos_y,cash)";
+      REQUIRE(result == expected);
+   }
+   SECTION("create table")
+   {
+      const auto result = v2::create_table<example>();
+      REQUIRE(result == "CREATE TABLE example(name TEXT SERIAL PRIMARY KEY,karma INT ,pos_x REAL ,pos_y REAL ,cash REAL );");
+   }   
+   SECTION("insert values into table")
+   {
+      const auto result = v2::insert_into(obj);
+      REQUIRE(result == R"(INSERT INTO example (name,karma,pos_x,pos_y,cash) VALUES ('foo',42,3.14,1.23,22500.0);)");
+   }   
+}

@@ -337,6 +337,11 @@ namespace sec21::units
    struct abbreviation {};
 }
 
+//! \todo 
+#define SEC21_UNITS_JSON_SERIALIZER
+
+#ifdef SEC21_UNITS_JSON_SERIALIZER
+
 #include <nlohmann/json.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/lexical_cast.hpp>
@@ -436,3 +441,5 @@ namespace sec21::units
       obj = detail::from_string<Q>(value);
    }
 }
+
+#endif

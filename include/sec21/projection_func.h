@@ -32,7 +32,7 @@ namespace sec21
    {
       Function    m_function;
       Projection  m_projection;
-      T m_t;
+      T m_value;
 
    public:
       projection() = delete;
@@ -40,13 +40,13 @@ namespace sec21
       explicit projection(Function function, Projection projection, T t) noexcept
          : m_function{ std::move(function) }
          , m_projection{ std::move(projection) }
-         , m_t{ std::move(t) }
+         , m_value{ std::move(t) }
       {}
 
       template <typename... Args>
       decltype(auto) operator() (Args &&... args) const 
       {
-         return std::invoke(m_function, std::invoke(m_projection, std::forward<Args>(args))... , m_t);
+         return std::invoke(m_function, std::invoke(m_projection, std::forward<Args>(args))... , m_value);
       }
    };   
 }

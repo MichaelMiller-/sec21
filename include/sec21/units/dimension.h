@@ -4,7 +4,7 @@
 
 namespace sec21::units
 {
-   // base_dimension is a unique sortable compile-time values ???
+   // base_dimension is a unique sortable compile-time value
    //! \todo is more like a dimension_tag
    template <auto Name, auto Symbol = 1>
    struct base_dimension

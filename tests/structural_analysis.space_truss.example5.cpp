@@ -8,6 +8,7 @@
 #include <sec21/structural_analysis/loadcase.h>
 #include <sec21/structural_analysis/system_result.h>
 #include <sec21/structural_analysis/solve.h>
+#include <sec21/structural_analysis/solver/backend/viennacl.h>
 
 #include <array>
 
@@ -45,7 +46,7 @@ TEST_CASE("example system 5.0 load from json", "[sec21][structural_analysis][spa
    {
       auto load = sec21::load_from_json<loadcase<decltype(sys)>>("example_5_load.json");
 
-      auto [success, result] = solve(sys, load);
+      auto [success, result] = solve<solver::backend::viennacl_impl>(sys, load);
       REQUIRE(success == true);
 
       std::vector<double> flat_support_reaction{};

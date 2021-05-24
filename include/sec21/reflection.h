@@ -1,10 +1,10 @@
 #pragma once
 
-#include <tuple>
-#include <string_view>
-#include <stdexcept>
-#include <type_traits>
 #include <functional>
+#include <stdexcept>
+#include <string_view>
+#include <tuple>
+#include <type_traits>
 
 namespace sec21::reflection
 {
@@ -15,22 +15,19 @@ namespace sec21::reflection
    template <typename Class, typename T>
    class register_member
    {
-   public:
+    public:
       using member_ptr_t = T Class::*;
       using value_t = T;
-   
-   private:
-      const std::string_view  m_name{};
-      member_ptr_t            m_ptr{nullptr};
 
-   public:
-      explicit register_member(std::string_view name, member_ptr_t ptr) noexcept
-         : m_name{ name }
-         , m_ptr{ ptr }
-      { }
+    private:
+      const std::string_view m_name{};
+      member_ptr_t m_ptr{nullptr};
+
+    public:
+      explicit register_member(std::string_view name, member_ptr_t ptr) noexcept : m_name{name}, m_ptr{ptr} {}
 
       auto name() const noexcept { return m_name; }
-      
+
       auto& get(Class& obj) const
       {
          if (m_ptr)
@@ -86,15 +83,21 @@ namespace sec21::reflection
 #endif
 
    //! \todo move th extra header
-   template<template<typename...> class, typename, typename=void>
-   struct is_specialized : std::false_type {};
+   template <template <typename...> class, typename, typename = void>
+   struct is_specialized : std::false_type
+   {
+   };
 
-   template<template<typename...> class Template, typename T>
-   struct is_specialized<Template, T, std::void_t<decltype(Template<T>{})>> : std::true_type {};
+   template <template <typename...> class Template, typename T>
+   struct is_specialized<Template, T, std::void_t<decltype(Template<T>{})>> : std::true_type
+   {
+   };
 
    //! \brief check if type T is known by the reflection system
    template <typename T>
-   struct is_registered : is_specialized<metainfo, T> {};
+   struct is_registered : is_specialized<metainfo, T>
+   {
+   };
 
    template <typename T>
    concept Reflected = is_registered<T>::value;
@@ -103,22 +106,21 @@ namespace sec21::reflection
    void for_each_member(Func&& func)
    {
       std::apply(
-         // [&](auto &&... e) { (..., wrapper<decltype(e), Func>{ func }(e)); }, 
-         [&](auto &&... e) { (..., func(e)); }, 
-         metainfo<Class>::type_info());
+         // [&](auto &&... e) { (..., wrapper<decltype(e), Func>{ func }(e)); },
+         [&](auto&&... e) { (..., func(e)); }, metainfo<Class>::type_info());
    }
-}
+} // namespace sec21::reflection
 
 /*
-#include <tuple>
-#include <string_view>
+#include <boost/core/demangle.hpp>
+#include <functional>
+#include <iomanip>
+#include <iostream>
+#include <optional>
 #include <stdexcept>
 #include <string>
-#include <iostream>
-#include <iomanip>
-#include <functional>
-#include <boost/core/demangle.hpp>
-#include <iostream>
+#include <string_view>
+#include <tuple>
 template <typename T>
 inline auto name() -> std::string
 {
@@ -172,7 +174,7 @@ public:
     { }
 
     auto name() const noexcept { return m_name; }
-    
+
     auto& get(Class& obj) const
     {
         if (m_ptr)
@@ -190,7 +192,7 @@ public:
     }
 
     template <typename Function>
-    decltype(auto) invoke(Function && func, Class && obj) 
+    decltype(auto) invoke(Function && func, Class && obj)
     {
         if (!m_ptr)
             throw std::runtime_error("invalid member pointer");
@@ -224,9 +226,9 @@ public:
     { }
 
     auto name() const noexcept { return m_name; }
-    
+
     // auto& get(Class& obj) const
-    // { 
+    // {
     //     if (m_ptr)
     //         return obj.*m_ptr;
 
@@ -301,8 +303,8 @@ template <Reflected Class, typename Func>
 void for_each_member(Func&& func)
 {
     std::apply(
-        [&](auto &&... e) { (..., wrapper<Class, decltype(e)>{}(func, e)); }, 
-        // [&](auto &&... e) { (..., func(e)); }, 
+        [&](auto &&... e) { (..., wrapper<Class, decltype(e)>{}(func, e)); },
+        // [&](auto &&... e) { (..., func(e)); },
         metainfo<Class>::type_info());
 }
 
@@ -338,7 +340,8 @@ struct node
 {
     static_assert(Dimension == 2, "Only works in 2D just yet");
     static_assert(std::is_floating_point<Precision>::value, "Precision is not a floating-point type");
-    static_assert(std::numeric_limits<Precision>::is_iec559, "Floating-point type does not fulfill the requirements of IEC 559");
+    static_assert(std::numeric_limits<Precision>::is_iec559, "Floating-point type does not fulfill the requirements of
+IEC 559");
 
     constexpr static auto dimension_v = Dimension;
 
@@ -363,7 +366,7 @@ struct metainfo<node<Dimension, Descriptor, Precision>>
 
     static auto type_info() noexcept
     {
-        return std::tuple{ 
+        return std::tuple{
             register_member{ "name", &type_t::name },
             register_array{ "position", &type_t::position },
             // register_member{ "position", &type_t::position },
@@ -374,17 +377,17 @@ struct metainfo<node<Dimension, Descriptor, Precision>>
 
 
 template <typename T>
-auto& operator << (std::ostream& os, metainfo<T> const& info) 
+auto& operator << (std::ostream& os, metainfo<T> const& info)
 {
     for_each_member<metainfo<T>::type_t>([&](auto const& member) { });
-    return os; 
+    return os;
 }
 
 template <auto Dimension, typename Descriptor, typename Precision>
-auto& operator << (std::ostream& os, node<Dimension, Descriptor, Precision> const& n) 
+auto& operator << (std::ostream& os, node<Dimension, Descriptor, Precision> const& n)
 {
     os << "node {\n";
-    for_each_member<std::decay_t<decltype(n)>>([&](auto const& member) 
+    for_each_member<std::decay_t<decltype(n)>>([&](auto const& member)
     {
         auto m = member.get(n);
         os << " N: " << std::quoted(member.name());
@@ -392,7 +395,7 @@ auto& operator << (std::ostream& os, node<Dimension, Descriptor, Precision> cons
         os << " V: "; // << m;
         os << std::endl;
     });
-    return os << "}"; 
+    return os << "}";
 }
 
 using node_t = node<2, int, double>;
@@ -404,12 +407,12 @@ template <typename T>
 struct dbo_wrapper : T
 {
     template <typename ... Args>
-    explicit dbo_wrapper(Args &&... args) noexcept : T{ std::forward<Args>(args)... } {} 
+    explicit dbo_wrapper(Args &&... args) noexcept : T{ std::forward<Args>(args)... } {}
 
     template <typename Action>
     void persist(Action& a) noexcept
     {
-        for_each_member<std::decay_t<T>>([&](auto const& member) 
+        for_each_member<std::decay_t<T>>([&](auto const& member)
         {
             // using vt = std::decay_t<decltype(member)>::value_t;
             // print_type<vt>("vt");
@@ -433,13 +436,13 @@ int main()
     using namespace ns;
     node_t n1{ 55, { 3.14, 4.4 } };
 
-    for_each_member<decltype(n1)>([&](auto const& member) 
+    for_each_member<decltype(n1)>([&](auto const& member)
     {
         // using vt = std::decay_t<decltype(member)>::value_t;
         // print_type<vt>("vt");
         // auto m = member.get(n1);
-        // std::cout << "N: " << std::quoted(member.name()) 
-        //     << " T: " << std::quoted(name<decltype(m)>()) 
+        // std::cout << "N: " << std::quoted(member.name())
+        //     << " T: " << std::quoted(name<decltype(m)>())
         //     << " V: " << m << std::endl;
     });
 
@@ -454,7 +457,7 @@ int main()
 #include <boost/hana.hpp>
 namespace hana = boost::hana;
 
-struct Person 
+struct Person
 {
   BOOST_HANA_DEFINE_STRUCT(Person,
     (std::string, name),

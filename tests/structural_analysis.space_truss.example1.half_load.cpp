@@ -8,6 +8,7 @@
 #include <sec21/structural_analysis/space_truss.h>
 #include <sec21/structural_analysis/system_result.h>
 #include <sec21/units.h>
+#include <sec21/structural_analysis/solver/backend/viennacl.h>
 
 #include <vector>
 #include <algorithm>
@@ -81,7 +82,7 @@ TEST_CASE("example system 1.2 with half load from example 1.0", "[sec21][structu
       loadcase<decltype(sys)> lf1{};
       lf1.node_load.emplace_back(2, loadcase<decltype(sys)>::load_t{{5.0_kN, -5.0_kN}});
 
-      auto [success, result] = solve(sys, lf1);
+      auto [success, result] = solve<solver::backend::viennacl_impl>(sys, lf1);
       REQUIRE(success == true);
 
       std::vector<double> flat_support_reaction{};

@@ -1,57 +1,62 @@
-#include "config.h"
-#include "preferences.h"
-#include "initialize_sdl_opengl3.h"
 #include "camera.h"
-#include "gui.h"
+#include "config.h"
 #include "events.h"
-#include "shader_loader.h"
+#include "gui.h"
+#include "initialize_sdl_opengl3.h"
+#include "preferences.h"
 #include "process_event.h"
+#include "project.h"
+#include "shader_loader.h"
 // debug
 #include "debug_data.h"
 #include "debug_output_opengl.h"
 //
 #include "vertex_buffer_loader.h"
-#include "vertex_factory/generated_sphere.h"
+#include "vertex_factory/generated_arrow.h"
 #include "vertex_factory/generated_cylinder.h"
+#include "vertex_factory/generated_sphere.h"
 #include "vertex_factory/generated_support_fixed.h"
 #include "vertex_factory/generated_support_roller.h"
-#include "vertex_factory/generated_arrow.h"
 // entities
+#include "make_axis.h"
+#include "make_camera.h"
+// #include "make_load.h"
+#include "make_member.h"
+#include "make_node.h"
+#include "make_support.h"
 #include "tags.h"
 #include "transformation.h"
-#include "make_camera.h"
-#include "make_axis.h"
-#include "make_node.h"
-#include "make_member.h"
-#include "make_support.h"
-#include "make_load.h"
-//! \todo replace -> events hsould handle this
-#include "input_data.h"
 // collision
 #include "intersection.h"
-#include "ocetree_listener.h"
 #include "model_listener.h"
+#include "ocetree_listener.h"
 
 // sec21
-#include <sec21/resource.h>
-#include <sec21/zip.h>
+#include <algorithm>
+#include <iterator>
 #include <sec21/access.h>
 #include <sec21/all_of.h>
+#include <sec21/event/backend/sdl2.h>
+#include <sec21/event/events.h>
+#include <sec21/event/input_manager.h>
 #include <sec21/file_loader.h>
-#include <sec21/structural_analysis/space_truss.h>
+#include <sec21/resource.h>
 #include <sec21/structural_analysis/loadcase.h>
-#include <sec21/structural_analysis/system_result.h>
+#include <sec21/structural_analysis/space_truss.h>
 #include <sec21/structural_analysis/support.h>
+#include <sec21/structural_analysis/system_result.h>
+#include <sec21/zip.h>
 
 // imgui
 #include <imgui.h>
-// logging
-#include <spdlog/spdlog.h>
-#include <spdlog/sinks/basic_file_sink.h>
 
-#include <glm/matrix.hpp>
+// logging
+#include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/spdlog.h>
+
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/gtx/string_cast.hpp>
+#include <glm/matrix.hpp>
 
 #include <nlohmann/json.hpp>
 
@@ -59,23 +64,41 @@
 
 #include <boost/math/constants/constants.hpp>
 
-#include <string>
-#include <string_view>
 #include <array>
-#include <tuple>
-#include <functional>
-#include <type_traits>
 #include <chrono>
 #include <filesystem>
-#include <vector>
+#include <functional>
+#include <string>
+#include <string_view>
+#include <tuple>
+#include <type_traits>
 #include <variant>
+#include <vector>
+
+//! \todo take a look: raylib
+//! \todo take a look: boost::json
+//! \todo take a look: https://libigl.github.io/tutorial/
 
 using namespace std::literals;
+
+#include <boost/core/demangle.hpp>
+#include <iostream>
+#include <optional>
+template <typename T>
+inline auto name() -> std::string
+{
+   return boost::core::demangle(typeid(T).name());
+}
+template <typename T>
+inline void print_type(std::string_view n)
+{
+   std::cout << n << ": " << name<T>() << std::endl;
+}
 
 template <typename Iterator>
 auto dump(Iterator first, Iterator last, std::string_view name)
 {
-   std::cout << name.data() << " n: "<< std::distance(first, last) << "\n(";
+   std::cout << name.data() << " n: " << std::distance(first, last) << "\n(";
    std::copy(first, last, std::ostream_iterator<typename std::iterator_traits<Iterator>::value_type>(std::cout, ", "));
    std::cout << ")\n" << std::endl;
 }
@@ -85,570 +108,377 @@ auto dump(Sequence&& seq, std::string_view name)
    dump(std::begin(seq), std::end(seq), std::move(name));
 }
 
-inline std::ostream& operator << (std::ostream& os, sec21::viewer::event::mouse_move const& evt) 
-{
-	os << std::boolalpha << evt.button_pressed[0] << ',' << evt.button_pressed[1] << ',' << evt.button_pressed[2] << ' ';
-	os << "relative to window (" << evt.relative_to_window[0] << "," << evt.relative_to_window[1] << ") ";
-	os << "relative motion (" << evt.relative_motion[0] << "," << evt.relative_motion[1] << ")";
-	return os;
-}  
-
-inline std::ostream& operator << (std::ostream& os, sec21::viewer::event::mouse_button_down const& evt) 
-{
-	os << std::boolalpha << evt.pressed[0] << ',' << evt.pressed[1] << ',' << evt.pressed[2] << ' ';
-	os << "relative to window (" << evt.relative_to_window[0] << "," << evt.relative_to_window[1] << ") ";
-	os << "clicks: " << evt.clicks;  
-	return os;
-}  
-inline std::ostream& operator << (std::ostream& os, sec21::viewer::event::mouse_button_up const& evt) 
-{
-	os << std::boolalpha << evt.released[0] << ',' << evt.released[1] << ',' << evt.released[2] << ' ';
-	os << "relative to window (" << evt.relative_to_window[0] << "," << evt.relative_to_window[1] << ") ";
-	os << "clicks: " << evt.clicks;  
-	return os;
-}  
-
-
-//! \todo clang
-#if defined(GCC)
-	#pragma GCC diagnostic push
-	// #pragma GCC diagnostic ignored "-Wunused-parameter"
-	#pragma GCC diagnostic ignored "-Wshadow"
-#endif
-#include <boost/sml.hpp>
-#include <boost/sml/utility/dispatch_table.hpp>
-
-template <SDL_EventType Id>
-decltype(boost::sml::event<sdl_event_impl<Id>>) sdl_event{};
-
-constexpr auto is_key(int key) noexcept {
-	return [=](auto event) { return event.data.key.keysym.sym == key; };
-}
-
-constexpr auto is_mouse_btn(int button) noexcept {
-	return [=](auto event) { return event.data.button.button == button; };
-}
-
-// constexpr auto is_mouse_wheel_scroll(int button) noexcept {
-// 	return [=](auto event) { return event.data.button.button == button; };
-// }
-
-
-struct sdl2 
-{
-	// entt::registry& registry;
-	// explicit sdl2(entt::registry& reg) : registry{ reg } {}
-
-	auto operator()() const noexcept 
-	{
-		using namespace boost::sml;
-		// clang-format off
-		return make_transition_table(
-		  "wait_for_user_input"_s <= *"idle"_s / [] { spdlog::debug("idle");}
-
-		, "idle"_s <= "wait_for_user_input"_s + sdl_event<SDL_MOUSEWHEEL> / [] { spdlog::debug("wheel"); }
-
-		, "pan_first_pick"_s <= "wait_for_user_input"_s + sdl_event<SDL_KEYUP>[is_key(SDLK_p)] / [] { spdlog::debug("p pressed -> pan enabled"); }
-		, "pan_second_pick"_s <= "pan_first_pick"_s + sdl_event<SDL_MOUSEBUTTONDOWN>[is_mouse_btn(SDL_BUTTON_MIDDLE)] / [] { spdlog::debug("pan started: pirst point picked"); }
-		, "pan_first_pick"_s <= "pan_second_pick"_s + sdl_event<SDL_MOUSEBUTTONUP>[is_mouse_btn(SDL_BUTTON_MIDDLE)] / []{ spdlog::debug("pan exited"); }
-		, "idle"_s <= "pan_first_pick"_s + sdl_event<SDL_KEYUP>[is_key(SDLK_ESCAPE)] / []{ spdlog::debug("pan aborted"); }
-
-		, X <= "wait_for_user_input"_s + sdl_event<SDL_KEYUP>[is_key(SDLK_ESCAPE)] / [] { spdlog::debug("escape key"); }
-		, X <= *"waiting_for_quit"_s + sdl_event<SDL_QUIT> / [] { spdlog::debug("quit event"); }
-		);
-		// clang-format on
-	}
-};
-
-#if defined(GCC)
-	#pragma GCC diagnostic pop
-#endif
-
 namespace sec21::viewer
 {
-#if 0	
-   //! \todo consider to be a entt::resource -> reload -> observe -> create new model
-   //! \todo replace filename type with std::filesystem::path
-   bool load_from_json(entt::registry& registry, std::string const& filename, preferences const& settings)
+   auto update_settings(entt::registry& registry)
    {
-      const auto result_filename = [](auto const& fn){
-         auto result = fn;
-         if (const auto pos = result.find_last_of('.'); pos != decltype(result)::npos)
-            result.insert(pos, "_result");
-         return result;
-      };
+      //! \todo there has to be a better way to store and get access to only one T
+      const auto settings_view = registry.view<preferences>();
+      const auto tuple = settings_view.get(*settings_view.begin());
+      const auto active_settings = std::get<0>(tuple);
 
-      //! \todo seperate loader code -> there could be one system with different kind of results
-      structural_analysis::system_result<decltype(sys)> sys_results{};
-      try
-      {
-         spdlog::info("try to load results from json file: {}", result_filename(filename));
-         if (std::ifstream ifs{result_filename(filename)}; ifs)
-         {
-            nlohmann::json j;
-            ifs >> j;
-            sys_results = j.get<decltype(sys_results)>();
-         }
-      }
-      catch (std::exception& ex)
-      {
-         spdlog::error("failed to load file: {} exception: {} ", filename, ex.what());
-      }
-      catch (...)
-      {
-         spdlog::error("failed to load results: unkown exception");
-      }
+      // order is important
+      registry.view<node_tag, viewable>().each([&](auto, auto& v) { v.value = active_settings.show_nodes; });
+      registry.view<member_tag, viewable>().each([&](auto, auto& v) { v.value = active_settings.show_members; });
+      registry.view<support_tag, viewable>().each([&](auto, auto& v) { v.value = active_settings.show_supports; });
+      registry.view<displacement_tag, viewable>().each(
+         [&](auto, auto& v) { v.value = active_settings.show_deformation; });
+      registry.view<load_tag, viewable>().each([&](auto, auto& v) { v.value = active_settings.show_load; });
+   }
 
-      if (std::empty(sys_results.nodes)) {
-         spdlog::warn("no results found");
-         return false;
-      }
+#if 0
+   auto update_camera(entt::registry& registry, transformation& trans)
+   {
+      const auto camera_view = registry.view<camera>();
+      const auto tuple = camera_view.get(*camera_view.begin());
+      const auto active_camera = std::get<0>(tuple);
 
-      using node_descriptor_t = size_t; // sec21::structural_analysis::space_truss::node_descriptor_t;
-      using pt_t = boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>;
-      // using pt_t = decltype(sys)::node_t::point_t;
-      std::map<node_descriptor_t, pt_t> node_displacement_lookup{};
+      registry.view<transformation>().each([&](auto& trans) {
+         //! \todo remove magic numbers -> near and far plane
+         trans.projection = glm::perspective(glm::radians(active_camera.zoom), viewport_ratio(trans), 0.1f, 1000.0f);
+         trans.view = view_matrix(active_camera);
+      });
 
-      //! \todo consider unit
-      static constexpr auto kunit = 50;
-      for (auto const& e : sys_results.nodes)
-         node_displacement_lookup[e.id] = { X(e.displacement).value() / kunit, Y(e.displacement).value() / kunit };
+      trans.projection = glm::perspective(glm::radians(active_camera.zoom), viewport_ratio(trans), 0.1f, 1000.0f);
+      trans.view = view_matrix(active_camera);
 
-      if (std::size(sys.nodes) != std::size(node_displacement_lookup))
-      {
-         spdlog::error("loaded results mismatches with inputdata");
-         //! \todo return ?
-		}
-
-      //! \todo only a view of ranges
-      for (auto [k, v] : node_displacement_lookup)
-      {
-         const auto p = structural_analysis::get_element(sys.nodes, k)->position;
-         make_displaced_node(registry, active_settings.radius_node, p + v);
-      }
-
-      for (auto [k, v] : sys.coincidence_table)
-      {
-         auto [s, e] = v;
-         const auto from = structural_analysis::get_element(sys.nodes, s);
-         const auto to = structural_analysis::get_element(sys.nodes, e);
-
-         make_displaced_member(
-            registry,
-            active_settings.radius_member,
-            //! \todo opportunite for boost::qvm
-            from->position + node_displacement_lookup.at(from->id),
-            to->position + node_displacement_lookup.at(to->id)
-         );
-      }
-      return true;
    }
 #endif
+   auto update_camera(camera const& cam, transformation& trans)
+   {
+      trans.projection = glm::perspective(glm::radians(cam.zoom), viewport_ratio(trans), 0.1f, 1000.0f);
+      trans.view = view_matrix(cam);
+   }
 
-	auto update_settings(entt::registry& registry)
-	{
-		auto settings_view = registry.view<preferences>();
-		const auto& active_settings = settings_view.get(*settings_view.begin());
+   // struct pan {};
+   // struct select {};
+   // using command_state_t = std::variant<std::monostate, pan, select>;
 
-		// order is important
-		registry.view<node_tag, viewable>().each([&](auto, auto& v) { v.value = active_settings.show_nodes; });
-		registry.view<member_tag, viewable>().each([&](auto, auto& v) { v.value = active_settings.show_members; });
-		registry.view<support_tag, viewable>().each([&](auto, auto& v) { v.value = active_settings.show_supports; });
-		registry.view<displacement_tag, viewable>().each([&](auto, auto& v) { v.value = active_settings.show_deformation; });
-		registry.view<load_tag, viewable>().each([&](auto, auto& v) { v.value = active_settings.show_load; });
-	}
-
-	auto update_camera(entt::registry& registry)
-	{
-		auto camera_view = registry.view<camera>();
-		const auto& active_camera = camera_view.get(*camera_view.begin());
-
-		registry.view<transformation>().each([&](auto& trans)
-		{
-			//! \todo remove magic numbers -> near and far plane
-			trans.projection = glm::perspective(glm::radians(active_camera.zoom), viewport_ratio(trans), 0.1f, 1000.0f);
-			trans.view = view_matrix(active_camera);
-		});
-	}
-
-	void update_collision(entt::registry& registry)
-	{
-		auto transformation_view = registry.view<transformation>();
-		const auto& active_transformation = transformation_view.get(*transformation_view.begin());
-
-		auto input_data_view = registry.view<input_data>();
-		const auto& active_input_data = input_data_view.get(*input_data_view.begin());
-
-		const auto win_x = active_input_data.mouse_position.x;
-		const auto win_y = viewport_height(active_transformation) - active_input_data.mouse_position.y;
-
-		const auto start_pos = glm::unProject(
-			{ win_x, win_y, 0.0f },
-			active_transformation.view,
-			active_transformation.projection,
-			active_transformation.viewport);
-
-		const auto end_pos = glm::unProject(
-			{ win_x, win_y, 1.0f },
-			active_transformation.view,
-			active_transformation.projection,
-			active_transformation.viewport);
-
-		const auto r = ray{ start_pos, end_pos - start_pos };
-
-		//! \todo quadtree (octree) to reduce the collision test
-		registry.view<selectable, sphere>().each([&](auto& obj, auto const& bounding_volume)
-		{
-			const auto intersects = intersect(r, bounding_volume);
-
-			obj.highlight = intersects;
-			obj.selected = intersects && active_input_data.mouse_btn_right_clicked;
-		});
-
-		//! \todo highlight objects
-		// registry.view<selectable, material>().each([&](auto const& obj, auto& mat)
-		// {
-		// 	//! \todo use some kind of emission
-		// 	mat = obj.highlight ? emerald : mat;
-		// });
-	}
-
-	namespace event
-	{
-		struct quit_application 
-		{
-			bool value{ false };
-		};
-	}
-
-	struct viewer_state
-	{
-		struct close_window {};
-
-		struct joystick
-		{
-			unsigned int id;
-			std::string name;
-			// unsigned int button_count;
-			std::array<bool, 32> button_state;
-			std::array<float, 8> axis_state;
-		};
-
-		using event_t = std::variant<event::quit_application, joystick, event::mouse_move, std::nullopt_t>;
-	};
-
-	template <typename... Ts> struct overloaded : Ts... { using Ts::operator()...; };
-	// explicit deduction guide (not needed as of C++20)
-	template <typename... Ts> overloaded(Ts...) -> overloaded<Ts...>;
-
-	struct pan
-	{
-
-	};
-
-	struct select
-	{
-
-	};
-
-	using command_state_t = std::variant<pan, select, std::nullopt_t>;
- 
-#if 0
-		void new_node(event_new_node const& evt)
-		{
-			spdlog::debug("event: create new node");
-			make_node(
-				registry,
-				//! \todo hardcoded
-				0.5,
-				glm::vec3{ std::get<0>(evt.value), std::get<1>(evt.value), std::get<2>(evt.value) });
-		}
-	#endif
-}
+} // namespace sec21::viewer
 
 struct command_listener
 {
-	entt::registry& registry;
-	sec21::viewer::preferences const& settings;
+   entt::registry& registry;
+   sec21::viewer::preferences const& settings;
+   sec21::viewer::camera& current_camera;
 
-	void zoom(sec21::viewer::event_mouse_wheel const& evt)
-	{
-		using namespace sec21::viewer;
-		spdlog::debug("event: mouse wheel: {}", evt.value);
+   void zoom(sec21::viewer::event_mouse_wheel const& evt)
+   {
+      using namespace sec21::viewer;
+      spdlog::debug("event: mouse wheel: {}", evt.value);
+#if 0
+      auto camera_view = registry.view<camera>();
+      auto& active_camera = camera_view.get(*camera_view.begin());
 
-		auto camera_view = registry.view<camera>();
-		auto& active_camera = camera_view.get(*camera_view.begin());
+      active_camera.position += active_camera.front * active_camera.movement_speed * static_cast<float>(evt.value);
+#else
+      current_camera.position += current_camera.front * current_camera.movement_speed * static_cast<float>(evt.value);
+#endif
+   }
 
-		active_camera.position += active_camera.front * active_camera.movement_speed * static_cast<float>(evt.value);
-	}
+   // void pan(sec21::viewer::event_mouse_wheel const& evt)
+   // {
+   // 	using namespace sec21::viewer;
+   // 	spdlog::debug("event: mouse wheel: {}", evt.value);
 
-	// void pan(sec21::viewer::event_mouse_wheel const& evt)
-	// {
-	// 	using namespace sec21::viewer;
-	// 	spdlog::debug("event: mouse wheel: {}", evt.value);
+   // 	auto camera_view = registry.view<camera>();
+   // 	auto& active_camera = camera_view.get(*camera_view.begin());
 
-	// 	auto camera_view = registry.view<camera>();
-	// 	auto& active_camera = camera_view.get(*camera_view.begin());
-
-	// 	active_camera.position += active_camera.front * active_camera.movement_speed * static_cast<float>(evt.value);
-	// }	
+   // 	active_camera.position += active_camera.front * active_camera.movement_speed * static_cast<float>(evt.value);
+   // }
 };
 
+void screenshot_to_targa(int width, int height)
+{
+   const int numberOfPixels = width * height * 3;
+   unsigned char pixels[numberOfPixels];
+
+   glPixelStorei(GL_PACK_ALIGNMENT, 1);
+   glReadBuffer(GL_FRONT);
+   glReadPixels(0, 0, width, height, GL_BGR_EXT, GL_UNSIGNED_BYTE, pixels);
+
+   FILE* outputFile = fopen("screenshot.tga", "w");
+   short header[] = {0, 2, 0, 0, 0, 0, static_cast<short>(width), static_cast<short>(height), 24};
+
+   fwrite(&header, sizeof(header), 1, outputFile);
+   fwrite(pixels, numberOfPixels, 1, outputFile);
+   fclose(outputFile);
+}
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] const char** argv)
 {
-	try
-	{
-		using namespace sec21::viewer;
+   try {
+      using namespace sec21::viewer;
 
-		// viewer_state state{};
+      entt::registry registry{};
+      entt::dispatcher dispatcher{};
 
-		entt::registry registry{};
-		entt::dispatcher dispatcher{};
+      spdlog::set_level(spdlog::level::debug);
+      spdlog::info("starting application sec21::viewer {}.{}", VERSION_MAJOR, VERSION_MINOR);
 
-		spdlog::set_level(spdlog::level::debug);
-		spdlog::info("starting application sec21::viewer {}.{}", VERSION_MAJOR, VERSION_MINOR);
+      spdlog::info("load settings");
+      const auto settings = sec21::load_from_json<preferences>("viewer/settings.json");
 
-		spdlog::info("load settings");
-		const auto settings = sec21::load_from_json<preferences>("viewer/settings.json");
+      spdlog::info("setup dispatcher");
 
-		spdlog::info("setup dispatcher");
-		//! \todo rename
-		model_listener listener{ registry, settings };
-		command_listener cmd_listener{ registry, settings };
-		ocetree_listener bbox_listender{ registry };
+#if 0
+      make_camera(registry);
+#else
+      auto active_camera = sec21::load_from_json<camera>("viewer/camera.json");
+#endif
+      const auto get_projects = []() {
+         sec21::http_connection conn("http://localhost:3003");
+         return conn.get("/projects");
+      };
 
-		dispatcher.sink<event_load_model>().connect<&model_listener::load_model>(listener);
-		dispatcher.sink<event_load_model_load>().connect<&model_listener::load_model_load>(listener);
-		dispatcher.sink<event_clear_entites>().connect<&model_listener::clear>(listener);
+      const auto projects = get_projects().get<std::vector<project>>();
+      spdlog::debug("{} projects found", size(projects));
 
-		dispatcher.sink<event_mouse_wheel>().connect<&command_listener::zoom>(cmd_listener);
+      std::vector<std::string> list_of_project_names{};
+      std::transform(begin(projects), end(projects), std::back_inserter(list_of_project_names),
+                     [](auto const& v) { return v.name; });
 
-		registry.on_construct<aabb>().connect<&ocetree_listener::insert>(bbox_listender);
-		// registry.on_construct<position>().connect<&my_free_function>();
+      //! \todo rename
+      model_listener listener{registry, settings};
+      command_listener cmd_listener{registry, settings, active_camera};
+      ocetree_listener bbox_listender{registry};
 
-		entt::observer selectable_observer{registry, entt::collector.update<selectable>()};
+      dispatcher.sink<event_load_project>().connect<&model_listener::load_model>(listener);
+      // dispatcher.sink<event_load_model_load>().connect<&model_listener::load_model_load>(listener);
+      dispatcher.sink<event_clear_entites>().connect<&model_listener::clear>(listener);
 
-		{
-			auto data = debug_data{};
+      dispatcher.sink<event_mouse_wheel>().connect<&command_listener::zoom>(cmd_listener);
 
-			std::vector<std::string> filelist{};
-			std::transform(std::filesystem::directory_iterator("viewer"), {}, std::back_inserter(filelist), [](auto const& p){
-				return p.path().string();
-			});
+      registry.on_construct<aabb>().connect<&ocetree_listener::insert>(bbox_listender);
+      // registry.on_construct<position>().connect<&my_free_function>();
 
-			const auto is_example = [](auto const& filename){ return filename.find("example") != std::string::npos; };
-			const auto is_load = [](auto const& filename){ return filename.find("load") != std::string::npos; };
+      entt::observer selectable_observer{registry, entt::collector.update<selectable>()};
 
-			std::copy_if(
-				begin(filelist), 
-				end(filelist), 
-				back_inserter(data.example_files), 
-				is_example);
+      auto [window, context] = initialize_sdl_opengl3(settings);
 
-			data.example_files.erase(
-				std::remove_if(begin(data.example_files), end(data.example_files), is_load),
-				std::end(data.example_files));
+      enable_opengl_debug_output();
 
-			std::copy_if(
-				begin(filelist), 
-				end(filelist), 
-				back_inserter(data.example_load_files), 
-				sec21::all_of{ is_example, is_load });
+      glEnable(GL_DEPTH_TEST);
+      glViewport(0, 0, settings.screen_width, settings.screen_height);
 
-			spdlog::debug("add debug-data: {} example files and {} load files", std::size(data.example_files), std::size(data.example_load_files));
+      glEnable(GL_CULL_FACE);
+      glEnable(GL_BLEND);
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-			auto entity = registry.create();
-			registry.emplace<debug_data>(entity, data);
-		}
+      ImGui::CreateContext();
+      ImGui::StyleColorsClassic();
+      ImGui_ImplSDL2_InitForOpenGL(window.get(), context);
+      ImGui_ImplOpenGL3_Init(glsl_version_140::version.data());
 
-		auto [window, context] = initialize_sdl_opengl3(settings);
+      spdlog::info("SDL start text input");
+      SDL_StartTextInput();
 
-		enable_opengl_debug_output();
+      spdlog::info("initizialize resource cache");
+      cache_shader_t cache_shader{};
+      cache_vertex_buffer_t cache_vertex_buffer{};
 
-		glEnable(GL_DEPTH_TEST);
-		glViewport(0, 0, settings.screen_width, settings.screen_height);
+      cache_shader.load<shader_loader>(handle_shader,
+                                       shader_resource::load_from_file("viewer/shader1.vs", "viewer/shader1.fs"));
 
-		glEnable(GL_CULL_FACE);
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      const auto sphere_vertices = vertex_factory::generated_sphere::vertices<vertex>();
+      const auto sphere_indices = vertex_factory::generated_sphere::indices();
 
-		ImGui::CreateContext();
-		ImGui::StyleColorsClassic();
-		ImGui_ImplSDL2_InitForOpenGL(window.get(), context);
-		ImGui_ImplOpenGL3_Init(glsl_version_140::version.data());
+      const auto cylinder_vertices = vertex_factory::generated_cylinder::vertices<vertex>();
+      const auto cylinder_indices = vertex_factory::generated_cylinder::indices();
 
-		spdlog::info("SDL start text input");
-		SDL_StartTextInput();
+      const auto support_fixed_vertices = vertex_factory::generated_support_fixed::vertices<vertex>();
+      const auto support_fixed_indices = vertex_factory::generated_support_fixed::indices();
 
-		spdlog::info("initizialize resource cache");
-		cache_shader_t cache_shader{};
-		cache_vertex_buffer_t cache_vertex_buffer{};
+      const auto support_roller_vertices = vertex_factory::generated_support_roller::vertices<vertex>();
+      const auto support_roller_indices = vertex_factory::generated_support_roller::indices();
 
-		cache_shader.load<shader_loader>(handle_shader, shader_resource::load_from_file("viewer/shader1.vs", "viewer/shader1.fs"));
+      const auto arrow_vertices = vertex_factory::generated_arrow::vertices<vertex>();
+      const auto arrow_indices = vertex_factory::generated_arrow::indices();
 
-		const auto sphere_vertices = vertex_factory::generated_sphere::vertices<vertex>();
-		const auto sphere_indices = vertex_factory::generated_sphere::indices();
+      cache_vertex_buffer.load<vertex_buffer_loader<vertex>>(
+         handle_vertexbuffer_sphere,
+         vertex_buffer_t::builder()
+            .attribute(vertex_attribute_tag_t::position, vertex_attribute_t::float_3)
+            .attribute(vertex_attribute_tag_t::normale, vertex_attribute_t::float_3, std::byte{12})
+            .attribute(vertex_attribute_tag_t::texture_coords, vertex_attribute_t::float_2, std::byte{24})
+            .from_vertex_array(std::begin(sphere_vertices), std::end(sphere_vertices),
+                               sphere_indices)); // sphere_creator.get_indices()));
 
-		const auto cylinder_vertices = vertex_factory::generated_cylinder::vertices<vertex>();
-		const auto cylinder_indices = vertex_factory::generated_cylinder::indices();
+      cache_vertex_buffer.load<vertex_buffer_loader<vertex>>(
+         handle_vertexbuffer_cylinder,
+         vertex_buffer_t::builder()
+            .attribute(vertex_attribute_tag_t::position, vertex_attribute_t::float_3)
+            .attribute(vertex_attribute_tag_t::normale, vertex_attribute_t::float_3, std::byte{12})
+            .attribute(vertex_attribute_tag_t::texture_coords, vertex_attribute_t::float_2, std::byte{24})
+            .from_vertex_array(std::begin(cylinder_vertices), std::end(cylinder_vertices), cylinder_indices));
 
-		const auto support_fixed_vertices = vertex_factory::generated_support_fixed::vertices<vertex>();
-		const auto support_fixed_indices = vertex_factory::generated_support_fixed::indices();
+      cache_vertex_buffer.load<vertex_buffer_loader<vertex>>(
+         handle_vertexbuffer_support_fixed,
+         vertex_buffer_t::builder()
+            .attribute(vertex_attribute_tag_t::position, vertex_attribute_t::float_3)
+            .attribute(vertex_attribute_tag_t::normale, vertex_attribute_t::float_3, std::byte{12})
+            .attribute(vertex_attribute_tag_t::texture_coords, vertex_attribute_t::float_2, std::byte{24})
+            .from_vertex_array(std::begin(support_fixed_vertices), std::end(support_fixed_vertices),
+                               support_fixed_indices));
 
-		const auto support_roller_vertices = vertex_factory::generated_support_roller::vertices<vertex>();
-		const auto support_roller_indices = vertex_factory::generated_support_roller::indices();
+      cache_vertex_buffer.load<vertex_buffer_loader<vertex>>(
+         handle_vertexbuffer_support_roller,
+         vertex_buffer_t::builder()
+            .attribute(vertex_attribute_tag_t::position, vertex_attribute_t::float_3)
+            .attribute(vertex_attribute_tag_t::normale, vertex_attribute_t::float_3, std::byte{12})
+            .attribute(vertex_attribute_tag_t::texture_coords, vertex_attribute_t::float_2, std::byte{24})
+            .from_vertex_array(std::begin(support_roller_vertices), std::end(support_roller_vertices),
+                               support_roller_indices));
 
-		const auto arrow_vertices = vertex_factory::generated_arrow::vertices<vertex>();
-		const auto arrow_indices = vertex_factory::generated_arrow::indices();
+      cache_vertex_buffer.load<vertex_buffer_loader<vertex>>(
+         handle_vertexbuffer_arrow,
+         vertex_buffer_t::builder()
+            .attribute(vertex_attribute_tag_t::position, vertex_attribute_t::float_3)
+            .attribute(vertex_attribute_tag_t::normale, vertex_attribute_t::float_3, std::byte{12})
+            .attribute(vertex_attribute_tag_t::texture_coords, vertex_attribute_t::float_2, std::byte{24})
+            .from_vertex_array(std::begin(arrow_vertices), std::end(arrow_vertices), arrow_indices));
 
-		cache_vertex_buffer.load<vertex_buffer_loader<vertex>>(
-			handle_vertexbuffer_sphere,
-			vertex_buffer_t::builder()
-				.attribute(vertex_attribute_tag_t::position, vertex_attribute_t::float_3)
-				.attribute(vertex_attribute_tag_t::normale, vertex_attribute_t::float_3, std::byte{ 12 })
-				.attribute(vertex_attribute_tag_t::texture_coords, vertex_attribute_t::float_2, std::byte{ 24 })
-				.from_vertex_array(std::begin(sphere_vertices), std::end(sphere_vertices), sphere_indices)); //sphere_creator.get_indices()));
+      spdlog::info("setup enitites ...");
 
-		cache_vertex_buffer.load<vertex_buffer_loader<vertex>>(
-			handle_vertexbuffer_cylinder,
-			vertex_buffer_t::builder()
-				.attribute(vertex_attribute_tag_t::position, vertex_attribute_t::float_3)
-				.attribute(vertex_attribute_tag_t::normale, vertex_attribute_t::float_3, std::byte{ 12 })
-				.attribute(vertex_attribute_tag_t::texture_coords, vertex_attribute_t::float_2, std::byte{ 24 })
-				.from_vertex_array(std::begin(cylinder_vertices), std::end(cylinder_vertices), cylinder_indices));
+      //! \todo: make_axis(registry);
+      //! \todo: make_viewcube(registry);
 
-		cache_vertex_buffer.load<vertex_buffer_loader<vertex>>(
-			handle_vertexbuffer_support_fixed,
-			vertex_buffer_t::builder()
-				.attribute(vertex_attribute_tag_t::position, vertex_attribute_t::float_3)
-				.attribute(vertex_attribute_tag_t::normale, vertex_attribute_t::float_3, std::byte{ 12 })
-				.attribute(vertex_attribute_tag_t::texture_coords, vertex_attribute_t::float_2, std::byte{ 24 })
-				.from_vertex_array(std::begin(support_fixed_vertices), std::end(support_fixed_vertices), support_fixed_indices));
+      transformation active_transformation;
+      active_transformation.viewport = glm::ivec4{0, 0, settings.screen_width, settings.screen_height};
 
-		cache_vertex_buffer.load<vertex_buffer_loader<vertex>>(
-			handle_vertexbuffer_support_roller,
-			vertex_buffer_t::builder()
-				.attribute(vertex_attribute_tag_t::position, vertex_attribute_t::float_3)
-				.attribute(vertex_attribute_tag_t::normale, vertex_attribute_t::float_3, std::byte{ 12 })
-				.attribute(vertex_attribute_tag_t::texture_coords, vertex_attribute_t::float_2, std::byte{ 24 })
-				.from_vertex_array(std::begin(support_roller_vertices), std::end(support_roller_vertices), support_roller_indices));
+      spdlog::info("application initialized successful");
 
-		cache_vertex_buffer.load<vertex_buffer_loader<vertex>>(
-			handle_vertexbuffer_arrow,
-			vertex_buffer_t::builder()
-				.attribute(vertex_attribute_tag_t::position, vertex_attribute_t::float_3)
-				.attribute(vertex_attribute_tag_t::normale, vertex_attribute_t::float_3, std::byte{ 12 })
-				.attribute(vertex_attribute_tag_t::texture_coords, vertex_attribute_t::float_2, std::byte{ 24 })
-				.from_vertex_array(std::begin(arrow_vertices), std::end(arrow_vertices), arrow_indices));
+      using namespace sec21::event;
 
-		spdlog::info("setup enitites ...");
+      bool quit{false};
+      input_manager<backend::sdl2> input;
+      std::vector<sec21::event::event_t> input_events{time_elapsed{}};
 
-		make_camera(registry);
-		//! \todo: make_axis(registry);
-		//! \todo: make_viewcube(registry);
+      auto frames = 0;
 
-		{
-			auto entity = registry.create();
-			auto& trans = registry.emplace<transformation>(entity);
-			trans.viewport = glm::ivec4{ 0, 0, settings.screen_width, settings.screen_height };
-		}
-		{
-			//! \todo should be handled via events
-			auto entity = registry.create();
-			registry.emplace<input_data>(entity);
-		}
+      while (!quit) {
+         const auto evt = input.next_event();
+         if (const auto sdl2_event = backend::sdl2::to_event(evt); sdl2_event) {
+            ImGui_ImplSDL2_ProcessEvent(&(*sdl2_event));
+         }
 
-		spdlog::info("application initialized successful");
+         using namespace sec21::event;
 
-		SDL_Event event{};
-		// bool quit{ false }; 
+         // compress events (merge adjacent time_elapsed events)
+         std::visit(
+            sec21::overloaded{[](time_elapsed& prev, time_elapsed const& next) { prev.elapsed += next.elapsed; },
+                              [&](auto const& /*prev*/, std::monostate const&) {},
+                              [&](auto const& /*prev*/, auto const& next) { input_events.push_back(next); }},
+            input_events.back(), evt);
 
-		boost::sml::sm<sdl2> sm; ///{ registry };
-		auto dispatch_event = boost::sml::utility::make_dispatch_table<SDL_Event, SDL_QUIT, SDL_MOUSEWHEEL>(sm);
+         bool render = false;
+         //! \note: overloaded pattern hat den vorteil das alle events abgehandelt werden müssen <-> compiletimefehler
+         sec21::match(
+            evt, [&](close_window const&) { quit = true; }, [](pressed<mouse_button> const&) {},
+            [](released<mouse_button> const&) {}, [](moved<mouse> const&) {},
+            [&](mouse_wheel const& evt) { dispatcher.enqueue<event_mouse_wheel>(evt.y); },
+            [&](pressed<key> const& value) {
+               if (value.source.code == Keycode::Escape) {
+                  quit = true;
+               }
+               if (value.source.code == Keycode::M) {
+                  dispatcher.enqueue<event_load_project>(1);
+               }
+            },
+            [](released<key> const&) {}, [&](time_elapsed const&) { render = true; }, [](std::monostate const&) {});
 
-		while (!sm.is(boost::sml::X))
-		{
-			// auto delta_frame_time = 10.0f / ImGui::GetIO().Framerate;
-			while (SDL_PollEvent(&event))
-			{
-				ImGui_ImplSDL2_ProcessEvent(&event);
-				dispatch_event(event, event.type);
-			}
-			// update_settings(registry);	// controls visibility
-			//! \todo update_transformation instead of update_camera()
-			update_camera(registry);
-			update_collision(registry);
+         if (!render) {
+            // todo: something more with a linear flow here
+            // right now this is just saying "no reason to update the render yet"
+            continue;
+         }
 
-			render_ui(registry, dispatcher, window.get());
-			SDL_GL_MakeCurrent(window.get(), context);
+         // emits all the events queued so far at once
+         dispatcher.update();
 
-			glClearColor(settings.clear_color[0], settings.clear_color[1], settings.clear_color[2], 1.f);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+         // update_settings(registry);	// controls visibility
+         //! \todo update_transformation instead of update_camera()
+         // update_camera(registry, active_transformation);
+         update_camera(active_camera, active_transformation);
+         // update_collision(registry);
 
-			using namespace sec21::viewer;
-			auto camera_view = registry.view<camera>();
-			const auto& active_camera = camera_view.get(*camera_view.begin());
+         render_ui(registry, dispatcher, list_of_project_names, window.get());
+         SDL_GL_MakeCurrent(window.get(), context);
 
-			auto transformation_view = registry.view<transformation>();
-			const auto& active_transformation = transformation_view.get(*transformation_view.begin());
+         glClearColor(settings.clear_color[0], settings.clear_color[1], settings.clear_color[2], 1.f);
+         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			auto h1 = cache_shader.handle(handle_shader);
-			if (!h1) {
-				throw std::runtime_error("invalid shader handle");
-			}
-			auto &active_shader = h1.get();
+         using namespace sec21::viewer;
+         // auto camera_view = registry.view<camera>();
+         // const auto& camera_tuple = camera_view.get(*camera_view.begin());
+         // const auto& active_camera = std::get<0>(camera_tuple);
 
-			active_shader.enable();
-			active_shader.uniform("light.position", 3.0f, 20.0f, 20.0f);
-			active_shader.uniform("light.ambient",  0.2f, 0.2f, 0.2f);
-			active_shader.uniform("light.diffuse", 1.0f, 1.0f, 1.0f);
-			// active_shader.uniform("light.specular", 1.0f, 1.0f, 1.0f);
-			active_shader.uniform_mat("projection"sv, active_transformation.projection);
-			active_shader.uniform_mat("view"sv, active_transformation.view);
-			active_shader.uniform("camera.position", active_camera.position.x, active_camera.position.y, active_camera.position.z);
+         auto h1 = cache_shader.handle(handle_shader);
+         if (!h1) {
+            throw std::runtime_error("invalid shader handle");
+         }
+         auto& active_shader = h1.get();
 
-			registry.view<material, viewable, vertex_buffer_id, model_transformation>().each([&](auto, auto const& mat, auto const& visible, const auto& vertex_buff_id, auto const& model_matrix) 
-			{
-				if (visible.value)
-				{
-					active_shader.uniform("material.ambient", mat.ambient);
-					active_shader.uniform("material.diffuse", mat.diffuse);
-					active_shader.uniform("material.specular", mat.specular);
-					active_shader.uniform("material.shininess", mat.shininess);
-					active_shader.uniform_mat("model"sv, model_matrix.value);
+         active_shader.enable();
+         active_shader.uniform("light.position", 3.0f, 20.0f, 20.0f);
+         active_shader.uniform("light.ambient", 0.2f, 0.2f, 0.2f);
+         active_shader.uniform("light.diffuse", 1.0f, 1.0f, 1.0f);
+         // active_shader.uniform("light.specular", 1.0f, 1.0f, 1.0f);
+         active_shader.uniform_mat("projection"sv, active_transformation.projection);
+         active_shader.uniform_mat("view"sv, active_transformation.view);
+         active_shader.uniform("camera.position", active_camera.position.x, active_camera.position.y,
+                               active_camera.position.z);
 
-					if (auto handle = cache_vertex_buffer.handle(vertex_buff_id.value); handle)
-					{
-						handle->bind();
-						//! \todo hardcoded implicit triangle
-						handle->draw();
-					}
-				}
-			});
+         registry.view<material, viewable, vertex_buffer_id, model_transformation>().each(
+            [&](auto, auto const& mat, auto const& visible, const auto& vertex_buff_id, auto const& model_matrix) {
+               if (visible.value) {
+                  active_shader.uniform("material.ambient", mat.ambient);
+                  active_shader.uniform("material.diffuse", mat.diffuse);
+                  active_shader.uniform("material.specular", mat.specular);
+                  active_shader.uniform("material.shininess", mat.shininess);
+                  active_shader.uniform_mat("model"sv, model_matrix.value);
 
-			// auto zz{0};
-			// selectable_observer.each([&zz](const auto entity) 
-			// {
-			// 	spdlog::debug("zz: {}", zz);
-			// });
-					//! \todo render text
-			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-			SDL_GL_SwapWindow(window.get());
-		}
+                  if (auto handle = cache_vertex_buffer.handle(vertex_buff_id.value); handle) {
+                     handle->bind();
+                     //! \todo hardcoded implicit triangle
+                     handle->draw();
+                  }
+               }
+            });
 
-		spdlog::info("stop application");
+         // auto zz{0};
+         // selectable_observer.each([&zz](const auto entity)
+         // {
+         // 	spdlog::debug("zz: {}", zz);
+         // });
+         //! \todo render text
+         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+         SDL_GL_SwapWindow(window.get());
 
-		cache_shader.clear();
-		cache_vertex_buffer.clear();
+         ++frames;
 
-		SDL_StopTextInput();
-		SDL_Quit();
-	}
-	catch (std::exception &ex)
-	{
-		spdlog::critical("exception {}", ex.what());
-		return -1;
-	}
-	return 0;
+         if (settings.headless == true && frames > settings.max_frames) {
+            screenshot_to_targa(settings.screen_width, settings.screen_height);
+            quit = true;
+         }
+      }
+      {
+         spdlog::debug("Events processed: {}", std::size(input_events));
+         std::ofstream ofs{"output_events.json"};
+         ofs << std::setw(2) << nlohmann::json(input_events);
+      }
+      spdlog::info("stop application");
+
+      cache_shader.clear();
+      cache_vertex_buffer.clear();
+
+      ImGui::DestroyContext();
+
+      SDL_StopTextInput();
+      SDL_Quit();
+   } catch (std::exception& ex) {
+      spdlog::critical("exception {}", ex.what());
+      return -1;
+   }
+   return 0;
 }

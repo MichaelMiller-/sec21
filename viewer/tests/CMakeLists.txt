@@ -1,17 +1,19 @@
 find_package(Catch2 CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
 
-function(test test)
-   string(REPLACE "/" "_" tmp ${test})
-   add_executable(test.${tmp} "${CMAKE_CURRENT_LIST_DIR}/${test}.cpp")
+function(test filename)
+   project(test.viewer.${filename})
+   add_executable(${PROJECT_NAME} "${PROJECT_SOURCE_DIR}/${filename}.cpp")
 
-   target_link_libraries(test.${tmp} PRIVATE Catch2::Catch2)
-   target_link_libraries(test.${tmp} PRIVATE glm)
-   target_link_libraries(test.${tmp} PUBLIC sec21)
+   target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
+
+   target_link_libraries(${PROJECT_NAME} PRIVATE Catch2::Catch2)
+   target_link_libraries(${PROJECT_NAME} PRIVATE glm::glm)
+   target_link_libraries(${PROJECT_NAME} PUBLIC sec21)
    
    add_test(
-      NAME test.${tmp} 
-      COMMAND "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test.${tmp}"
+      NAME ${PROJECT_NAME}
+      COMMAND "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_NAME}"
       WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
 endfunction()
 

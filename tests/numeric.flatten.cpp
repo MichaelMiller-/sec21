@@ -27,7 +27,7 @@ TEST_CASE("flatten matrix to a std::vector", "[core]")
       REQUIRE(std::size(result) == std::size(expected));
       REQUIRE(result == expected);
    }
-#if 0   
+#if 0
    SECTION("example 1x5 matrix")
    {
       std::vector<std::vector<int>> helper_input{ 

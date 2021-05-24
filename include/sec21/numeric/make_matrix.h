@@ -1,7 +1,5 @@
 #pragma once
 
-#include <sec21/contains.h>
-
 #include <boost/numeric/ublas/matrix.hpp>
 
 namespace sec21::numeric

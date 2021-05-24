@@ -10,11 +10,10 @@
 
 using namespace sec21::numeric;
 
-#if 0
 TEST_CASE("create a vector from a std-sequence (vector)", "[sec21][numeric]") 
 {
    const auto input = std::vector{ 1, 3, 4, 6, 8, 9, 10, 11, 2 };
-   auto result = make_vector<int, std::allocator<int>>(std::begin(input), std::end(input));
+   auto result = make_vector<std::allocator<int>>(std::begin(input), std::end(input));
 
    REQUIRE(std::size(result) == std::size(input));
    REQUIRE(std::equal(std::begin(result), std::end(result), std::begin(input), std::end(input)));
@@ -32,8 +31,6 @@ TEST_CASE("create a vector from a sequence with units", "[sec21][numeric]")
    REQUIRE(std::size(result) == std::size(expected));
    REQUIRE(std::equal(std::begin(result), std::end(result), std::begin(expected), std::end(expected)));
 }
-#endif
-
 TEST_CASE("create a vector from a std::pmr::vector with allocator wrapper", "[sec21][numeric]") 
 {
    std::array<std::byte, 256> buffer; 
@@ -46,7 +43,6 @@ TEST_CASE("create a vector from a std::pmr::vector with allocator wrapper", "[se
    REQUIRE(result.size() == std::size(input));
    REQUIRE(std::equal(std::begin(result), std::end(result), std::begin(input), std::end(input)));
 }
-
 #if 0
 TEST_CASE("create a vector from a pmr::sequence with units", "[sec21][numeric]") 
 {
