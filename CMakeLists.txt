@@ -217,8 +217,8 @@ set(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.33)")
 
 ## PKGBUILD 
 ##
-configure_file(${PROJECT_SOURCE_DIR}/PKGBUILD.in ${PROJECT_BINARY_DIR}/PKGBUILD.generated @ONLY)
-configure_file(${PROJECT_SOURCE_DIR}/generate_pkgbuild.sh.in ${PROJECT_BINARY_DIR}/generate_pkgbuild.sh @ONLY)
+# configure_file(${PROJECT_SOURCE_DIR}/PKGBUILD.in ${PROJECT_BINARY_DIR}/PKGBUILD.generated @ONLY)
+# configure_file(${PROJECT_SOURCE_DIR}/generate_pkgbuild.sh.in ${PROJECT_BINARY_DIR}/generate_pkgbuild.sh @ONLY)
 
 # add_custom_command(
 #    OUTPUT "package.checksum"
