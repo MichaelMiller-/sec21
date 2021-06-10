@@ -1,18 +1,18 @@
 import Button from "react-bootstrap/Button";
-import { faFolderOpen } from "@fortawesome/free-solid-svg-icons"
+import { faPlusCircle } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-export type OpenButtonProps = {
+export type NewButtonProps = {
    onClick: () => void;
    disabled: boolean;
 }
 
-const OpenButton = (props: OpenButtonProps) => {
+const NewButton = (props: NewButtonProps) => {
    return (
       <Button variant="link" onClick={props.onClick} disabled={props.disabled}>
-         <FontAwesomeIcon icon={faFolderOpen} size="2x" />
+         <FontAwesomeIcon icon={faPlusCircle} size="2x" />
       </Button>
    )
 }
 
-export default OpenButton;
+export default NewButton;
