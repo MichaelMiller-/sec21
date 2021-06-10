@@ -1,28 +1,44 @@
 import { Request, Response } from "express";
 import { getManager } from "typeorm";
+import Result from "../dto/Result";
 import { Material } from "../entity/Material";
 import { Project } from "../entity/Project";
 
 export async function addMaterial(request: Request, response: Response) {
 
+   let result = new Result<null>();
+
    const prj = await getManager().getRepository(Project).findOne(request.params.id);
 
    if (getManager().getRepository(Project).hasId(prj) === false) {
-      response.send({ "sucess": false, "message": "project not found" });
+      result.success = false;
+      result.message = "Project not found"
+      response.send(result);
       return;
    }
 
    let obj = new Material();
    obj.name = request.body.name;
-   obj.E_modules = request.body.E_modules;
+   obj.E_modulus = request.body.E_modulus;
+   obj.project = prj;
 
    if (obj.name.length === 0) {
-      response.send({ "sucess": false, "message": "name cannot be empty" });
+      result.success = false;
+      result.message = "'name' cannot be empty"
+      response.send(result);
       return;
    }
 
    getManager().getRepository(Material)
       .save(obj)
-      .then(obj => { response.send({ "sucess": true, "message": "" }); })
-      .catch();
+      .then(() => {
+         result.success = true;
+         result.message = "";
+      })
+      .catch(() => {
+         result.success = false;
+         result.message = "TODO: exception";
+      });
+
+   response.send(result);
 }

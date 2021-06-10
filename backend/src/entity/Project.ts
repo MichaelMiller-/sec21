@@ -17,6 +17,12 @@ export class Project {
     @Column()
     title: string;
 
+    // @Column()
+    // created: Date; timestamp
+
+    // @Column()
+    // modified: Date;
+
     @OneToMany(type => Material, material => material.project)
     materials: Material[];
 

@@ -7,6 +7,8 @@ export async function listCurveMembers(request: Request, response: Response) {
    const values = await getManager()
       .getRepository(CurveMember)
       .createQueryBuilder("obj")
+      .leftJoinAndSelect('obj.beginNode', 'notused1')
+      .leftJoinAndSelect('obj.endNode', 'notused2')
       .where("obj.project = :id", { id: request.params.id })
       .getMany();
 

@@ -4,6 +4,7 @@ import { listMaterials } from "./controller/ListMaterials";
 import { listCrossSections } from "./controller/ListCrossSections";
 import { listLoadCases } from "./controller/ListLoadCases";
 import { listCurveMembers } from "./controller/ListCurveMembers";
+import { listPointSupports } from "./controller/ListPointSupports";
 import { addProject } from "./controller/AddProject";
 import { addStructuralPoint } from "./controller/AddStructuralPoint";
 import { addMaterial } from "./controller/AddMaterial";
@@ -11,12 +12,14 @@ import { addCrossSection } from "./controller/AddCrossSection";
 import { addLoadCase } from "./controller/AddLoadCase";
 import { addPointAction } from "./controller/AddPointAction";
 import { addCurveMember } from "./controller/AddCurveMember";
+import { addPointSupport } from "./controller/AddPointSupport";
 import { deleteStructuralPoint } from "./controller/DeleteStructuralPoint";
+import { deleteMaterial } from "./controller/DeleteMaterial";
+import { deleteCurveMember } from "./controller/DeleteCurveMember";
+import { deleteCrossSection } from "./controller/DeleteCrossSection";
 import { getProject } from "./controller/GetProject";
 import { getMaterial } from "./controller/GetMaterial";
 import { getCrossSection } from "./controller/GetCrossSection";
-import { addPointSupport } from "./controller/AddPointSupport";
-import { listPointSupports } from "./controller/ListPointSupports";
 
 export const AppRoutes = [
     {
@@ -95,9 +98,24 @@ export const AppRoutes = [
         action: addCurveMember
     },
     {
-        path: "/structuralpoint:id",
+        path: "/structuralpoint/:id",
         method: "delete",
         action: deleteStructuralPoint
+    },
+    {
+        path: "/curvemember/:id",
+        method: "delete",
+        action: deleteCurveMember
+    },
+    {
+        path: "/material/:id",
+        method: "delete",
+        action: deleteMaterial
+    },
+    {
+        path: "/crosssection/:id",
+        method: "delete",
+        action: deleteCrossSection
     },
     {
         path: "/project/:id",

@@ -44,7 +44,7 @@ export class LoadCase {
       enum: ActionType,
       default: ActionType.PERMANENT
    })
-   actionTyppe: ActionType
+   actionType: ActionType
 
    @Column({
       type: "enum",
