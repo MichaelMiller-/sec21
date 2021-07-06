@@ -14,13 +14,13 @@ export class StructuralPoint {
     @Generated("uuid")
     uuid: string;
 
-    @Column()
+    @Column("real")
     coordinate_x: number;
 
-    @Column()
+    @Column("real")
     coordinate_y: number;
 
-    @Column()
+    @Column("real")
     coordinate_z: number;
 
     @ManyToOne(type => Project, project => project.structuralPoints)

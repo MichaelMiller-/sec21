@@ -22,8 +22,7 @@ export class CrossSection {
    @JoinColumn()
    material: Material;
 
-   //! \todo: real
-   @Column()
+   @Column("real")
    area: number;
 
    @ManyToOne(type => Project, project => project.crossSections)

@@ -20,7 +20,7 @@ export async function addCurveMember(request: Request, response: Response) {
       return;
    }
 
-   const toPt = await getManager().getRepository(StructuralPoint).findOne(request.params.from);
+   const toPt = await getManager().getRepository(StructuralPoint).findOne(request.params.to);
 
    if (getManager().getRepository(StructuralPoint).hasId(toPt) === false) {
       response.send({ "sucess": false, "message": "structural point is not found" });

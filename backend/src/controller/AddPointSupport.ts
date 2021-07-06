@@ -13,8 +13,13 @@ export async function addPointSupport(request: Request, response: Response) {
    }
 
    let obj = new PointSupport();
-   obj.supportType = request.body.supportType;
    obj.referencePoint = pt;
+   obj.ux = request.body.ux;
+   obj.uy = request.body.uy;
+   obj.uz = request.body.uz;
+   obj.fix = request.body.fix;
+   obj.fiy = request.body.fiy;
+   obj.fiz = request.body.fiz;
    obj.stiffnessX = 0
    obj.stiffnessY = 0
    obj.stiffnessZ = 0

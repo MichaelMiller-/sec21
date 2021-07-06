@@ -28,16 +28,13 @@ export class CurveMember {
    @Generated("uuid")
    uuid: string;
 
-   @OneToOne(type => CrossSection)
-   @JoinColumn()
+   @ManyToOne(type => CrossSection, cs => cs.id)
    crossSection: CrossSection;
 
-   @OneToOne(type => StructuralPoint)
-   @JoinColumn()
+   @ManyToOne(type => StructuralPoint, pt => pt.id)
    beginNode: StructuralPoint;
 
-   @OneToOne(type => StructuralPoint)
-   @JoinColumn()
+   @ManyToOne(type => StructuralPoint, pt => pt.id)
    endNode: StructuralPoint;
 
    @Column({

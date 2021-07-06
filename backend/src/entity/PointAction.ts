@@ -19,13 +19,13 @@ export class PointAction {
    @JoinColumn()
    referencePoint: StructuralPoint;
 
-   @Column()
+   @Column("real")
    value_x: number; // [kN]
 
-   @Column()
+   @Column("real")
    value_y: number; // [kN]
 
-   @Column()
+   @Column("real")
    value_z: number; // [kN]
 
    @OneToOne(type => LoadCase)

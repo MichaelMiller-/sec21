@@ -14,7 +14,7 @@ export class Material {
    @Generated("uuid")
    uuid: string;
 
-   @Column()
+   @Column("real")
    E_modulus: number;
 
    @ManyToOne(type => Project, project => project.materials)

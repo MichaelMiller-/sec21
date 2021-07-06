@@ -19,6 +19,8 @@ import { LoadCase } from "./entity/LoadCase";
 import { LoadGroup } from "./entity/LoadGroup";
 import { CurveMember } from "./entity/CurveMember";
 import { PointSupport } from "./entity/PointSupport";
+import { Displacement } from "./entity/Displacement";
+import { CurveMemberResult } from "./entity/CurveMemberResult";
 
 const PORT = Number(process.env.PORT) || 3003;
 // const OPTIONS: ConnectionOptions = {
@@ -38,7 +40,7 @@ const OPTIONS: ConnectionOptions = {
     database: process.env.DATABASE_NAME!,
     logging: true,
     synchronize: true,
-    entities: [Project, StructuralPoint, Material, CrossSection, LoadGroup, LoadCase, PointAction, CurveMember, PointSupport],
+    entities: [Project, StructuralPoint, Material, CrossSection, LoadGroup, LoadCase, PointAction, CurveMember, PointSupport, Displacement, CurveMemberResult],
 };
 
 createConnection(OPTIONS).then(async connection => {
