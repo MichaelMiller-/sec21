@@ -31,14 +31,14 @@ export async function addMaterial(request: Request, response: Response) {
 
    getManager().getRepository(Material)
       .save(obj)
-      .then(() => {
-         result.success = true;
-         result.message = "";
-      })
-      .catch(() => {
-         result.success = false;
-         result.message = "TODO: exception";
-      });
+         .then(() => {
+            result.success = true;
+            result.message = "";
+         })
+         .catch(() => {
+            result.success = false;
+            result.message = "TODO: exception";
+         });
 
-   response.send(result);
+      response.send(result);
 }

@@ -2,13 +2,18 @@ import { Request, Response } from "express";
 import { getManager } from "typeorm";
 import { PointSupport } from "../entity/PointSupport";
 import { StructuralPoint } from "../entity/StructuralPoint";
+import Result from "../dto/Result";
 
 export async function addPointSupport(request: Request, response: Response) {
+
+   let result = new Result<null>();
 
    const pt = await getManager().getRepository(StructuralPoint).findOne(request.params.pt);
 
    if (getManager().getRepository(StructuralPoint).hasId(pt) === false) {
-      response.send({ "sucess": false, "message": "structural point is not found" });
+      result.success = false;
+      result.message = "Structural Point not found"
+      response.send(result);
       return;
    }
 
@@ -29,6 +34,14 @@ export async function addPointSupport(request: Request, response: Response) {
 
    getManager().getRepository(PointSupport)
       .save(obj)
-      .then(() => { response.send({ "sucess": true, "message": "" }); })
-      .catch(ex => { response.send({ "sucess": false, "message": ex }); });
+      .then(() => {
+         result.success = true;
+         result.message = "";
+      })
+      .catch(ex => {
+         result.success = false;
+         result.message = ex;
+      });
+
+   response.send(result);
 }
