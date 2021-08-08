@@ -57,3 +57,14 @@ TEST_CASE("drop row from vector", "[sec21][numeric]")
    REQUIRE(std::size(result) == std::size(expected));
    REQUIRE(std::equal(begin(expected), end(expected), begin(tmp)));
 }
+TEST_CASE("drop row from a std::vector", "[sec21][numeric]")
+{
+   using namespace sec21;
+
+   auto input = std::vector{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+   auto result = numeric::drop(input, {row{2}, row{4}, row{5}, row{13}});
+   const auto expected = std::vector{0, 1, 3, 6, 7, 8, 9, 10, 11, 12, 14, 15};
+
+   REQUIRE(std::size(result) == std::size(expected));
+   REQUIRE(std::equal(begin(expected), end(expected), begin(result)));
+}

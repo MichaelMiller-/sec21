@@ -8,7 +8,7 @@
 namespace sec21::numeric
 {
    template <typename Allocator, typename Iterator>
-   [[nodiscard]] auto make_vector(Iterator first, Iterator last) 
+   [[nodiscard]] auto make_vector(Iterator first, Iterator last)
    {
       using value_t = typename std::iterator_traits<Iterator>::value_type;
       const auto n = std::distance(first, last);
@@ -17,8 +17,14 @@ namespace sec21::numeric
       return boost::numeric::ublas::vector<value_t, decltype(storage)>(n, storage);
    }
 
+   template <typename Allocator, typename Sequence>
+   [[nodiscard]] auto make_vector(Sequence const&& sequence)
+   {
+      return make_vector<Allocator>(begin(sequence), end(sequence));
+   }
+
    template <typename Allocator, typename Iterator, typename TransformFunc>
-   [[nodiscard]] auto make_vector(Iterator first, Iterator last, TransformFunc&& func) 
+   [[nodiscard]] auto make_vector(Iterator first, Iterator last, TransformFunc&& func)
    {
       using arg_t = typename std::iterator_traits<Iterator>::value_type;
       using value_t = std::invoke_result_t<TransformFunc, arg_t>;

@@ -33,7 +33,7 @@ TEST_CASE("create a vector from a sequence with units", "[sec21][numeric]")
 }
 TEST_CASE("create a vector from a std::pmr::vector with allocator wrapper", "[sec21][numeric]") 
 {
-   std::array<std::byte, 256> buffer; 
+   std::array<std::byte, 256> buffer{};
    std::pmr::monotonic_buffer_resource res(buffer.data(), size(buffer));
    std::pmr::vector<int> input{ { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, &res };
 
@@ -49,7 +49,7 @@ TEST_CASE("create a vector from a pmr::sequence with units", "[sec21][numeric]")
    using namespace sec21::units::literals;
    using value_t = sec21::units::quantity<sec21::units::newton, int>;
 
-   std::array<std::byte, 256> buffer; 
+   std::array<std::byte, 256> buffer{};
    std::pmr::monotonic_buffer_resource res(buffer.data(), size(buffer));
    std::pmr::vector<value_t> input{ { { 1_N }, { 2_kN }, { 422_N }, { 17_N } }, &res };
 

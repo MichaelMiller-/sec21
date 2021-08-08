@@ -55,7 +55,7 @@ TEST_CASE("create a matrix from a std::vector and wrap allocator", "[sec21][nume
 }
 TEST_CASE("create a matrix from a std::pmr::vector with allocator wrapper", "[sec21][numeric]") 
 {
-   std::array<std::byte, 256> buffer; 
+   std::array<std::byte, 256> buffer{};
    std::pmr::monotonic_buffer_resource res(buffer.data(), size(buffer));
    std::pmr::vector<int> input{ { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, &res };
    using alloc_t = decltype(input)::allocator_type;

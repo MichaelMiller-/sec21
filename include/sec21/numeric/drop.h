@@ -56,7 +56,6 @@ namespace sec21::numeric
    }
 
    template <typename T, typename Allocator>
-   //! \todo write test
    auto drop(boost::numeric::ublas::vector<T, Allocator> input, std::vector<row> const& rows)
    {
       using namespace boost::numeric;
@@ -69,6 +68,18 @@ namespace sec21::numeric
 
          *first = input[i];
          ++first;
+      }
+      return result;
+   }
+
+   template <typename T, typename Allocator>
+   auto drop(std::vector<T, Allocator> const& input, std::vector<row> const& rows) -> std::vector<T, Allocator>
+   {
+      std::vector<T, Allocator> result;
+      for (auto i = 0; i < size(input); ++i) {
+         const auto it = std::find(begin(rows), end(rows), row{i});
+         if (it == end(rows))
+            result.push_back(input[i]);
       }
       return result;
    }
