@@ -33,7 +33,7 @@ function(test filename)
    target_link_libraries(${PROJECT_NAME} PRIVATE Eigen3::Eigen)
    ## viennacl
    target_compile_definitions(${PROJECT_NAME} PRIVATE VIENNACL_WITH_OPENMP)
-   target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/viennacl/include")
+   target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/viennacl/include)
 
    target_link_libraries(${PROJECT_NAME} PRIVATE catch_main)
    target_link_libraries(${PROJECT_NAME} PRIVATE sec21)
@@ -42,7 +42,12 @@ function(test filename)
       string(LENGTH "${ARG}" length_data_file)
       if(length_data_file)
          message(STATUS "copy configure file: ${CMAKE_SOURCE_DIR}/data/${ARG}")
+         ## needed for console "make test"
          configure_file(${CMAKE_SOURCE_DIR}/data/${ARG} "${PROJECT_BINARY_DIR}/${ARG}" COPYONLY)
+         ## needed for direct call from build directory
+         configure_file(${CMAKE_SOURCE_DIR}/data/${ARG} "${CMAKE_BINARY_DIR}/${ARG}" COPYONLY)
+         ## needed for Clion
+         configure_file(${CMAKE_SOURCE_DIR}/data/${ARG} "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${ARG}" COPYONLY)
       endif()
    endforeach()   
 
@@ -59,7 +64,6 @@ endif()
 
 ## unit tests via catch (alphabetical order)
 ##
-test("access")
 test("any_of")
 test("all_of")
 test("alphabet")
@@ -70,7 +74,6 @@ test("concat")
 test("dispatcher")
 test("double_values")
 test("drawdown")
-test("enclose")
 test("enumerate")
 test("erase_if_index")
 # test_cpp20("event.input_manager")

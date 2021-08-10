@@ -7,11 +7,10 @@
 #include <sstream>
 #include <tuple>
 
-//! \todo relace with fmt::join
 namespace sec21
 {
    template <typename Sequence>
-   [[maybe_unused]] auto& enclose(
+   [[deprecated("replace with fmt::join")]][[maybe_unused]] auto& enclose(
       std::ostream& os,
       Sequence const& seq,
       std::string_view delimiter = ", ",
@@ -21,7 +20,7 @@ namespace sec21
       using T = typename Sequence::value_type;
 
       os << start;
-      if (std::empty(seq) == false) 
+      if (std::empty(seq) == false)
       {
          std::copy(std::begin(seq), std::prev(std::end(seq)), std::ostream_iterator<T>(os, delimiter.data()));
          os << *std::rbegin(seq);
@@ -31,7 +30,7 @@ namespace sec21
    }
 
    template <typename Sequence>
-   [[nodiscard]] auto enclose(
+   [[deprecated("replace with fmt::join")]][[nodiscard]] auto enclose(
       Sequence&& seq,
       std::string_view delimiter = ", ",
       std::string_view start = "{",
@@ -52,7 +51,7 @@ namespace sec21
    }
 
    template <typename... Args, typename TransformFunction>
-   auto enclose(
+   [[deprecated("replace with fmt::join")]] auto enclose(
       std::tuple<Args...> args,
       TransformFunction&& func,
       std::string_view delimiter = ",",
@@ -71,12 +70,12 @@ namespace sec21
    }
 
    template <typename... Args>
-   auto enclose(
+   [[deprecated("replace with fmt::join")]] auto enclose(
       std::tuple<Args...> args,
       std::string_view delimiter = ",",
       std::string_view start = "(",
       std::string_view end = ")")
    {
       return enclose(args, [](auto v){ return v; }, delimiter, start, end);
-   }   
+   }
 } // sec21
