@@ -8,7 +8,7 @@ require('dotenv').config();
 
 // backend
 //
-import { AppRoutes } from "./routes";
+import { appRoutes } from "./routes";
 // entities
 import { StructuralPoint } from "./entity/StructuralPoint";
 import { Project } from "./entity/Project";
@@ -22,16 +22,13 @@ import { PointSupport } from "./entity/PointSupport";
 import { Displacement } from "./entity/Displacement";
 import { CurveMemberResult } from "./entity/CurveMemberResult";
 
-const PORT = Number(process.env.PORT) || 3003;
-// const OPTIONS: ConnectionOptions = {
-//     type: "sqlite",
-//     database: process.env.DATABASE_NAME,
-//     logging: true,
-//     synchronize: true,
-//     entities: [Project, StructuralPoint, Material, CrossSection],
-// };
+// logging
+import logger from "./logging/Logger"
+import morganConfig from './logging/MorganConfig'
 
-const OPTIONS: ConnectionOptions = {
+const port = Number(process.env.APP_PORT) || 3003;
+
+const databaseOptions: ConnectionOptions = {
     type: "postgres",
     host: process.env.DATABASE_HOST!,
     port: Number(process.env.DATABASE_PORT),
@@ -43,21 +40,23 @@ const OPTIONS: ConnectionOptions = {
     entities: [Project, StructuralPoint, Material, CrossSection, LoadGroup, LoadCase, PointAction, CurveMember, PointSupport, Displacement, CurveMemberResult],
 };
 
-createConnection(OPTIONS).then(async connection => {
+createConnection(databaseOptions).then(async connection => {
     // create express app
     const app = express();
+
     app.use(bodyParser.json());
+    app.use(morganConfig);
 
     app.use(function (req, res, next) {
         res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
         res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
         res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-        // res.setHeader('Access-Control-Allow-Credentials', true);
         next();
     });
 
     // register all application routes
-    AppRoutes.forEach(route => {
+    appRoutes.forEach(route => {
+        logger.info(`register endpoint: ${route.path}`);
         app[route.method](route.path, (request: Request, response: Response, next: NextFunction) => {
             route.action(request, response)
                 .then(() => next)
@@ -65,7 +64,6 @@ createConnection(OPTIONS).then(async connection => {
         });
     });
 
-    app.listen(PORT);
-    console.log("sec21::backend is up and running on port:", PORT);
+    app.listen(port, () => logger.info(`sec21::backend is up and running on port: ${port}`));
 
-}).catch(error => console.log("TypeORM connection error: ", error));
+}).catch(error => logger.error(`TypeORM connection error: ${error}`));

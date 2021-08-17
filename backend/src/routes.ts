@@ -21,7 +21,7 @@ import { getProject } from "./controller/GetProject";
 import { getMaterial } from "./controller/GetMaterial";
 import { getCrossSection } from "./controller/GetCrossSection";
 
-export const AppRoutes = [
+export const appRoutes = [
     {
         path: "/projects",
         method: "get",
