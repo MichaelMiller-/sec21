@@ -67,9 +67,4 @@ jobs:
       - name: Test
         working-directory: ${{runner.workspace}}/build
         shell: bash
-        run: ctest --build-config ${{matrix.config}}
-
-      - name: Rerun failed tests
-        working-directory: ${{runner.workspace}}/build
-        shell: bash
-        run: ctest --rerun-failed --output-on-failure
+        run: ctest --build-config ${{matrix.config}} --rerun-failed --output-on-failure
