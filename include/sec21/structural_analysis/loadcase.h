@@ -52,7 +52,7 @@ namespace sec21::structural_analysis
    {
       constexpr auto dim = System::dimension_v;
       const auto it =
-         std::find_if(begin(sys.nodes), end(sys.nodes), [&load](auto const& m) { return m.name == load.first; });
+         std::find_if(begin(sys.nodes), end(sys.nodes), [&load](auto const& m) { return m.id == load.first; });
 
       if (it == end(sys.nodes))
          throw std::invalid_argument("invalid node id");
@@ -66,7 +66,6 @@ namespace sec21::structural_analysis
    template <typename System, typename Unit, typename Allocator>
    auto add_node_load(System const& sys, loadcase<System> const& load, std::vector<Unit, Allocator>& F)
    {
-      // constexpr auto dim = System::dimension_v;
       //! \todo std::for_each(std::execution::par
       for (auto const& lf : load.node_load)
          copy_load(sys, lf, std::begin(F));
@@ -79,16 +78,16 @@ namespace sec21::structural_analysis
       //! \todo std::for_each(std::execution::par
       for (auto const& lf : load.temperature_loads) {
          const auto it = std::find_if(begin(sys.members), end(sys.members),
-                                      [id = lf.member_id](auto const& m) { return m.name == id; });
+                                      [id = lf.member_id](auto const& m) { return m.id == id; });
 
          if (it == std::end(sys.members))
             throw std::invalid_argument("member id not found");
 
          const auto [s, e] = sys.coincidence_table.at(lf.member_id);
 
-         const auto from = std::find_if(begin(sys.nodes), end(sys.nodes), [s](auto const& n) { return n.name == s; });
-
-         const auto to = std::find_if(begin(sys.nodes), end(sys.nodes), [e](auto const& n) { return n.name == e; });
+         // to prevent bug in clang use generalized lambda capture
+         const auto from = std::find_if(begin(sys.nodes), end(sys.nodes), [s = s](auto const& n) { return n.id == s; });
+         const auto to = std::find_if(begin(sys.nodes), end(sys.nodes), [e = e](auto const& n) { return n.id == e; });
 
          //! \todo error handling
          const auto alpha = impl::angle_to_x_axis(*from, *to);
@@ -144,9 +143,9 @@ namespace sec21::structural_analysis
       LoadType type{LoadType::Standard};
       ActionType action_type{ActionType::Permanent};
       Direction direction{Direction::Z};
-      // reference_node
+      //! \todo reference_node
       double value; // [kN]
-      // loadcase
+      //! \todo loadcase
       CoordinateSystem coordinate_system{CoordinateSystem::Global};
    };
 } // namespace sec21::structural_analysis
