@@ -49,6 +49,7 @@ jobs:
         ./vcpkg install nlohmann-json
         ./vcpkg install spdlog
         ./vcpkg install eigen3
+        ./vcpkg install cpprestsdk
 
     - name: Create Build Environment
       run: cmake -E make_directory ${{runner.workspace}}/build
@@ -66,5 +67,5 @@ jobs:
     - name: Test
       working-directory: ${{runner.workspace}}/build
       shell: bash
-      run: ctest --build-config ${{matrix.config}}
+      run: ctest --build-config ${{matrix.config}} --rerun-failed --output-on-failure
 
