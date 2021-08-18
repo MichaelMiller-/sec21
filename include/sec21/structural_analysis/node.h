@@ -11,7 +11,7 @@
 
 namespace sec21::structural_analysis
 {
-   template <auto Dimension, typename Descriptor = int, typename Precision = double>
+   template <auto Dimension, typename Descriptor = std::size_t, typename Precision = double>
    struct node
    {
       static_assert(Dimension == 2, "Only works in 2D just yet");
@@ -26,16 +26,21 @@ namespace sec21::structural_analysis
       using point_t = std::array<precision_t, dimension_v>;
       using global_support_t = support<dimension_v>;
 
+      //! \brief
+      descriptor_t id{ descriptor_traits<descriptor_t>::invalid() };
+
       //! \brief unique name
-      descriptor_t name{ descriptor_traits<descriptor_t>::invalid() };
+      // std::string name;
+
       //! \brief World Position
       point_t position{};
 
       std::optional<global_support_t> global_support{};
    };
 
-   //! \brief generates a list of supports per node and direction 
+   //! \brief generates a list of supports per node and direction
    template <typename InputIterator, typename OutputIterator>
+   //! \todo [[deprecated]]
    auto support_mask(InputIterator first, InputIterator last, OutputIterator out) -> OutputIterator
    {
       // static_assert(std::is_same_v<typename std::iterator_traits<OutputIterator>::value_type, bool>);
@@ -130,7 +135,7 @@ namespace sec21::structural_analysis
    template <auto Dimension, typename Descriptor, typename Precision>
    void to_json(nlohmann::json& j, node<Dimension, Descriptor, Precision> const& obj) {
       j = nlohmann::json{
-         {"name", obj.name},
+         {"name", obj.id},
          {"position", obj.position}, 
          {"global_support", obj.global_support}
       };
@@ -138,7 +143,7 @@ namespace sec21::structural_analysis
    template <auto Dimension, typename Descriptor, typename Precision>
    void from_json(nlohmann::json const& j, node<Dimension, Descriptor, Precision>& obj) 
    {
-      j.at("name").get_to(obj.name);
+      j.at("name").get_to(obj.id);
       j.at("position").get_to(obj.position);
       j.at("global_support").get_to(obj.global_support);
    }
