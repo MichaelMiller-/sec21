@@ -33,10 +33,12 @@ int main()
       }),
       nonius::benchmark("Eigen: displacement() with boost::ublas input", [&] { 
          return eigen::displacement(K, F);
-      }),
+      })
+#if 0
       nonius::benchmark("Eigen: displacement() with std::vector input", [&] { 
          return eigen::displacement(K, F);
-      })      
+      })
+#endif
    );
 
    return 0;

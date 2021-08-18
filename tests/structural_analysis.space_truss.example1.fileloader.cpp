@@ -26,38 +26,27 @@ TEST_CASE("example system 1.0 load from json", "[sec21][structural_analysis][spa
    loadcase<decltype(sys)> lf1{};
    lf1.node_load.emplace_back(2, loadcase<decltype(sys)>::load_t{{10.0_kN, -10.0_kN}});
 
-   auto [success, result] = solve<solver::backend::viennacl_impl>(sys, lf1);
-   REQUIRE(success == true);
+   const auto success = solve<solver::backend::viennacl_impl>(sys, lf1);
+   REQUIRE(success.has_value() == true);
 
-   {
-      std::vector<double> flat_support_reaction{};
-      for (auto [k,v] : result.node) 
-      {
-         std::transform(
-            std::begin(v.support_reaction), 
-            std::end(v.support_reaction), 
-            std::back_inserter(flat_support_reaction),
-            [](auto&& e) { return e.value(); });
-      }
+   const auto result = success.value();
 
-      // unit: newton [N]
-      const auto expected = std::array{ 0.0, 0.0, 0.0, 0.0, 0.0, 20'000.0, -10'000.0, -10'000.0 };
-      REQUIRE(approx_equal(flat_support_reaction, expected, kDivergence));
-   }
-   {
-      std::vector<double> flat_displacement{};
-      for (auto [k,v] : result.node) 
-      {
-         std::transform(
-            std::begin(v.displacement), 
-            std::end(v.displacement), 
-            std::back_inserter(flat_displacement),
-            [](auto&& e) { return e.value(); });
-      }
-      // unit: millimeter [mm]
-      const auto expected = std::array{ 0.0869117, 0.018, 0.1049117, -0.054, 0.018, 0.0, 0.0, 0.0 };
-      REQUIRE(approx_equal(flat_displacement, expected, kDivergence));
-   }
+   // unit: newton [N]
+   REQUIRE(std::get<0>(result.nodes[2].support_reaction).value() == Approx(0.0).epsilon(kDivergence));
+   REQUIRE(std::get<1>(result.nodes[2].support_reaction).value() == Approx(20'000).epsilon(kDivergence));
+   REQUIRE(std::get<0>(result.nodes[3].support_reaction).value() == Approx(-10'000).epsilon(kDivergence));
+   REQUIRE(std::get<1>(result.nodes[3].support_reaction).value() == Approx(-10'000).epsilon(kDivergence));
+
+   // unit: millimeter [mm]
+   REQUIRE(std::get<0>(result.nodes[0].displacement).value() == Approx(0.86).epsilon(kDivergence));
+   REQUIRE(std::get<1>(result.nodes[0].displacement).value() == Approx(0.18).epsilon(kDivergence));
+   REQUIRE(std::get<0>(result.nodes[1].displacement).value() == Approx(1.04).epsilon(kDivergence));
+   REQUIRE(std::get<1>(result.nodes[1].displacement).value() == Approx(-0.53).epsilon(kDivergence));
+   REQUIRE(std::get<0>(result.nodes[2].displacement).value() == Approx(0.18).epsilon(kDivergence));
+   REQUIRE(std::get<1>(result.nodes[2].displacement).value() == Approx(0.0).epsilon(kDivergence));
+   REQUIRE(std::get<0>(result.nodes[3].displacement).value() == Approx(0.0).epsilon(kDivergence));
+   REQUIRE(std::get<1>(result.nodes[3].displacement).value() == Approx(0.0).epsilon(kDivergence));
+
    {
       std::vector<double> copied_results{};
       std::transform(

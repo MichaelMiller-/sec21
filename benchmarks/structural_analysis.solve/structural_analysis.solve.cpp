@@ -45,12 +45,12 @@ int main()
 
    benchmark_runner(
       nonius::benchmark("ViennaCL solver backend", [&] { 
-         auto [success, result] = solve<solver::backend::viennacl_impl>(sys, lf1);
-         return success;
+         const auto success = solve<solver::backend::viennacl_impl>(sys, lf1);
+         return success.value();
       }),
-      nonius::benchmark("Eigen solver backend", [&] { 
-         auto [success, result] = solve<solver::backend::eigen>(sys, lf1);
-         return success;
+      nonius::benchmark("Eigen solver backend", [&] {
+         const auto success = solve<solver::backend::eigen>(sys, lf1);
+         return success.value();
       })
    );
 

@@ -1,5 +1,4 @@
 ﻿#include <catch.hpp>
-#include "approx_equal.h"
 
 #include <sec21/file_loader.h>
 #include <sec21/structural_analysis/loadcase.h>
@@ -37,7 +36,7 @@ TEST_CASE("test loadcase", "[sec21][structural_analysis][loadcase]")
 
       add_temperature_load(sys, lf1, begin(F));
 
-      const auto expected = std::array{ -302'400.0_N, 0.0_N, 302'400.0_N, 0.0_N, 0.0_N, 0.0_N, 0.0_N, 0.0_N };
+      const auto expected = std::array{ -30'240.0_N, 0.0_N, 30'240.0_N, 0.0_N, 0.0_N, 0.0_N, 0.0_N, 0.0_N };
       REQUIRE(std::size(F) == std::size(expected));
       REQUIRE(std::equal(std::begin(F), std::end(F), std::begin(expected)));
    }

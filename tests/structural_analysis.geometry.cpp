@@ -22,6 +22,7 @@ TEST_CASE("test geometry", "[sec21][structural_analysis]")
    REQUIRE(angle_to_x_axis(value_t{ 5.0, 1.0 }, value_t{ 7.0, 4.0 }) == Approx(0.9827937232));
    REQUIRE(angle_to_x_axis(value_t{ 1.0, -1.0 }, value_t{ 3.0, -4.0 }) == Approx(-0.9827937232));
    REQUIRE(angle_to_x_axis(value_t{ 0.0, 0.0 }, value_t{ 3.0, 0.0 }) == Approx(0.0));
+   REQUIRE(angle_to_x_axis(value_t{ 0.0, 0.0 }, value_t{ -3.0, 0.0 }) == Approx(-0.0));
    REQUIRE(angle_to_x_axis(value_t{ 0.0, 0.0 }, value_t{ 0.0, 3.0 }) == Approx(half_pi));
    REQUIRE(angle_to_x_axis(value_t{ 0.0, 3.0 }, value_t{ 3.0, 0.0 }) == Approx(-fourth_pi));
    REQUIRE(angle_to_x_axis(value_t{ 3.0, 0.0 }, value_t{ 0.0, 3.0 }) == Approx(-fourth_pi));

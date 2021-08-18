@@ -1,6 +1,9 @@
 #pragma once
 
 #include <sec21/units/quantity.h>
+#include <sec21/structural_analysis/common.h>
+
+#include <boost/outcome.hpp>
 
 #include <vector>
 #include <map>
@@ -15,23 +18,13 @@ namespace sec21::structural_analysis
       Descriptor id{};
       std::array<Displacement, Dimension> displacement{};
       std::array<Force, Dimension> support_reaction{};
-
-      constexpr bool operator < (node_result_2 const& rhs) const noexcept
-      {
-         return id < rhs.id;
-      }      
-   };   
+   };
 
    template <typename Descriptor, typename Force = units::quantity<units::newton, double> >
    struct member_result
    {
       Descriptor id{};
       Force normal_force{};
-
-      constexpr bool operator < (member_result const& rhs) const noexcept
-      {
-         return id < rhs.id;
-      }
    };
 
    template <typename System>
@@ -53,18 +46,70 @@ namespace sec21::structural_analysis
          std::array<displacement_t, dimension_v> displacement{};
          std::array<force_t, dimension_v> support_reaction{};
          //! \todo or boost::qvm
-         // boost::qvm::vec<displacement_t, dimension_v> displacement{};
+//         boost::qvm::vec<displacement_t, dimension_v> displacement{};
       };
 
-      //! \todo decide which approch
+      //! \todo decide which approch -> map forces to use structured bindings -> no RVO
       std::map<node_descriptor_t, node_result> node;
 
       using node_result_t = node_result_2<node_descriptor_t, displacement_t, force_t, dimension_v>;
       using member_result_set_t = member_result<member_descriptor_t, force_t>;
 
-      std::set<node_result_t> nodes;
-      std::set<member_result_set_t> members;
+      std::vector<node_result_t> nodes;
+      std::vector<member_result_set_t> members;
    };
+
+   namespace outcome = BOOST_OUTCOME_V2_NAMESPACE;
+
+   //! \todo consider std::optional
+   //! \todo not exception save!
+   //! \todo argument displacements and reactions could be a view
+   //! \todo return outcome
+   template<typename System, typename T>
+   auto make_result(System const& sys, std::vector<T> const& displacements, std::vector<T> const& support_reactions)
+   -> outcome::std_result<system_result<System>>
+   {
+      if (size(displacements) != size(support_reactions))
+         throw std::runtime_error("make_result: mismatch sizes");
+
+      constexpr auto dim = System::dimension_v;
+
+      system_result<System> result{};
+
+      for (auto i = 0, j = 0; i < size(sys.nodes); ++i, j += dim) {
+         result.nodes.push_back({sys.nodes[i].id, displacements[j], displacements[j + 1], support_reactions[j], support_reactions[j + 1]});
+      }
+
+      for (auto const& m : sys.members) {
+         const auto lookup = sys.coincidence_table.at(m.id);
+
+         const auto it_s =
+            std::find_if(begin(result.nodes), end(result.nodes), [&lookup](auto n) { return n.id == lookup.first; });
+         const auto it_e = std::find_if(begin(result.nodes), end(result.nodes),
+                                        [&lookup](auto n) { return n.id == lookup.second; });
+
+         const auto delta_s = it_s->displacement;
+         const auto delta_e = it_e->displacement;
+         const auto kv = EA_over_l(m.E, m.A, impl::length(sys, m.id)).value();
+         const auto alpha = impl::angle_to_x_axis(sys, m.id);
+         //! \todo k1?
+         const auto k1 = alpha < 0.0 ? -1.0 : 1.0;
+
+         using namespace boost::qvm;
+         //! clang-format off
+         const auto N = (
+                           -std::cos(alpha) * X(delta_s).value() +
+                           -std::sin(alpha) * Y(delta_s).value() +
+                           std::cos(alpha) * X(delta_e).value() +
+                           std::sin(alpha) * Y(delta_e).value()) * k1 * kv;
+         //! clang-format on
+         result.members.push_back({m.id, N});
+      }
+      // sanity check
+//         if (size(result.members) != size(sys.members) || size(result.nodes) != size(sys.nodes))
+//            return {};
+      return result;
+   }
 }
 
 #include <nlohmann/json.hpp>
@@ -73,7 +118,7 @@ namespace sec21::structural_analysis
 {
    //
    template <typename Descriptor, typename Displacement, typename Force, auto Dimension>
-   void to_json(nlohmann::json& j, node_result_2<Descriptor, Displacement, Force, Dimension> const& obj) 
+   void to_json(nlohmann::json& j, node_result_2<Descriptor, Displacement, Force, Dimension> const& obj)
    {
       j = nlohmann::json{
          {"id", obj.id},
@@ -82,7 +127,7 @@ namespace sec21::structural_analysis
    }
 
    template <typename Descriptor, typename Displacement, typename Force, auto Dimension>
-   void from_json(nlohmann::json const& j, node_result_2<Descriptor, Displacement, Force, Dimension>& obj) 
+   void from_json(nlohmann::json const& j, node_result_2<Descriptor, Displacement, Force, Dimension>& obj)
    {
       j.at("id").get_to(obj.id);
       j.at("displacement").get_to(obj.displacement);

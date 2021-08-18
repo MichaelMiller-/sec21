@@ -1,5 +1,4 @@
 ﻿#include <catch.hpp>
-#include "approx_equal.h"
 
 #include <sec21/file_loader.h>
 #include <sec21/structural_analysis/loadcase.h>
@@ -7,7 +6,6 @@
 #include <sec21/structural_analysis/node.h>
 #include <sec21/structural_analysis/member.h>
 #include <sec21/structural_analysis/space_truss.h>
-#include <sec21/structural_analysis/system_result.h>
 #include <sec21/structural_analysis/solver/backend/viennacl.h>
 
 #include <array>
@@ -26,8 +24,13 @@ TEST_CASE("example system 2.0 with temperature load", "[sec21][structural_analys
    auto sys = sec21::load_from_json<space_truss_t>("example_2.json");
    auto load = sec21::load_from_json<loadcase<decltype(sys)>>("example_2_temperature_load.json");
 
-   auto [success, result] = solve<solver::backend::viennacl_impl>(sys, load);
-   REQUIRE(success == true);
+   REQUIRE(size(sys.nodes) == 4);
+   REQUIRE(size(sys.members) == 5);
+
+   const auto success = solve<solver::backend::viennacl_impl>(sys, load);
+   REQUIRE(success.has_value() == true);
+
+   const auto result = success.value();
 
    std::vector<double> flat_support_reaction{};
    for (auto [k,v] : result.node) 
@@ -38,14 +41,6 @@ TEST_CASE("example system 2.0 with temperature load", "[sec21][structural_analys
          std::back_inserter(flat_support_reaction),
          [](auto&& e) { return e.value(); });
    }
-
-   std::vector<double> flat_displacement{};
-   for (auto [k,v] : result.node) 
-      std::transform(
-         std::begin(v.displacement), 
-         std::end(v.displacement), 
-         std::back_inserter(flat_displacement),
-         [](auto&& e) { return e.value(); });
 
    std::vector<double> copied_results{};
    std::transform(
@@ -61,7 +56,7 @@ TEST_CASE("example system 2.0 with temperature load", "[sec21][structural_analys
    // REQUIRE(flat_support_reaction[7] == Approx(0.0));
 
    // unit: millimeter [mm]
-   REQUIRE(flat_displacement[3] == Approx(-7.8).epsilon(kDivergence));
+   REQUIRE(std::get<1>(result.nodes[2].displacement).value() == Approx(-7.8).epsilon(kDivergence));
 
    // unit: newton [N]
    // REQUIRE(copied_results[0] == Approx(1'500));

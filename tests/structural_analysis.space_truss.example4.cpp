@@ -1,12 +1,10 @@
 ﻿#include <catch.hpp>
-#include "approx_equal.h"
 
 #include <sec21/file_loader.h>
 #include <sec21/structural_analysis/node.h>
 #include <sec21/structural_analysis/member.h>
 #include <sec21/structural_analysis/space_truss.h>
 #include <sec21/structural_analysis/loadcase.h>
-#include <sec21/structural_analysis/system_result.h>
 #include <sec21/structural_analysis/solve.h>
 #include <sec21/structural_analysis/solver/backend/viennacl.h>
 
@@ -24,10 +22,17 @@ TEST_CASE("example system 4.0 load from json", "[sec21][structural_analysis][spa
    using space_truss_t = space_truss<node_t, member_t>;
 
    auto sys = sec21::load_from_json<space_truss_t>("example_4.json");
+
+   REQUIRE(size(sys.nodes) == 7);
+   REQUIRE(size(sys.members) == 10);
+   REQUIRE(size(sys.coincidence_table) == 10);
+
    auto lf1 = sec21::load_from_json<loadcase<decltype(sys)>>("example_4_load.json");
 
-   auto [success, result] = solve<solver::backend::viennacl_impl>(sys, lf1);
-   REQUIRE(success == true);
+   const auto success = solve<solver::backend::viennacl_impl>(sys, lf1);
+   REQUIRE(success.has_value() == true);
+
+   const auto result = success.value();
 
    std::vector<double> flat_support_reaction{};
    for (auto [k,v] : result.node) 
@@ -39,16 +44,6 @@ TEST_CASE("example system 4.0 load from json", "[sec21][structural_analysis][spa
          [](auto&& e) { return e.value(); });
    }
 
-   std::vector<double> flat_displacement{};
-   for (auto [k,v] : result.node) 
-   {
-      std::transform(
-         std::begin(v.displacement), 
-         std::end(v.displacement), 
-         std::back_inserter(flat_displacement),
-         [](auto&& e) { return e.value(); });
-   }
-
    std::vector<double> copied_results{};
    std::transform(
       std::begin(result.members), 
@@ -57,13 +52,13 @@ TEST_CASE("example system 4.0 load from json", "[sec21][structural_analysis][spa
       [](auto&& m) { return m.normal_force.value(); });
 
    // unit: newton [N]
-   REQUIRE(flat_support_reaction[0] == Approx(60'000.0));
-   REQUIRE(flat_support_reaction[1] == Approx(70'000.0));
-   REQUIRE(flat_support_reaction[2] == Approx(-60'000.0));
-   REQUIRE(flat_support_reaction[3] == Approx(70'000.0));        
+   REQUIRE(std::get<0>(result.nodes[0].support_reaction).value() == Approx(60'000).epsilon(kDivergence));
+   REQUIRE(std::get<1>(result.nodes[0].support_reaction).value() == Approx(70'000).epsilon(kDivergence));
+   REQUIRE(std::get<0>(result.nodes[1].support_reaction).value() == Approx(-60'000).epsilon(kDivergence));
+   REQUIRE(std::get<1>(result.nodes[1].support_reaction).value() == Approx(70'000).epsilon(kDivergence));
 
    // unit: millimeter [mm]
-   REQUIRE(flat_displacement[13] == Approx(-29.2).epsilon(kDivergence));
+   REQUIRE(std::get<1>(result.nodes[6].displacement).value() == Approx(-29.2).epsilon(kDivergence));
 
    // unit: newton [N]
    REQUIRE(copied_results[0] == Approx(30'000));

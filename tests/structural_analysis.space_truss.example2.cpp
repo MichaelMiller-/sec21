@@ -35,7 +35,7 @@ TEST_CASE("example system 2.0 load from json", "[sec21][structural_analysis][spa
    SECTION("coincidence matrix from member 1")
    {
       using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<double>>;
-      auto Z = impl::coincidence_matrix<allocator_t>(sys, 1);
+      const auto Z = impl::coincidence_matrix<allocator_t>(sys, 1);
       REQUIRE(Z.size1() == 4);
       REQUIRE(Z.size2() == 8);
       // clang-format off
@@ -51,7 +51,7 @@ TEST_CASE("example system 2.0 load from json", "[sec21][structural_analysis][spa
    SECTION("coincidence matrix from member 2")
    {
       using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<double>>;
-      auto Z = impl::coincidence_matrix<allocator_t>(sys, 2);
+      const auto Z = impl::coincidence_matrix<allocator_t>(sys, 2);
       REQUIRE(Z.size1() == 4);
       REQUIRE(Z.size2() == 8);
       // clang-format off
@@ -67,7 +67,7 @@ TEST_CASE("example system 2.0 load from json", "[sec21][structural_analysis][spa
    SECTION("coincidence matrix from member 3")
    {
       using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<double>>;
-      auto Z = impl::coincidence_matrix<allocator_t>(sys, 3);
+      const auto Z = impl::coincidence_matrix<allocator_t>(sys, 3);
       REQUIRE(Z.size1() == 4);
       REQUIRE(Z.size2() == 8);
       // clang-format off
@@ -83,7 +83,7 @@ TEST_CASE("example system 2.0 load from json", "[sec21][structural_analysis][spa
    SECTION("coincidence matrix from member 4")
    {
       using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<double>>;
-      auto Z = impl::coincidence_matrix<allocator_t>(sys, 4);
+      const auto Z = impl::coincidence_matrix<allocator_t>(sys, 4);
       REQUIRE(Z.size1() == 4);
       REQUIRE(Z.size2() == 8);
       // clang-format off
@@ -99,7 +99,7 @@ TEST_CASE("example system 2.0 load from json", "[sec21][structural_analysis][spa
    SECTION("coincidence matrix from member 5")
    {
       using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<double>>;
-      auto Z = impl::coincidence_matrix<allocator_t>(sys, 5);
+      const auto Z = impl::coincidence_matrix<allocator_t>(sys, 5);
       REQUIRE(Z.size1() == 4);
       REQUIRE(Z.size2() == 8);
       // clang-format off
@@ -115,7 +115,7 @@ TEST_CASE("example system 2.0 load from json", "[sec21][structural_analysis][spa
    SECTION("stiffness matrix from member 1")
    {
       using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<double>>;
-      auto K = impl::stiffness_matrix<allocator_t>(sys, 1);
+      const auto K = impl::stiffness_matrix<allocator_t>(sys, 1);
       REQUIRE(K.size1() == 8);
       REQUIRE(K.size2() == 8);
       // clang-format off
@@ -139,7 +139,7 @@ TEST_CASE("example system 2.0 load from json", "[sec21][structural_analysis][spa
    SECTION("stiffness matrix from member 4")
    {
       using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<double>>;
-      auto K = impl::stiffness_matrix<allocator_t>(sys, 4);
+      const auto K = impl::stiffness_matrix<allocator_t>(sys, 4);
       REQUIRE(K.size1() == 8);
       REQUIRE(K.size2() == 8);
       // clang-format off
@@ -162,8 +162,10 @@ TEST_CASE("example system 2.0 load from json", "[sec21][structural_analysis][spa
    }
    SECTION("solve")
    {
-      auto [success, result] = solve<solver::backend::viennacl_impl>(sys, load);
-      REQUIRE(success == true);
+      const auto success = solve<solver::backend::viennacl_impl>(sys, load);
+      REQUIRE(success.has_value() == true);
+
+      const auto result = success.value();
 
       std::vector<double> flat_support_reaction{};
       for (auto [k,v] : result.node) 
@@ -175,14 +177,6 @@ TEST_CASE("example system 2.0 load from json", "[sec21][structural_analysis][spa
             [](auto&& e) { return e.value(); });
       }
 
-      std::vector<double> flat_displacement{};
-      for (auto [k,v] : result.node) 
-         std::transform(
-            std::begin(v.displacement), 
-            std::end(v.displacement), 
-            std::back_inserter(flat_displacement),
-            [](auto&& e) { return e.value(); });
-
       std::vector<double> copied_results{};
       std::transform(
          std::begin(result.members), 
@@ -190,15 +184,16 @@ TEST_CASE("example system 2.0 load from json", "[sec21][structural_analysis][spa
          std::back_inserter(copied_results), 
          [](auto&& m) { return m.normal_force.value(); });
 
+/*
       // unit: newton [N]
       REQUIRE(flat_support_reaction[0] == Approx(3'000.0));
       REQUIRE(flat_support_reaction[1] == Approx(3'000.0));
       REQUIRE(flat_support_reaction[6] == Approx(-3'000.0));
       REQUIRE(flat_support_reaction[7] == Approx(0.0));
-
+      */
       // unit: millimeter [mm]
-      REQUIRE(flat_displacement[2] == Approx(1.5).epsilon(kDivergence));
-      REQUIRE(flat_displacement[3] == Approx(-22.4).epsilon(kDivergence));
+      REQUIRE(std::get<0>(result.nodes[1].displacement).value() == Approx(1.5).epsilon(kDivergence));
+      REQUIRE(std::get<1>(result.nodes[1].displacement).value() == Approx(-22.4).epsilon(kDivergence));
 
       // unit: newton [N]
       REQUIRE(copied_results[0] == Approx(1'500));
