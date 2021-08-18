@@ -1,9 +1,9 @@
 #include <catch.hpp>
 
-#include <sec21/database/table.h>
 #include <sec21/database/column.h>
 #include <sec21/database/column_type.h>
 #include <sec21/database/query.h>
+#include <sec21/database/table.h>
 
 #include <iostream>
 #include <tuple>
@@ -50,7 +50,7 @@ struct user
    std::string name{};
    std::string password{};
    int karma{};
-   double cash{}; 
+   double cash{};
 };
 // end-snippet
 
@@ -86,13 +86,9 @@ namespace sec21::database
          using password = column<"password", user, std::string, &user::password, not_null>;
          using karma = column<"karma", user, int, &user::karma>;
          using cash = column<"cash", user, double, &user::cash>;
-     };
+      };
 
-      using metainfo = std::tuple<
-         columns::name,
-         columns::password,
-         columns::karma,
-         columns::cash>;
+      using metainfo = std::tuple<columns::name, columns::password, columns::karma, columns::cash>;
    };
    // end-snippet
 } // namespace sec21::database
@@ -162,7 +158,7 @@ TEST_CASE("test detail implementation", "[sec21][database]")
       detail::embraced_row_values<reflection_t>(ss, obj, indices);
 
       REQUIRE(ss.str() == R"(('John Doe','hidden',42,3.14))");
-   }   
+   }
 }
 
 TEST_CASE("test database queries from type: user", "[sec21][database]")
@@ -172,7 +168,8 @@ TEST_CASE("test database queries from type: user", "[sec21][database]")
    SECTION("create table")
    {
       const auto result = create_table<user>();
-      REQUIRE(result == "CREATE TABLE user(name TEXT PRIMARY KEY NOT NULL,password TEXT NOT NULL,karma INT,cash REAL);");
+      REQUIRE(result ==
+              "CREATE TABLE user(name TEXT PRIMARY KEY NOT NULL,password TEXT NOT NULL,karma INT,cash REAL);");
    }
    SECTION("insert values into table")
    {
@@ -181,7 +178,7 @@ TEST_CASE("test database queries from type: user", "[sec21][database]")
       user obj{.name = "John Doe", .password = "hidden", .karma = 42, .cash = 3.14};
 #else
       user obj{"John Doe", "hidden", 42, 3.14};
-#endif      
+#endif
       const auto result = insert_into(obj);
 
       REQUIRE(result == R"(INSERT INTO user (name,password,karma,cash) VALUES ('John Doe','hidden',42,3.14);)");
@@ -200,8 +197,8 @@ struct example
 {
    std::string name{};
    int karma{};
-   std::array<double,2> position{};
-   double cash{}; 
+   std::array<double, 2> position{};
+   double cash{};
 };
 
 namespace sec21::database
@@ -213,43 +210,43 @@ namespace sec21::database
 
       struct columns
       {
-         struct name {
+         struct name
+         {
             using value_t = std::string;
             using constraints_t = std::tuple<serial, primary_key>;
             static constexpr inline auto column_name = "name";
-            static value_t get(example const& obj) { return obj.name; } 
+            static value_t get(example const& obj) { return obj.name; }
          };
-         struct pos_x {
+         struct pos_x
+         {
             using value_t = double;
             using constraints_t = std::tuple<>;
             static constexpr inline auto column_name = "pos_x";
-            static value_t get(example const& obj) { return std::get<0>(obj.position); } 
-         };        
-         struct pos_y {
+            static value_t get(example const& obj) { return std::get<0>(obj.position); }
+         };
+         struct pos_y
+         {
             using value_t = double;
             using constraints_t = std::tuple<>;
             static constexpr inline auto column_name = "pos_y";
-            static value_t get(example const& obj) { return std::get<1>(obj.position); } 
-         };        
-         struct cash {
+            static value_t get(example const& obj) { return std::get<1>(obj.position); }
+         };
+         struct cash
+         {
             using value_t = double;
             using constraints_t = std::tuple<>;
             static constexpr inline auto column_name = "cash";
             static value_t get(example const& obj) { return obj.cash; }
-         }; 
-         struct karma {
+         };
+         struct karma
+         {
             using value_t = int;
             using constraints_t = std::tuple<>;
             static constexpr inline auto column_name = "karma";
-            static value_t get(example const& obj) { return obj.karma; }           
+            static value_t get(example const& obj) { return obj.karma; }
          };
       };
-      using metainfo = std::tuple<
-         columns::name,
-         columns::karma,
-         columns::pos_x,
-         columns::pos_y,
-         columns::cash>;
+      using metainfo = std::tuple<columns::name, columns::karma, columns::pos_x, columns::pos_y, columns::cash>;
    };
 } // namespace sec21::database
 
@@ -258,33 +255,20 @@ namespace sec21::database
 
 namespace v2
 {
-#if 1 
-   template<typename...Ts, typename Function, size_t... Is>
-   constexpr auto transform_impl(std::tuple<Ts...> const& inputs, Function function, std::index_sequence<Is...>)
+   template <typename... Ts, typename Callable>
+   constexpr auto transform(std::tuple<Ts...> const& inputs, Callable function)
    {
-      return std::tuple<std::result_of_t<Function(Ts)>...>{function(std::get<Is>(inputs))...};
+      return [&]<size_t... Is>(std::index_sequence<Is...>) noexcept(noexcept(std::is_nothrow_invocable_v<Callable, Ts...>))
+      {
+         return std::tuple<std::result_of_t<Callable(Ts)>...>{function(std::get<Is>(inputs))...};
+      }
+      (std::make_index_sequence<sizeof...(Ts)>{});
    }
 
-   template<typename... Ts, typename Function>
-   constexpr auto transform(std::tuple<Ts...> const& inputs, Function function)
-   {
-      return transform_impl(inputs, function, std::make_index_sequence<sizeof...(Ts)>{});
-   }
-#else
-   template <typename Tuple, typename Callable, size_t... Is>
-   [[nodiscard]] auto transform(Tuple const& inputs, Callable&& func, std::index_sequence<Is...> = {})
-   {
-      if (std::tuple_size<Tuple>::value == sizeof...(Is)) {
-         // return {std::get<Is>(t)...};
-         return std::tuple<std::result_of_t<Callable(std::tuple_element<Is>::type)>>{function(std::get<Is>(inputs))...};
-      }
-      return transform(inputs, std::forward<Callable>(func), std::make_index_sequence<std::tuple_size<Tuple>::value>{});
-   }
-#endif
    template <typename Table>
    auto column_names()
    {
-      constexpr auto names = transform(Table{}, [](auto v){ return decltype(v)::column_name; });
+      constexpr auto names = transform(Table{}, [](auto v) { return decltype(v)::column_name; });
       return fmt::format("{}", fmt::join(names, ","));
    }
 
@@ -293,17 +277,14 @@ namespace v2
    {
       using reflection_t = typename sec21::database::table<Row>::metainfo;
 
-      const auto values = transform(reflection_t{}, [obj = row](auto v)
-      { 
+      const auto values = transform(reflection_t{}, [obj = row](auto v) {
          if constexpr (std::is_convertible_v<typename decltype(v)::value_t, std::string>) {
-               return fmt::format("'{}'", decltype(v)::get(obj));
+            return fmt::format("'{}'", decltype(v)::get(obj));
          }
-         return decltype(v)::get(obj); 
+         return decltype(v)::get(obj);
       });
-      return fmt::format("INSERT INTO {} ({}) VALUES ({});",
-         sec21::database::table<Row>::name,
-         column_names<reflection_t>(),
-         fmt::join(values, ","));
+      return fmt::format("INSERT INTO {} ({}) VALUES ({});", sec21::database::table<Row>::name,
+                         column_names<reflection_t>(), fmt::join(values, ","));
    }
 
    template <typename Table>
@@ -311,27 +292,30 @@ namespace v2
    {
       using reflection_t = typename sec21::database::table<Table>::metainfo;
 
-      const auto types = transform(reflection_t{}, [](auto v)
-      { 
-         constexpr auto constrains = transform(typename decltype(v)::constraints_t{}, [](auto y){ 
-            return decltype(y)::value; 
-         });
+      const auto types = transform(reflection_t{}, [](auto v) {
+         constexpr auto constrains =
+            transform(typename decltype(v)::constraints_t{}, [](auto y) { return decltype(y)::value; });
 
-         return fmt::format("{} {} {}", 
-               decltype(v)::column_name, 
-               sec21::database::column_type<typename decltype(v)::value_t>::name,
-               fmt::join(constrains, " ")
-         );
+         return fmt::format("{} {} {}", decltype(v)::column_name,
+                            sec21::database::column_type<typename decltype(v)::value_t>::name,
+                            fmt::join(constrains, " "));
       });
       return fmt::format("CREATE TABLE {}({});", sec21::database::table<Table>::name, fmt::join(types, ","));
    }
-}
+
+   template <typename Table>
+   auto select()
+   {
+      using reflection_t = typename sec21::database::table<Table>::metainfo;
+      return fmt::format("SELECT {} FROM {}", column_names<reflection_t>(), sec21::database::table<Table>::name);
+   }
+} // namespace v2
 
 TEST_CASE("test example", "[sec21][database]")
 {
    using namespace sec21::database;
 
-   example obj{ "foo", 42, { 3.14, 1.23 }, 22500 };
+   example obj{"foo", 42, {3.14, 1.23}, 22500};
 
    using reflection_t = table<decltype(obj)>::metainfo;
 
@@ -344,11 +328,17 @@ TEST_CASE("test example", "[sec21][database]")
    SECTION("create table")
    {
       const auto result = v2::create_table<example>();
-      REQUIRE(result == "CREATE TABLE example(name TEXT SERIAL PRIMARY KEY,karma INT ,pos_x REAL ,pos_y REAL ,cash REAL );");
-   }   
+      REQUIRE(result ==
+              "CREATE TABLE example(name TEXT SERIAL PRIMARY KEY,karma INT ,pos_x REAL ,pos_y REAL ,cash REAL );");
+   }
    SECTION("insert values into table")
    {
       const auto result = v2::insert_into(obj);
-      REQUIRE(result == R"(INSERT INTO example (name,karma,pos_x,pos_y,cash) VALUES ('foo',42,3.14,1.23,22500.0);)");
-   }   
+      REQUIRE(result == R"(INSERT INTO example (name,karma,pos_x,pos_y,cash) VALUES ('foo',42,3.14,1.23,22500);)");
+   }
+   SECTION("select all members")
+   {
+      const auto result = v2::select<example>();
+      REQUIRE(result == "SELECT name,karma,pos_x,pos_y,cash FROM example");
+   }
 }
