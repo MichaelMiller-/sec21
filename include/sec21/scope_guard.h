@@ -16,7 +16,7 @@ namespace sec21
 #endif
    class scope_guard
    {
-      Callable func;
+      [[no_unique_address]] Callable func;
    public:
       scope_guard() = delete;
       scope_guard(scope_guard const&) = delete;
@@ -45,7 +45,7 @@ namespace sec21
 #endif
    class scope_guard_if_exception
    {
-      Callable func;
+      [[no_unique_address]] Callable func;
       uncaught_exception_detector detector;
    public:
       scope_guard_if_exception() = delete;
