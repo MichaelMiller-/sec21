@@ -50,7 +50,7 @@
                 "quantity": "0.004_sq_m"
             },
             "E": {
-                "quantity": "210000000.0_kPa"
+                "quantity": "21000000.0_kPa"
             },
             "name": 1
         },
@@ -59,7 +59,7 @@
                 "quantity": "0.004_sq_m"
             },
             "E": {
-                "quantity": "210000000.0_kPa"
+                "quantity": "21000000.0_kPa"
             },
             "name": 2
         },
@@ -68,7 +68,7 @@
                 "quantity": "0.004_sq_m"
             },
             "E": {
-                "quantity": "210000000.0_kPa"
+                "quantity": "21000000.0_kPa"
             },
             "name": 3
         },
@@ -77,7 +77,7 @@
                 "quantity": "0.004_sq_m"
             },
             "E": {
-                "quantity": "210000000.0_kPa"
+                "quantity": "21000000.0_kPa"
             },
             "name": 4
         },
@@ -86,7 +86,7 @@
                 "quantity": "0.004_sq_m"
             },
             "E": {
-                "quantity": "210000000.0_kPa"
+                "quantity": "21000000.0_kPa"
             },
             "name": 5
         },
@@ -95,7 +95,7 @@
                 "quantity": "0.004_sq_m"
             },
             "E": {
-                "quantity": "210000000.0_kPa"
+                "quantity": "21000000.0_kPa"
             },
             "name": 6
         }
