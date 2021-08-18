@@ -111,7 +111,7 @@ namespace expression_template
    class expression : base_expression
    {
       std::tuple<Operands const&...> args;
-      Callable func;
+      [[no_unique_address]] Callable func;
    public:
       constexpr expression(Callable f, Operands const&... ops) : args{ ops... }, func{ f } {}
 
