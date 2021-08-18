@@ -140,85 +140,12 @@ namespace sec21::structural_analysis
             boost::numeric::ublas::vector<typename System::precision_t, Allocator> F)
       {
          std::vector<bool> mask{};
-         support_mask(std::begin(sys.nodes), std::end(sys.nodes), std::back_inserter(mask));
+         support_mask(begin(sys.nodes), end(sys.nodes), std::back_inserter(mask));
 
          const auto lookup = impl::make_lookup(sys, row{});
          const auto num_nodes = std::distance(begin(sys.nodes), end(sys.nodes));
 
-         if (size(lookup) != size(mask))
-            throw std::runtime_error("solve: mismatch sizes");
-
-         if (K.size1() != F.size())
-            throw std::runtime_error("solve: K + F size mismatch");
-
-         std::decay_t<decltype(lookup)> supported_rows{};
-         std::decay_t<decltype(lookup)> not_supported_rows{};
-
-         partition_lookup(begin(lookup), end(lookup), begin(mask), end(mask), std::back_inserter(supported_rows),
-                          std::back_inserter(not_supported_rows));
-
-         const auto supported_cols = row_to_col(begin(supported_rows), end(supported_rows));
-
-         //! \todo use std::vector
-         const auto K_without_supports = numeric::drop(numeric::drop(K, supported_rows), supported_cols);
-         const auto K_strich = numeric::drop(numeric::drop(K, not_supported_rows), supported_cols);
-         const auto F_without_supports = numeric::drop(F, supported_rows);
-
-         // consider sanity checks:
-         // F.size1() == K_without_supports.size1() == K_without_supports.size2()
-         // F.size1() == K_strich.size2()
-         // expects(std::size(lookup) == n * dim);
-
-         using precision_t = typename System::precision_t;
-
-         const auto verschiebungen = Solver::displacement(K_without_supports, F_without_supports);
-
-         //! \todo fix Allocator template argument
-         boost::numeric::ublas::vector<precision_t> auflagerreaktionen(K_strich.size1());
-         boost::numeric::ublas::axpy_prod(K_strich, verschiebungen, auflagerreaktionen, false);
-
-         constexpr auto dim = System::dimension_v;
-
-         std::vector<precision_t> support_reactions(num_nodes * dim, 0.0); //! \todo not saved in result!
-         std::vector<precision_t> displacements(num_nodes * dim, 0.0);
-
-         zip([&support_reactions](
-                auto&& tuple) { support_reactions[static_cast<int>(std::get<row>(tuple))] = std::get<1>(tuple); },
-             std::begin(supported_rows), std::end(supported_rows), std::begin(auflagerreaktionen));
-         zip([&displacements](
-                auto&& tuple) { displacements[static_cast<int>(std::get<row>(tuple))] = std::get<1>(tuple); },
-             std::begin(not_supported_rows), std::end(not_supported_rows), std::begin(verschiebungen));
-
-         // -> extract to function
-         system_result<System> result{};
-
-         for (auto i = 0, j = 0; i < size(sys.nodes); ++i, j += dim) {
-            result.nodes.push_back({sys.nodes[i].id, displacements[j], displacements[j + 1]});
-         }
-
-         std::transform(
-            begin(sys.nodes), end(sys.nodes), std::inserter(result.node, std::end(result.node)),
-            [&result](auto&& node) { return std::make_pair(node.id, typename decltype(result)::node_result{}); });
-
-         auto it = std::begin(result.node);
-         for_each_chunk<dim>(std::begin(support_reactions), std::end(support_reactions),
-                             //! \todo is not working with msvc: [it = std::begin(result.node)](auto x, auto y) mutable
-                             [&it](auto x, auto y) {
-                                using value_t = typename decltype(it->second.support_reaction)::value_type;
-                                it->second.support_reaction = {value_t{x}, value_t{y}};
-                                it++;
-                             });
-
-         it = std::begin(result.node);
-         for_each_chunk<dim>(std::begin(displacements), std::end(displacements),
-                             //! \todo is not working with msvc: [it = std::begin(result.node)](auto x, auto y) mutable
-                             [&it](auto x, auto y) {
-                                using value_t = typename decltype(it->second.displacement)::value_type;
-                                it->second.displacement = {value_t{x}, value_t{y}};
-                                it++;
-                             });
-
-         return make_result(sys, displacements, support_reactions);
+         return solve<Solver>(sys, num_nodes, K, F, lookup, mask);
       }
 
    } // namespace impl
