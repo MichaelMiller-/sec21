@@ -1,12 +1,10 @@
 ﻿#include <catch.hpp>
-#include "approx_equal.h"
 
 #include <sec21/file_loader.h>
 #include <sec21/structural_analysis/node.h>
 #include <sec21/structural_analysis/member.h>
 #include <sec21/structural_analysis/space_truss.h>
 #include <sec21/structural_analysis/loadcase.h>
-#include <sec21/structural_analysis/system_result.h>
 #include <sec21/structural_analysis/solve.h>
 #include <sec21/structural_analysis/solver/backend/viennacl.h>
 
@@ -52,24 +50,6 @@ TEST_CASE("example system 5.0 load from json", "[sec21][structural_analysis][spa
 
       const auto result = success.value();
 
-      std::vector<double> flat_support_reaction{};
-      for (auto [k,v] : result.node) 
-      {
-         std::transform(
-            std::begin(v.support_reaction), 
-            std::end(v.support_reaction), 
-            std::back_inserter(flat_support_reaction),
-            [](auto&& e) { return e.value(); });
-      }
-
-
-      std::vector<double> copied_results{};
-      std::transform(
-         std::begin(result.members), 
-         std::end(result.members), 
-         std::back_inserter(copied_results), 
-         [](auto&& m) { return m.normal_force.value(); });
-
       // unit: newton [N]
       REQUIRE(std::get<0>(result.nodes[0].support_reaction).value() == Approx(-12'000).epsilon(kDivergence));
       REQUIRE(std::get<1>(result.nodes[0].support_reaction).value() == Approx(52'000).epsilon(kDivergence));
@@ -77,24 +57,32 @@ TEST_CASE("example system 5.0 load from json", "[sec21][structural_analysis][spa
       REQUIRE(std::get<1>(result.nodes[1].support_reaction).value() == Approx(52'000).epsilon(kDivergence));
 
       // // unit: millimeter [mm]
+      REQUIRE(std::get<0>(result.nodes[0].displacement).value() == Approx(0.0).epsilon(kDivergence));
+      REQUIRE(std::get<1>(result.nodes[0].displacement).value() == Approx(0.0).epsilon(kDivergence));
+      REQUIRE(std::get<0>(result.nodes[1].displacement).value() == Approx(0.0).epsilon(kDivergence));
+      REQUIRE(std::get<1>(result.nodes[1].displacement).value() == Approx(0.0).epsilon(kDivergence));
+      REQUIRE(std::get<0>(result.nodes[2].displacement).value() == Approx(-0.77).epsilon(kDivergence));
+      REQUIRE(std::get<1>(result.nodes[2].displacement).value() == Approx(-1.25).epsilon(kDivergence));
+      REQUIRE(std::get<0>(result.nodes[3].displacement).value() == Approx(-0.77).epsilon(kDivergence));
+      REQUIRE(std::get<1>(result.nodes[3].displacement).value() == Approx(-0.8).epsilon(kDivergence));
+      REQUIRE(std::get<0>(result.nodes[4].displacement).value() == Approx(0.77).epsilon(kDivergence));
+      REQUIRE(std::get<1>(result.nodes[4].displacement).value() == Approx(-0.8).epsilon(kDivergence));
+      REQUIRE(std::get<0>(result.nodes[5].displacement).value() == Approx(0.77).epsilon(kDivergence));
+      REQUIRE(std::get<1>(result.nodes[5].displacement).value() == Approx(-1.25).epsilon(kDivergence));
+      REQUIRE(std::get<0>(result.nodes[6].displacement).value() == Approx(-0.24).epsilon(kDivergence));
+      REQUIRE(std::get<1>(result.nodes[6].displacement).value() == Approx(-1.28).epsilon(kDivergence));
       REQUIRE(std::get<1>(result.nodes[7].displacement).value() == Approx(-1.83).epsilon(kDivergence));
 
       // unit: newton [N]
-      REQUIRE(copied_results[0] == Approx(-23'320).epsilon(kDivergence));
-      REQUIRE(copied_results[1] == Approx(-23'320).epsilon(kDivergence));
-      REQUIRE(copied_results[2] == Approx(-32'000));
-      REQUIRE(copied_results[3] == Approx(-32'000));
-      REQUIRE(copied_results[6] == Approx(16'970).epsilon(kDivergence));
-      REQUIRE(copied_results[7] == Approx(16'970).epsilon(kDivergence));
-      REQUIRE(copied_results[8] == Approx(-32'000));
-      REQUIRE(copied_results[9] == Approx(-32'000));
-      REQUIRE(copied_results[12] == Approx(12'000.0));
-      REQUIRE(copied_results[13] == Approx(12'000.0));
-
-      {
-         std::ofstream ofs{"output_example_5_result.json"};
-         nlohmann::json tmp = result;
-         ofs << std::setw(4) << tmp;
-      }         
+      REQUIRE(result.members[0].normal_force.value() == Approx(-23'320).epsilon(kDivergence));
+      REQUIRE(result.members[1].normal_force.value() == Approx(-23'320).epsilon(kDivergence));
+      REQUIRE(result.members[2].normal_force.value() == Approx(-32'000));
+      REQUIRE(result.members[3].normal_force.value() == Approx(-32'000));
+      REQUIRE(result.members[6].normal_force.value() == Approx(16'970).epsilon(kDivergence));
+      REQUIRE(result.members[7].normal_force.value() == Approx(16'970).epsilon(kDivergence));
+      REQUIRE(result.members[8].normal_force.value() == Approx(-32'000));
+      REQUIRE(result.members[9].normal_force.value() == Approx(-32'000));
+      REQUIRE(result.members[12].normal_force.value() == Approx(12'000.0));
+      REQUIRE(result.members[13].normal_force.value() == Approx(12'000.0));
    }
 }
