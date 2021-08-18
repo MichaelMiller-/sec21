@@ -1,4 +1,3 @@
-#define CATCH_CONFIG_MAIN
 #include <catch.hpp>
 
 #include <vector>
@@ -54,60 +53,3 @@ TEST_CASE("enumerate over map and get current value and index", "[enumerate]")
    }
 #endif
 }
-
-
-namespace sec21::v2
-{
-   namespace detail
-   {
-      template <std::size_t... Is, typename F, typename... Ts>
-      void enumerate_impl(std::index_sequence<Is...>, F&& f, Ts&&... ts)
-      {
-         (f(std::integral_constant<std::size_t, Is>{}, std::forward<Ts>(ts)), ...);
-      }
-   }
-
-   template <typename F, typename... Ts>
-   void enumerate(F&& f, Ts&&... ts)
-   {
-      v2::detail::enumerate_impl(std::index_sequence_for<Ts...>{}, std::forward<F>(f), std::forward<Ts>(ts)...);
-   }
-}
-namespace sec21::v3
-{
-   namespace detail
-   {
-      template <std::size_t... Is, typename F, typename... Ts>
-      void enumerate_impl(std::index_sequence<Is...>, F&& f, Ts&&... ts)
-      {
-         (f.template operator() < Is > (std::forward<Ts>(ts)), ...);
-      }
-   }
-
-   template <typename F, typename... Ts>
-   void enumerate(F&& f, Ts&&... ts)
-   {
-      v3::detail::enumerate_impl(std::index_sequence_for<Ts...>{}, std::forward<F>(f), std::forward<Ts>(ts)...);
-   }
-}
-
-template <typename... Ts>
-void print_with_index(Ts&&... ts)
-{
-   sec21::v3::enumerate([]<auto i>(auto x) {
-      std::cout << i << ": " << x << std::endl;
-   }, ts...);
-}
-
-namespace sec21::v4
-{
-   template <typename F, typename... Ts>
-   void enumerate(F&& f, Ts&&... ts)
-   {
-      [&] <auto... Is>(std::index_sequence<Is...>) {
-         (f.template operator() < Is > (std::forward<Ts>(ts)), ...);
-      }(std::index_sequence_for<Ts...>{});
-   }
-}
-
-//! \todo: write benchmarks
