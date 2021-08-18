@@ -15,8 +15,11 @@ namespace sec21::structural_analysis
       using e_modul_t = units::quantity<units::kilopascal, precision_t>;
       using area_t = units::quantity<units::square_meter, precision_t>;
 
+      descriptor_t id{ descriptor_traits<descriptor_t>::invalid() };
+
+      //! \todo really needed in
       //! \brief unique name
-      descriptor_t name{ descriptor_traits<descriptor_t>::invalid() };
+      // std::string name{ descriptor_traits<descriptor_t>::invalid() };
 
       //! \todo querschnittswerte -> new class: "cross_section"; ref to cross_section; 
       //! \brief
@@ -33,7 +36,7 @@ namespace sec21::structural_analysis
    template <typename Descriptor, typename Precision>
    void to_json(nlohmann::json& j, member<Descriptor, Precision> const& obj) {
       j = nlohmann::json{
-         {"name", obj.name},
+         {"name", obj.id},
          {"E", obj.E},
          {"A", obj.A}
       };
@@ -42,7 +45,7 @@ namespace sec21::structural_analysis
    template <typename Descriptor, typename Precision>
    void from_json(nlohmann::json const& j, member<Descriptor, Precision>& obj) 
    {
-      j.at("name").get_to(obj.name);
+      j.at("name").get_to(obj.id);
       j.at("E").get_to(obj.E);
       j.at("A").get_to(obj.A);
    }
