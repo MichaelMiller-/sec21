@@ -2,17 +2,16 @@
 
 #include <nlohmann/json.hpp>
 
-#include <fstream>
 #include <filesystem>
+#include <fstream>
 
 namespace sec21
 {
    template <typename T>
    auto load_from_json(std::filesystem::path const& filename) -> T
    {
-      if (exists(filename))
-      {
-         std::ifstream ifs{ filename };
+      if (exists(filename)) {
+         std::ifstream ifs{filename};
          nlohmann::json j{};
          ifs >> j;
          return j.get<T>();
@@ -20,4 +19,4 @@ namespace sec21
       //! \todo exception handling
       return {};
    }
-} // sec21
+} // namespace sec21
