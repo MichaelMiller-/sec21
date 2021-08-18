@@ -6,7 +6,6 @@
 #include <sec21/structural_analysis/space_truss.h>
 #include <sec21/structural_analysis/loadcase.h>
 #include <sec21/structural_analysis/solve.h>
-#include <sec21/structural_analysis/solver/backend/viennacl.h>
 #include <sec21/structural_analysis/solver/backend/eigen.h>
 
 #include <array>
@@ -42,6 +41,7 @@ TEST_CASE("example system 5.0 load from json", "[sec21][structural_analysis][spa
       auto EA = it->E * it->A;
       REQUIRE(EA.value() == Approx(200'000));
    }
+#if 0
    SECTION("solve")
    {
       auto load = sec21::load_from_json<loadcase<decltype(sys)>>("example_5_load.json");
@@ -50,13 +50,6 @@ TEST_CASE("example system 5.0 load from json", "[sec21][structural_analysis][spa
       REQUIRE(success.has_value() == true);
 
       const auto result = success.value();
-
-      auto i = 0;
-      for (auto e : result.nodes)
-      {
-         std::cout << i << " x: " << std::get<0>(e.support_reaction).value()<< " y: " << std::get<1>(e.support_reaction).value() << std::endl;
-         ++i;
-      }
 
       // unit: newton [N]
       REQUIRE(std::get<0>(result.nodes[0].support_reaction).value() == Approx(-12'000).epsilon(kDivergence));
@@ -93,6 +86,7 @@ TEST_CASE("example system 5.0 load from json", "[sec21][structural_analysis][spa
       REQUIRE(result.members[12].normal_force.value() == Approx(12'000.0));
       REQUIRE(result.members[13].normal_force.value() == Approx(12'000.0));
    }
+#endif
    SECTION("solve with eigen backend")
    {
       auto load = sec21::load_from_json<loadcase<decltype(sys)>>("example_5_load.json");
@@ -101,13 +95,6 @@ TEST_CASE("example system 5.0 load from json", "[sec21][structural_analysis][spa
       REQUIRE(success.has_value() == true);
 
       const auto result = success.value();
-
-      auto i = 0;
-      for (auto e : result.nodes)
-      {
-         std::cout << i << " x: " << std::get<0>(e.support_reaction).value()<< " y: " << std::get<1>(e.support_reaction).value() << std::endl;
-         ++i;
-      }
 
       // unit: newton [N]
       REQUIRE(std::get<0>(result.nodes[0].support_reaction).value() == Approx(-12'000).epsilon(kDivergence));
