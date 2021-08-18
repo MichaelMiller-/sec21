@@ -34,12 +34,12 @@ namespace sec21::structural_analysis::impl
       auto it = std::find_if(
          std::begin(sys.members), 
          std::end(sys.members), 
-         [&id](auto&& m) { return m.name == id; });
+         [&id](auto&& m) { return m.id == id; });
 
       if (it == std::end(sys.members))
          throw std::invalid_argument("invalid member descriptor"); //fmt::format("invalid member descriptor: {}"), id);
 
-      const auto kv = EA_over_l(it->E, it->A, length(sys, it->name)).value();
+      const auto kv = EA_over_l(it->E, it->A, length(sys, it->id)).value();
 
       using namespace boost::math;
       //! \note this approch (rad / pi) get better results -> so the minimal overhead is tolerable

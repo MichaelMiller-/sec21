@@ -19,7 +19,7 @@ namespace sec21::structural_analysis::impl
 
       //! \todo parallelize 
       for (auto const& member : sys.members)
-         result += stiffness_matrix<Allocator>(sys, member.name);
+         result += stiffness_matrix<Allocator>(sys, member.id);
 
       return result;
    }

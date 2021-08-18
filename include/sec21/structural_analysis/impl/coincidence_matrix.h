@@ -3,43 +3,47 @@
 #include <sec21/numeric/make_matrix.h>
 #include <sec21/structural_analysis/concepts.h>
 
-#include <memory>
 #include <algorithm>
+#include <memory>
 
 #ifdef __cpp_lib_format
-   #include <format>
+#include <format>
 #endif
 
 namespace sec21::structural_analysis::impl
 {
 #ifdef __cpp_concepts
    template <typename Allocator, SpaceTruss2D System>
-#else   
+#else
    template <typename Allocator, typename System>
 #endif
    [[nodiscard]] auto coincidence_matrix(System const& sys, typename System::member_descriptor_t id)
    {
       static_assert(System::node_t::dimension_v == 2, "Only works with 2D system");
 
+      // sanitiy check
+      if (size(sys.members) != size(sys.coincidence_table))
+         throw std::runtime_error("coincidence_matrix: size of members mismatches with size of coincidence table");
+
       constexpr auto dim = System::node_t::dimension_v;
 
-      auto find_node = [&sys](auto const& id)
-      {
-         const auto it = std::find_if(begin(sys.nodes), end(sys.nodes), [&id](auto&& e) { return id == e.name; });
+      auto find_node = [&sys](auto const& id) {
+         const auto it = std::find_if(begin(sys.nodes), end(sys.nodes), [&id](auto&& e) { return id == e.id; });
          if (it == end(sys.nodes))
 #ifdef __cpp_lib_format
             throw std::runtime_error(std::format("coincidence_matrix: could not find node id {}", id));
-#else            
+#else
             throw std::runtime_error("coincidence_matrix: could not find node");
 #endif
          return it;
       };
 
-      const auto n = 4; // anzahl der verschiebungen 
+      const auto n = 4; // anzahl der verschiebungen
       const auto m = std::size(sys.nodes) * dim;
-      const auto[s, e] = sys.coincidence_table.at(id);
+      //! \todo can throw
+      const auto [s, e] = sys.coincidence_table.at(id);
       const auto from = find_node(s);
-      const auto to =  find_node(e);
+      const auto to = find_node(e);
       const auto u = std::distance(std::begin(sys.nodes), from);
       const auto v = std::distance(std::begin(sys.nodes), to);
 
@@ -50,4 +54,4 @@ namespace sec21::structural_analysis::impl
       result(3, (v * dim) + 1) = 1;
       return result;
    }
-}
+} // namespace sec21::structural_analysis::impl
