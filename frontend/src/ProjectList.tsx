@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Spinner, Table } from "react-bootstrap";
+import React, { useEffect, useState } from 'react';
+import { Dropdown, DropdownButton, Spinner, Table } from "react-bootstrap";
 import { useHistory } from 'react-router-dom';
 import { DbProject } from './DatabaseInterface';
 import axios from 'axios';
@@ -37,6 +37,13 @@ function ProjectListItem(props: ProjectListItemProps) {
          <td>TODO</td>
          <td><CopyButton onClick={onCopy} disabled={true} /></td>
          <td><RemoveButton onClick={onDelete} disabled={false} /></td>
+         <td>
+            {/* TODO: style */}
+            <DropdownButton disabled={true} id="dropdown-basic-button" title="...">
+               {/* TODO: icon, implement */}
+               <Dropdown.Item href="#/action-1">Export to SAF</Dropdown.Item>
+            </DropdownButton>
+         </td>
       </tr>
    )
 }

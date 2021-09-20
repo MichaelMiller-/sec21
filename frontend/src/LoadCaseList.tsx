@@ -46,7 +46,10 @@ const LoadCaseList = (props: LoadCaseListProps) => {
          .finally(() => setLoading(false))
    }
 
-   useEffect(() => { getData() }, []);
+   useEffect(() => {
+      getData()
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, []);
 
    if (loading) {
       return (<><Spinner animation="border" role="status"></Spinner></>);

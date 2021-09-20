@@ -44,7 +44,10 @@ const CrossSectionDialog = (props: CrossSectionDialogProps) => {
          .finally(() => setLoading(false))
    }
 
-   useEffect(() => { getMaterials() }, []);
+   useEffect(() => {
+      getMaterials()
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, []);
 
    return (
       <Modal {...props} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
@@ -136,7 +139,10 @@ const CrossSectionList = (props: CrossSectionListProps) => {
          .finally(() => setLoading(false))
    }
 
-   useEffect(() => { getData() }, []);
+   useEffect(() => {
+      getData()
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, []);
 
    if (loading) {
       return (<><Spinner animation="border" role="status"></Spinner></>);

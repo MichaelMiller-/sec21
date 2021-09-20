@@ -22,7 +22,10 @@ const Project = (props: ProjectListProps) => {
    });
    const [loading, setProjectLoading] = useState(true)
 
-   useEffect(() => { getProject() }, []);
+   useEffect(() => {
+      getProject()
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, []);
 
    const getProject = async () => {
       await axios.get(process.env.REACT_APP_BACKEND + '/project/' + props.projectId)
