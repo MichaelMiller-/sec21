@@ -20,8 +20,7 @@ jobs:
 
     - name: Sync
       run: |
+        sudo apt install sshpass
         echo "${{secrets.DEPLOY_KEY}}" > deploy_key
-        chmod 600 ./deploy_key
-        rsync -chav --delete \
-          -e 'ssh -i ./deploy_key -o StrictHostKeyChecking=no' \
-          ./build/ root@efeeab4.online-server.cloud:/var/www/frontend
+        chmod 400 ./deploy_key
+        sshpass -p $(cat ./deploy_key) rsync -chav --delete -e ssh ./build/ root@efeeab4.online-server.cloud:/var/www/frontend
