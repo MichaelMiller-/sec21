@@ -1,5 +1,6 @@
 /node_modules
 .env
 package-lock.json
-testdb
 /logs/
+/ormconfig.json
+.idea
