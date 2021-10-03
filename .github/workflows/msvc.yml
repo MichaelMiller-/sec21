@@ -28,7 +28,6 @@ jobs:
         git clone https://github.com/Microsoft/vcpkg.git 
         cd vcpkg
         bootstrap-vcpkg.bat
-        vcpkg install boost
         vcpkg install boost-core
         vcpkg install boost-function-types 
         vcpkg install boost-geometry
