@@ -36,16 +36,19 @@ export class PointSupport {
    @Generated("uuid")
    uuid: string;
 
+   @Column()
+   name: string;
+
    @OneToOne(type => StructuralPoint)
    @JoinColumn()
    referencePoint: StructuralPoint;
 
-   // @Column({
-   //    type: "enum",
-   //    enum: SupportType,
-   //    default: SupportType.FIXED
-   // })
-   // supportType: SupportType;
+   @Column({
+      type: "enum",
+      enum: SupportType,
+      default: SupportType.FIXED
+   })
+   type: SupportType;
 
    @Column({
       type: "enum",

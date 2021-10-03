@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import { createConnection, ConnectionOptions } from "typeorm";
+import { createConnection } from "typeorm";
 import * as express from "express";
 import { Request, Response, NextFunction } from "express";
 
@@ -7,43 +7,17 @@ const bodyParser = require('body-parser')
 require('dotenv').config();
 
 // backend
-//
 import { appRoutes } from "./routes";
-// entities
-import { StructuralPoint } from "./entity/StructuralPoint";
-import { Project } from "./entity/Project";
-import { Material } from "./entity/Material";
-import { CrossSection } from "./entity/CrossSection";
-import { PointAction } from "./entity/PointAction";
-import { LoadCase } from "./entity/LoadCase";
-import { LoadGroup } from "./entity/LoadGroup";
-import { CurveMember } from "./entity/CurveMember";
-import { PointSupport } from "./entity/PointSupport";
-import { Displacement } from "./entity/Displacement";
-import { CurveMemberResult } from "./entity/CurveMemberResult";
-
 // logging
 import logger from "./logging/Logger"
 import morganConfig from './logging/MorganConfig'
 
 const port = Number(process.env.APP_PORT) || 3003;
 
-const databaseOptions: ConnectionOptions = {
-    type: "postgres",
-    host: process.env.DATABASE_HOST!,
-    port: Number(process.env.DATABASE_PORT),
-    username: process.env.DATABASE_USERNAME!,
-    password: process.env.DATABASE_PASSWORD!,
-    database: process.env.DATABASE_NAME!,
-    logging: true,
-    synchronize: true,
-    entities: [Project, StructuralPoint, Material, CrossSection, LoadGroup, LoadCase, PointAction, CurveMember, PointSupport, Displacement, CurveMemberResult],
-};
-
-createConnection(databaseOptions).then(async connection => {
+createConnection().then(async () => {
     // create express app
     const app = express();
-
+    // add logger middleware
     app.use(bodyParser.json());
     app.use(morganConfig);
 

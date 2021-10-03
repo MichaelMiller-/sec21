@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
+import {Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn} from "typeorm";
 import { CrossSection } from "./CrossSection";
 import { CurveMember } from "./CurveMember";
 import { LoadCase } from "./LoadCase";
@@ -17,11 +17,11 @@ export class Project {
     @Column()
     title: string;
 
-    // @Column()
-    // created: Date; timestamp
+    @CreateDateColumn()
+    createdAt: Date;
 
-    // @Column()
-    // modified: Date;
+    @Column()
+    modifiedAt: Date; // modified by database trigger
 
     @OneToMany(type => Material, material => material.project)
     materials: Material[];
