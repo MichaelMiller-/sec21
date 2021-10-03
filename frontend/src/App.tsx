@@ -8,7 +8,7 @@ import Structure, { RouterComponentStructureProps } from './Structure';
 
 const App = () => {
    return (
-      <Container className="p-3">
+      <Container fluid>
          <BrowserRouter>
             <Switch>
                <Route exact path="/404">not found</Route>
