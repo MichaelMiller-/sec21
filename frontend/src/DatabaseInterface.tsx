@@ -1,9 +1,11 @@
-// todo: generate from backend ORM entities
+// todo: generate from backend TypeORM entities
 
 export interface DbProject {
    id: number;
    name: string;
    title: string;
+   createdAt: Date;
+   modifiedAt: Date;
 }
 
 export interface DbStructuralPoint {
@@ -26,6 +28,7 @@ export interface DbCrossSection {
    id: number;
    name: string;
    uuid: string;
+//   material: DbMaterial;
    area: number;
 }
 
