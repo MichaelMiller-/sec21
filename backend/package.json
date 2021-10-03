@@ -39,6 +39,11 @@
     "dev": "nodemon src/index.ts",
     "test": "jest",
     "coverage": "jest --coverage",
-    "build": "webpack --mode production"
+    "build": "webpack --mode production",
+    "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js",
+    "migration": "npm run typeorm migration:run",
+    "migration:generate": "npm run typeorm migration:generate -- -n",
+    "migration:touch": "npm run typeorm migration:create -- -n",
+    "migration:revert": "npm run typeorm migration:revert"
   }
 }
