@@ -2,9 +2,8 @@ name: Test Frontend
 
 on:
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+    paths:
+      - 'frontend/**'
 
 jobs:
   build:
