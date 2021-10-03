@@ -18,6 +18,13 @@ export async function addProject(request: Request, response: Response) {
         return;
     }
 
+    if (prj.title.length === 0) {
+        result.success = false;
+        result.message = "'title' cannot be empty"
+        response.send(result);
+        return;
+    }
+
     getManager().getRepository(Project)
         .save(prj)
         .then(() => {
