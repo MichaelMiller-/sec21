@@ -111,6 +111,7 @@ const CrossSectionListItem = (props: DbCrossSection) => {
       }
       window.location.reload();
    }
+//         <td>{props.material.name}</td>
    return (
       <tr>
          <td><EditButton onClick={onEdit} disabled={true}></EditButton></td>
@@ -148,10 +149,12 @@ const CrossSectionList = (props: CrossSectionListProps) => {
       return (<><Spinner animation="border" role="status"></Spinner></>);
    }
 
+   console.log("data: ", data)
+
    return (
-      <Container>
+      <Container fluid>
          <Row>
-            <h4>Crosssections</h4>
+            <h4>Cross Sections</h4>
             <NewButton onClick={() => setShowNewDialog(true)} disabled={false} />
          </Row>
          {data.length === 0 && <Alert variant='danger'>No cross section defined.</Alert>}
@@ -171,6 +174,7 @@ const CrossSectionList = (props: CrossSectionListProps) => {
                      id={e.id}
                      name={e.name}
                      uuid={e.uuid}
+                     // material={e.material}
                      area={e.area}
                   />))}
             </tbody>
