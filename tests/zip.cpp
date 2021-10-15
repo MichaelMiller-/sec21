@@ -1,8 +1,8 @@
-#define CATCH_CONFIG_MAIN
 #include <catch.hpp>
 
 #include <sec21/zip.h>
 
+#include <map>
 #include <vector>
 
 TEST_CASE("zip two containers to a map", "[sec21][core]")
@@ -30,7 +30,7 @@ TEST_CASE("zip two containers to a map", "[sec21][core]")
    REQUIRE(std::equal(std::begin(result), std::end(result), std::begin(expected)));
 }
 
-TEST_CASE("zip three sequences to one", "[sec21][core]")
+TEST_CASE("zip three sequences into one", "[sec21][core]")
 {
    const std::vector<int> input1{ 1, 4, 7 };
    const std::vector<int> input2{ 2, 5, 8 };
