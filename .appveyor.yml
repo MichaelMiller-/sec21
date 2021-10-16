@@ -28,6 +28,7 @@ install:
   - vcpkg install assimp:x64-windows
   - vcpkg install freetype:x64-windows
   - vcpkg install eigen3:x64-windows
+  - vcpkg install cpprestsdk:x64-windows
   - cd c:\tools\vcpkg
   - vcpkg integrate install
 
