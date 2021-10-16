@@ -1,18 +1,59 @@
+
 # sec21
 [![GCC](https://github.com/MichaelMiller-/sec21/actions/workflows/gcc.yml/badge.svg)](https://github.com/MichaelMiller-/sec21/actions/workflows/gcc.yml) [![Clang](https://github.com/MichaelMiller-/sec21/actions/workflows/clang.yml/badge.svg)](https://github.com/MichaelMiller-/sec21/actions/workflows/clang.yml) [![MSVC](https://github.com/MichaelMiller-/sec21/actions/workflows/msvc.yml/badge.svg)](https://github.com/MichaelMiller-/sec21/actions/workflows/msvc.yml)
 
 **sec21** is a collection of useful functions and classes.
-- [Units](#Units)
-- [Eventsystem](#Eventsystem)
-- [SQL Database Wrapper](include/sec21/database/README.md)
-- [strong_type](#strong_type)
 
+- [all_of / any_of ](#allanyof)
+- [scope_guard ](#scopeguard)
+- [Units ](#units)
+- [SQL Database Wrapper ](#database)
+- [arity ](#arity)
+- [Eventsystem ](#events)
+- [strong_type ](#strongtype)
 
-Examples 
+Examples
 - [Viewer](viewer/README.md)
 
----------------------------------------
-## Units
+
+--------------
+## all_of / any_of <span id="allanyof"></span>
+
+[all_of.h](include/sec21/all_of.h)
+[any_of.h](include/sec21/any_of.h)
+
+Zero overhead syntax helper which also works with lambdas.
+
+### Example
+```c++
+int x{10};
+int y{50};
+int z{99};
+
+if (all_of{x, y, z} < 100) {
+   // do something
+}
+
+auto lambda1 = [](auto e){ return e < 100; };
+auto lambda2 = [](auto e){ return e > 5; };
+auto lambda3 = [](auto e){ return e > 10; };
+
+auto func = all_of{lambda1, lambda2, lambda3};
+
+if (func(16)) {
+   // do something
+}
+```
+--------------
+## scope_guard <span id="scopeguard"></span>
+
+[Header](include/sec21/scope_guard.h)
+
+General-purpose scope guard intended to call its exit function when a scope is exited. 
+
+--------------
+## Units <span id="units"></span>
+
 Is a modern, lightweight library for [dimensional analysis](https://en.wikipedia.org/wiki/Dimensional_analysis). 
 Inspired by [Boost](https://www.boost.org)-Units and Boost-MPL. 
 In order to be able to use their full range of functions, only one include is required. 
@@ -40,10 +81,80 @@ struct kilopascal : derived_unit<kilopascal, pressure, std::kilo> {};
 ### Dependencies
 - [Boost.Mp11](https://www.boost.org/doc/libs/1_74_0/libs/mp11/doc/html/mp11.html)
 - [nlohmann/json](https://github.com/nlohmann/json)
+--------------
+## SQL Database Wrapper <span id="database"></span>
 
+Is a simple database wrapper that allows, via a reflection mechanism, to interpret data structures as SQL tables.  
+```cpp
+struct user
+{
+   std::string name{};
+   std::string password{};
+   int karma{};
+   double cash{}; 
+};
+```
+The original data structure is not changed. Instead, the table reflection is specified by another class. Thanks to the template specialization of the ```database::table``` class, all columns of the table are made known.
+```cpp
+template <>
+struct table<user>
+{
+   static constexpr inline auto name = "user";
 
----------------------------------------
-## Eventsystem
+   struct columns
+   {
+      using name = column<"name", user, std::string, &user::name, primary_key, not_null>;
+      using password = column<"password", user, std::string, &user::password, not_null>;
+      using karma = column<"karma", user, int, &user::karma>;
+      using cash = column<"cash", user, double, &user::cash>;
+   };
+
+   using metainfo = std::tuple<
+      columns::name,
+      columns::password,
+      columns::karma,
+      columns::cash>;
+};
+```
+
+This procedure enables type-safe SQL statements to be set up and used. The following code shows, for example, the insertion of C++ objects into the database table specified above.
+```cpp
+user obj{.name = "John Doe", .password = "hidden", .karma = 42, .cash = 3.14};
+const auto result = insert_into(obj);
+
+REQUIRE(result == R"(INSERT INTO user (name,password,karma,cash) VALUES ('John Doe','hidden',42,3.14);)");
+```
+
+### TODO
+### Dependencies
+- [{fmt}](https://github.com/fmtlib/fmt)
+
+--------------
+## arity <span id="arity"></span>
+
+[Header](include/sec21/arity.h)
+
+Count the number of argumentes of any given callable, including generic lambdas and generic function objects.
+
+### Example
+```c++
+// plan function
+void func(int, int);
+static_assert(arity(func) == 2);
+
+// function object
+struct binary_functor {
+   template <typename T, typename U>
+   void operator()(T, U) {}
+};
+static_assert(arity(binary_functor{}) == 2);
+
+// generic lambda
+const auto l3 = [](auto, auto, auto) {};
+static_assert(arity(l3) == 3);
+```
+--------------
+## Eventsystem <span id="events"></span>
 
 The [input_manager](https://github.com/MichaelMiller-/sec21/blob/master/include/sec21/event/input_manager.h) represents an abstraction layer to system events that are triggered by the hardware (keyboard, mouse, ...). This abstraction allows input events to be simulated using simple input data (JSON files). Making the eventsystem and other systems built on it such as a commmand-queue filled by hardware events very easy to test.
 
@@ -64,9 +175,11 @@ The backend should also be able to convert the events provided by the eventsyste
 ### Dependencies
 - [nlohmann/json](https://github.com/nlohmann/json)
 
+--------------
+## strong_type <span id="strongtype"></span>
 
----------------------------------------
-## strong_type
+[Header](include/sec21/strong_type.h)
+
 The static typing of the programming language C ++ allows you to design types that exactly meet the specified requirements. Due to the [policy-based design](https://en.wikipedia.org/wiki/Modern_C%2B%2B_Design#Policy-based_design) of 'strong_type' it is very easy to design new types. For example, a counter-like type should be designed which can only be incremented. Trying to decrement an object of this type will result in a compiler error. 
 ```c++
 using counter_t = strong_type<int, struct counter_tag, policy::increment>;
@@ -135,3 +248,4 @@ alhpabet_t obj{ "Z" };
 ++obj;
 REQUIRE(obj == "A1");
 ```
+
