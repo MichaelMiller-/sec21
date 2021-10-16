@@ -1,7 +1,9 @@
 #pragma once
 
+#define message(ignore)
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#undef message
 
 namespace sec21::viewer
 {
@@ -14,18 +16,18 @@ namespace sec21::viewer
       static constexpr auto kSensitivity = 0.1f;
       static constexpr auto kZoom = 45.0f;
 
-      glm::vec3 position{ 0.0f, 0.0f, 0.0f };
-      glm::vec3 front{ 0.0f, 0.0f, -1.0f };
-      glm::vec3 up{ 0.0f, 1.0f, 0.0f };
-      glm::vec3 right{ 1.0f, 0.0f, 0.0f };
-      glm::vec3 world_up{ 0.0f, 1.0f, 0.0f };
+      glm::vec3 position{0.0f, 0.0f, 0.0f};
+      glm::vec3 front{0.0f, 0.0f, -1.0f};
+      glm::vec3 up{0.0f, 1.0f, 0.0f};
+      glm::vec3 right{1.0f, 0.0f, 0.0f};
+      glm::vec3 world_up{0.0f, 1.0f, 0.0f};
       // Euler Angles
-      float yaw{ kYaw };
-      float pitch { kPitch };
+      float yaw{kYaw};
+      float pitch{kPitch};
       // camera options
-      float movement_speed{ kZoom };
-      float mouse_sensitivity{ kSensitivity };
-      float zoom{ kZoom };
+      float movement_speed{kSpeed};
+      float mouse_sensitivity{kSensitivity};
+      float zoom{kZoom};
    };
 
    //! \brief returns the view matrix calculated using Euler Angles and the LookAt Matrix
@@ -39,45 +41,33 @@ namespace sec21::viewer
    }
 } // namespace sec21::viewer
 
-
-
 #include <nlohmann/json.hpp>
 
 namespace glm
 {
-   void to_json(nlohmann::json &j, vec3 const& value)
+   void to_json(nlohmann::json& j, vec3 const& value)
    {
-      j = nlohmann::json{
-         {"x", value.x},
-         {"y", value.y},
-         {"z", value.z}};
+      j = nlohmann::json{{"x", value.x}, {"y", value.y}, {"z", value.z}};
    }
-   void from_json(nlohmann::json const &j, vec3 &value)
+   void from_json(nlohmann::json const& j, vec3& value)
    {
       j.at("x").get_to(value.x);
       j.at("y").get_to(value.y);
       j.at("z").get_to(value.z);
    }
-}
+} // namespace glm
 
 namespace sec21::viewer
 {
-   void to_json(nlohmann::json &j, camera const& value)
+   void to_json(nlohmann::json& j, camera const& value)
    {
       j = nlohmann::json{
-         {"position", value.position},
-         {"front", value.front},
-         {"up", value.up},
-         {"right", value.right},
-         {"world_up", value.world_up},
-         {"yaw", value.yaw},
-         {"pitch", value.pitch},
-         {"speed", value.movement_speed},
-         {"mouse_sensitivity", value.mouse_sensitivity},
-         {"zoom", value.zoom}
-      };
+         {"position", value.position}, {"front", value.front},          {"up", value.up},
+         {"right", value.right},       {"world_up", value.world_up},    {"yaw", value.yaw},
+         {"pitch", value.pitch},       {"speed", value.movement_speed}, {"mouse_sensitivity", value.mouse_sensitivity},
+         {"zoom", value.zoom}};
    }
-   void from_json(nlohmann::json const &j, camera &value)
+   void from_json(nlohmann::json const& j, camera& value)
    {
       j.at("position").get_to(value.position);
       j.at("front").get_to(value.front);
@@ -90,4 +80,4 @@ namespace sec21::viewer
       j.at("mouse_sensitivity").get_to(value.mouse_sensitivity);
       j.at("zoom").get_to(value.zoom);
    }
-}
+} // namespace sec21::viewer

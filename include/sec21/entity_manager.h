@@ -43,7 +43,7 @@ namespace sec21
    {
       entity* owner{ nullptr };
 
-      virtual ~component() { }
+      virtual ~component() = default;
 
       virtual void init() { }
       virtual void update([[maybe_unused]] float elapsed_time) { }
@@ -81,7 +81,7 @@ namespace sec21
       entity() = default;
 
       entity(entity const&) = delete;
-      auto& operator = (entity const&) = delete;
+      entity& operator = (entity const&) = delete;
 
       template <typename T>
       void update(T elapsed_time)
@@ -97,7 +97,8 @@ namespace sec21
       }
 
       void destroy() noexcept { alive = false; }
-      bool is_alive() const noexcept { return alive; }
+
+      [[nodiscard]] bool is_alive() const noexcept { return alive; }
 
       template <typename T>
       [[nodiscard]] inline bool has_component() const noexcept
@@ -150,23 +151,25 @@ namespace sec21
 
    public:
       entity_manager() = default;
+      // rule of 5
       ~entity_manager() { clear(); }
 
       entity_manager(entity_manager const&) = delete;
-      auto& operator = (entity_manager const&) = delete;
+      entity_manager& operator = (entity_manager const&) = delete;
+
+      //! \todo move ctor and move assignment
 
       template <typename T>
       void update(T elapsed_time)
       {
-         const auto is_alive = [](auto const& e) { return !e->is_alive(); };
+         const auto is_alive = [](auto&& e) { return !e->is_alive(); };
          // remove all "dead" entities
 #ifdef __cpp_lib_erase_if
-         std::erase_if(std::begin(entities), std::end(entities), is_alive);
+         std::erase_if(entities, is_alive);
 #else
          entities.erase(
-            std::remove_if(std::begin(entities), std::end(entities), is_alive),
-            std::end(entities));
-
+            std::remove_if(begin(entities), end(entities), is_alive),
+            end(entities));
 #endif
          //! \todo: std::for_each(parallel, std::begin(), std::end(), );
          for (auto& e : entities)
@@ -179,10 +182,10 @@ namespace sec21
       }
 
       template <typename Function>
-      void apply(Function func) const
+      void apply(Function&& func) const
       {
          for (const auto& e : entities)
-            std::invoke(func, e);
+            std::invoke(std::forward<Function>(func), e);
       }
 
 #if 0
