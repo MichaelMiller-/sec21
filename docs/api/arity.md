@@ -2,7 +2,7 @@
 
 [Header](include/sec21/arity.h)
 
-Count the number of argumentes of any given callable, including generic lambdas and generic function objects.
+Count the number of arguments of any given callable, including generic lambdas and generic function objects.
 
 ### Example
 ```c++
