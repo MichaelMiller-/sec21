@@ -65,5 +65,16 @@ namespace sec21
    } // namespace detail
 
    template <typename T>
-   using underlying_type = decltype(detail::underlying_type(std::declval<std::decay_t<T>>()));
+#ifdef __cpp_concepts
+   requires StrongType<T>
+#endif
+   using underlying_t = decltype(detail::underlying_type(std::declval<std::decay_t<T>>()));
+
+   // compile-time checks
+   static_assert(is_strong_type_v<int> == false);
+   static_assert(is_strong_type_v<std::string> == false);
+   static_assert(is_strong_type_v<strong_type<int, struct tag>> == true);
+   static_assert(std::is_same_v<underlying_t<strong_type<int, struct tag>>, int> == true);
+   static_assert(std::is_same_v<underlying_t<strong_type<float, struct tag>>, float> == true);
+   static_assert(std::is_same_v<underlying_t<strong_type<int, struct tag>>, float> == false);
 }
