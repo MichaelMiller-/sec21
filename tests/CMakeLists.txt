@@ -25,7 +25,7 @@ function(test filename)
 
    target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
    ## TODO: find a generic solution
-   target_link_libraries(${PROJECT_NAME} PRIVATE "-fcoroutines")
+   ## target_link_libraries(${PROJECT_NAME} PRIVATE "-fcoroutines")
 
    target_link_libraries(${PROJECT_NAME} PRIVATE Boost::boost)
    target_link_libraries(${PROJECT_NAME} PRIVATE OpenMP::OpenMP_CXX)
