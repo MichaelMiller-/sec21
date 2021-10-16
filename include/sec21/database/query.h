@@ -2,13 +2,14 @@
 
 #include <sec21/database/column.h>
 #include <sec21/database/column_type.h>
+#include <sec21/database/table.h>
 
 #include <fmt/format.h>
 
+#include <iomanip>
 #include <sstream>
 #include <string_view>
 #include <tuple>
-#include <iomanip>
 #include <type_traits>
 
 namespace sec21::database
@@ -82,7 +83,7 @@ namespace sec21::database
          ((os << (Is == 0 ? "" : ","), escape_value_if_necessary<std::tuple_element_t<Is, Columns>>(os, row)), ...);
          os << ')';
       }
-   }
+   } // namespace detail
 
    template <typename Table>
    auto create_table()
@@ -97,6 +98,7 @@ namespace sec21::database
       return out.str();
    }
 
+   //! \todo auto insert_into(RowConcept auto const& row)
    template <typename Row>
    auto insert_into(Row const& row)
    {
@@ -109,9 +111,9 @@ namespace sec21::database
       detail::embraced_column_names<reflection_t>(out, indices);
       out << " VALUES ";
       detail::embraced_row_values<reflection_t>(out, row, indices);
-      out << ";";      
+      out << ";";
       return out.str();
-   }   
+   }
 
    template <typename Table>
    auto select()
@@ -126,7 +128,7 @@ namespace sec21::database
       out << table<Table>::name;
       return out.str();
 #else
-      return fmt::format("SELECT {} FROM {}", detail::column_names<reflection_t>(out, indices), table<Table>::name);
-#endif      
+      return fmt::format("SELECT {} FROM {}", column_names<reflection_t>(), table<Table>::name);
+#endif
    }
-}
+} // namespace sec21::database
