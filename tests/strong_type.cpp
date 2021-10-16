@@ -19,7 +19,7 @@ TEST_CASE("test strong types", "[sec21][core]")
       policy::print>;
    using T = width_t::underlying_t;
 
-   static_assert(std::is_same_v<T, underlying_type<width_t>>);
+   static_assert(std::is_same_v<T, underlying_t<width_t>>);
    static_assert(is_strong_type<int>::value == false);
    static_assert(is_strong_type<width_t>::value == true);
    static_assert(is_strong_type_v<int> == false);
@@ -75,7 +75,7 @@ TEST_CASE("test strong types", "[sec21][core]")
       ++b;
       REQUIRE(static_cast<T>(b) == 6);
    }
-   SECTION("deincrement")
+   SECTION("decrement")
    {
       auto c = a--;
       static_assert(std::is_same_v<decltype(c), width_t>);
