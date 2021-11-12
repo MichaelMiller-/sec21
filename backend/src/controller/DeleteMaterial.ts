@@ -9,7 +9,7 @@ export async function deleteMaterial(request: Request, response: Response) {
 
    await getManager().getRepository(Material)
       .delete(request.params.id)
-      .catch((e) => {
+      .catch(() => {
          result.success = false;
          result.message = "Cannot delete Member";
       });
