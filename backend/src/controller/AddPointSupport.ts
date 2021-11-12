@@ -18,6 +18,7 @@ export async function addPointSupport(request: Request, response: Response) {
    }
 
    let obj = new PointSupport();
+   obj.name = request.body.name;
    obj.referencePoint = pt;
    obj.ux = request.body.ux;
    obj.uy = request.body.uy;
