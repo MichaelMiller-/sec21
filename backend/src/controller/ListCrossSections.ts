@@ -6,9 +6,10 @@ export async function listCrossSections(request: Request, response: Response) {
 
    const values = await getManager()
       .getRepository(CrossSection)
-      .createQueryBuilder("crosssection")
-      .where("crosssection.project = :id", { id: request.params.id })
-      .orderBy("crosssection.name", "ASC")
+      .createQueryBuilder("obj")
+      .leftJoinAndSelect('obj.material', 'notused1')
+      .where("obj.project = :id", { id: request.params.id })
+      .orderBy("obj.name", "ASC")
       .getMany();
 
    response.send(values);
