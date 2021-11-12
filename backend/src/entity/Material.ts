@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Generated } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Generated, OneToMany } from "typeorm";
+import { CrossSection } from "./CrossSection";
 import { Project } from "./Project";
 
 @Entity()
@@ -19,4 +20,7 @@ export class Material {
 
    @ManyToOne(type => Project, project => project.materials)
    project: Project;
+
+   @OneToMany(type => CrossSection, crosssection => crosssection.material)
+   crossSections: CrossSection[];
 }

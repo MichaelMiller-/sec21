@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Generated, JoinColumn, OneToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Generated } from "typeorm";
 import { CrossSection } from "./CrossSection";
 import { Project } from "./Project";
 import { StructuralPoint } from "./StructuralPoint";
@@ -6,7 +6,7 @@ import { StructuralPoint } from "./StructuralPoint";
 export enum SystemLine {
    CENTRE = "centre",
    TOP = "top",
-   BOTTON = "buttom",
+   BOTTOM = "buttom",
    LEFT = "left",
    RIGHT = "right",
    TOPLEFT = "top_left",

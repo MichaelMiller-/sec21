@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Generated, OneToOne, JoinColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Generated } from "typeorm";
 import { Material } from "./Material";
 import { Project } from "./Project";
 
@@ -8,18 +8,16 @@ export class CrossSection {
    @PrimaryGeneratedColumn()
    id: number;
 
-   // @PrimaryGeneratedColumn("uuid")
-   // id: string;
-
    @Column()
    name: string;
 
    @Column()
    @Generated("uuid")
    uuid: string;
+   // @PrimaryGeneratedColumn("uuid")
+   // id: string;
 
-   @OneToOne(type => Material)
-   @JoinColumn()
+   @ManyToOne(type => Material, material => material.crossSections)
    material: Material;
 
    @Column("real")
