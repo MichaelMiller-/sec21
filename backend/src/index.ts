@@ -30,7 +30,7 @@ createConnection().then(async () => {
 
     // register all application routes
     appRoutes.forEach(route => {
-        logger.info(`register endpoint: ${route.path}`);
+        logger.info(`register endpoint: ${route.method.toUpperCase()} ${route.path}`);
         app[route.method]("/api" + route.path, (request: Request, response: Response, next: NextFunction) => {
             route.action(request, response)
                 .then(() => next)
