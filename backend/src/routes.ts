@@ -5,6 +5,7 @@ import { listCrossSections } from "./controller/ListCrossSections";
 import { listLoadCases } from "./controller/ListLoadCases";
 import { listCurveMembers } from "./controller/ListCurveMembers";
 import { listPointSupports } from "./controller/ListPointSupports";
+import { listPointActions } from "./controller/ListPointActions";
 import { addProject } from "./controller/AddProject";
 import { addStructuralPoint } from "./controller/AddStructuralPoint";
 import { addMaterial } from "./controller/AddMaterial";
@@ -17,6 +18,7 @@ import { deleteStructuralPoint } from "./controller/DeleteStructuralPoint";
 import { deleteMaterial } from "./controller/DeleteMaterial";
 import { deleteCurveMember } from "./controller/DeleteCurveMember";
 import { deleteCrossSection } from "./controller/DeleteCrossSection";
+import { deletePointSupport } from "./controller/DeletePointSupport";
 import { getProject } from "./controller/GetProject";
 import { getMaterial } from "./controller/GetMaterial";
 import { getCrossSection } from "./controller/GetCrossSection";
@@ -58,6 +60,11 @@ export const appRoutes = [
         action: listPointSupports
     },
     {
+        path: "/pointactions/:id",
+        method: "get",
+        action: listPointActions
+    },
+    {
         path: "/projects",
         method: "post",
         action: addProject
@@ -73,7 +80,7 @@ export const appRoutes = [
         action: addMaterial
     },
     {
-        path: "/crosssections/:id",
+        path: "/crosssections/:id/:material",
         method: "post",
         action: addCrossSection
     },
@@ -116,6 +123,11 @@ export const appRoutes = [
         path: "/crosssection/:id",
         method: "delete",
         action: deleteCrossSection
+    },
+    {
+        path: "/pointsupport/:id",
+        method: "delete",
+        action: deletePointSupport
     },
     {
         path: "/project/:id",
