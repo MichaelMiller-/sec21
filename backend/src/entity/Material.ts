@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Generated, OneToMany } from "typeorm";
 import { CrossSection } from "./CrossSection";
 import { Project } from "./Project";
+import {SurfaceMember} from "./SurfaceMember";
 
 @Entity()
 export class Material {
@@ -23,4 +24,7 @@ export class Material {
 
    @OneToMany(type => CrossSection, crosssection => crosssection.material)
    crossSections: CrossSection[];
+
+   @OneToMany(type => SurfaceMember, surface => surface.material)
+   surfaceMember: SurfaceMember[];
 }

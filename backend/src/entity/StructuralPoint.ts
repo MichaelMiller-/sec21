@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Generated } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Generated, ManyToMany } from "typeorm";
 import { Project } from "./Project";
+import { SurfaceMember } from "./SurfaceMember";
 
 @Entity()
 export class StructuralPoint {
@@ -25,4 +26,7 @@ export class StructuralPoint {
 
     @ManyToOne(type => Project, project => project.structuralPoints)
     project: Project;
+
+    @ManyToMany(type => SurfaceMember, surface => surface.id)
+    surfaceMember: SurfaceMember;
 }
