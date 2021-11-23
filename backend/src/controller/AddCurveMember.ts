@@ -4,6 +4,7 @@ import { CurveMember } from "../entity/CurveMember";
 import { Project } from "../entity/Project";
 import { StructuralPoint } from "../entity/StructuralPoint";
 import Result from "../dto/Result";
+import { CrossSection } from "../entity/CrossSection";
 
 export async function addCurveMember(request: Request, response: Response) {
 
@@ -36,19 +37,21 @@ export async function addCurveMember(request: Request, response: Response) {
       return;
    }
 
+   const cs = await getManager().getRepository(CrossSection).findOne(request.params.cs);
+
+   if (getManager().getRepository(CrossSection).hasId(cs) === false) {
+      result.success = false;
+      result.message = "Cross Section not found"
+      response.send(result);
+      return;
+   }
 
    let obj = new CurveMember();
    obj.name = request.body.name;
    obj.beginNode = fromPt;
    obj.endNode = toPt;
    obj.project = ref;
-
-   if (obj.name.length === 0) {
-      result.success = false;
-      result.message = "'name' cannot be empty"
-      response.send(result);
-      return;
-   }
+   obj.crossSection = cs;
 
    getManager().getRepository(CurveMember)
       .save(obj)
@@ -58,7 +61,7 @@ export async function addCurveMember(request: Request, response: Response) {
       })
       .catch(ex => {
          result.success = false;
-         result.message = ex;
+         result.message = ex.detail;
       });
 
    response.send(result);
