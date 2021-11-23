@@ -9,10 +9,11 @@ export async function deleteCrossSection(request: Request, response: Response) {
 
    await getManager().getRepository(CrossSection)
       .delete(request.params.id)
-      .catch((e) => {
-         result.success = false;
-         result.message = "Cannot delete CrossSection";
-      });
+       .catch((ex) => {
+           const msg = ex
+           result.success = false
+           result.message = msg.detail
+       });
 
    response.send(result);
 }

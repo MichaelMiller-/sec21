@@ -6,6 +6,7 @@ import { listLoadCases } from "./controller/ListLoadCases";
 import { listCurveMembers } from "./controller/ListCurveMembers";
 import { listPointSupports } from "./controller/ListPointSupports";
 import { listPointActions } from "./controller/ListPointActions";
+import { listSurfaceMembers } from "./controller/ListSurfaceMembers";
 import { addProject } from "./controller/AddProject";
 import { addStructuralPoint } from "./controller/AddStructuralPoint";
 import { addMaterial } from "./controller/AddMaterial";
@@ -22,6 +23,8 @@ import { deletePointSupport } from "./controller/DeletePointSupport";
 import { getProject } from "./controller/GetProject";
 import { getMaterial } from "./controller/GetMaterial";
 import { getCrossSection } from "./controller/GetCrossSection";
+import { deleteProject } from "./controller/DeleteProject";
+import { addSurfaceMember } from "./controller/AddSurfaceMember";
 
 export const appRoutes = [
     {
@@ -65,6 +68,11 @@ export const appRoutes = [
         action: listPointActions
     },
     {
+        path: "/surfacemembers/:id",
+        method: "get",
+        action: listSurfaceMembers
+    },
+    {
         path: "/projects",
         method: "post",
         action: addProject
@@ -100,9 +108,19 @@ export const appRoutes = [
         action: addPointSupport
     },
     {
-        path: "/curvemember/:id/:from/:to",
+        path: "/curvemember/:id/:from/:to/:cs",
         method: "post",
         action: addCurveMember
+    },
+    {
+        path: "/surfacemembers/:id/:material",
+        method: "post",
+        action: addSurfaceMember
+    },
+    {
+        path: "/project/:id",
+        method: "delete",
+        action: deleteProject
     },
     {
         path: "/structuralpoint/:id",

@@ -9,10 +9,11 @@ export async function deletePointSupport(request: Request, response: Response) {
 
    await getManager().getRepository(PointSupport)
       .delete(request.params.id)
-      .catch(() => {
-         result.success = false;
-         result.message = "Cannot delete Point-Support";
-      });
+       .catch((ex) => {
+           const msg = ex
+           result.success = false
+           result.message = msg.detail
+       });
 
    response.send(result);
 }

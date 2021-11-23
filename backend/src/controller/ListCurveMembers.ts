@@ -9,6 +9,7 @@ export async function listCurveMembers(request: Request, response: Response) {
       .createQueryBuilder("obj")
       .leftJoinAndSelect('obj.beginNode', 'notused1')
       .leftJoinAndSelect('obj.endNode', 'notused2')
+      .leftJoinAndSelect('obj.crossSection', 'notused3')
       .where("obj.project = :id", { id: request.params.id })
       .getMany();
 

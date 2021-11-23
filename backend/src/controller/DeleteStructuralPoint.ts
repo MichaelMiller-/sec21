@@ -5,18 +5,15 @@ import Result from "../dto/Result";
 
 export async function deleteStructuralPoint(request: Request, response: Response) {
 
-   let result = new Result<null>();
+    let result = new Result<null>();
 
-   await getManager().getRepository(StructuralPoint)
-      .delete(request.params.id)
-      .catch((e) => {
-         result.success = false;
-         if (e.code === '23503') {
-            result.message = "Cannot delete StructuralPoint because it is still referenced";
-         }
-         else
-            result.message = "Cannot delete StructuralPoint";
-      });
+    await getManager().getRepository(StructuralPoint)
+        .delete(request.params.id)
+        .catch((ex) => {
+            const msg = ex
+            result.success = false
+            result.message = msg.detail
+        });
 
-   response.send(result);
+    response.send(result);
 }
