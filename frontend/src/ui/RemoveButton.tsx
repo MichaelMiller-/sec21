@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export type RemoveButtonProps = {
    onClick: () => void;
-   disabled: boolean;
+   disabled?: boolean;
 }
 
 const RemoveButton = (props: RemoveButtonProps) => {

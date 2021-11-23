@@ -4,14 +4,14 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export type OpenButtonProps = {
    onClick: () => void;
-   disabled: boolean;
+   disabled?: boolean;
 }
 
 const OpenButton = (props: OpenButtonProps) => {
    return (
-      <Button variant="link" onClick={props.onClick} disabled={props.disabled}>
-         <FontAwesomeIcon icon={faFolderOpen} size="2x" />
-      </Button>
+       <Button variant="link" onClick={props.onClick} disabled={props.disabled}>
+          <FontAwesomeIcon icon={faFolderOpen} size="2x" onClick={props.onClick}/>
+       </Button>
    )
 }
 
