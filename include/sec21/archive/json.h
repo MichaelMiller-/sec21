@@ -23,7 +23,7 @@ namespace sec21
 
          template <typename U, std::enable_if_t<!reflection::is_registered_v<std::decay_t<U>>, int> = 0>
 #ifdef __cpp_conditional_explicit
-         explicit(!reflection::is_registered_v<std::decay_t<T>>)
+         explicit(!reflection::is_registered_v<std::decay_t<U>>)
 #endif
          void write(std::string_view name, U const& u) {
             j[name.data()] = u;
@@ -31,7 +31,7 @@ namespace sec21
 
          template <typename U, std::enable_if_t<reflection::is_registered_v<std::decay_t<U>>, int> = 0>
 #ifdef __cpp_conditional_explicit
-         explicit(reflection::is_registered_v<std::decay_t<T>>)
+         explicit(reflection::is_registered_v<std::decay_t<U>>)
 #endif
          void write(std::string_view name, U const& u) 
          {
