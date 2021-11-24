@@ -1,12 +1,24 @@
 #pragma once
 
-#include <string>
+#include <sec21/type_traits/is_specialized.h>
+
 #include <limits>
+#include <string>
 
 namespace sec21::structural_analysis
 {
    template <typename T>
    struct descriptor_traits;
+
+   template <typename T>
+   struct is_descriptor : type_traits::is_specialized<descriptor_traits, T>
+   {
+   };
+
+#ifdef __cpp_concepts
+   template <typename T>
+   concept Descriptor = is_descriptor<T>::value;
+#endif
 
    // default traits <int, std::string>
    //
@@ -15,10 +27,7 @@ namespace sec21::structural_analysis
    {
       using type_t = int;
 
-      static constexpr auto invalid() noexcept -> type_t
-      {
-         return std::numeric_limits<type_t>::max();
-      }
+      static constexpr auto invalid() noexcept -> type_t { return std::numeric_limits<type_t>::max(); }
    };
 
    template <>
@@ -26,10 +35,7 @@ namespace sec21::structural_analysis
    {
       using type_t = std::size_t;
 
-      static constexpr auto invalid() noexcept -> type_t
-      {
-         return std::numeric_limits<type_t>::max();
-      }
+      static constexpr auto invalid() noexcept -> type_t { return std::numeric_limits<type_t>::max(); }
    };
 
    template <>
@@ -37,9 +43,6 @@ namespace sec21::structural_analysis
    {
       using type_t = std::string;
 
-      static type_t invalid() noexcept
-      {
-         return {""};
-      }
+      static type_t invalid() noexcept { return {""}; }
    };
-}
+} // namespace sec21::structural_analysis
