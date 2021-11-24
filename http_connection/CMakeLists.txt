@@ -2,17 +2,12 @@ project(http_connection VERSION 0.0.1 LANGUAGES CXX)
 
 configure_file(${PROJECT_SOURCE_DIR}/config.h.in "${PROJECT_BINARY_DIR}/config.h")
 
-set(CMAKE_CXX_VISIBILITY_PRESET hidden)
-set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
-
 add_library(${PROJECT_NAME} STATIC src/${PROJECT_NAME}.cpp)
-
-include(GenerateExportHeader)
-generate_export_header(${PROJECT_NAME})
 
 target_include_directories(${PROJECT_NAME}
         PUBLIC "include"
-        PUBLIC ${PROJECT_BINARY_DIR}
+        PRIVATE ${PROJECT_BINARY_DIR}
+        PRIVATE "include/sec21"
         PRIVATE "src")
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)

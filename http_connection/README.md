@@ -1,3 +1,2 @@
 # sec21::http_connection
-
-establish a http connection
+Is a static library that creates a http connection.

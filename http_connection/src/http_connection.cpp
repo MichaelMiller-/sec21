@@ -77,7 +77,9 @@ struct http_connection::impl
    }
 };
 
-http_connection::http_connection(std::string_view host) : pimpl{new impl(host)} {}
+http_connection::http_connection(std::string_view host) : pimpl{std::make_unique<impl>(host)} {}
+
+http_connection::~http_connection() = default;
 
 nlohmann::json http_connection::get(std::string_view endpoint)
 {
