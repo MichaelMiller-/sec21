@@ -2,7 +2,7 @@
 
 #include <type_traits>
 
-namespace sec21
+namespace sec21::type_traits
 {
    template <template <typename...> class, typename, typename = void>
    struct is_specialized : std::false_type
