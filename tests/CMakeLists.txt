@@ -4,20 +4,25 @@ find_package(OpenMP REQUIRED)
 find_package(fmt REQUIRED)
 find_package(Eigen3 CONFIG REQUIRED)
 
-include(ExternalProject)
-ExternalProject_Add(
-   ViennaCL-tests
-   URL https://sourceforge.net/projects/viennacl/files/1.7.x/ViennaCL-1.7.1.zip
-   CMAKE_ARGS -Wno-dev -D BUILD_EXAMPLES=OFF
-      -D ENABLE_OPENCL=OFF
-      -D CMAKE_BUILD_TYPE=Release
-      -D CMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/viennacl
-)
-
 ## speed up the compiletime process
 add_library(catch_main STATIC catch_main.cpp)
-target_link_libraries(catch_main PRIVATE Catch2::Catch2)
+# target_link_libraries(catch_main PRIVATE Catch2::Catch2)
+target_link_libraries(catch_main PUBLIC Catch2::Catch2 Catch2::Catch2WithMain)
+
+
+# if(ENABLE_VIENNA_CL)
+   include(ExternalProject)
+   ExternalProject_Add(
+           ViennaCL-tests
+           URL https://sourceforge.net/projects/viennacl/files/1.7.x/ViennaCL-1.7.1.zip
+           CMAKE_ARGS -Wno-dev
+           -D BUILD_EXAMPLES=OFF
+           -D ENABLE_OPENCL=OFF
+           -D CMAKE_BUILD_TYPE=Release
+           -D CMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/viennacl
+   )
 add_dependencies(catch_main ViennaCL-tests)
+# endif()
 
 function(test filename)
    project(test.${filename})
@@ -25,7 +30,8 @@ function(test filename)
 
    target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
    ## needed for Clang
-   target_compile_options(${PROJECT_NAME} PRIVATE $<$<CXX_COMPILER_ID:Clang>:-fcoroutines>)
+   ## TODO: fails
+   # target_compile_options(${PROJECT_NAME} PRIVATE "$<$<CXX_COMPILER_ID:Clang>:-fcoroutines>")
 
    target_link_libraries(${PROJECT_NAME} PRIVATE Boost::boost)
    target_link_libraries(${PROJECT_NAME} PRIVATE OpenMP::OpenMP_CXX)
@@ -33,9 +39,11 @@ function(test filename)
    ## disable non MPL2 compatible features, or in other words disable the features which are still under the LGPL.
    target_compile_definitions(${PROJECT_NAME} PRIVATE EIGEN_MPL2_ONLY)
    target_link_libraries(${PROJECT_NAME} PRIVATE Eigen3::Eigen)
-   ## viennacl
-   target_compile_definitions(${PROJECT_NAME} PRIVATE VIENNACL_WITH_OPENMP)
-   target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/viennacl/include)
+
+  #  if(ENABLE_VIENNA_CL)
+      target_compile_definitions(${PROJECT_NAME} PRIVATE VIENNACL_WITH_OPENMP)
+      target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/viennacl/include)
+   # endif()
 
    target_link_libraries(${PROJECT_NAME} PRIVATE catch_main)
    target_link_libraries(${PROJECT_NAME} PRIVATE sec21)
@@ -73,6 +81,7 @@ test("arity")
 test("bit_pattern")
 test("concat")
 # test("database.query")
+test("debug_timer")
 test("dispatcher")
 test("double_values")
 test("drawdown")
@@ -84,7 +93,6 @@ test("flat_vector")
 test("for_each_chunk")
 test("for_each_indexed")
 test("in_range")
-test("is_specialized")
 test("make_iota_array")
 test("math")
 test("min_absent")
@@ -121,7 +129,9 @@ test("structural_analysis.space_truss.node")
 test("structural_analysis.space_truss.solver.backend.viennacl")
 test("structural_analysis.space_truss.solver.backend.eigen")
 test("structural_analysis.support")
+test("timestamp")
 test("traits")
+test("type_traits.is_specialized")
 test("units.dimension")
 test("units.quantity" "test_data_units.json")
 test("units.ratio")
