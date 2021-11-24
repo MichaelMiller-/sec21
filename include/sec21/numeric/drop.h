@@ -20,7 +20,11 @@ namespace sec21::numeric
 
       auto counter{0};
       for (decltype(input.size1()) i = 0; i < input.size1(); ++i) {
+#ifdef MSVC // bug -> narrowing conversion
+         if (auto it = std::find(begin(rows), end(rows), row(i)); it != end(rows))
+#else
          if (auto it = std::find(begin(rows), end(rows), row{i}); it != end(rows))
+#endif
             continue;
 
          const ublas::matrix_row<decltype(input)> input_row(input, i);
@@ -43,7 +47,11 @@ namespace sec21::numeric
 
       auto counter{0};
       for (decltype(input.size2()) i = 0; i < input.size2(); ++i) {
+#ifdef MSVC // bug -> narrowing conversion
+         if (auto it = std::find(begin(cols), end(cols), col(i)); it != end(cols))
+#else
          if (auto it = std::find(begin(cols), end(cols), col{i}); it != end(cols))
+#endif
             continue;
 
          const ublas::matrix_column<decltype(input)> input_col(input, i);
@@ -63,7 +71,11 @@ namespace sec21::numeric
 
       auto first = begin(result);
       for (decltype(input.size()) i = 0; i < input.size(); ++i) {
+#ifdef MSVC // bug -> narrowing conversion
+         if (auto it = std::find(begin(rows), end(rows), row(i)); it != end(rows))
+#else
          if (auto it = std::find(begin(rows), end(rows), row{i}); it != end(rows))
+#endif
             continue;
 
          *first = input[i];
@@ -77,8 +89,11 @@ namespace sec21::numeric
    {
       std::vector<T, Allocator> result;
       for (auto i = 0; i < size(input); ++i) {
-         const auto it = std::find(begin(rows), end(rows), row{i});
-         if (it == end(rows))
+#ifdef MSVC // bug -> narrowing conversion
+         if (auto it = std::find(begin(rows), end(rows), row(i)); it == end(rows))
+#else
+         if (auto it = std::find(begin(rows), end(rows), row{i}); it == end(rows))
+#endif
             result.push_back(input[i]);
       }
       return result;
