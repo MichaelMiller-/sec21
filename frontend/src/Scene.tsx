@@ -29,7 +29,7 @@ type LineProps = {
     end: Vector3
 }
 const Line2 = (props: LineProps) => {
-    const points = useMemo(() => [props.begin, props.end], [])
+    const points = useMemo(() => [props.begin, props.end], [props.begin, props.end])
     const onUpdate = useCallback(self => self.setFromPoints(points), [points])
 
     return (
@@ -45,11 +45,12 @@ type CameraControlProps = {
     deltaDrag: Vector2
 }
 const CameraControls = (props: CameraControlProps) => {
-    const {camera, size: {width, height}} = useThree();
+    // const {camera, size: {width, height}} = useThree();
+    const {camera } = useThree();
 
     const dragVelocity = 100000
 
-    return useFrame((state, delta) => {
+    return useFrame(() => {
         const X = camera.position.x + (props.deltaDrag.x / dragVelocity)
         const Y = camera.position.y + (props.deltaDrag.y / dragVelocity)
 
