@@ -1,12 +1,14 @@
 #pragma once
 
-#include <sec21/is_specialized.h>
+#include <sec21/type_traits/is_specialized.h>
 
 #include <functional>
 #include <tuple>
 #include <variant>
 #include <string_view>
 #include <optional>
+
+//! \todo header requires: __cpp_generic_lambdas > 201304
 
 namespace sec21
 {
@@ -16,23 +18,30 @@ namespace sec21
 
    namespace detail
    {
+#if 0
       template<typename...Ts, typename Function, size_t... Is>
       auto transform(std::tuple<Ts...> const& inputs, Function function, std::index_sequence<Is...>)
       {
          return std::tuple<std::invoke_result_t<Function, Ts>...>{function(std::get<Is>(inputs))...};
       }
-
+#endif
       template<typename... Ts, typename Function>
-      auto transform(std::tuple<Ts...> const& inputs, Function function)
+      [[nodiscard]] decltype(auto) transform(std::tuple<Ts...> const& inputs, Function function)
       {
+#if __cpp_generic_lambdas > 201304
+         return [&]<size_t... Is>(std::index_sequence<Is...>){
+           return std::tuple<std::invoke_result_t<Function, Ts>...>{function(std::get<Is>(inputs))...};
+         }(std::make_index_sequence<sizeof...(Ts)>{});
+#else
          return transform(inputs, function, std::make_index_sequence<sizeof...(Ts)>{});
+#endif
       }
 
       template <typename... InputDescriptions>
-      [[nodiscard]] auto transform_inputs(std::string_view input)
+      [[nodiscard]] decltype(auto) transform_inputs(std::string_view input)
       {
 #if __cpp_generic_lambdas > 201304         
-         const auto validate_input = [&input]<typename T>(T) { return std::invoke(validate<T>{}, input); };
+         const auto validate_input = [&input]<typename T>(T) { return std::invoke(validate<T>{}, std::move(input)); };
 #else         
          const auto validate_input = [&input](auto v) {
             return std::invoke(validate<std::decay_t<decltype(v)>>{}, input); 
@@ -46,7 +55,7 @@ namespace sec21
    class input_dispatcher
    {
       static_assert(sizeof...(InputDescriptions) > 0);
-      static_assert(std::conjunction_v<is_specialized<validate, InputDescriptions>...>);
+      static_assert(std::conjunction_v<type_traits::is_specialized<validate, InputDescriptions>...>);
 
    public:
       using action_t = std::variant<InputDescriptions...>;
@@ -56,11 +65,11 @@ namespace sec21
       process_t func;
 
    public:
-      constexpr explicit input_dispatcher(process_t&& process) : func{process} {}
+      constexpr explicit input_dispatcher(process_t process) : func{std::move(process)} {}
 
       [[nodiscard]] auto operator()(std::string_view input) const noexcept -> Response
       {
-         const auto validated_inputs = detail::transform_inputs<InputDescriptions...>(input);
+         const auto validated_inputs = detail::transform_inputs<InputDescriptions...>(std::move(input));
 
          // check if at least one input is valid 
          //! \todo count is maybe saver: condition= c == 1 -> true; else is false
