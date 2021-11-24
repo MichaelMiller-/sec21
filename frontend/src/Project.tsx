@@ -216,7 +216,7 @@ export const Project = (props: ProjectListProps) => {
             })
 
         setDisableCurveMemberTab(structuralPoints.length < 2)
-
+        // eslint-disable-next-line
     }, [props.projectId]);
 
     const runCalculation = async () => {
