@@ -11,7 +11,7 @@ namespace sec21::numeric
    [[nodiscard]] auto make_vector(Iterator first, Iterator last)
    {
       using value_t = typename std::iterator_traits<Iterator>::value_type;
-      const auto n = std::distance(first, last);
+      const auto n = std:: distance(first, last);
       boost::numeric::ublas::unbounded_array<value_t, Allocator> storage(n, Allocator{});
       std::copy(first, last, storage.begin());
       return boost::numeric::ublas::vector<value_t, decltype(storage)>(n, storage);
