@@ -11,9 +11,7 @@
 #include <sec21/structural_analysis/node.h>
 #include <sec21/structural_analysis/member.h>
 #include <sec21/structural_analysis/space_truss.h>
-#include <sec21/structural_analysis/system_result.h>
 #include <sec21/units.h>
-#include <sec21/structural_analysis/solver/backend/viennacl.h>
 #include <sec21/structural_analysis/solver/backend/eigen.h>
 
 #include <algorithm>
@@ -58,12 +56,12 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    //! \todo use units
    // constexpr auto E = 21'000'000.0_kPa;
    // constexpr auto A = unit::square_meter<double>(0.004_sq_m);
-   auto m1 = add_member(sys, 1, 2, {1, 0.004, 21'000'000});
-   auto m2 = add_member(sys, 3, 2, {2, 0.004, 21'000'000});
-   auto m3 = add_member(sys, 4, 3, {3, 0.004, 21'000'000});
-   auto m4 = add_member(sys, 4, 1, {4, 0.004, 21'000'000});
-   auto m5 = add_member(sys, 4, 2, {5, 0.004, 21'000'000});
-   auto m6 = add_member(sys, 3, 1, {6, 0.004, 21'000'000});
+   auto m1 = add_member(sys, 1, 2, {1, "", {}, "", "", 0.004, 21'000'000});
+   auto m2 = add_member(sys, 3, 2, {2, "", {}, "", "", 0.004, 21'000'000});
+   auto m3 = add_member(sys, 4, 3, {3, "", {}, "", "", 0.004, 21'000'000});
+   auto m4 = add_member(sys, 4, 1, {4, "", {}, "", "", 0.004, 21'000'000});
+   auto m5 = add_member(sys, 4, 2, {5, "", {}, "", "", 0.004, 21'000'000});
+   auto m6 = add_member(sys, 3, 1, {6, "", {}, "", "", 0.004, 21'000'000});
 
    const auto EA_l1 = 28'000.0;
    const auto EA_l2 = 19'798.98987;
@@ -628,7 +626,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       loadcase_t lf1;
       lf1.node_load.emplace_back(2, loadcase_t::load_t{{10.0_kN, -10.0_kN}});
 
-      const auto success = solve<solver::backend::viennacl_impl>(sys, lf1);
+      const auto success = solve<solver::backend::eigen>(sys, lf1);
       REQUIRE(success.has_value() == true);
 
       const auto result = success.value();
