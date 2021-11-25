@@ -16,7 +16,7 @@ TEST_CASE("test loadcase", "[sec21][structural_analysis][loadcase]")
    using node_t = node<2, int, double>;
    using space_truss_t = space_truss<node_t, member_t>;
 
-   auto sys = sec21::load_from_json<space_truss_t>("example_1.json");
+   auto sys = sec21::read_from_json<space_truss_t>("example_1.json");
    REQUIRE(std::size(sys.nodes) == 4);
 
    using loadcase_t = loadcase<decltype(sys)>;
