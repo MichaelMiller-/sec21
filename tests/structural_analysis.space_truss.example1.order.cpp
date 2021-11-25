@@ -24,28 +24,26 @@ TEST_CASE("example 1.1 with different node id's (N1 switched with N3 from exampl
    using space_truss_t = space_truss<node_t, member_t>;
 
    auto sys = space_truss_t{};
-   using precision_t = decltype(sys)::precision_t;
 
    using precision_t = decltype(sys)::precision_t;
-   using node_t = decltype(sys)::node_t;
    using support_t = node_t::global_support_t;
 
-   auto n1 = add_node(sys, {1, {3.0, 0.0}, support_t{ false, true }});
-   auto n2 = add_node(sys, {2, {3.0, 3.0}});
-   auto n3 = add_node(sys, {3, {0.0, 3.0}});
-   auto n4 = add_node(sys, {4, {0.0, 0.0}, support_t{ true, true }});
+   auto n1 = add_node(sys, node_t{1, {3.0, 0.0}, support_t{ false, true }});
+   auto n2 = add_node(sys, node_t{2, {3.0, 3.0}});
+   auto n3 = add_node(sys, node_t{3, {0.0, 3.0}});
+   auto n4 = add_node(sys, node_t{4, {0.0, 0.0}, support_t{ true, true }});
 
    REQUIRE(static_cast<bool>(n1) == true);
    REQUIRE(static_cast<bool>(n2) == true);
    REQUIRE(static_cast<bool>(n3) == true);
    REQUIRE(static_cast<bool>(n4) == true);
 
-   auto m1 = add_member(sys, 3, 2, {1, "", {}, "", "", 0.004, 21'000'000});
-   auto m2 = add_member(sys, 1, 2, {2, "", {}, "", "", 0.004, 21'000'000});
-   auto m3 = add_member(sys, 4, 1, {3, "", {}, "", "", 0.004, 21'000'000});
-   auto m4 = add_member(sys, 4, 3, {4, "", {}, "", "", 0.004, 21'000'000});
-   auto m5 = add_member(sys, 4, 2, {5, "", {}, "", "", 0.004, 21'000'000});
-   auto m6 = add_member(sys, 1, 3, {6, "", {}, "", "", 0.004, 21'000'000});
+   auto m1 = add_member(sys, 3, 2, member_t{1, "", {}, "", "", 0.004, 21'000'000});
+   auto m2 = add_member(sys, 1, 2, member_t{2, "", {}, "", "", 0.004, 21'000'000});
+   auto m3 = add_member(sys, 4, 1, member_t{3, "", {}, "", "", 0.004, 21'000'000});
+   auto m4 = add_member(sys, 4, 3, member_t{4, "", {}, "", "", 0.004, 21'000'000});
+   auto m5 = add_member(sys, 4, 2, member_t{5, "", {}, "", "", 0.004, 21'000'000});
+   auto m6 = add_member(sys, 1, 3, member_t{6, "", {}, "", "", 0.004, 21'000'000});
 
    REQUIRE(static_cast<bool>(m1) == true);
    REQUIRE(static_cast<bool>(m2) == true);
