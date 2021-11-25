@@ -6,25 +6,25 @@ find_package(Eigen3 CONFIG REQUIRED)
 
 ## speed up the compiletime process
 add_library(catch_main STATIC catch_main.cpp)
-if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     target_link_libraries(catch_main PUBLIC Catch2::Catch2)
 else ()
     target_link_libraries(catch_main PUBLIC Catch2::Catch2 Catch2::Catch2WithMain)
 endif ()
 
-# if(ENABLE_VIENNA_CL)
-include(ExternalProject)
-ExternalProject_Add(
-        ViennaCL-tests
-        URL https://sourceforge.net/projects/viennacl/files/1.7.x/ViennaCL-1.7.1.zip
-        CMAKE_ARGS -Wno-dev
-        -D BUILD_EXAMPLES=OFF
-        -D ENABLE_OPENCL=OFF
-        -D CMAKE_BUILD_TYPE=Release
-        -D CMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/viennacl
-)
-add_dependencies(catch_main ViennaCL-tests)
-# endif()
+if (ENABLE_VIENNA_CL)
+    include(ExternalProject)
+    ExternalProject_Add(
+            ViennaCL-tests
+            URL https://sourceforge.net/projects/viennacl/files/1.7.x/ViennaCL-1.7.1.zip
+            CMAKE_ARGS -Wno-dev
+            -D BUILD_EXAMPLES=OFF
+            -D ENABLE_OPENCL=OFF
+            -D CMAKE_BUILD_TYPE=Release
+            -D CMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/viennacl
+    )
+    add_dependencies(catch_main ViennaCL-tests)
+endif ()
 
 function(test filename)
     project(test.${filename})
@@ -42,10 +42,10 @@ function(test filename)
     target_compile_definitions(${PROJECT_NAME} PRIVATE EIGEN_MPL2_ONLY)
     target_link_libraries(${PROJECT_NAME} PRIVATE Eigen3::Eigen)
 
-    #  if(ENABLE_VIENNA_CL)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE VIENNACL_WITH_OPENMP)
-    target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/viennacl/include)
-    # endif()
+    if (ENABLE_VIENNA_CL)
+        target_compile_definitions(${PROJECT_NAME} PRIVATE VIENNACL_WITH_OPENMP)
+        target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/viennacl/include)
+    endif ()
 
     target_link_libraries(${PROJECT_NAME} PRIVATE catch_main)
     target_link_libraries(${PROJECT_NAME} PRIVATE sec21)
@@ -128,7 +128,9 @@ test("structural_analysis.space_truss.example6" "example_6.json" "example_6_load
 test("structural_analysis.space_truss.example7" "example_7.json" "example_7_load.json")
 test("structural_analysis.space_truss.member")
 test("structural_analysis.space_truss.node")
-test("structural_analysis.space_truss.solver.backend.viennacl")
+if (ENABLE_VIENNA_CL)
+    test("structural_analysis.space_truss.solver.backend.viennacl")
+endif ()
 test("structural_analysis.space_truss.solver.backend.eigen")
 test("structural_analysis.support")
 test("timestamp")
