@@ -19,7 +19,7 @@ struct content
 
 using namespace std::literals;
 
-const auto output_template = R"(
+constexpr auto output_template = R"(
 # sec21
 [![GCC](https://github.com/MichaelMiller-/sec21/actions/workflows/gcc.yml/badge.svg)](https://github.com/MichaelMiller-/sec21/actions/workflows/gcc.yml) [![Clang](https://github.com/MichaelMiller-/sec21/actions/workflows/clang.yml/badge.svg)](https://github.com/MichaelMiller-/sec21/actions/workflows/clang.yml) [![MSVC](https://github.com/MichaelMiller-/sec21/actions/workflows/msvc.yml/badge.svg)](https://github.com/MichaelMiller-/sec21/actions/workflows/msvc.yml)
 
@@ -30,7 +30,7 @@ Examples
 - [Viewer](viewer/README.md)
 
 {}
-)"s;
+)";
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 {
