@@ -7,13 +7,24 @@
 #include <cpprest/http_listener.h>          // HTTP server
 #include <cpprest/json.h>                   // JSON library
 
+#include <boost/locale/encoding.hpp>
+
 using namespace sec21;
+
+auto to_platform_specific_string(std::string_view value)
+{
+#ifdef _MSC_VER
+   return boost::locale::conv::utf_to_utf<wchar_t>(std::string{value});
+#else
+   return value;
+#endif
+}
 
 struct http_connection::impl
 {
    web::http::client::http_client client;
 
-   explicit impl(std::string_view host) : client(host.data()) {}
+   explicit impl(std::string_view host) : client(to_platform_specific_string(host).data()) {}
 
    template <typename Method, typename Callable>
    void make_request(Method mtd, std::string_view endpoint, Callable&& func)
