@@ -17,10 +17,10 @@ TEST_CASE("support mask", "[sec21][structural_analysis][node]")
    using support_t = node_t::global_support_t;
 
    std::vector<node_t> input{
-      {1, {0.0, 3.0}},
-      {2, {3.0, 3.0}, support_t{ false, true }},
-      {3, {3.0, 0.0}},
-      {4, {0.0, 0.0}, support_t{ true, true }}
+      {1u, {0.0, 3.0}},
+      {2u, {3.0, 3.0}, support_t{ false, true }},
+      {3u, {3.0, 0.0}},
+      {4u, {0.0, 0.0}, support_t{ true, true }}
    };
 
    std::vector<bool> mask;
@@ -38,10 +38,10 @@ TEST_CASE("support mask 2", "[sec21][structural_analysis][node]")
    using support_t = node_t::global_support_t;
 
    std::vector<node_t> input{
-      {1, {0.0, 3.0}},
-      {2, {3.0, 3.0}},
-      {3, {3.0, 0.0}, support_t{ true, true }},
-      {4, {0.0, 0.0}, support_t{ false, true }}
+      {1u, {0.0, 3.0}},
+      {2u, {3.0, 3.0}},
+      {3u, {3.0, 0.0}, support_t{ true, true }},
+      {4u, {0.0, 0.0}, support_t{ false, true }}
    };
 
    std::vector<bool> mask;
