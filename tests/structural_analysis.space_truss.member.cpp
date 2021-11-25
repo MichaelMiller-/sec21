@@ -24,7 +24,7 @@ TEST_CASE("add member to system", "[sec21][structural_analysis][space_truss]")
       REQUIRE(static_cast<bool>(n2) == true);
       REQUIRE(n2.value() == 2);
 
-      auto m1 = add_member(sys, n1.value(), n2.value(), { 1, "", {}, "", "", 1.0, 1.0 });
+      auto m1 = add_member(sys, n1.value(), n2.value(), member_t{ 1, "", {}, "", "", 1.0, 1.0 });
       REQUIRE(static_cast<bool>(m1) == true);
       REQUIRE(m1.value() == 1);
    }
@@ -38,7 +38,7 @@ TEST_CASE("add member to system", "[sec21][structural_analysis][space_truss]")
       REQUIRE(static_cast<bool>(n2) == true);
       REQUIRE(n2.value() == 2);
 
-      auto m1 = add_member(sys, n1.value(), n2.value(), { std::numeric_limits<int>::max(), "", {}, "", "", 1.0, 1.0 });
+      auto m1 = add_member(sys, n1.value(), n2.value(), member_t{ std::numeric_limits<int>::max(), "", {}, "", "", 1.0, 1.0 });
       REQUIRE(static_cast<bool>(m1) == false);
    }
    SECTION("add two member with the same id")
@@ -51,8 +51,8 @@ TEST_CASE("add member to system", "[sec21][structural_analysis][space_truss]")
       REQUIRE(static_cast<bool>(n2) == true);
       REQUIRE(n2.value() == 2);
 
-      auto m1 = add_member(sys, n1.value(), n2.value(), { 1u, "", {}, "", "", 1.0, 1.0 });
-      auto m2 = add_member(sys, n1.value(), n2.value(), { 1u, "", {}, "", "", 1.0, 1.0 });
+      auto m1 = add_member(sys, n1.value(), n2.value(), member_t{ 1u, "", {}, "", "", 1.0, 1.0 });
+      auto m2 = add_member(sys, n1.value(), n2.value(), member_t{ 1u, "", {}, "", "", 1.0, 1.0 });
       REQUIRE(static_cast<bool>(m1) == true);
       REQUIRE(m1.value() == 1);
       REQUIRE(static_cast<bool>(m2) == false);
