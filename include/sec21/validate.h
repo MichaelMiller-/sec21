@@ -18,13 +18,12 @@ namespace sec21
 
    namespace detail
    {
-#if 0
       template<typename...Ts, typename Function, size_t... Is>
       auto transform(std::tuple<Ts...> const& inputs, Function function, std::index_sequence<Is...>)
       {
          return std::tuple<std::invoke_result_t<Function, Ts>...>{function(std::get<Is>(inputs))...};
       }
-#endif
+
       template<typename... Ts, typename Function>
       [[nodiscard]] decltype(auto) transform(std::tuple<Ts...> const& inputs, Function function)
       {
