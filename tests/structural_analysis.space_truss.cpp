@@ -43,10 +43,10 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    using support_t = node_t::global_support_t;
    using loadcase_t = loadcase<decltype(sys)>;
 
-   auto n1 = add_node(sys, {1, {0.0, 3.0}});
-   auto n2 = add_node(sys, {2, {3.0, 3.0}});
-   auto n3 = add_node(sys, {3, {3.0, 0.0}, support_t{false, true}});
-   auto n4 = add_node(sys, {4, {0.0, 0.0}, support_t{true, true}});
+   auto n1 = add_node(sys, {1u, {0.0, 3.0}});
+   auto n2 = add_node(sys, {2u, {3.0, 3.0}});
+   auto n3 = add_node(sys, {3u, {3.0, 0.0}, support_t{false, true}});
+   auto n4 = add_node(sys, {4u, {0.0, 0.0}, support_t{true, true}});
 
    REQUIRE(static_cast<bool>(n1) == true);
    REQUIRE(static_cast<bool>(n2) == true);
@@ -56,12 +56,12 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    //! \todo use units
    // constexpr auto E = 21'000'000.0_kPa;
    // constexpr auto A = unit::square_meter<double>(0.004_sq_m);
-   auto m1 = add_member(sys, 1, 2, {1, "", {}, "", "", 0.004, 21'000'000});
-   auto m2 = add_member(sys, 3, 2, {2, "", {}, "", "", 0.004, 21'000'000});
-   auto m3 = add_member(sys, 4, 3, {3, "", {}, "", "", 0.004, 21'000'000});
-   auto m4 = add_member(sys, 4, 1, {4, "", {}, "", "", 0.004, 21'000'000});
-   auto m5 = add_member(sys, 4, 2, {5, "", {}, "", "", 0.004, 21'000'000});
-   auto m6 = add_member(sys, 3, 1, {6, "", {}, "", "", 0.004, 21'000'000});
+   auto m1 = add_member(sys, 1, 2, {1u, "", {}, "", "", 0.004, 21'000'000});
+   auto m2 = add_member(sys, 3, 2, {2u, "", {}, "", "", 0.004, 21'000'000});
+   auto m3 = add_member(sys, 4, 3, {3u, "", {}, "", "", 0.004, 21'000'000});
+   auto m4 = add_member(sys, 4, 1, {4u, "", {}, "", "", 0.004, 21'000'000});
+   auto m5 = add_member(sys, 4, 2, {5u, "", {}, "", "", 0.004, 21'000'000});
+   auto m6 = add_member(sys, 3, 1, {6u, "", {}, "", "", 0.004, 21'000'000});
 
    const auto EA_l1 = 28'000.0;
    const auto EA_l2 = 19'798.98987;
