@@ -14,8 +14,6 @@
 
 namespace sec21::structural_analysis
 {
-   namespace outcome = BOOST_OUTCOME_V2_NAMESPACE;
-
    //! \brief Datencontainer für das Stabwerkssystem
    //! \brief A space frame truss is a N-dimensional framework of members pinned at their ends
    template <typename Node, typename Member>
@@ -39,6 +37,8 @@ namespace sec21::structural_analysis
       std::map<member_descriptor_t, std::pair<node_descriptor_t, node_descriptor_t>> coincidence_table{};
    };
 
+   namespace outcome = BOOST_OUTCOME_V2_NAMESPACE;
+
    template <typename System>
    auto add_node(System& sys, typename System::node_t node) noexcept
       -> outcome::std_result<typename System::node_descriptor_t>
@@ -56,9 +56,9 @@ namespace sec21::structural_analysis
    }
 
    template <typename System, typename... Args>
-   auto add_node(System& sys, Args&&... args) noexcept
+   decltype(auto) add_node(System& sys, Args&&... args) noexcept
    {
-      return add_node(sys, typename System::node_t{std::forward<Args>(args)...});
+      return add_node(sys, {std::forward<Args>(args)...});
    }
 
    template <typename System>
@@ -89,10 +89,10 @@ namespace sec21::structural_analysis
    }
 
    template <typename System, typename... Args>
-   auto add_member(System& sys, typename System::node_descriptor_t from, typename System::node_descriptor_t to,
-                   Args&&... args) noexcept -> outcome::std_result<typename System::member_descriptor_t>
+   decltype(auto) add_member(System& sys, typename System::node_descriptor_t from, typename System::node_descriptor_t to,
+                   Args&&... args) noexcept
    {
-      return add_member(sys, from, to, {std::forward<Args>(args)...});
+      return add_member(sys, std::move(from), std::move(to), {std::forward<Args>(args)...});
    }
 } // namespace sec21::structural_analysis
 
