@@ -8,15 +8,17 @@
 namespace sec21
 {
    template <typename T>
-   auto load_from_json(std::filesystem::path const& filename) -> T
+   [[nodiscard]] auto read_from_json(std::filesystem::path const& filename) noexcept -> T
    {
-      if (exists(filename)) {
+      T result;
+      try {
          std::ifstream ifs{filename};
-         nlohmann::json j{};
-         ifs >> j;
-         return j.get<T>();
+         const auto j = nlohmann::json::parse(ifs);
+         result = j.get<T>();
+      } catch (...) {
+         // ignore
       }
-      //! \todo exception handling
-      return {};
+      return result;
    }
+
 } // namespace sec21
