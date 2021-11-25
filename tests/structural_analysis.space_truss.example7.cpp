@@ -6,9 +6,8 @@
 #include <sec21/structural_analysis/member.h>
 #include <sec21/structural_analysis/node.h>
 #include <sec21/structural_analysis/solve.h>
-#include <sec21/structural_analysis/solver/backend/viennacl.h>
+#include <sec21/structural_analysis/solver/backend/eigen.h>
 #include <sec21/structural_analysis/space_truss.h>
-#include <sec21/structural_analysis/system_result.h>
 
 #include <array>
 
@@ -23,10 +22,10 @@ TEST_CASE("example system 7.0 load from json", "[sec21][structural_analysis][spa
    using node_t = node<2, int, double>;
    using space_truss_t = space_truss<node_t, member_t>;
 
-   auto sys = sec21::load_from_json<space_truss_t>("example_7.json");
-   auto lf1 = sec21::load_from_json<loadcase<decltype(sys)>>("example_7_load.json");
+   auto sys = sec21::read_from_json<space_truss_t>("example_7.json");
+   auto lf1 = sec21::read_from_json<loadcase<decltype(sys)>>("example_7_load.json");
 
-   const auto success = solve<solver::backend::viennacl_impl>(sys, lf1);
+   const auto success = solve<solver::backend::eigen>(sys, lf1);
    REQUIRE(success.has_value() == true);
 
    const auto result = success.value();
@@ -65,10 +64,4 @@ TEST_CASE("example system 7.0 load from json", "[sec21][structural_analysis][spa
    REQUIRE(copied_results[26] == Approx(45000));
    REQUIRE(copied_results[27] == Approx(-75000));
    REQUIRE(copied_results[28] == Approx(-75000));
-
-   {
-      std::ofstream ofs{"output_example_7_result.json"};
-      nlohmann::json tmp = result;
-      ofs << std::setw(4) << tmp;
-   }
 }

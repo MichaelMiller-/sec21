@@ -6,9 +6,8 @@
 #include <sec21/structural_analysis/member.h>
 #include <sec21/structural_analysis/space_truss.h>
 #include <sec21/structural_analysis/loadcase.h>
-#include <sec21/structural_analysis/system_result.h>
 #include <sec21/structural_analysis/solve.h>
-#include <sec21/structural_analysis/solver/backend/viennacl.h>
+#include <sec21/structural_analysis/solver/backend/eigen.h>
 
 TEST_CASE("example system 1.0 load from json", "[sec21][structural_analysis][space_truss]")
 {
@@ -21,12 +20,12 @@ TEST_CASE("example system 1.0 load from json", "[sec21][structural_analysis][spa
    using node_t = node<2, int, double>;
    using space_truss_t = space_truss<node_t, member_t>;
 
-   auto sys = sec21::load_from_json<space_truss_t>("example_1.json");
+   auto sys = sec21::read_from_json<space_truss_t>("example_1.json");
 
    loadcase<decltype(sys)> lf1{};
    lf1.node_load.emplace_back(2, loadcase<decltype(sys)>::load_t{{10.0_kN, -10.0_kN}});
 
-   const auto success = solve<solver::backend::viennacl_impl>(sys, lf1);
+   const auto success = solve<solver::backend::eigen>(sys, lf1);
    REQUIRE(success.has_value() == true);
 
    const auto result = success.value();

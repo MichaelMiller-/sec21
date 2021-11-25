@@ -6,7 +6,7 @@
 #include <sec21/structural_analysis/space_truss.h>
 #include <sec21/structural_analysis/loadcase.h>
 #include <sec21/structural_analysis/solve.h>
-#include <sec21/structural_analysis/solver/backend/viennacl.h>
+#include <sec21/structural_analysis/solver/backend/eigen.h>
 
 #include <array>
 
@@ -21,15 +21,15 @@ TEST_CASE("example system 4.0 load from json", "[sec21][structural_analysis][spa
    using node_t = node<2, int, double>;
    using space_truss_t = space_truss<node_t, member_t>;
 
-   auto sys = sec21::load_from_json<space_truss_t>("example_4.json");
+   auto sys = sec21::read_from_json<space_truss_t>("example_4.json");
 
    REQUIRE(size(sys.nodes) == 7);
    REQUIRE(size(sys.members) == 10);
    REQUIRE(size(sys.coincidence_table) == 10);
 
-   auto lf1 = sec21::load_from_json<loadcase<decltype(sys)>>("example_4_load.json");
+   auto lf1 = sec21::read_from_json<loadcase<decltype(sys)>>("example_4_load.json");
 
-   const auto success = solve<solver::backend::viennacl_impl>(sys, lf1);
+   const auto success = solve<solver::backend::eigen>(sys, lf1);
    REQUIRE(success.has_value() == true);
 
    const auto result = success.value();
@@ -71,10 +71,4 @@ TEST_CASE("example system 4.0 load from json", "[sec21][structural_analysis][spa
    REQUIRE(copied_results[7] == Approx(-141'400).epsilon(kDivergence));
    REQUIRE(copied_results[8] == Approx(141'400).epsilon(kDivergence));
    REQUIRE(copied_results[9] == Approx(80'800).epsilon(kDivergence));
-
-   {
-      std::ofstream ofs{"output_example_4_result.json"};
-      nlohmann::json tmp = result;
-      ofs << std::setw(4) << tmp;
-   }         
 }

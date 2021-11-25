@@ -9,8 +9,7 @@
 #include <sec21/structural_analysis/node.h>
 #include <sec21/structural_analysis/member.h>
 #include <sec21/structural_analysis/space_truss.h>
-#include <sec21/structural_analysis/system_result.h>
-#include <sec21/structural_analysis/solver/backend/viennacl.h>
+#include <sec21/structural_analysis/solver/backend/eigen.h>
 
 #include <array>
 #include <valarray>
@@ -26,11 +25,11 @@ TEST_CASE("example system 2.0 load from json", "[sec21][structural_analysis][spa
    using node_t = node<2, int, double>;
    using space_truss_t = space_truss<node_t, member_t>;
 
-   auto sys = sec21::load_from_json<space_truss_t>("example_2.json");
-   auto load = sec21::load_from_json<loadcase<decltype(sys)>>("example_2_load.json");
+   auto sys = sec21::read_from_json<space_truss_t>("example_2.json");
+   auto load = sec21::read_from_json<loadcase<decltype(sys)>>("example_2_load.json");
 
-   REQUIRE(std::size(sys.nodes) == 4);
-   REQUIRE(std::size(sys.members) == 5);
+   REQUIRE(size(sys.nodes) == 4);
+   REQUIRE(size(sys.members) == 5);
 
    SECTION("coincidence matrix from member 1")
    {
@@ -162,7 +161,7 @@ TEST_CASE("example system 2.0 load from json", "[sec21][structural_analysis][spa
    }
    SECTION("solve")
    {
-      const auto success = solve<solver::backend::viennacl_impl>(sys, load);
+      const auto success = solve<solver::backend::eigen>(sys, load);
       REQUIRE(success.has_value() == true);
 
       const auto result = success.value();

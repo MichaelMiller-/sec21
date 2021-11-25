@@ -9,8 +9,7 @@
 #include <sec21/structural_analysis/node.h>
 #include <sec21/structural_analysis/member.h>
 #include <sec21/structural_analysis/space_truss.h>
-#include <sec21/structural_analysis/system_result.h>
-#include <sec21/structural_analysis/solver/backend/viennacl.h>
+#include <sec21/structural_analysis/solver/backend/eigen.h>
 
 #include <array>
 
@@ -25,7 +24,7 @@ TEST_CASE("example system 6.0 load from json", "[sec21][structural_analysis][spa
    using node_t = node<2, int, double>;
    using space_truss_t = space_truss<node_t, member_t>;
 
-   auto sys = sec21::load_from_json<space_truss_t>("example_6.json");
+   auto sys = sec21::read_from_json<space_truss_t>("example_6.json");
 
    REQUIRE(size(sys.nodes) == 7);
    REQUIRE(size(sys.members) == 11);
@@ -42,6 +41,7 @@ TEST_CASE("example system 6.0 load from json", "[sec21][structural_analysis][spa
       // REQUIRE(impl::length(sys, m5.value()).value() == Approx(4.24264)); //_m);
       // REQUIRE(impl::length(sys, m6.value()).value() == Approx(4.24264)); //_m);
 
+      //! \todo replace with std::numeric
       namespace bmc = boost::math::constants;
       using precision_t = double;
       // const auto fourth_pi{bmc::half_pi<precision_t>() * 0.5};
@@ -449,9 +449,9 @@ TEST_CASE("example system 6.0 load from json", "[sec21][structural_analysis][spa
 #endif
    SECTION("solve")
    {
-      auto load = sec21::load_from_json<loadcase<decltype(sys)>>("example_6_load.json");
+      auto load = sec21::read_from_json<loadcase<decltype(sys)>>("example_6_load.json");
 
-      const auto success = solve<solver::backend::viennacl_impl>(sys, load);
+      const auto success = solve<solver::backend::eigen>(sys, load);
       REQUIRE(success.has_value() == true);
 
       const auto result = success.value();
@@ -483,11 +483,5 @@ TEST_CASE("example system 6.0 load from json", "[sec21][structural_analysis][spa
       // REQUIRE(copied_results[8] == Approx(0.0));
       REQUIRE(copied_results[9] == Approx(67'500));
       REQUIRE(copied_results[10] == Approx(67'500));
-
-      {
-         std::ofstream ofs{"output_example_6_result.json"};
-         nlohmann::json tmp = result;
-         ofs << std::setw(4) << tmp;
-      }
    }
 }

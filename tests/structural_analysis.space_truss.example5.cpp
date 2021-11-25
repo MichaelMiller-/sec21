@@ -21,7 +21,7 @@ TEST_CASE("example system 5.0 load from json", "[sec21][structural_analysis][spa
    using node_t = node<2, int, double>;
    using space_truss_t = space_truss<node_t, member_t>;
 
-   auto sys = sec21::load_from_json<space_truss_t>("example_5.json");
+   auto sys = sec21::read_from_json<space_truss_t>("example_5.json");
 
    REQUIRE(std::size(sys.nodes) == 9);
    REQUIRE(size(sys.members) == 14);
@@ -89,7 +89,7 @@ TEST_CASE("example system 5.0 load from json", "[sec21][structural_analysis][spa
 #endif
    SECTION("solve with eigen backend")
    {
-      auto load = sec21::load_from_json<loadcase<decltype(sys)>>("example_5_load.json");
+      const auto load = sec21::read_from_json<loadcase<decltype(sys)>>("example_5_load.json");
 
       const auto success = solve<solver::backend::eigen>(sys, load);
       REQUIRE(success.has_value() == true);

@@ -8,9 +8,8 @@
 #include <sec21/structural_analysis/node.h>
 #include <sec21/structural_analysis/member.h>
 #include <sec21/structural_analysis/space_truss.h>
-#include <sec21/structural_analysis/system_result.h>
 #include <sec21/units.h>
-#include <sec21/structural_analysis/solver/backend/viennacl.h>
+#include <sec21/structural_analysis/solver/backend/eigen.h>
 
 TEST_CASE("example 1.1 with different node id's (N1 switched with N3 from example 1)", "[sec21][structural_analysis][space_truss]")
 {
@@ -41,12 +40,12 @@ TEST_CASE("example 1.1 with different node id's (N1 switched with N3 from exampl
    REQUIRE(static_cast<bool>(n3) == true);
    REQUIRE(static_cast<bool>(n4) == true);
 
-   auto m1 = add_member(sys, 3, 2, {1, 0.004, 21'000'000});
-   auto m2 = add_member(sys, 1, 2, {2, 0.004, 21'000'000});
-   auto m3 = add_member(sys, 4, 1, {3, 0.004, 21'000'000});
-   auto m4 = add_member(sys, 4, 3, {4, 0.004, 21'000'000});
-   auto m5 = add_member(sys, 4, 2, {5, 0.004, 21'000'000});
-   auto m6 = add_member(sys, 1, 3, {6, 0.004, 21'000'000});
+   auto m1 = add_member(sys, 3, 2, {1, "", {}, "", "", 0.004, 21'000'000});
+   auto m2 = add_member(sys, 1, 2, {2, "", {}, "", "", 0.004, 21'000'000});
+   auto m3 = add_member(sys, 4, 1, {3, "", {}, "", "", 0.004, 21'000'000});
+   auto m4 = add_member(sys, 4, 3, {4, "", {}, "", "", 0.004, 21'000'000});
+   auto m5 = add_member(sys, 4, 2, {5, "", {}, "", "", 0.004, 21'000'000});
+   auto m6 = add_member(sys, 1, 3, {6, "", {}, "", "", 0.004, 21'000'000});
 
    REQUIRE(static_cast<bool>(m1) == true);
    REQUIRE(static_cast<bool>(m2) == true);
@@ -202,7 +201,7 @@ TEST_CASE("example 1.1 with different node id's (N1 switched with N3 from exampl
       loadcase<decltype(sys)> lf1;
       lf1.node_load.emplace_back(2, loadcase<decltype(sys)>::load_t{{10.0_kN, -10.0_kN}});
 
-      const auto success = solve<solver::backend::viennacl_impl>(sys, lf1);
+      const auto success = solve<solver::backend::eigen>(sys, lf1);
       REQUIRE(success.has_value() == true);
 
       const auto result = success.value();

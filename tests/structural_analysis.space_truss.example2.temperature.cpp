@@ -6,7 +6,7 @@
 #include <sec21/structural_analysis/node.h>
 #include <sec21/structural_analysis/member.h>
 #include <sec21/structural_analysis/space_truss.h>
-#include <sec21/structural_analysis/solver/backend/viennacl.h>
+#include <sec21/structural_analysis/solver/backend/eigen.h>
 
 #include <array>
 
@@ -21,13 +21,13 @@ TEST_CASE("example system 2.0 with temperature load", "[sec21][structural_analys
    using node_t = node<2, int, double>;
    using space_truss_t = space_truss<node_t, member_t>;
 
-   auto sys = sec21::load_from_json<space_truss_t>("example_2.json");
-   auto load = sec21::load_from_json<loadcase<decltype(sys)>>("example_2_temperature_load.json");
+   auto sys = sec21::read_from_json<space_truss_t>("example_2.json");
+   auto load = sec21::read_from_json<loadcase<decltype(sys)>>("example_2_temperature_load.json");
 
    REQUIRE(size(sys.nodes) == 4);
    REQUIRE(size(sys.members) == 5);
 
-   const auto success = solve<solver::backend::viennacl_impl>(sys, load);
+   const auto success = solve<solver::backend::eigen>(sys, load);
    REQUIRE(success.has_value() == true);
 
    const auto result = success.value();
@@ -48,6 +48,8 @@ TEST_CASE("example system 2.0 with temperature load", "[sec21][structural_analys
       std::end(result.members), 
       std::back_inserter(copied_results), 
       [](auto&& m) { return m.normal_force.value(); });
+
+   //! \todo
 
    // unit: newton [N]
    // REQUIRE(flat_support_reaction[0] == Approx(3'000.0));
