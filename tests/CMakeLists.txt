@@ -6,71 +6,73 @@ find_package(Eigen3 CONFIG REQUIRED)
 
 ## speed up the compiletime process
 add_library(catch_main STATIC catch_main.cpp)
-# target_link_libraries(catch_main PRIVATE Catch2::Catch2)
-target_link_libraries(catch_main PUBLIC Catch2::Catch2 Catch2::Catch2WithMain)
-
+if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    target_link_libraries(catch_main PUBLIC Catch2::Catch2)
+else ()
+    target_link_libraries(catch_main PUBLIC Catch2::Catch2 Catch2::Catch2WithMain)
+endif ()
 
 # if(ENABLE_VIENNA_CL)
-   include(ExternalProject)
-   ExternalProject_Add(
-           ViennaCL-tests
-           URL https://sourceforge.net/projects/viennacl/files/1.7.x/ViennaCL-1.7.1.zip
-           CMAKE_ARGS -Wno-dev
-           -D BUILD_EXAMPLES=OFF
-           -D ENABLE_OPENCL=OFF
-           -D CMAKE_BUILD_TYPE=Release
-           -D CMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/viennacl
-   )
+include(ExternalProject)
+ExternalProject_Add(
+        ViennaCL-tests
+        URL https://sourceforge.net/projects/viennacl/files/1.7.x/ViennaCL-1.7.1.zip
+        CMAKE_ARGS -Wno-dev
+        -D BUILD_EXAMPLES=OFF
+        -D ENABLE_OPENCL=OFF
+        -D CMAKE_BUILD_TYPE=Release
+        -D CMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/viennacl
+)
 add_dependencies(catch_main ViennaCL-tests)
 # endif()
 
 function(test filename)
-   project(test.${filename})
-   add_executable(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/${filename}.cpp)
+    project(test.${filename})
+    add_executable(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/${filename}.cpp)
 
-   target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
-   ## needed for Clang
-   ## TODO: fails
-   # target_compile_options(${PROJECT_NAME} PRIVATE "$<$<CXX_COMPILER_ID:Clang>:-fcoroutines>")
+    target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
+    ## needed for Clang
+    ## TODO: fails
+    # target_compile_options(${PROJECT_NAME} PRIVATE "$<$<CXX_COMPILER_ID:Clang>:-fcoroutines>")
 
-   target_link_libraries(${PROJECT_NAME} PRIVATE Boost::boost)
-   target_link_libraries(${PROJECT_NAME} PRIVATE OpenMP::OpenMP_CXX)
-   target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt-header-only)
-   ## disable non MPL2 compatible features, or in other words disable the features which are still under the LGPL.
-   target_compile_definitions(${PROJECT_NAME} PRIVATE EIGEN_MPL2_ONLY)
-   target_link_libraries(${PROJECT_NAME} PRIVATE Eigen3::Eigen)
+    target_link_libraries(${PROJECT_NAME} PRIVATE Boost::boost)
+    target_link_libraries(${PROJECT_NAME} PRIVATE OpenMP::OpenMP_CXX)
+    target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt-header-only)
+    ## disable non MPL2 compatible features, or in other words disable the features which are still under the LGPL.
+    target_compile_definitions(${PROJECT_NAME} PRIVATE EIGEN_MPL2_ONLY)
+    target_link_libraries(${PROJECT_NAME} PRIVATE Eigen3::Eigen)
 
-  #  if(ENABLE_VIENNA_CL)
-      target_compile_definitions(${PROJECT_NAME} PRIVATE VIENNACL_WITH_OPENMP)
-      target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/viennacl/include)
-   # endif()
+    #  if(ENABLE_VIENNA_CL)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE VIENNACL_WITH_OPENMP)
+    target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/viennacl/include)
+    # endif()
 
-   target_link_libraries(${PROJECT_NAME} PRIVATE catch_main)
-   target_link_libraries(${PROJECT_NAME} PRIVATE sec21)
-   
-   foreach(ARG ${ARGN})
-      string(LENGTH "${ARG}" length_data_file)
-      if(length_data_file)
-         message(STATUS "copy configure file: ${CMAKE_SOURCE_DIR}/data/${ARG}")
-         ## needed for console "make test"
-         configure_file(${CMAKE_SOURCE_DIR}/data/${ARG} "${PROJECT_BINARY_DIR}/${ARG}" COPYONLY)
-         ## needed for direct call from build directory
-         configure_file(${CMAKE_SOURCE_DIR}/data/${ARG} "${CMAKE_BINARY_DIR}/${ARG}" COPYONLY)
-         ## needed for Clion
-         configure_file(${CMAKE_SOURCE_DIR}/data/${ARG} "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${ARG}" COPYONLY)
-      endif()
-   endforeach()   
+    target_link_libraries(${PROJECT_NAME} PRIVATE catch_main)
+    target_link_libraries(${PROJECT_NAME} PRIVATE sec21)
 
-   add_test(
-      NAME ${PROJECT_NAME} 
-      COMMAND "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_NAME}"
-      WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+    foreach (ARG ${ARGN})
+        string(LENGTH "${ARG}" length_data_file)
+        if (length_data_file)
+            message(STATUS "copy configure file: ${CMAKE_SOURCE_DIR}/data/${ARG}")
+            ## needed for console "make test"
+            configure_file(${CMAKE_SOURCE_DIR}/data/${ARG} "${PROJECT_BINARY_DIR}/${ARG}" COPYONLY)
+            ## needed for direct call from build directory
+            configure_file(${CMAKE_SOURCE_DIR}/data/${ARG} "${CMAKE_BINARY_DIR}/${ARG}" COPYONLY)
+            ## needed for Clion
+            configure_file(${CMAKE_SOURCE_DIR}/data/${ARG} "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${ARG}" COPYONLY)
+        endif ()
+    endforeach ()
+
+    add_test(
+            NAME ${PROJECT_NAME}
+            COMMAND "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_NAME}"
+            WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
 endfunction()
 
 ## copy optional data 
-if(EXISTS "${CMAKE_SOURCE_DIR}/data/cp_results.sh")
-   configure_file("${CMAKE_SOURCE_DIR}/data/cp_results.sh" "${PROJECT_BINARY_DIR}/cp_results.sh" COPYONLY)
-endif()
+if (EXISTS "${CMAKE_SOURCE_DIR}/data/cp_results.sh")
+    configure_file("${CMAKE_SOURCE_DIR}/data/cp_results.sh" "${PROJECT_BINARY_DIR}/cp_results.sh" COPYONLY)
+endif ()
 
 ## unit tests via catch (alphabetical order)
 ##
