@@ -51,7 +51,9 @@ jobs:
     - name: Configure CMake
       shell: bash
       working-directory: build
-      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{matrix.config}} -DCMAKE_TOOLCHAIN_FILE=$GITHUB_WORKSPACE\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake
+      run: echo $GITHUB_WORKSPACE |
+        echo ${{runner.workspace}} |
+        cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{matrix.config}} -DCMAKE_TOOLCHAIN_FILE=$GITHUB_WORKSPACE\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake
 
     - name: Build
       working-directory: build
