@@ -1,0 +1,4 @@
+#define VERSION_MAJOR @logger_VERSION_MAJOR@
+#define VERSION_MINOR @logger_VERSION_MINOR@
+
+constexpr char SEC21_PROGRAM_NAME[] = "@PROJECT_NAME@";
