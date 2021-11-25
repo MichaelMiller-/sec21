@@ -20,7 +20,7 @@ namespace sec21::numeric
 
       auto counter{0};
       for (decltype(input.size1()) i = 0; i < input.size1(); ++i) {
-#ifdef MSVC // bug -> narrowing conversion
+#ifdef _MSC_VER // MSVC // bug -> narrowing conversion
          if (auto it = std::find(begin(rows), end(rows), row(i)); it != end(rows))
 #else
          if (auto it = std::find(begin(rows), end(rows), row{i}); it != end(rows))
@@ -47,7 +47,7 @@ namespace sec21::numeric
 
       auto counter{0};
       for (decltype(input.size2()) i = 0; i < input.size2(); ++i) {
-#ifdef MSVC // bug -> narrowing conversion
+#ifdef _MSC_VER // bug -> narrowing conversion
          if (auto it = std::find(begin(cols), end(cols), col(i)); it != end(cols))
 #else
          if (auto it = std::find(begin(cols), end(cols), col{i}); it != end(cols))
@@ -71,7 +71,7 @@ namespace sec21::numeric
 
       auto first = begin(result);
       for (decltype(input.size()) i = 0; i < input.size(); ++i) {
-#ifdef MSVC // bug -> narrowing conversion
+#ifdef _MSC_VER // bug in MSVC -> narrowing conversion
          if (auto it = std::find(begin(rows), end(rows), row(i)); it != end(rows))
 #else
          if (auto it = std::find(begin(rows), end(rows), row{i}); it != end(rows))
@@ -89,7 +89,7 @@ namespace sec21::numeric
    {
       std::vector<T, Allocator> result;
       for (auto i = 0; i < size(input); ++i) {
-#ifdef MSVC // bug -> narrowing conversion
+#ifdef _MSC_VER // bug -> narrowing conversion
          if (auto it = std::find(begin(rows), end(rows), row(i)); it == end(rows))
 #else
          if (auto it = std::find(begin(rows), end(rows), row{i}); it == end(rows))
