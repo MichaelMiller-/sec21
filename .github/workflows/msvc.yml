@@ -24,6 +24,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Install Dependencies
+      working-directory: ${{runner.workspace}}
       run: |
         git clone https://github.com/Microsoft/vcpkg.git 
         cd vcpkg
@@ -50,7 +51,7 @@ jobs:
     - name: Configure CMake
       shell: bash
       working-directory: build
-      run: cmake -DCMAKE_BUILD_TYPE=${{matrix.config}} -DCMAKE_TOOLCHAIN_FILE="..\vcpkg\scripts\buildsystems\vcpkg.cmake" ..
+      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{matrix.config}} -DCMAKE_TOOLCHAIN_FILE=${{runner.workspace}}/vcpkg/scripts/buildsystems/vcpkg.cmake
 
     - name: Build
       working-directory: build
