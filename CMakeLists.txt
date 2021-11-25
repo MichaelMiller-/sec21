@@ -48,9 +48,9 @@ endif ()
 option(ENABLE_BENCHMARKS "Enable benchmarks" OFF)
 option(ENABLE_VIEWER "Enable system viewer" OFF)
 option(ENABLE_SCRIPT_INTERFACE "Enable script interface" OFF)
-option(ENABLE_TESTS "Enable tests" ON)
 option(ENABLE_DEVTOOLS "tools needed for the development process" OFF)
 option(ENABLE_PRODUCTION "not listed on GITHUB" OFF)
+option(ENABLE_VIENNA_CL "Enable ViennaCL solver" OFF)
 
 if (ENABLE_BENCHMARKS)
     message(STATUS "Benchmarks enabled")
@@ -67,8 +67,8 @@ if (ENABLE_SCRIPT_INTERFACE)
     add_subdirectory(scripting)
 endif ()
 
-if (ENABLE_TESTS)
-    include(CTest)
+include(CTest)
+if (BUILD_TESTING) # option is created by CTest
     enable_testing()
     add_subdirectory(tests)
 endif ()
@@ -84,37 +84,42 @@ add_custom_target(
 
 ##
 ##
+add_subdirectory(logger)
 add_subdirectory(http_connection)
 add_subdirectory(orm_compiler)
+add_subdirectory(make_readme)
 
 ## production code - not listed on GITHUB
 ##
 if (ENABLE_PRODUCTION)
     add_subdirectory(codegen)
-    add_subdirectory(collect)
-    add_subdirectory(controller)
     add_subdirectory(database_connection)
-    add_subdirectory(editor)
+    add_subdirectory(service_provider)
     add_subdirectory(esbp)
+    add_subdirectory(sanity_check)
+    add_subdirectory(triangulation)
+endif ()
+
+option(ENABLE_WORK_IN_PROGRESS "work in progress!" OFF)
+if (ENABLE_WORK_IN_PROGRESS)
+    add_subdirectory(editor)
     # add_subdirectory(fuzzing_test)
-    # add_subdirectory(integration_test_sqlite3_backend)
-    add_subdirectory(log_service)
-    add_subdirectory(logger)
+    add_subdirectory(integration_test_sqlite3_backend)
     add_subdirectory(opengl_window)
     add_subdirectory(plotter)
     add_subdirectory(pmr)
     add_subdirectory(polymorphism)
     # add_subdirectory(portal) ## Wt
     add_subdirectory(que)
-    add_subdirectory(resttest)
     add_subdirectory(runtime_enviroment)
     add_subdirectory(translate)
     add_subdirectory(udf)
-    add_subdirectory(viewer_sfml)
+    # add_subdirectory(viewer_sfml)
+    add_subdirectory(worker) ## test logger
     # add_subdirectory(webviewer) ## Emscripten test
-    add_subdirectory(worker)
     # add_subdirectory(workspace) ## Alia test
 endif ()
+
 
 ## installation
 ##
@@ -180,12 +185,16 @@ add_custom_target(
 
 ##
 ## TODO: copy dockerfile
+## TODO: build in docker and deploy
 # add_custom_target(
 #    docker
 # )
 
 ## copy optional data
 ##
+if (EXISTS "${PROJECT_SOURCE_DIR}/make_and_deploy.sh.in")
+    configure_file(${PROJECT_SOURCE_DIR}/make_and_deploy.sh.in ${PROJECT_BINARY_DIR}/make_and_deploy.sh @ONLY)
+endif ()
 if (EXISTS "${PROJECT_SOURCE_DIR}/data/cp_gen.sh")
     configure_file(${PROJECT_SOURCE_DIR}/data/cp_gen.sh ${PROJECT_BINARY_DIR}/cp_gen.sh COPYONLY)
 endif ()
