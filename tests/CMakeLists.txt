@@ -6,11 +6,7 @@ find_package(Eigen3 CONFIG REQUIRED)
 
 ## speed up the compiletime process
 add_library(catch_main STATIC catch_main.cpp)
-if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-    target_link_libraries(catch_main PUBLIC Catch2::Catch2)
-else ()
-    target_link_libraries(catch_main PUBLIC Catch2::Catch2 Catch2::Catch2WithMain)
-endif ()
+target_link_libraries(catch_main PUBLIC Catch2::Catch2)
 
 if (ENABLE_VIENNA_CL)
     include(ExternalProject)
