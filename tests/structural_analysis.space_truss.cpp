@@ -29,7 +29,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    using namespace sec21::structural_analysis;
    using namespace sec21::units::literals;
 
-   using precision_t = float;
+   using precision_t = double;
    using member_t = member<int, precision_t>;
    using node_t = node<2, int, precision_t>;
    using space_truss_t = space_truss<node_t, member_t>;
