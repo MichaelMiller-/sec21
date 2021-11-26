@@ -61,7 +61,7 @@ namespace sec21::structural_analysis::impl
    // }
 
    template <typename T>
-   [[nodiscard]] auto angle_to_x_axis(T const& from, T const& to) noexcept -> double
+   [[nodiscard]] auto angle_to_x_axis(T const& from, T const& to) noexcept
    {
       using namespace boost::qvm;
       using value_t = typename vec_traits<T>::scalar_type;
