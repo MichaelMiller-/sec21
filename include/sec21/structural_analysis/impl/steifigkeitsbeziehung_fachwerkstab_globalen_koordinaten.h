@@ -60,7 +60,7 @@ namespace sec21::structural_analysis::impl
       }
 
       // clang-format off
-      const auto values = {
+      const auto values = std::array<precision_t, 4 * 4>{
          (c * c) * kv,  (s * c) * kv, (-c * c) * kv, (-s * c) * kv,
          (s * c) * kv,  (s * s) * kv, (-s * c) * kv, (-s * s) * kv,
          (-c * c) * kv, (-s * c) * kv,  (c * c) * kv,  (s * c) * kv,
