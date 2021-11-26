@@ -12,8 +12,9 @@ TEST_CASE("test loadcase", "[sec21][structural_analysis][loadcase]")
    using namespace sec21::units::literals;
    using namespace std::literals;
 
-   using member_t = member<int, double>;
-   using node_t = node<2, int, double>;
+   using precision_t = double;
+   using member_t = member<int, precision_t>;
+   using node_t = node<2, int, precision_t>;
    using space_truss_t = space_truss<node_t, member_t>;
 
    auto sys = sec21::read_from_json<space_truss_t>("example_1.json");
@@ -29,7 +30,7 @@ TEST_CASE("test loadcase", "[sec21][structural_analysis][loadcase]")
       lf1.temperature_loads.emplace_back(loadcase_t::temperature_load_t{1, 30.0_K, 0.012});
 
       using namespace sec21;
-      using value_t = units::quantity<units::newton, typename decltype(sys)::precision_t>;
+      using value_t = units::quantity<units::newton, precision_t>;
 
       std::vector<value_t> F(std::size(sys.nodes) * dim);
       REQUIRE(std::size(F) == 8);
@@ -47,7 +48,7 @@ TEST_CASE("test loadcase", "[sec21][structural_analysis][loadcase]")
       lf1.node_load.push_back({ 2, {10.0_kN, -10.0_kN}});
 
       using namespace sec21;
-      using value_t = units::quantity<units::newton, typename decltype(sys)::precision_t>;
+      using value_t = units::quantity<units::newton, precision_t>;
 
       std::vector<value_t> F(std::size(sys.nodes) * dim);
       REQUIRE(std::size(F) == 8);
@@ -67,7 +68,7 @@ TEST_CASE("test loadcase", "[sec21][structural_analysis][loadcase]")
       lf1.node_load.push_back({ 1, { -7.0_kN,  7.0_kN}});
 
       using namespace sec21;
-      using value_t = units::quantity<units::newton, typename decltype(sys)::precision_t>;
+      using value_t = units::quantity<units::newton, precision_t>;
 
       std::vector<value_t> F(std::size(sys.nodes) * dim);
       REQUIRE(std::size(F) == 8);
