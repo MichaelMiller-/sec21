@@ -29,8 +29,9 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    using namespace sec21::structural_analysis;
    using namespace sec21::units::literals;
 
-   using member_t = member<int, double>;
-   using node_t = node<2, int, double>;
+   using precision_t = float;
+   using member_t = member<int, precision_t>;
+   using node_t = node<2, int, precision_t>;
    using space_truss_t = space_truss<node_t, member_t>;
    using support_t = node_t::global_support_t;
 
@@ -39,7 +40,6 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    static_assert(is_space_truss<decltype(sys)>::value);
    static_assert(is_space_truss_2D<decltype(sys)>::value);
 
-   using precision_t = decltype(sys)::precision_t;
    using loadcase_t = loadcase<decltype(sys)>;
 
    auto n1 = add_node(sys, node_t{1u, {0.0, 3.0}});
@@ -62,8 +62,8 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    auto m5 = add_member(sys, 4, 2, member_t{5u, "", {}, "", "", 0.004, 21'000'000});
    auto m6 = add_member(sys, 3, 1, member_t{6u, "", {}, "", "", 0.004, 21'000'000});
 
-   const auto EA_l1 = 28'000.0;
-   const auto EA_l2 = 19'798.98987;
+   const precision_t EA_l1 = 28'000.0;
+   const precision_t EA_l2 = 19'798.98987;
 
    REQUIRE(static_cast<bool>(m1) == true);
    REQUIRE(static_cast<bool>(m2) == true);
@@ -88,7 +88,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       REQUIRE(impl::length(sys, m6.value()).value() == Approx(4.24264)); //_m);
 
       namespace bmc = boost::math::constants;
-      const auto fourth_pi{bmc::half_pi<precision_t>() * 0.5};
+      const auto fourth_pi{bmc::half_pi<precision_t>() * static_cast<precision_t>(0.5)};
 
       REQUIRE(impl::angle_to_x_axis(sys, m1.value()) == Approx(0.0));
       REQUIRE(impl::angle_to_x_axis(sys, m2.value()) == Approx(bmc::half_pi<precision_t>()));
@@ -131,7 +131,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    }
    SECTION("Steifigkeitsbeziehung vom Fachwerkstab 1 in globalen Koordinaten")
    {
-      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<double>>;
+      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
       auto result = impl::steifigkeitsbeziehung_fachwerkstab_globalen_koordinaten<allocator_t>(sys, m1.value());
 
       REQUIRE(result.size1() == 4);
@@ -145,7 +145,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       /// Fx2           -1  0  1  0      u2
       /// Fy2            0  0  0  0      v2
       ///
-      auto expected = std::valarray{
+      auto expected = std::valarray<precision_t>{
          1.0, 0.0,-1.0, 0.0,
          0.0, 0.0, 0.0, 0.0,
         -1.0, 0.0, 1.0, 0.0,
@@ -157,7 +157,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    }
    SECTION("Steifigkeitsbeziehung vom Fachwerkstab 2 in globalen Koordinaten")
    {
-      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<double>>;
+      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
       auto result = impl::steifigkeitsbeziehung_fachwerkstab_globalen_koordinaten<allocator_t>(sys, m2.value());
 
       REQUIRE(result.size1() == 4);
@@ -171,7 +171,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       /// Fx2            0  0  0  0      u2
       /// Fy2            0 -1  0  1      v2
       ///
-      auto expected = std::valarray{
+      auto expected = std::valarray<precision_t>{
          0.0, 0.0, 0.0, 0.0,
          0.0, 1.0, 0.0,-1.0,
          0.0, 0.0, 0.0, 0.0,
@@ -183,7 +183,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    }
    SECTION("Steifigkeitsbeziehung vom Fachwerkstab 3 in globalen Koordinaten")
    {
-      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<double>>;
+      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
       auto result = impl::steifigkeitsbeziehung_fachwerkstab_globalen_koordinaten<allocator_t>(sys, m3.value());
 
       REQUIRE(result.size1() == 4);
@@ -197,7 +197,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       /// Fx3           -1  0  1  0      u3
       /// Fy3            0  0  0  0      v3
       ///
-      auto expected = std::valarray{
+      auto expected = std::valarray<precision_t>{
          1.0, 0.0,-1.0, 0.0,
          0.0, 0.0, 0.0, 0.0,
         -1.0, 0.0, 1.0, 0.0,
@@ -209,7 +209,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    }
    SECTION("Steifigkeitsbeziehung vom Fachwerkstab 4 in globalen Koordinaten")
    {
-      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<double>>;
+      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
       auto result = impl::steifigkeitsbeziehung_fachwerkstab_globalen_koordinaten<allocator_t>(sys, m4.value());
 
       REQUIRE(result.size1() == 4);
@@ -223,7 +223,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       /// Fx4            0  0  0  0      u4
       /// Fy4            0  -1  0  1     v4
       ///
-      auto expected = std::valarray{
+      auto expected = std::valarray<precision_t>{
          0.0, 0.0, 0.0, 0.0,
          0.0, 1.0, 0.0,-1.0,
          0.0, 0.0, 0.0, 0.0,
@@ -235,13 +235,13 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    }
    SECTION("Steifigkeitsbeziehung vom Fachwerkstab 5 in globalen Koordinaten")
    {
-      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<double>>;
+      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
       auto result = impl::steifigkeitsbeziehung_fachwerkstab_globalen_koordinaten<allocator_t>(sys, m5.value());
 
       REQUIRE(result.size1() == 4);
       REQUIRE(result.size2() == 4);
       // clang-format off
-      auto expected = std::valarray{
+      auto expected = std::valarray<precision_t>{
           0.5, 0.5,-0.5,-0.5,
           0.5, 0.5,-0.5,-0.5,
          -0.5,-0.5, 0.5, 0.5,
@@ -253,13 +253,13 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    }
    SECTION("Steifigkeitsbeziehung vom Fachwerkstab 6 in globalen Koordinaten")
    {
-      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<double>>;
+      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
       auto result = impl::steifigkeitsbeziehung_fachwerkstab_globalen_koordinaten<allocator_t>(sys, m6.value());
 
       REQUIRE(result.size1() == 4);
       REQUIRE(result.size2() == 4);
       // clang-format off
-      auto expected = std::valarray{
+      auto expected = std::valarray<precision_t>{
           0.5,-0.5,-0.5, 0.5,
          -0.5, 0.5, 0.5,-0.5,
          -0.5, 0.5, 0.5,-0.5,
@@ -271,13 +271,13 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    }
    SECTION("coincidence matrix from member 1")
    {
-      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<double>>;
+      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
       auto Z = impl::coincidence_matrix<allocator_t>(sys, m1.value());
 
       REQUIRE(Z.size1() == 4);
       REQUIRE(Z.size2() == 8);
       // clang-format off
-      const auto expected = std::array{
+      const auto expected = std::array<precision_t, 4*8>{
          1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
          0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
          0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -288,13 +288,13 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    }
    SECTION("coincidence matrix from member 2")
    {
-      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<double>>;
+      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
       auto Z = impl::coincidence_matrix<allocator_t>(sys, m2.value());
 
       REQUIRE(Z.size1() == 4);
       REQUIRE(Z.size2() == 8);
       // clang-format off
-      const auto expected = std::array{
+      const auto expected = std::array<precision_t, 4*8>{
          0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0,
          0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0,
          0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -305,13 +305,13 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    }
    SECTION("coincidence matrix from member 3")
    {
-      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<double>>;
+      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
       auto Z = impl::coincidence_matrix<allocator_t>(sys, m3.value());
 
       REQUIRE(Z.size1() == 4);
       REQUIRE(Z.size2() == 8);
       // clang-format off
-      const auto expected = std::array{
+      const auto expected = std::array<precision_t, 4*8>{
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0,
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0,
          0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0,
@@ -322,13 +322,13 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    }
    SECTION("coincidence matrix from member 4")
    {
-      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<double>>;
+      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
       auto Z = impl::coincidence_matrix<allocator_t>(sys, m4.value());
 
       REQUIRE(Z.size1() == 4);
       REQUIRE(Z.size2() == 8);
       // clang-format off
-      const auto expected = std::array{
+      const auto expected = std::array<precision_t, 4*8>{
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0,
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0,
          1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -339,13 +339,13 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    }
    SECTION("coincidence matrix from member 5")
    {
-      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<double>>;
+      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
       auto Z = impl::coincidence_matrix<allocator_t>(sys, m5.value());
 
       REQUIRE(Z.size1() == 4);
       REQUIRE(Z.size2() == 8);
       // clang-format off
-      const auto expected = std::array{
+      const auto expected = std::array<precision_t, 4*8>{
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0,
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0,
          0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -356,13 +356,13 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    }
    SECTION("coincidence matrix from member 6")
    {
-      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<double>>;
+      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
       auto Z = impl::coincidence_matrix<allocator_t>(sys, m6.value());
 
       REQUIRE(Z.size1() == 4);
       REQUIRE(Z.size2() == 8);
       // clang-format off
-      const auto expected = std::array{
+      const auto expected = std::array<precision_t, 4*8>{
          0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0,
          0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0,
          1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -373,13 +373,13 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    }
    SECTION("stiffness matrix from member 1")
    {
-      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<double>>;
+      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
       auto K = impl::stiffness_matrix<allocator_t>(sys, m1.value());
 
       REQUIRE(K.size1() == 8);
       REQUIRE(K.size2() == 8);
       // clang-format off
-      auto expected = std::valarray{
+      auto expected = std::valarray<precision_t>{
          1.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
          0.0, 0.0,  0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
         -1.0, 0.0,  1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -397,13 +397,13 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    }
    SECTION("stiffness matrix from member 2")
    {
-      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<double>>;
+      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
       auto K = impl::stiffness_matrix<allocator_t>(sys, m2.value());
 
       REQUIRE(K.size1() == 8);
       REQUIRE(K.size2() == 8);
       // clang-format off
-      auto expected = std::valarray{
+      auto expected = std::valarray<precision_t>{
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -421,13 +421,13 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    }
    SECTION("stiffness matrix from member 3")
    {
-      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<double>>;
+      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
       auto K = impl::stiffness_matrix<allocator_t>(sys, m3.value());
 
       REQUIRE(K.size1() == 8);
       REQUIRE(K.size2() == 8);
       // clang-format off
-      auto expected = std::valarray{
+      auto expected = std::valarray<precision_t>{
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -445,13 +445,13 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    }
    SECTION("stiffness matrix from member 4")
    {
-      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<double>>;
+      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
       auto K = impl::stiffness_matrix<allocator_t>(sys, m4.value());
 
       REQUIRE(K.size1() == 8);
       REQUIRE(K.size2() == 8);
       // clang-format off
-      auto expected = std::valarray{
+      auto expected = std::valarray<precision_t>{
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
          0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0,-1.0,
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -475,7 +475,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       REQUIRE(K.size1() == 8);
       REQUIRE(K.size2() == 8);
       // clang-format off
-      auto expected = std::valarray{
+      auto expected = std::valarray<precision_t>{
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
          0.0, 0.0, 0.5, 0.5, 0.0, 0.0,-0.5,-0.5,
@@ -499,7 +499,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       REQUIRE(K.size1() == 8);
       REQUIRE(K.size2() == 8);
       // clang-format off
-      auto expected = std::valarray{
+      auto expected = std::valarray<precision_t>{
          0.5,-0.5, 0.0, 0.0,-0.5, 0.5, 0.0, 0.0,
         -0.5, 0.5, 0.0, 0.0, 0.5,-0.5, 0.0, 0.0,
          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -523,7 +523,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       REQUIRE(K.size1() == 8);
       REQUIRE(K.size2() == 8);
       // clang-format off
-      auto expected = std::valarray{
+      auto expected = std::valarray<precision_t>{
           1.35, -0.35,-1.0,  0.0, -0.35, 0.35, 0.0,   0.0,
          -0.35,  1.35, 0.0,  0.0,  0.35,-0.35, 0.0,  -1.0,
          -1.0,   0.0,  1.35, 0.35, 0.0,  0.0, -0.35, -0.35,
@@ -567,7 +567,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       // 2.8 * 10^3 * | -1.0,   0.0,   1.35  0.35, 0.0,  | * | u2 | = | Fx2 |
       //              |  0.0,   0.0,   0.35, 1.35, 0.0,  |   | v2 |   | Fy2 |
       //              | -0.35,  0.35,  0.0,  0.0,  1.35  |   | u3 |   | Fx3 |
-      auto expected = std::valarray{
+      auto expected = std::valarray<precision_t>{
           1.35, -0.35, -1.0,  0.0, -0.35,
          -0.35,  1.35,  0.0,  0.0,  0.35,
          -1.0,   0.0,   1.35, 0.35, 0.0,
@@ -608,7 +608,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       // 2.8 * 10^3 * |  0.0,   0.0,  -0.35, -0.35, -1.0,  | * | u2 | = | Fx4 |  
       //              |  0.0,  -1.0,  -0.35  -0.35,  0.0   |   | v2 |   | Fy4 |
       //                                                       | u3 |
-      auto expected = std::valarray{
+      auto expected = std::valarray<precision_t>{
           0.35, -0.35, 0.0,  -1.0,  -0.35,
           0.0,   0.0, -0.35, -0.35, -1.0,
           0.0,  -1.0, -0.35, -0.35,  0.0
