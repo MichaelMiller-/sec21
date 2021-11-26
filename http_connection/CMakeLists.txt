@@ -13,7 +13,7 @@ target_include_directories(${PROJECT_NAME}
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
 
 find_package(cpprestsdk CONFIG REQUIRED)
-find_package(Boost REQUIRED)
+find_package(Boost 1.70 REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE cpprestsdk::cpprest cpprestsdk::cpprestsdk_zlib_internal)
