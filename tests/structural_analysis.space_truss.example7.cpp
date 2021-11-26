@@ -1,5 +1,4 @@
-﻿#include "approx_equal.h"
-#include <catch.hpp>
+﻿#include <catch.hpp>
 
 #include <sec21/file_loader.h>
 #include <sec21/structural_analysis/loadcase.h>
@@ -18,8 +17,9 @@ TEST_CASE("example system 7.0 load from json", "[sec21][structural_analysis][spa
    using namespace sec21::structural_analysis;
    using namespace sec21::units::literals;
 
-   using member_t = member<int, double>;
-   using node_t = node<2, int, double>;
+   using precision_t = float;
+   using member_t = member<int, precision_t>;
+   using node_t = node<2, int, precision_t>;
    using space_truss_t = space_truss<node_t, member_t>;
 
    auto sys = sec21::read_from_json<space_truss_t>("example_7.json");
@@ -38,7 +38,7 @@ TEST_CASE("example system 7.0 load from json", "[sec21][structural_analysis][spa
    // unit: millimeter [mm]
    REQUIRE(std::get<1>(result.nodes[0].displacement).value() == Approx(-13.9).epsilon(kDivergence));
 
-   std::vector<double> copied_results{};
+   std::vector<precision_t> copied_results{};
    std::transform(std::begin(result.members), std::end(result.members), std::back_inserter(copied_results),
                   [](auto&& m) { return m.normal_force.value(); });
 
@@ -48,7 +48,7 @@ TEST_CASE("example system 7.0 load from json", "[sec21][structural_analysis][spa
    REQUIRE(copied_results[2] == Approx(-15000));
    REQUIRE(copied_results[3] == Approx(80000));
    REQUIRE(copied_results[4] == Approx(-36055).epsilon(kDivergence));
-   REQUIRE(copied_results[5] == Approx(20000));
+   REQUIRE(copied_results[5] == Approx(20000).epsilon(kDivergence));
    REQUIRE(copied_results[6] == Approx(234000));
    REQUIRE(copied_results[7] == Approx(-177000));
    REQUIRE(copied_results[8] == Approx(147000));
