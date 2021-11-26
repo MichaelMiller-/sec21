@@ -20,8 +20,9 @@ TEST_CASE("example system 6.0 load from json", "[sec21][structural_analysis][spa
    using namespace sec21::structural_analysis;
    using namespace sec21::units::literals;
 
-   using member_t = member<int, double>;
-   using node_t = node<2, int, double>;
+   using precision_t= float;
+   using member_t = member<int, precision_t>;
+   using node_t = node<2, int, precision_t>;
    using space_truss_t = space_truss<node_t, member_t>;
 
    auto sys = sec21::read_from_json<space_truss_t>("example_6.json");
@@ -43,7 +44,6 @@ TEST_CASE("example system 6.0 load from json", "[sec21][structural_analysis][spa
 
       //! \todo replace with std::numeric
       namespace bmc = boost::math::constants;
-      using precision_t = double;
       // const auto fourth_pi{bmc::half_pi<precision_t>() * 0.5};
 
       REQUIRE(impl::angle_to_x_axis(sys, 1) == Approx(0.0));
@@ -416,12 +416,12 @@ TEST_CASE("example system 6.0 load from json", "[sec21][structural_analysis][spa
 #endif
    SECTION("coincidence matrix from member 1")
    {
-      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<double>>;
+      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
       auto Z = impl::coincidence_matrix<allocator_t>(sys, 1);
       REQUIRE(Z.size1() == 4);
       REQUIRE(Z.size2() == 14);
       // clang-format off
-      const auto expected = std::array{
+      const auto expected = std::array<precision_t, 4*14>{
          1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
          0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
          0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
