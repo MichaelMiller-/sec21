@@ -26,9 +26,9 @@ TEST_CASE("try to convert a vector of string to a vector of log entries", "[sec2
    const auto result = to_entries(begin(input), end(input));
 
    const auto expected = std::vector<entry>{
-      { Kind::Info, 978393203777l, 244125, "Starting application sec21:esbp 0.0" },
-      { Kind::Debug, 978393203777l, 244125, "Write results into database" },
-      { Kind::Info, 978393203777l, 244125, "done" }
+      { Kind::Info, 978393203777, 244125, "Starting application sec21:esbp 0.0" },
+      { Kind::Debug, 978393203777, 244125, "Write results into database" },
+      { Kind::Info, 978393203777, 244125, "done" }
    };
    REQUIRE(size(result) == 3);
    REQUIRE(std::equal(begin(result), end(result), begin(expected)));

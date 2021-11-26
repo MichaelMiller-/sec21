@@ -23,7 +23,7 @@ namespace sec21::log
 
    void info(std::string_view message, std::optional<boost::uuids::uuid> element)
    {
-      log(entry{Kind::Info, timestamp<long>::now(), current_process_id(), std::string{message}, element});
+      log(entry{Kind::Info, timestamp<std::uint64_t>::now(), current_process_id(), std::string{message}, element});
    }
 
    void error(entry const& e)
@@ -33,12 +33,12 @@ namespace sec21::log
 
    void error(std::string_view message, std::optional<boost::uuids::uuid> element)
    {
-      log(entry{Kind::Error, timestamp<long>::now(), current_process_id(), std::string{message}, element});
+      log(entry{Kind::Error, timestamp<std::uint64_t>::now(), current_process_id(), std::string{message}, element});
    }
 
    void debug(std::string_view message)
    {
-      log(entry{Kind::Debug, timestamp<long>::now(), current_process_id(), std::string{message}});
+      log(entry{Kind::Debug, timestamp<std::uint64_t>::now(), current_process_id(), std::string{message}});
    }
 
    void warn(entry const& e)
@@ -48,7 +48,7 @@ namespace sec21::log
 
    void warn(std::string_view message)
    {
-      log(entry{Kind::Warning, timestamp<long>::now(), current_process_id(), std::string{message}});
+      log(entry{Kind::Warning, timestamp<std::uint64_t>::now(), current_process_id(), std::string{message}});
    }
 
 } // namespace sec21::log

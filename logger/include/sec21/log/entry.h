@@ -23,7 +23,7 @@ namespace sec21::log
       Kind kind{Kind::Info};
       //
       //! \todo timestamp<long>
-      long timestamp{0}; // 1970-01-01
+      std::uint64_t timestamp{0}; // 1970-01-01
       //
       int process_id{-1};
       //
@@ -92,7 +92,7 @@ namespace sec21::log
         {
            return {
               to_kind(string_match[2].str()),
-              timestamp<long>(string_match[1].str()),
+              timestamp<std::uint64_t>(string_match[1].str()),
               std::atoi(string_match[3].str().c_str()),
               string_match[4].str()
            };
