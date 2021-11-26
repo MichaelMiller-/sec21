@@ -72,19 +72,7 @@ struct CompareId
    }
 };
 
-//! \brief creates a std::set with a is_transparent comparator
-template <typename T, typename... Comparator>
-auto make_set(Comparator&&... comparator)
-{
-   struct Compare : std::decay_t<Comparator>...
-   {
-      using std::decay_t<Comparator>::operator()...;
-      using is_transparent = void;
-   };
-   return std::set<T, Compare>{ Compare{ std::forward<Comparator>(comparator)... } };
-}
-
-/// 
+///
 ///
 
 // language feature: c++17
@@ -173,7 +161,7 @@ TEST_CASE("Designated initializer", "[features]")
 TEST_CASE("lambdas in a unevaluated context and default constructable stateless lambdas", "[features]")
 {
 #if __cplusplus > 201803L
-   auto file = std::unique_ptr<FILE, decltype([](FILE* p) { fclose(p) })>(fopen("somefile.txt", "w"));
+   auto file = std::unique_ptr<FILE, decltype([](FILE* p) { fclose(p); })>(fopen("somefile.txt", "w"));
    SUCCEED("Nothing to test. Compiletests");
 #else
    WARN("lambdas in a unevaluated context are not supported");
@@ -182,6 +170,18 @@ TEST_CASE("lambdas in a unevaluated context and default constructable stateless 
 
 ///
 ///
+//! \brief creates a std::set with a is_transparent comparator
+template <typename T, typename... Comparator>
+auto make_set(Comparator&&... comparator)
+{
+   struct Compare : std::decay_t<Comparator>...
+   {
+      using std::decay_t<Comparator>::operator()...;
+      // ignore "-Wunused-local-typedefs"
+      using is_transparent = void;
+   };
+   return std::set<T, Compare>{ Compare{ std::forward<Comparator>(comparator)... } };
+}
 
 // library feature: c++14
 TEST_CASE("Heterogeneous lookup", "[features]")
@@ -390,3 +390,32 @@ static_assert(!is_compute_available<double&>::value);
 //! \todo is (or can be) replaced by "Design By Introspection in C++20 (concepts + if constexpr)"
  if constexpr (requires { Compute(int&); }) {
 */
+
+#if 0
+
+#include <iostream>
+   #include <boost/core/demangle.hpp>
+template <typename T>
+inline auto name() -> std::string
+{
+   return boost::core::demangle(typeid(T).name());
+}
+template <typename T>
+inline void print_type(std::string n)
+{
+   std::cout << n << ": " << name<T>() << std::endl;
+}
+template <typename Iterator>
+auto dump(Iterator first, Iterator last, std::string_view name)
+{
+   std::cout << name.data() << " n: " << std::distance(first, last) << "\n(";
+   std::copy(first, last, std::ostream_iterator<typename std::iterator_traits<Iterator>::value_type>(std::cout, ", "));
+   std::cout << ")\n" << std::endl;
+}
+template <typename Sequence>
+auto dump(Sequence&& seq, std::string_view name)
+{
+   dump(std::begin(seq), std::end(seq), std::move(name));
+}
+
+#endif
