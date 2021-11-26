@@ -31,7 +31,15 @@ namespace sec21::log
       // contains the UUID of the item to which the message is related
       std::optional<boost::uuids::uuid> element{};
 
-      bool operator == (entry const&) const = default;
+#ifdef __cpp_lib_three_way_comparison
+      bool operator == (entry const& ) const = default;
+#else
+      bool operator == (entry const& rhs) const
+      {
+         return std::tie(kind, timestamp, process_id, message, element) ==
+                std::tie(rhs.kind, rhs.timestamp, rhs.process_id, rhs.message, rhs.element);
+      }
+#endif
    };
 
    constexpr bool operator<(entry const& lhs, entry const& rhs) noexcept { return lhs.timestamp < rhs.timestamp; }
