@@ -4,10 +4,12 @@
 #include <nlohmann/json.hpp>
 
 #include <cpprest/http_client.h>
-#include <cpprest/http_listener.h>          // HTTP server
-#include <cpprest/json.h>                   // JSON library
+#include <cpprest/http_listener.h> // HTTP server
+#include <cpprest/json.h>          // JSON library
 
+#ifdef _MSC_VER
 #include <boost/locale/encoding.hpp>
+#endif
 
 using namespace sec21;
 
@@ -106,8 +108,7 @@ nlohmann::json http_connection::post(std::string_view endpoint, nlohmann::json v
    nlohmann::json result;
 
    //! \todo check for error
-   pimpl->make_request(endpoint,
-                       web::json::value{value.dump()},
+   pimpl->make_request(endpoint, web::json::value{value.dump()},
                        [&result](web::json::value const& v) { result = nlohmann::json::parse(v.serialize()); });
 
    //! \todo exception border
