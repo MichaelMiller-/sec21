@@ -18,14 +18,13 @@ TEST_CASE("example system 1.2 with half load from example 1.0", "[sec21][structu
    using namespace sec21::structural_analysis;
    using namespace sec21::units::literals;
 
-   using member_t = member<int, double>;
-   using node_t = node<2, int, double>;
+   using precision_t = float;
+   using member_t = member<int, precision_t>;
+   using node_t = node<2, int, precision_t>;
    using support_t = node_t::global_support_t;
    using space_truss_t = space_truss<node_t, member_t>;
 
    auto sys = space_truss_t{};
-
-   using precision_t = decltype(sys)::precision_t;
 
    auto n1 = add_node(sys, node_t{1, {0.0, 3.0}});
    auto n2 = add_node(sys, node_t{2, {3.0, 3.0}});
@@ -63,7 +62,7 @@ TEST_CASE("example system 1.2 with half load from example 1.0", "[sec21][structu
       REQUIRE(impl::length(sys, m6.value()).value() == Approx(4.24264).epsilon(kDivergence)); //_m);
 
       namespace bmc = boost::math::constants;
-      const auto fourth_pi{bmc::half_pi<precision_t>() * 0.5};
+      const auto fourth_pi{bmc::half_pi<precision_t>() * static_cast<precision_t>(0.5)};
 
       REQUIRE(impl::angle_to_x_axis(sys, m1.value()) == Approx(0.0));
       REQUIRE(impl::angle_to_x_axis(sys, m2.value()) == Approx(bmc::half_pi<precision_t>()));
