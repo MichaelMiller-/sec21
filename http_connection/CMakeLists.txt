@@ -13,12 +13,13 @@ target_include_directories(${PROJECT_NAME}
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
 
 find_package(cpprestsdk CONFIG REQUIRED)
+find_package(Boost REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 
-target_link_libraries(${PROJECT_NAME} PUBLIC cpprestsdk::cpprest cpprestsdk::cpprestsdk_zlib_internal)
+target_link_libraries(${PROJECT_NAME} PRIVATE cpprestsdk::cpprest cpprestsdk::cpprestsdk_zlib_internal)
 target_link_libraries(${PROJECT_NAME} PRIVATE
         "$<$<CXX_COMPILER_ID:Clang,GNU>:cpprestsdk::cpprestsdk_boost_internal;cpprestsdk::cpprestsdk_openssl_internal>"
         "$<$<CXX_COMPILER_ID:MSVC>:cpprestsdk::cpprestsdk_brotli_internal>"
 )
+target_link_libraries(${PROJECT_NAME} PRIVATE Boost::boost)
 target_link_libraries(${PROJECT_NAME} PUBLIC nlohmann_json nlohmann_json::nlohmann_json)
-
