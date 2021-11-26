@@ -1,4 +1,4 @@
-name: GCC
+name: GCC 10.3
 
 on:
   push:
