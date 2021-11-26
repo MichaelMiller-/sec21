@@ -1,4 +1,4 @@
-name: Clang
+name: Clang 10.0
 
 on:
   push:
