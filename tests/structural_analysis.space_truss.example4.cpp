@@ -17,7 +17,7 @@ TEST_CASE("example system 4.0 load from json", "[sec21][structural_analysis][spa
    using namespace sec21::structural_analysis;
    using namespace sec21::units::literals;
 
-   using precision_t = float;
+   using precision_t = double;
    using member_t = member<int, precision_t>;
    using node_t = node<2, int, precision_t>;
    using space_truss_t = space_truss<node_t, member_t>;
