@@ -25,6 +25,7 @@ jobs:
     - name: Install Compiler
       run: |
         sudo apt install gcc-10
+        g++ --version
 
     - name: Install Dependencies
       shell: bash
