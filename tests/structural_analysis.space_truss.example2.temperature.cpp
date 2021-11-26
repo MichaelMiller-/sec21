@@ -17,8 +17,9 @@ TEST_CASE("example system 2.0 with temperature load", "[sec21][structural_analys
    using namespace sec21::structural_analysis;
    using namespace sec21::units::literals;
 
-   using member_t = member<int, double>;
-   using node_t = node<2, int, double>;
+   using precision_t = float;
+   using member_t = member<int, precision_t>;
+   using node_t = node<2, int, precision_t>;
    using space_truss_t = space_truss<node_t, member_t>;
 
    auto sys = sec21::read_from_json<space_truss_t>("example_2.json");
@@ -32,7 +33,7 @@ TEST_CASE("example system 2.0 with temperature load", "[sec21][structural_analys
 
    const auto result = success.value();
 
-   std::vector<double> flat_support_reaction{};
+   std::vector<precision_t> flat_support_reaction{};
    for (auto [k,v] : result.node) 
    {
       std::transform(
@@ -42,7 +43,7 @@ TEST_CASE("example system 2.0 with temperature load", "[sec21][structural_analys
          [](auto&& e) { return e.value(); });
    }
 
-   std::vector<double> copied_results{};
+   std::vector<precision_t> copied_results{};
    std::transform(
       std::begin(result.members), 
       std::end(result.members), 
