@@ -157,6 +157,7 @@ TEST_CASE("Designated initializer", "[features]")
 #endif
 }
 
+#if 0
 // language feature: c++20
 TEST_CASE("lambdas in a unevaluated context and default constructable stateless lambdas", "[features]")
 {
@@ -167,6 +168,7 @@ TEST_CASE("lambdas in a unevaluated context and default constructable stateless 
    WARN("lambdas in a unevaluated context are not supported");
 #endif
 }
+#endif
 
 ///
 ///
