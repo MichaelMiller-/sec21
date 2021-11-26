@@ -18,7 +18,7 @@ TEST_CASE("example system 1.2 with half load from example 1.0", "[sec21][structu
    using namespace sec21::structural_analysis;
    using namespace sec21::units::literals;
 
-   using precision_t = float;
+   using precision_t = double;
    using member_t = member<int, precision_t>;
    using node_t = node<2, int, precision_t>;
    using support_t = node_t::global_support_t;
