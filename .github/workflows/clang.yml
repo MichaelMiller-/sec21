@@ -22,6 +22,7 @@ jobs:
       - name: Install Compiler
         run: |
           sudo apt install clang
+          clang --version
           sudo pip install gcovr
           
       - name: Install Dependencies
