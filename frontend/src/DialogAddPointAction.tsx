@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
-import {Button, Col, Form, Modal, Spinner} from "react-bootstrap";
-import {ActionType, DbLoadCase, DbPointAction, LoadType} from "./DatabaseInterface";
+import {Button, Col, Form, Modal} from "react-bootstrap";
+import {ActionType, DbLoadCase, DbPointAction, DbStructuralPoint, LoadType} from "./DatabaseInterface";
 import axios from "axios";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faThumbtack} from "@fortawesome/free-solid-svg-icons";
@@ -28,11 +28,21 @@ const DialogAddPointAction = (props: DialogAddPointActionProps) => {
             description: "",
             actionType: ActionType.PERMANENT,
             type: LoadType.STANDARD
+        },
+        referencePoint: {
+            id: 0,
+            name: "",
+            uuid: "",
+            coordinate_x: 0,
+            coordinate_y: 0,
+            coordinate_z: 0,
         }
     });
     const [loadcaseList, setLoadcaseList] = useState<DbLoadCase[]>([]);
-    const [loading, setLoading] = useState(true)
+    const [structurePointList, setStructurePointList] = useState<DbStructuralPoint[]>([]);
     const [pinned, setPinned] = useState(false);
+    const [selectedLoadCase, setSelectedLoadCase] = useState(0);
+    const [selectedRefPoint, setSelectedRefPoint] = useState(0);
 
     const handleInputChange = (e: { target: { name: any; value: any; }; }) => {
         const {name, value} = e.target;
@@ -41,15 +51,7 @@ const DialogAddPointAction = (props: DialogAddPointActionProps) => {
 
     const handleSubmit = async (event: { currentTarget: any; preventDefault: () => void; stopPropagation: () => void; }) => {
         event.preventDefault();
-        //! \todo
-        /*
-        await axios.post(process.env.REACT_APP_BACKEND + '/pointaction/' + props.projectId, data)
-            .catch((e) => {
-                //! \todo show error message
-                console.log(e)
-            })
-        window.location.reload();
-         */
+        await axios.post(process.env.REACT_APP_BACKEND + '/pointaction/' + loadcaseList[selectedLoadCase].id + '/' + structurePointList[selectedRefPoint].id, data)
         props.onSubmit();
         if (pinned === false)
             props.onHide();
@@ -58,7 +60,8 @@ const DialogAddPointAction = (props: DialogAddPointActionProps) => {
     useEffect(() => {
         axios.get(process.env.REACT_APP_BACKEND + '/loadcases/' + props.projectId)
             .then(response => setLoadcaseList(response.data))
-            .finally(() => setLoading(false))
+        axios.get(process.env.REACT_APP_BACKEND + '/structuralpoints/' + props.projectId)
+            .then(response => setStructurePointList(response.data))
     }, [props.show, props.projectId]);
 
     return (
@@ -79,10 +82,11 @@ const DialogAddPointAction = (props: DialogAddPointActionProps) => {
                         />
                         <Form.Control.Feedback>Please provide a valid name.</Form.Control.Feedback>
                     </Form.Group>
-                    {loading && <Spinner animation="border" role="status"></Spinner>}
-                    <Form.Group controlId="ControlSelectBegin">
+                    <Form.Group controlId="controlSelectLoadCase">
                         <Form.Label>Loadcase</Form.Label>
-                        <Form.Control as="select">
+                        <Form.Control as="select" onChange={(e: any) => {
+                            setSelectedLoadCase(e.target.selectedIndex);
+                        }}>
                             {loadcaseList.map(e => (<option key={e.id}>{e.name}</option>))}
                         </Form.Control>
                     </Form.Group>
@@ -122,10 +126,20 @@ const DialogAddPointAction = (props: DialogAddPointActionProps) => {
                         />
                         <Form.Control.Feedback>Please provide a valid value.</Form.Control.Feedback>
                     </Form.Group>
+                    <Form.Group controlId="controlSelectRefNode">
+                        <Form.Label>from</Form.Label>
+                        <Form.Control as="select" onChange={(e: any) => {
+                            setSelectedRefPoint(e.target.selectedIndex);
+                        }}>
+                            {structurePointList.map(e => (<option key={e.id}>{e.name}</option>))}
+                        </Form.Control>
+                    </Form.Group>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="link" onClick={() => { setPinned(!pinned) }} >
-                        <FontAwesomeIcon icon={faThumbtack } flip={pinned ? "vertical" : "horizontal" } size="2x" />
+                    <Button variant="link" onClick={() => {
+                        setPinned(!pinned)
+                    }}>
+                        <FontAwesomeIcon icon={faThumbtack} flip={pinned ? "vertical" : "horizontal"} size="2x"/>
                     </Button>
                     <Button type="submit">Submit</Button>
                     <Button onClick={props.onHide}>Close</Button>
