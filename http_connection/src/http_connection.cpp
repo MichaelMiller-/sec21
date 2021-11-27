@@ -108,7 +108,7 @@ nlohmann::json http_connection::post(std::string_view endpoint, nlohmann::json v
    nlohmann::json result;
 
    //! \todo check for error
-   pimpl->make_request(endpoint, web::json::value{value.dump()},
+   pimpl->make_request(endpoint, web::json::value(value.dump()),
                        [&result](web::json::value const& v) { result = nlohmann::json::parse(v.serialize()); });
 
    //! \todo exception border
