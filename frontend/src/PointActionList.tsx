@@ -17,6 +17,7 @@ const PointActionListItem = (props: ListItemProps<DbPointAction>) => {
             <td>{props.item.value_y}</td>
             <td>{props.item.value_z}</td>
             <td>{props.item.loadcase.name}</td>
+            <td>{props.item.referencePoint.name}</td>
             <td><EditButton onClick={() => {
             }} disabled={true}/></td>
             <td><CopyButton onClick={() => {
@@ -41,6 +42,7 @@ const PointActionList = (props: ListProps<DbPointAction>) => {
                     <th>Y [N]</th>
                     <th>Z [N]</th>
                     <th>Loadcase</th>
+                    <th>Reference</th>
                 </tr>
                 </thead>
                 <tbody>
