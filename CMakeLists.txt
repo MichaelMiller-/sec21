@@ -6,6 +6,7 @@ project(sec21
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(SEC21_CMAKE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+list(APPEND CMAKE_MODULE_PATH ${SEC21_CMAKE_PATH})
 
 include(${SEC21_CMAKE_PATH}/StandardProjectSettings.cmake)
 
@@ -97,7 +98,7 @@ if (ENABLE_PRODUCTION)
     add_subdirectory(service_provider)
     add_subdirectory(esbp)
     add_subdirectory(sanity_check)
-    add_subdirectory(triangulation)
+    # add_subdirectory(triangulation)
 endif ()
 
 option(ENABLE_WORK_IN_PROGRESS "work in progress!" OFF)
