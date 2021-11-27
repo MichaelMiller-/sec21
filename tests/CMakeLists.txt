@@ -1,6 +1,5 @@
 find_package(Catch2 CONFIG REQUIRED)
 find_package(Boost 1.70 REQUIRED)
-# find_package(OpenMP REQUIRED)
 find_package(fmt REQUIRED)
 find_package(Eigen3 CONFIG REQUIRED)
 
@@ -20,6 +19,8 @@ if (ENABLE_VIENNA_CL)
             -D CMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/viennacl
     )
     add_dependencies(catch_main ViennaCL-tests)
+
+    find_package(OpenMP REQUIRED)
 endif ()
 
 find_package(Coroutines)
@@ -34,7 +35,6 @@ function(test filename)
     # target_compile_options(${PROJECT_NAME} PRIVATE "$<$<CXX_COMPILER_ID:Clang>:-fcoroutines>")
 
     target_link_libraries(${PROJECT_NAME} PRIVATE Boost::boost)
-    # target_link_libraries(${PROJECT_NAME} PRIVATE OpenMP::OpenMP_CXX)
     target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt-header-only)
     ## disable non MPL2 compatible features, or in other words disable the features which are still under the LGPL.
     target_compile_definitions(${PROJECT_NAME} PRIVATE EIGEN_MPL2_ONLY)
@@ -47,6 +47,7 @@ function(test filename)
     if (ENABLE_VIENNA_CL)
         target_compile_definitions(${PROJECT_NAME} PRIVATE VIENNACL_WITH_OPENMP)
         target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/viennacl/include)
+        target_link_libraries(${PROJECT_NAME} PRIVATE OpenMP::OpenMP_CXX)
     endif ()
 
     target_link_libraries(${PROJECT_NAME} PRIVATE catch_main)
