@@ -5,6 +5,11 @@ import ProjectList from "./ProjectList";
 import {Project, RouterComponentProjectProps} from "./Project";
 
 const App = () => {
+
+    console.log("backend: ", process.env.REACT_APP_BACKEND);
+    console.log("services: ", process.env.REACT_APP_SERVICE_PROVIDER);
+    console.log("download URL: ", process.env.REACT_APP_DOWNLOAD_URL);
+
     return (
         <Container fluid>
             <BrowserRouter>
