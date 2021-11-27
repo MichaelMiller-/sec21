@@ -4,6 +4,7 @@ import { LoadCase } from "../entity/LoadCase";
 import { PointAction } from "../entity/PointAction";
 import { StructuralPoint } from "../entity/StructuralPoint";
 import Result from "../dto/Result";
+import logger from "../logging/Logger";
 
 export async function addPointAction(request: Request, response: Response) {
 
@@ -49,6 +50,7 @@ export async function addPointAction(request: Request, response: Response) {
          result.message = "";
       })
       .catch(ex => {
+         logger.error(ex);
          result.success = false;
          result.message = ex;
       });
