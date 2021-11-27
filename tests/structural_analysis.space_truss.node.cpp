@@ -8,8 +8,8 @@ TEST_CASE("add node to system", "[sec21][structural_analysis][space_truss][node]
 {
    using namespace sec21::structural_analysis;
 
-   using member_t = member<int, float>;
-   using node_t = node<2, int, float>;
+   using member_t = member<size_t, float>;
+   using node_t = node<2, size_t, float>;
    using space_truss_t = space_truss<node_t, member_t>;
 
    SECTION("add one node")
