@@ -22,7 +22,7 @@ namespace sec21::structural_analysis::solver::backend
          if (std::size(K) != std::pow(std::size(F), 2))
             throw std::invalid_argument("size mismatch");
 
-         const auto lu = Eigen::FullPivLU<Eigen::MatrixXd>(K);
+         const auto lu = Eigen::FullPivLU<Eigen::Matrix<Precision, -1, -1>>(K);
          return lu.solve(F);
       }
 
@@ -35,8 +35,8 @@ namespace sec21::structural_analysis::solver::backend
             throw std::invalid_argument("size mismatch");
 
          //! \todo consider alignment
-         const Eigen::MatrixXd kk = Eigen::Map<const Eigen::MatrixXd>(K.data(), F.size(), F.size());
-         const Eigen::VectorXd ff = Eigen::Map<const Eigen::VectorXd, Eigen::Unaligned>(F.data(), F.size());
+         Eigen::Matrix<Precision, Eigen::Dynamic, Eigen::Dynamic> kk = Eigen::Map<const Eigen::Matrix<Precision, -1, -1>>(K.data(), F.size(), F.size());
+         Eigen::Matrix<Precision, Eigen::Dynamic, 1> ff = Eigen::Map<const Eigen::Matrix<Precision, -1, 1>, Eigen::Unaligned>(F.data(), F.size());
 
          const auto result = displacement(kk, ff);
 
