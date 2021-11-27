@@ -15,8 +15,7 @@ export class PointAction {
    @Generated("uuid")
    uuid: string;
 
-   @OneToOne(type => StructuralPoint)
-   @JoinColumn()
+   @ManyToOne(type => StructuralPoint, pt => pt.id)
    referencePoint: StructuralPoint;
 
    @Column("real")
