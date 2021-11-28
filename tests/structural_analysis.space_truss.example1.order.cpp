@@ -54,22 +54,22 @@ TEST_CASE("example 1.1 with different node id's (N1 switched with N3 from exampl
 
    SECTION("test the geometry of the system")
    {
-      REQUIRE(impl::length(sys, m1.value()) == 3.0_m);
-      REQUIRE(impl::length(sys, m2.value()) == 3.0_m);
-      REQUIRE(impl::length(sys, m3.value()) == 3.0_m);
-      REQUIRE(impl::length(sys, m4.value()) == 3.0_m);
-      REQUIRE(impl::length(sys, m5.value()).value() == Approx(4.24264)); //_m);
-      REQUIRE(impl::length(sys, m6.value()).value() == Approx(4.24264)); //_m);
+      REQUIRE(impl::length(sys, m1) == 3.0_m);
+      REQUIRE(impl::length(sys, m2) == 3.0_m);
+      REQUIRE(impl::length(sys, m3) == 3.0_m);
+      REQUIRE(impl::length(sys, m4) == 3.0_m);
+      REQUIRE(impl::length(sys, m5).value() == Approx(4.24264)); //_m);
+      REQUIRE(impl::length(sys, m6).value() == Approx(4.24264)); //_m);
 
       namespace bmc = boost::math::constants;
       const auto fourth_pi{bmc::half_pi<precision_t>() * static_cast<precision_t>(0.5)};
 
-      REQUIRE(impl::angle_to_x_axis(sys, m1.value()) == Approx(0.0));
-      REQUIRE(impl::angle_to_x_axis(sys, m2.value()) == Approx(bmc::half_pi<precision_t>()));
-      REQUIRE(impl::angle_to_x_axis(sys, m3.value()) == Approx(0.0));
-      REQUIRE(impl::angle_to_x_axis(sys, m4.value()) == Approx(bmc::half_pi<precision_t>()));
-      REQUIRE(impl::angle_to_x_axis(sys, m5.value()) == Approx(fourth_pi));
-      REQUIRE(impl::angle_to_x_axis(sys, m6.value()) == Approx(-fourth_pi));
+      REQUIRE(impl::angle_to_x_axis(sys, m1) == Approx(0.0));
+      REQUIRE(impl::angle_to_x_axis(sys, m2) == Approx(bmc::half_pi<precision_t>()));
+      REQUIRE(impl::angle_to_x_axis(sys, m3) == Approx(0.0));
+      REQUIRE(impl::angle_to_x_axis(sys, m4) == Approx(bmc::half_pi<precision_t>()));
+      REQUIRE(impl::angle_to_x_axis(sys, m5) == Approx(fourth_pi));
+      REQUIRE(impl::angle_to_x_axis(sys, m6) == Approx(-fourth_pi));
    }
    SECTION("filter supported nodes from lookup table") 
    {
@@ -101,7 +101,7 @@ TEST_CASE("example 1.1 with different node id's (N1 switched with N3 from exampl
    SECTION("coincidence matrix from member 1")
    {
       using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
-      auto Z = impl::coincidence_matrix<allocator_t>(sys, m1.value());
+      auto Z = impl::coincidence_matrix<allocator_t>(sys, m1);
       REQUIRE(Z.size1() == 4);
       REQUIRE(Z.size2() == 8);
       //! \clang-format off
@@ -117,7 +117,7 @@ TEST_CASE("example 1.1 with different node id's (N1 switched with N3 from exampl
    SECTION("coincidence matrix from member 2")
    {
       using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
-      auto Z = impl::coincidence_matrix<allocator_t>(sys, m2.value());
+      auto Z = impl::coincidence_matrix<allocator_t>(sys, m2);
       REQUIRE(Z.size1() == 4);
       REQUIRE(Z.size2() == 8);
       //! \clang-format off
@@ -133,7 +133,7 @@ TEST_CASE("example 1.1 with different node id's (N1 switched with N3 from exampl
    SECTION("coincidence matrix from member 3")
    {
       using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
-      auto Z = impl::coincidence_matrix<allocator_t>(sys, m3.value());
+      auto Z = impl::coincidence_matrix<allocator_t>(sys, m3);
       REQUIRE(Z.size1() == 4);
       REQUIRE(Z.size2() == 8);
       //! \clang-format off
@@ -149,7 +149,7 @@ TEST_CASE("example 1.1 with different node id's (N1 switched with N3 from exampl
    SECTION("coincidence matrix from member 4")
    {
       using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
-      auto Z = impl::coincidence_matrix<allocator_t>(sys, m4.value());
+      auto Z = impl::coincidence_matrix<allocator_t>(sys, m4);
       REQUIRE(Z.size1() == 4);
       REQUIRE(Z.size2() == 8);
       //! \clang-format off
@@ -165,7 +165,7 @@ TEST_CASE("example 1.1 with different node id's (N1 switched with N3 from exampl
    SECTION("coincidence matrix from member 5")
    {
       using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
-      auto Z = impl::coincidence_matrix<allocator_t>(sys, m5.value());
+      auto Z = impl::coincidence_matrix<allocator_t>(sys, m5);
       REQUIRE(Z.size1() == 4);
       REQUIRE(Z.size2() == 8);
       //! \clang-format off
@@ -181,7 +181,7 @@ TEST_CASE("example 1.1 with different node id's (N1 switched with N3 from exampl
    SECTION("coincidence matrix from member 6")
    {
       using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
-      auto Z = impl::coincidence_matrix<allocator_t>(sys, m6.value());
+      auto Z = impl::coincidence_matrix<allocator_t>(sys, m6);
       REQUIRE(Z.size1() == 4);
       REQUIRE(Z.size2() == 8);
       //! \clang-format off

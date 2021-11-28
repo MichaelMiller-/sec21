@@ -31,10 +31,10 @@ TEST_CASE("example system 1.2 with half load from example 1.0", "[sec21][structu
    auto n3 = add_node(sys, node_t{3, {3.0, 0.0}, support_t{ false, true }});
    auto n4 = add_node(sys, node_t{4, {0.0, 0.0}, support_t{ true, true }});
 
-   REQUIRE(static_cast<bool>(n1) == true);
-   REQUIRE(static_cast<bool>(n2) == true);
-   REQUIRE(static_cast<bool>(n3) == true);
-   REQUIRE(static_cast<bool>(n4) == true);
+   REQUIRE(n1 == 1);
+   REQUIRE(n2 == 2);
+   REQUIRE(n3 == 3);
+   REQUIRE(n4 == 4);
 
    // constexpr auto E = 210.0_kPa;
    // constexpr auto A = unit::square_meter<double>(0.004);
@@ -45,31 +45,31 @@ TEST_CASE("example system 1.2 with half load from example 1.0", "[sec21][structu
    auto m5 = add_member(sys, 4, 2, member_t{5, "", {}, "", "", 0.004, 21'000'000});
    auto m6 = add_member(sys, 3, 1, member_t{6, "", {}, "", "", 0.004, 21'000'000});
 
-   REQUIRE(static_cast<bool>(m1) == true);
-   REQUIRE(static_cast<bool>(m2) == true);
-   REQUIRE(static_cast<bool>(m3) == true);
-   REQUIRE(static_cast<bool>(m4) == true);
-   REQUIRE(static_cast<bool>(m5) == true);
-   REQUIRE(static_cast<bool>(m6) == true);
+   REQUIRE(m1 == 1);
+   REQUIRE(m2 == 2);
+   REQUIRE(m3 == 3);
+   REQUIRE(m4 == 4);
+   REQUIRE(m5 == 5);
+   REQUIRE(m6 == 6);
 
    SECTION("test the geometry of the system")
    {
-      REQUIRE(impl::length(sys, m1.value()) == 3.0_m);
-      REQUIRE(impl::length(sys, m2.value()) == 3.0_m);
-      REQUIRE(impl::length(sys, m3.value()) == 3.0_m);
-      REQUIRE(impl::length(sys, m4.value()) == 3.0_m);
-      REQUIRE(impl::length(sys, m5.value()).value() == Approx(4.24264).epsilon(kDivergence)); //_m);
-      REQUIRE(impl::length(sys, m6.value()).value() == Approx(4.24264).epsilon(kDivergence)); //_m);
+      REQUIRE(impl::length(sys, m1) == 3.0_m);
+      REQUIRE(impl::length(sys, m2) == 3.0_m);
+      REQUIRE(impl::length(sys, m3) == 3.0_m);
+      REQUIRE(impl::length(sys, m4) == 3.0_m);
+      REQUIRE(impl::length(sys, m5).value() == Approx(4.24264).epsilon(kDivergence)); //_m);
+      REQUIRE(impl::length(sys, m6).value() == Approx(4.24264).epsilon(kDivergence)); //_m);
 
       namespace bmc = boost::math::constants;
       const auto fourth_pi{bmc::half_pi<precision_t>() * static_cast<precision_t>(0.5)};
 
-      REQUIRE(impl::angle_to_x_axis(sys, m1.value()) == Approx(0.0));
-      REQUIRE(impl::angle_to_x_axis(sys, m2.value()) == Approx(bmc::half_pi<precision_t>()));
-      REQUIRE(impl::angle_to_x_axis(sys, m3.value()) == Approx(0.0));
-      REQUIRE(impl::angle_to_x_axis(sys, m4.value()) == Approx(bmc::half_pi<precision_t>()));
-      REQUIRE(impl::angle_to_x_axis(sys, m5.value()) == Approx(fourth_pi));
-      REQUIRE(impl::angle_to_x_axis(sys, m6.value()) == Approx(-fourth_pi));
+      REQUIRE(impl::angle_to_x_axis(sys, m1) == Approx(0.0));
+      REQUIRE(impl::angle_to_x_axis(sys, m2) == Approx(bmc::half_pi<precision_t>()));
+      REQUIRE(impl::angle_to_x_axis(sys, m3) == Approx(0.0));
+      REQUIRE(impl::angle_to_x_axis(sys, m4) == Approx(bmc::half_pi<precision_t>()));
+      REQUIRE(impl::angle_to_x_axis(sys, m5) == Approx(fourth_pi));
+      REQUIRE(impl::angle_to_x_axis(sys, m6) == Approx(-fourth_pi));
    }
    SECTION("solve")
    {

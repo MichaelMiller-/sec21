@@ -47,10 +47,10 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    auto n3 = add_node(sys, node_t{3u, {3.0, 0.0}, support_t{false, true}});
    auto n4 = add_node(sys, node_t{4u, {0.0, 0.0}, support_t{true, true}});
 
-   REQUIRE(static_cast<bool>(n1) == true);
-   REQUIRE(static_cast<bool>(n2) == true);
-   REQUIRE(static_cast<bool>(n3) == true);
-   REQUIRE(static_cast<bool>(n4) == true);
+   REQUIRE(n1 == 1);
+   REQUIRE(n2 == 2);
+   REQUIRE(n3 == 3);
+   REQUIRE(n4 == 4);
 
    //! \todo use units
    // constexpr auto E = 21'000'000.0_kPa;
@@ -65,37 +65,31 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    const precision_t EA_l1 = 28'000.0;
    const precision_t EA_l2 = 19'798.98987;
 
-   REQUIRE(static_cast<bool>(m1) == true);
-   REQUIRE(static_cast<bool>(m2) == true);
-   REQUIRE(static_cast<bool>(m3) == true);
-   REQUIRE(static_cast<bool>(m4) == true);
-   REQUIRE(static_cast<bool>(m5) == true);
-   REQUIRE(static_cast<bool>(m6) == true);
-
-   {
-      std::ofstream ofs{"output_example_1.json"};
-      nlohmann::json j = sys;
-      ofs << std::setw(4) << j;
-   }
+   REQUIRE(m1 == 1);
+   REQUIRE(m2 == 2);
+   REQUIRE(m3 == 3);
+   REQUIRE(m4 == 4);
+   REQUIRE(m5 == 5);
+   REQUIRE(m6 == 6);
 
    SECTION("test the geometry of the system")
    {
-      REQUIRE(impl::length(sys, m1.value()) == 3.0_m);
-      REQUIRE(impl::length(sys, m2.value()) == 3.0_m);
-      REQUIRE(impl::length(sys, m3.value()) == 3.0_m);
-      REQUIRE(impl::length(sys, m4.value()) == 3.0_m);
-      REQUIRE(impl::length(sys, m5.value()).value() == Approx(4.24264)); //_m);
-      REQUIRE(impl::length(sys, m6.value()).value() == Approx(4.24264)); //_m);
+      REQUIRE(impl::length(sys, m1) == 3.0_m);
+      REQUIRE(impl::length(sys, m2) == 3.0_m);
+      REQUIRE(impl::length(sys, m3) == 3.0_m);
+      REQUIRE(impl::length(sys, m4) == 3.0_m);
+      REQUIRE(impl::length(sys, m5).value() == Approx(4.24264)); //_m);
+      REQUIRE(impl::length(sys, m6).value() == Approx(4.24264)); //_m);
 
       namespace bmc = boost::math::constants;
       const auto fourth_pi{bmc::half_pi<precision_t>() * static_cast<precision_t>(0.5)};
 
-      REQUIRE(impl::angle_to_x_axis(sys, m1.value()) == Approx(0.0));
-      REQUIRE(impl::angle_to_x_axis(sys, m2.value()) == Approx(bmc::half_pi<precision_t>()));
-      REQUIRE(impl::angle_to_x_axis(sys, m3.value()) == Approx(0.0));
-      REQUIRE(impl::angle_to_x_axis(sys, m4.value()) == Approx(bmc::half_pi<precision_t>()));
-      REQUIRE(impl::angle_to_x_axis(sys, m5.value()) == Approx(fourth_pi));
-      REQUIRE(impl::angle_to_x_axis(sys, m6.value()) == Approx(-fourth_pi));
+      REQUIRE(impl::angle_to_x_axis(sys, m1) == Approx(0.0));
+      REQUIRE(impl::angle_to_x_axis(sys, m2) == Approx(bmc::half_pi<precision_t>()));
+      REQUIRE(impl::angle_to_x_axis(sys, m3) == Approx(0.0));
+      REQUIRE(impl::angle_to_x_axis(sys, m4) == Approx(bmc::half_pi<precision_t>()));
+      REQUIRE(impl::angle_to_x_axis(sys, m5) == Approx(fourth_pi));
+      REQUIRE(impl::angle_to_x_axis(sys, m6) == Approx(-fourth_pi));
    }
    SECTION("create lookup table")
    {
@@ -132,7 +126,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    SECTION("Steifigkeitsbeziehung vom Fachwerkstab 1 in globalen Koordinaten")
    {
       using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
-      auto result = impl::steifigkeitsbeziehung_fachwerkstab_globalen_koordinaten<allocator_t>(sys, m1.value());
+      auto result = impl::steifigkeitsbeziehung_fachwerkstab_globalen_koordinaten<allocator_t>(sys, m1);
 
       REQUIRE(result.size1() == 4);
       REQUIRE(result.size2() == 4);
@@ -158,7 +152,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    SECTION("Steifigkeitsbeziehung vom Fachwerkstab 2 in globalen Koordinaten")
    {
       using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
-      auto result = impl::steifigkeitsbeziehung_fachwerkstab_globalen_koordinaten<allocator_t>(sys, m2.value());
+      auto result = impl::steifigkeitsbeziehung_fachwerkstab_globalen_koordinaten<allocator_t>(sys, m2);
 
       REQUIRE(result.size1() == 4);
       REQUIRE(result.size2() == 4);
@@ -184,7 +178,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    SECTION("Steifigkeitsbeziehung vom Fachwerkstab 3 in globalen Koordinaten")
    {
       using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
-      auto result = impl::steifigkeitsbeziehung_fachwerkstab_globalen_koordinaten<allocator_t>(sys, m3.value());
+      auto result = impl::steifigkeitsbeziehung_fachwerkstab_globalen_koordinaten<allocator_t>(sys, m3);
 
       REQUIRE(result.size1() == 4);
       REQUIRE(result.size2() == 4);
@@ -210,7 +204,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    SECTION("Steifigkeitsbeziehung vom Fachwerkstab 4 in globalen Koordinaten")
    {
       using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
-      auto result = impl::steifigkeitsbeziehung_fachwerkstab_globalen_koordinaten<allocator_t>(sys, m4.value());
+      auto result = impl::steifigkeitsbeziehung_fachwerkstab_globalen_koordinaten<allocator_t>(sys, m4);
 
       REQUIRE(result.size1() == 4);
       REQUIRE(result.size2() == 4);
@@ -236,7 +230,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    SECTION("Steifigkeitsbeziehung vom Fachwerkstab 5 in globalen Koordinaten")
    {
       using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
-      auto result = impl::steifigkeitsbeziehung_fachwerkstab_globalen_koordinaten<allocator_t>(sys, m5.value());
+      auto result = impl::steifigkeitsbeziehung_fachwerkstab_globalen_koordinaten<allocator_t>(sys, m5);
 
       REQUIRE(result.size1() == 4);
       REQUIRE(result.size2() == 4);
@@ -254,7 +248,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    SECTION("Steifigkeitsbeziehung vom Fachwerkstab 6 in globalen Koordinaten")
    {
       using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
-      auto result = impl::steifigkeitsbeziehung_fachwerkstab_globalen_koordinaten<allocator_t>(sys, m6.value());
+      auto result = impl::steifigkeitsbeziehung_fachwerkstab_globalen_koordinaten<allocator_t>(sys, m6);
 
       REQUIRE(result.size1() == 4);
       REQUIRE(result.size2() == 4);
@@ -272,7 +266,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    SECTION("coincidence matrix from member 1")
    {
       using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
-      auto Z = impl::coincidence_matrix<allocator_t>(sys, m1.value());
+      auto Z = impl::coincidence_matrix<allocator_t>(sys, m1);
 
       REQUIRE(Z.size1() == 4);
       REQUIRE(Z.size2() == 8);
@@ -289,7 +283,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    SECTION("coincidence matrix from member 2")
    {
       using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
-      auto Z = impl::coincidence_matrix<allocator_t>(sys, m2.value());
+      auto Z = impl::coincidence_matrix<allocator_t>(sys, m2);
 
       REQUIRE(Z.size1() == 4);
       REQUIRE(Z.size2() == 8);
@@ -306,7 +300,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    SECTION("coincidence matrix from member 3")
    {
       using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
-      auto Z = impl::coincidence_matrix<allocator_t>(sys, m3.value());
+      auto Z = impl::coincidence_matrix<allocator_t>(sys, m3);
 
       REQUIRE(Z.size1() == 4);
       REQUIRE(Z.size2() == 8);
@@ -323,7 +317,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    SECTION("coincidence matrix from member 4")
    {
       using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
-      auto Z = impl::coincidence_matrix<allocator_t>(sys, m4.value());
+      auto Z = impl::coincidence_matrix<allocator_t>(sys, m4);
 
       REQUIRE(Z.size1() == 4);
       REQUIRE(Z.size2() == 8);
@@ -340,7 +334,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    SECTION("coincidence matrix from member 5")
    {
       using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
-      auto Z = impl::coincidence_matrix<allocator_t>(sys, m5.value());
+      auto Z = impl::coincidence_matrix<allocator_t>(sys, m5);
 
       REQUIRE(Z.size1() == 4);
       REQUIRE(Z.size2() == 8);
@@ -357,7 +351,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    SECTION("coincidence matrix from member 6")
    {
       using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
-      auto Z = impl::coincidence_matrix<allocator_t>(sys, m6.value());
+      auto Z = impl::coincidence_matrix<allocator_t>(sys, m6);
 
       REQUIRE(Z.size1() == 4);
       REQUIRE(Z.size2() == 8);
@@ -374,7 +368,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    SECTION("stiffness matrix from member 1")
    {
       using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
-      auto K = impl::stiffness_matrix<allocator_t>(sys, m1.value());
+      auto K = impl::stiffness_matrix<allocator_t>(sys, m1);
 
       REQUIRE(K.size1() == 8);
       REQUIRE(K.size2() == 8);
@@ -398,7 +392,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    SECTION("stiffness matrix from member 2")
    {
       using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
-      auto K = impl::stiffness_matrix<allocator_t>(sys, m2.value());
+      auto K = impl::stiffness_matrix<allocator_t>(sys, m2);
 
       REQUIRE(K.size1() == 8);
       REQUIRE(K.size2() == 8);
@@ -422,7 +416,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    SECTION("stiffness matrix from member 3")
    {
       using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
-      auto K = impl::stiffness_matrix<allocator_t>(sys, m3.value());
+      auto K = impl::stiffness_matrix<allocator_t>(sys, m3);
 
       REQUIRE(K.size1() == 8);
       REQUIRE(K.size2() == 8);
@@ -446,7 +440,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    SECTION("stiffness matrix from member 4")
    {
       using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
-      auto K = impl::stiffness_matrix<allocator_t>(sys, m4.value());
+      auto K = impl::stiffness_matrix<allocator_t>(sys, m4);
 
       REQUIRE(K.size1() == 8);
       REQUIRE(K.size2() == 8);
@@ -470,7 +464,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    SECTION("stiffness matrix from member 5")
    {
       using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
-      auto K = impl::stiffness_matrix<allocator_t>(sys, m5.value());
+      auto K = impl::stiffness_matrix<allocator_t>(sys, m5);
 
       REQUIRE(K.size1() == 8);
       REQUIRE(K.size2() == 8);
@@ -494,7 +488,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
    SECTION("stiffness matrix from member 6")
    {
       using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
-      auto K = impl::stiffness_matrix<allocator_t>(sys, m6.value());
+      auto K = impl::stiffness_matrix<allocator_t>(sys, m6);
 
       REQUIRE(K.size1() == 8);
       REQUIRE(K.size2() == 8);

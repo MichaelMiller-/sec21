@@ -41,7 +41,6 @@ jobs:
         ./vcpkg install boost-geometry
         ./vcpkg install boost-hana
         ./vcpkg install boost-math
-        ./vcpkg install boost-outcome
         ./vcpkg install boost-program-options
         ./vcpkg install boost-qvm
         ./vcpkg install boost-range
