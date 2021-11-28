@@ -22,7 +22,7 @@ const PointActionListItem = (props: ListItemProps<DbPointAction>) => {
             }} disabled={true}/></td>
             <td><CopyButton onClick={() => {
             }} disabled={true}/></td>
-            <td><RemoveButton onClick={() => (props.onDelete(props.item.id))} disabled={true} /></td>
+            <td><RemoveButton onClick={() => (props.onDelete(props.item.id))} /></td>
         </tr>
     )
 }
