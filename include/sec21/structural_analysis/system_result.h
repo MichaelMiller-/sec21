@@ -3,12 +3,11 @@
 #include <sec21/units/quantity.h>
 #include <sec21/structural_analysis/common.h>
 
-#include <boost/outcome.hpp>
-
 #include <vector>
 #include <map>
 #include <set>
 #include <string_view>
+#include <optional>
 
 namespace sec21::structural_analysis
 {
@@ -20,11 +19,14 @@ namespace sec21::structural_analysis
       std::array<Force, Dimension> support_reaction{};
    };
 
-   template <typename Descriptor, typename Force = units::quantity<units::newton, double> >
+   template <typename Descriptor, typename Precision>
    struct member_result
    {
-      Descriptor id{};
-      Force normal_force{};
+      using descriptor_t = Descriptor;
+      using force_t = typename units::quantity<units::newton, Precision>;
+
+      descriptor_t id{};
+      force_t normal_force{};
    };
 
    template <typename System>
@@ -53,13 +55,35 @@ namespace sec21::structural_analysis
       std::map<node_descriptor_t, node_result> node;
 
       using node_result_t = node_result_2<node_descriptor_t, displacement_t, force_t, dimension_v>;
-      using member_result_set_t = member_result<member_descriptor_t, force_t>;
+      using member_result_set_t = member_result<member_descriptor_t, precision_t>;
 
       std::vector<node_result_t> nodes;
       std::vector<member_result_set_t> members;
    };
 
-   namespace outcome = BOOST_OUTCOME_V2_NAMESPACE;
+   template <typename Writer, typename System>
+   void write_result(Writer& writer, system_result<System> const& result)
+   {
+      using namespace boost::qvm;
+
+#if __cpp_lib_ranges
+      std::ranges::for_each(result.nodes, [&writer](auto const& e) {
+        writer.spacetruss_2D_insert_displacement(e.id, X(e.displacement).value(), Y(e.displacement).value());
+        //! \todo write support reactions
+      });
+      std::ranges::for_each(result.members, [&writer](auto const& e) {
+        writer.spacetruss_2D_insert_normal_force(e.id, e.normal_force.value());
+      });
+#else
+      std::for_each(begin(result.nodes), end(result.nodes), [&writer](auto const& e) {
+     writer.spacetruss_2D_insert_displacement(e.id, X(e.displacement).value(), Y(e.displacement).value());
+     //! \todo write support reactions
+   });
+   std::for_each(begin(result.members), end(result.members), [&writer](auto const& e) {
+     writer.spacetruss_2D_insert_normal_force(e.id, e.normal_force.value());
+   });
+#endif
+   }
 
    //! \todo consider std::optional
    //! \todo not exception save!
@@ -67,8 +91,10 @@ namespace sec21::structural_analysis
    //! \todo return outcome
    template<typename System, typename T>
    auto make_result(System const& sys, std::vector<T> const& displacements, std::vector<T> const& support_reactions)
-   -> outcome::std_result<system_result<System>>
+   -> std::optional<system_result<System>>
    {
+      using precision_t = typename System::precision_t;
+
       if (size(displacements) != size(support_reactions))
          throw std::runtime_error("make_result: mismatch sizes");
 
