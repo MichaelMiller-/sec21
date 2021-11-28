@@ -21,14 +21,14 @@ namespace sec21
       http_connection& operator = (http_connection const&) = default;
       http_connection& operator = (http_connection &&) = default;
 
-      nlohmann::json get(std::string_view endpoint);
+      nlohmann::json get(std::string const& endpoint);
 
-      nlohmann::json post(std::string_view endpoint, nlohmann::json value);
+      nlohmann::json post(std::string const& endpoint, nlohmann::json const& value);
    };
 
    //! \brief Single-shot
    //! \param host
    //! \param endpoint
    //! \return query result
-   nlohmann::json http_get(std::string_view host, std::string_view endpoint);
+   nlohmann::json http_get(std::string const& host, std::string const& endpoint);
 } // namespace sec21

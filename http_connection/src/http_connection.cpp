@@ -29,7 +29,7 @@ struct http_connection::impl
    explicit impl(std::string_view host) : client(to_platform_specific_string(host).data()) {}
 
    template <typename Method, typename Callable>
-   void make_request(Method mtd, std::string_view endpoint, Callable&& func)
+   void make_request(Method mtd, std::string const& endpoint, Callable&& func)
    {
       make_task_request<web::http::http_response>(std::move(mtd), endpoint)
          .then([](web::http::http_response response) {
@@ -50,15 +50,15 @@ struct http_connection::impl
 
    //! \brief implicit a GET request
    template <typename Callable>
-   void make_request(std::string_view endpoint, Callable&& func)
+   void make_request(std::string const& endpoint, Callable&& func)
    {
       make_request(web::http::methods::GET, endpoint, std::forward<Callable>(func));
    }
 
    template <typename Callable>
-   void make_request(std::string_view endpoint, web::json::value value, Callable&& func)
+   void make_request(std::string const& endpoint, web::json::value const& value, Callable&& func)
    {
-      make_task_request<web::http::http_response>(web::http::methods::POST, endpoint, std::move(value))
+      make_task_request<web::http::http_response>(web::http::methods::POST, endpoint, value)
          .then([](web::http::http_response response) {
             if (response.status_code() == web::http::status_codes::OK) {
                return response.extract_json();
@@ -77,16 +77,16 @@ struct http_connection::impl
 
  private:
    template <typename Response>
-   auto make_task_request(web::http::method mtd, std::string_view endpoint) -> pplx::task<Response>
+   auto make_task_request(web::http::method mtd, std::string const& endpoint) -> pplx::task<Response>
    {
-      return client.request(mtd, endpoint.data());
+      return client.request(mtd, endpoint);
    }
 
    template <typename Response>
-   auto make_task_request(web::http::method mtd, std::string_view endpoint, web::json::value value)
+   auto make_task_request(web::http::method mtd, std::string const& endpoint, web::json::value const& value)
       -> pplx::task<Response>
    {
-      return client.request(mtd, endpoint.data(), value);
+      return client.request(mtd, endpoint, value);
    }
 };
 
@@ -94,7 +94,7 @@ http_connection::http_connection(std::string_view host) : pimpl{std::make_unique
 
 http_connection::~http_connection() = default;
 
-nlohmann::json http_connection::get(std::string_view endpoint)
+nlohmann::json http_connection::get(std::string const& endpoint)
 {
    nlohmann::json result;
    pimpl->make_request(endpoint,
@@ -103,7 +103,7 @@ nlohmann::json http_connection::get(std::string_view endpoint)
    return result;
 }
 
-nlohmann::json http_connection::post(std::string_view endpoint, nlohmann::json value)
+nlohmann::json http_connection::post(std::string const& endpoint, nlohmann::json const& value)
 {
    nlohmann::json result;
 
@@ -115,7 +115,7 @@ nlohmann::json http_connection::post(std::string_view endpoint, nlohmann::json v
    return result;
 }
 
-nlohmann::json http_get(std::string_view host, std::string_view endpoint)
+nlohmann::json http_get(std::string const& host, std::string const& endpoint)
 {
    http_connection connection{host};
    return connection.get(endpoint);
