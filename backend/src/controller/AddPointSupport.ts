@@ -3,6 +3,7 @@ import { getManager } from "typeorm";
 import { PointSupport } from "../entity/PointSupport";
 import { StructuralPoint } from "../entity/StructuralPoint";
 import Result from "../dto/Result";
+import logger from "../logging/Logger";
 
 export async function addPointSupport(request: Request, response: Response) {
 
@@ -40,6 +41,7 @@ export async function addPointSupport(request: Request, response: Response) {
          result.message = "";
       })
       .catch(ex => {
+         logger.error(ex);
          result.success = false;
          result.message = ex;
       });
