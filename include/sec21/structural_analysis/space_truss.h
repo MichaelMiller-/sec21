@@ -9,6 +9,7 @@
 #include <map>
 #include <type_traits>
 #include <vector>
+#include <optional>
 
 namespace sec21::structural_analysis
 {
