@@ -28,37 +28,31 @@ struct http_connection::impl
 
    explicit impl(std::string_view host) : client(to_platform_specific_string(host).data()) {}
 
-   template <typename Method, typename Callable>
-   void make_request(Method mtd, std::string const& endpoint, Callable&& func)
+   //! \brief implicit a GET request
+   template <typename Callable>
+   void get_request(std::string const& endpoint, Callable&& func)
    {
-      make_task_request<web::http::http_response>(std::move(mtd), endpoint)
+      make_task_request(web::http::methods::GET, endpoint)
          .then([](web::http::http_response response) {
-            if (response.status_code() == web::http::status_codes::OK) {
-               return response.extract_json();
-            }
-            return pplx::task_from_result(web::json::value{});
+           if (response.status_code() == web::http::status_codes::OK) {
+              return response.extract_json();
+           }
+           return pplx::task_from_result(web::json::value{});
          })
          .then([=](pplx::task<web::json::value> previous) {
-            try {
-               std::invoke(func, previous.get());
-            } catch (web::http::http_exception& e) {
-               // spdlog::error("HTTP error: {}", e.what());
-            }
+           try {
+              std::invoke(func, previous.get());
+           } catch (web::http::http_exception& e) {
+              // spdlog::error("HTTP error: {}", e.what());
+           }
          })
          .wait();
    }
 
-   //! \brief implicit a GET request
    template <typename Callable>
-   void make_request(std::string const& endpoint, Callable&& func)
+   void post_request(std::string const& endpoint, std::string value, Callable&& func)
    {
-      make_request(web::http::methods::GET, endpoint, std::forward<Callable>(func));
-   }
-
-   template <typename Callable>
-   void make_request(std::string const& endpoint, web::json::value const& value, Callable&& func)
-   {
-      make_task_request<web::http::http_response>(web::http::methods::POST, endpoint, value)
+      make_task_request(web::http::methods::POST, endpoint, std::move(value))
          .then([](web::http::http_response response) {
             if (response.status_code() == web::http::status_codes::OK) {
                return response.extract_json();
@@ -76,17 +70,14 @@ struct http_connection::impl
    }
 
  private:
-   template <typename Response>
-   auto make_task_request(web::http::method mtd, std::string const& endpoint) -> pplx::task<Response>
+   auto make_task_request(web::http::method mtd, std::string const& endpoint) -> pplx::task<web::http::http_response>
    {
       return client.request(mtd, endpoint);
    }
-
-   template <typename Response>
-   auto make_task_request(web::http::method mtd, std::string const& endpoint, web::json::value const& value)
-      -> pplx::task<Response>
+   auto make_task_request(web::http::method mtd, std::string const& endpoint, std::string value)
+   -> pplx::task<web::http::http_response>
    {
-      return client.request(mtd, endpoint, value);
+      return client.request(mtd, endpoint, std::move(value));
    }
 };
 
@@ -97,7 +88,7 @@ http_connection::~http_connection() = default;
 nlohmann::json http_connection::get(std::string const& endpoint)
 {
    nlohmann::json result;
-   pimpl->make_request(endpoint,
+   pimpl->get_request(endpoint,
                        [&result](web::json::value const& v) { result = nlohmann::json::parse(v.serialize()); });
    //! \todo exception border
    return result;
@@ -108,7 +99,7 @@ nlohmann::json http_connection::post(std::string const& endpoint, nlohmann::json
    nlohmann::json result;
 
    //! \todo check for error
-   pimpl->make_request(endpoint, value.dump(),
+   pimpl->post_request(endpoint, value.dump(),
                        [&result](web::json::value const& v) { result = nlohmann::json::parse(v.serialize()); });
 
    //! \todo exception border
