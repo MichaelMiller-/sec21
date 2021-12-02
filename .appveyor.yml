@@ -32,4 +32,4 @@ build_script:
   - cmake --build . 
 
 test_script:
-  - cmd: ctest
+  - cmd: ctest -C Debug
