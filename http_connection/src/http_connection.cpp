@@ -7,7 +7,7 @@
 #include <cpprest/http_listener.h> // HTTP server
 #include <cpprest/json.h>          // JSON library
 
-#ifdef _MSC_VER
+#ifdef _WIN32
 #include <boost/locale/encoding.hpp>
 #endif
 
@@ -15,7 +15,7 @@ using namespace sec21;
 
 auto to_platform_specific_string(std::string const& value)
 {
-#ifdef _MSC_VER
+#ifdef _WIN32
    return boost::locale::conv::utf_to_utf<wchar_t>(value);
 #else
    return value;
