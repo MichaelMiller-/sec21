@@ -13,10 +13,10 @@
 
 using namespace sec21;
 
-auto to_platform_specific_string(std::string_view value)
+auto to_platform_specific_string(std::string const& value)
 {
 #ifdef _MSC_VER
-   return boost::locale::conv::utf_to_utf<wchar_t>(std::string{value});
+   return boost::locale::conv::utf_to_utf<wchar_t>(value);
 #else
    return value;
 #endif
@@ -26,7 +26,7 @@ struct http_connection::impl
 {
    web::http::client::http_client client;
 
-   explicit impl(std::string_view host) : client(to_platform_specific_string(host).data()) {}
+   explicit impl(std::string_view host) : client(to_platform_specific_string(std::string{host}).data()) {}
 
    //! \brief implicit a GET request
    template <typename Callable>
@@ -72,12 +72,12 @@ struct http_connection::impl
  private:
    auto make_task_request(web::http::method mtd, std::string const& endpoint) -> pplx::task<web::http::http_response>
    {
-      return client.request(mtd, endpoint);
+      return client.request(mtd, to_platform_specific_string(endpoint));
    }
    auto make_task_request(web::http::method mtd, std::string const& endpoint, std::string value)
    -> pplx::task<web::http::http_response>
    {
-      return client.request(mtd, endpoint, std::move(value));
+      return client.request(mtd, to_platform_specific_string(endpoint), std::move(value));
    }
 };
 
