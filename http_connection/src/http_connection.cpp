@@ -11,9 +11,7 @@
 #include <boost/locale/encoding.hpp>
 #endif
 
-using namespace sec21;
-
-auto to_platform_specific_string(std::string const& value)
+auto to_platform_specific_string(std::string value)
 {
 #ifdef _WIN32
    return boost::locale::conv::utf_to_utf<wchar_t>(value);
@@ -22,17 +20,19 @@ auto to_platform_specific_string(std::string const& value)
 #endif
 }
 
+using namespace sec21;
+
 struct http_connection::impl
 {
    web::http::client::http_client client;
 
-   explicit impl(std::string_view host) : client(to_platform_specific_string(std::string{host}).data()) {}
+   explicit impl(std::string_view host) : client(to_platform_specific_string(std::string{host})) {}
 
    //! \brief implicit a GET request
    template <typename Callable>
-   void get_request(std::string const& endpoint, Callable&& func)
+   void get_request(std::string endpoint, Callable&& func)
    {
-      make_task_request(web::http::methods::GET, endpoint)
+      make_task_request(web::http::methods::GET, std::move(endpoint))
          .then([](web::http::http_response response) {
            if (response.status_code() == web::http::status_codes::OK) {
               return response.extract_json();
@@ -50,9 +50,9 @@ struct http_connection::impl
    }
 
    template <typename Callable>
-   void post_request(std::string const& endpoint, std::string value, Callable&& func)
+   void post_request(std::string endpoint, std::string value, Callable&& func)
    {
-      make_task_request(web::http::methods::POST, endpoint, std::move(value))
+      make_task_request(web::http::methods::POST, std::move(endpoint), std::move(value))
          .then([](web::http::http_response response) {
             if (response.status_code() == web::http::status_codes::OK) {
                return response.extract_json();
@@ -70,14 +70,14 @@ struct http_connection::impl
    }
 
  private:
-   auto make_task_request(web::http::method mtd, std::string const& endpoint) -> pplx::task<web::http::http_response>
+   auto make_task_request(web::http::method mtd, std::string endpoint) -> pplx::task<web::http::http_response>
    {
-      return client.request(mtd, to_platform_specific_string(endpoint));
+      return client.request(mtd, to_platform_specific_string(std::move(endpoint)));
    }
-   auto make_task_request(web::http::method mtd, std::string const& endpoint, std::string value)
+   auto make_task_request(web::http::method mtd, std::string endpoint, std::string value)
    -> pplx::task<web::http::http_response>
    {
-      return client.request(mtd, to_platform_specific_string(endpoint), std::move(value));
+      return client.request(mtd, to_platform_specific_string(std::move(endpoint)), to_platform_specific_string(std::move(value)));
    }
 };
 
