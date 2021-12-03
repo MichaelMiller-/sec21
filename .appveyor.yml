@@ -32,4 +32,5 @@ build_script:
   - cmake --build . 
 
 test_script:
-  - cmd: ctest -C Debug
+  - ctest -C Debug
+  - ctest -C Debug --rerun-failed --output-on-failure
