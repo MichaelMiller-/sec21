@@ -203,7 +203,13 @@ export const Project = (props: ProjectListProps) => {
         getSurfaceMemberList()
         getPointActionList()
         getLoadCaseList()
-
+/*
+        Api.get(`project/${props.projectId}`)
+            .then(response => {
+                setProject(response.data)
+            })
+            .finally(() => setLoading(false))
+*/
         axios.get(process.env.REACT_APP_BACKEND + '/project/' + props.projectId)
             .then(response => {
                 setProject(response.data)
@@ -295,10 +301,10 @@ export const Project = (props: ProjectListProps) => {
                     <SurfaceMemberList projectId={props.projectId} items={surfaceMembers}
                                        onUpdate={getSurfaceMemberList} onDelete={onDeleteSurfaceMember}/>
                 </Tab>
-                <Tab eventKey="loadcases" title="Loadcases" disabled={disableLoadCaseTab}>
+                <Tab eventKey="loadcases" title="Load Cases" disabled={disableLoadCaseTab}>
                     <LoadCaseList projectId={props.projectId} items={loadCases} onUpdate={getLoadCaseList} onDelete={onDeleteLoadCase}/>
                 </Tab>
-                <Tab eventKey="loads" title="Loads" disabled={false}>
+                <Tab eventKey="loads" title="Point Load" disabled={false}>
                     <PointActionList projectId={props.projectId} items={pointActions} onUpdate={getPointActionList} onDelete={onDeletePointAction} />
                 </Tab>
             </Tabs>
