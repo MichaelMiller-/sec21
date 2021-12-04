@@ -14,6 +14,9 @@ const PointSupportItem = (props: ListItemProps<DbPointSupport>) => {
             <td>{props.item.name}</td>
             <td>{props.item.type}</td>
             <td>{props.item.referencePoint.name}</td>
+            <td>{props.item.ux}</td>
+            <td>{props.item.uy}</td>
+            <td>{props.item.uz}</td>
             <td><EditButton onClick={() => {
             }} disabled={true}/></td>
             <td><RemoveButton onClick={() => {
@@ -36,6 +39,9 @@ const PointSupportList = (props: ListProps<DbPointSupport>) => {
                     <th>Name</th>
                     <th>Type</th>
                     <th>Reference Point</th>
+                    <th>ux</th>
+                    <th>uy</th>
+                    <th>uz</th>
                 </tr>
                 </thead>
                 <tbody>
