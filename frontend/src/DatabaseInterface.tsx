@@ -93,6 +93,16 @@ export enum SupportType {
     SLIDING = "sliding",
     CUSTOM = "custom"
 }
+export enum SupportTranslation {
+    RIGID = "rigid",
+    FREE = "free",
+    FLEXIBLE = "flexible",
+    COMPRESSION_ONLY = "compression_only",
+    TENSION__ONLY = "tension_only",
+    //  "Flexible compression only",
+    // "Flexible tension only",
+    NON_LINEAR = "non_linear"
+}
 
 export interface DbPointSupport {
     id: number;
@@ -100,6 +110,9 @@ export interface DbPointSupport {
     uuid: string;
     type: SupportType;
     referencePoint: DbStructuralPoint;
+    ux: SupportTranslation;
+    uy: SupportTranslation;
+    uz: SupportTranslation;
 }
 
 export interface DbPointAction {
