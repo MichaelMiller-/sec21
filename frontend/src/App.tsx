@@ -3,6 +3,7 @@ import {Container} from "react-bootstrap";
 import React from "react";
 import ProjectList from "./ProjectList";
 import {Project, RouterComponentProjectProps} from "./Project";
+import Login from "./Login";
 
 const App = () => {
 
@@ -22,6 +23,7 @@ const App = () => {
                         render={({match}: RouterComponentProjectProps) => (
                             <Project projectId={match.params.projectId}/>)}
                     />
+                    <Route exact path="/login"><Login/></Route>
                 </Switch>
             </BrowserRouter>
         </Container>
