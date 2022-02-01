@@ -9,8 +9,8 @@ TEST_CASE("add node to system", "[sec21][structural_analysis][space_truss][node]
    using namespace sec21::structural_analysis;
 
    using descriptor_t = int;
-   using member_t = member<descriptor_t, float>;
-   using node_t = node<2, descriptor_t, float>;
+   using member_t = member<descriptor_t>;
+   using node_t = node<2, descriptor_t>;
    using space_truss_t = space_truss<node_t, member_t>;
 
    SECTION("add one node")
