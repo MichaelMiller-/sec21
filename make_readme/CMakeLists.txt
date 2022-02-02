@@ -9,5 +9,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_BINARY_DIR})
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
 
 find_package(spdlog REQUIRED)
+find_package(fmt REQUIRED)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog spdlog::spdlog_header_only)
+target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt-header-only)
