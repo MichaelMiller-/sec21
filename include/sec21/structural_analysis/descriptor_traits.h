@@ -16,7 +16,7 @@ namespace sec21::structural_analysis
    };
 
    template <typename T>
-   inline constexpr bool is_descriptor_v = is_descriptor<T>::value;
+   static constexpr bool is_descriptor_v = is_descriptor<T>::value;
 
 #ifdef __cpp_concepts
    template <typename T>
