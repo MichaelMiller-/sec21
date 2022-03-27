@@ -10,12 +10,11 @@ namespace sec21::log
    template <typename... Ts>
    class registry
    {
+      static_assert(std::conjunction_v<std::is_base_of<base_logger, Ts>...>);
+
       std::array<std::unique_ptr<base_logger>, sizeof...(Ts)> loggers;
 
-      registry() : loggers{std::make_unique<Ts>()...}
-      {
-         static_assert(std::conjunction_v<std::is_base_of<base_logger, Ts>...>);
-      }
+      registry() : loggers{std::make_unique<Ts>()...} {}
       ~registry() = default;
 
     public:
