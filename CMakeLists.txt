@@ -87,7 +87,6 @@ add_custom_target(
 ##
 add_subdirectory(logger)
 add_subdirectory(http_connection)
-add_subdirectory(orm_compiler)
 add_subdirectory(make_readme)
 
 ## production code - not listed on GITHUB
@@ -95,15 +94,19 @@ add_subdirectory(make_readme)
 if (ENABLE_PRODUCTION)
     add_subdirectory(codegen)
     add_subdirectory(database_connection)
+    add_subdirectory(test_database_connection)
     add_subdirectory(service_provider)
     add_subdirectory(esbp)
+    add_subdirectory(femp)
     add_subdirectory(sanity_check)
+    add_subdirectory(stbp)
+    add_subdirectory(quze)
     # add_subdirectory(triangulation)
 endif ()
 
 option(ENABLE_WORK_IN_PROGRESS "work in progress!" OFF)
 if (ENABLE_WORK_IN_PROGRESS)
-    add_subdirectory(editor)
+    # TODO: delete: add_subdirectory(editor)
     # add_subdirectory(fuzzing_test)
     add_subdirectory(integration_test_sqlite3_backend)
     add_subdirectory(opengl_window)
@@ -115,9 +118,9 @@ if (ENABLE_WORK_IN_PROGRESS)
     add_subdirectory(runtime_enviroment)
     add_subdirectory(translate)
     add_subdirectory(udf)
+    add_subdirectory(vulkan)
     # add_subdirectory(viewer_sfml)
     add_subdirectory(worker) ## test logger
-    # add_subdirectory(webviewer) ## Emscripten test
     # add_subdirectory(workspace) ## Alia test
 endif ()
 
