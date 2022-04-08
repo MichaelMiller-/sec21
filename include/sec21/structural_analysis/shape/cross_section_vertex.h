@@ -9,9 +9,14 @@ namespace sec21::structural_analysis::shape
 
       T y{}; // [mm]
       T z{}; // [mm]
-
+#ifdef __cpp_lib_three_way_comparison
       constexpr bool operator==(cross_section_vertex const&) const = default;
-
+#else
+      constexpr bool operator==(cross_section_vertex const& obj) const
+      {
+         return std::tie(y, z) == std::tie(obj.y, obj.z);
+      }
+#endif
       template <typename U>
       friend auto operator*(cross_section_vertex const& lhs, U const& rhs) noexcept
       {
