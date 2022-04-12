@@ -1,5 +1,5 @@
 #define VERSION_MAJOR @make_readme_VERSION_MAJOR@
 #define VERSION_MINOR @make_readme_VERSION_MINOR@
 
-constexpr char SEC21_PROGRAM_NAME[] = "@PROJECT_NAME@";
-constexpr char SEC21_ROOT_DIRECTORY[] = "@CMAKE_SOURCE_DIR@";
+static constexpr char SEC21_PROGRAM_NAME[] = "@PROJECT_NAME@";
+static constexpr char SEC21_ROOT_DIRECTORY[] = "@CMAKE_SOURCE_DIR@";
