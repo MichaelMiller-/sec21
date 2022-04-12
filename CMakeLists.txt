@@ -4,6 +4,8 @@ project(sec21
         DESCRIPTION "sec21::workspace"
         )
 
+include(GNUInstallDirs)
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(SEC21_CMAKE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 list(APPEND CMAKE_MODULE_PATH ${SEC21_CMAKE_PATH})
@@ -12,7 +14,13 @@ include(${SEC21_CMAKE_PATH}/StandardProjectSettings.cmake)
 
 ## header-only library
 add_library(${PROJECT_NAME} INTERFACE)
+## alias
+add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
+target_include_directories(${PROJECT_NAME} INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>)
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+## project dependencies
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
@@ -22,7 +30,6 @@ find_package(nlohmann_json CONFIG REQUIRED)
 
 target_link_libraries(${PROJECT_NAME} INTERFACE Boost::boost)
 target_link_libraries(${PROJECT_NAME} INTERFACE nlohmann_json nlohmann_json::nlohmann_json)
-target_include_directories(${PROJECT_NAME} SYSTEM INTERFACE include)
 
 include(${SEC21_CMAKE_PATH}/CompilerWarnings.cmake)
 set_project_warnings(${PROJECT_NAME})
@@ -125,15 +132,33 @@ if (ENABLE_WORK_IN_PROGRESS)
 endif ()
 
 
-## installation
+## Installation + CMake config files
 ##
-include(GNUInstallDirs)
-## set different paths
-#install(TARGETS ${CMAKE_PROJECT_NAME}
-#        RUNTIME DESTINATION bin
-#        LIBRARY DESTINATION lib
-#        ARCHIVE DESTINATION lib)
+include(CMakePackageConfigHelpers)
 
+install(TARGETS ${PROJECT_NAME}
+        EXPORT local-export-name
+        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        )
+
+install(EXPORT local-export-name
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+        NAMESPACE ${PROJECT_NAME}::
+        FILE ${PROJECT_NAME}Config.cmake
+        )
+
+write_basic_package_version_file(
+        ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+        VERSION ${PROJECT_VERSION}
+        COMPATIBILITY AnyNewerVersion
+)
+install(FILES
+        ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+        )
+
+## Packages
+##
 set(CPACK_PACKAGE_NAME ${PROJECT_NAME})
 set(CPACK_PACKAGE_VENDOR "Planungsbüro Michael Miller")
 set(CPACK_VERBATIM_VARIABLES true)
