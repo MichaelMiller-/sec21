@@ -99,7 +99,6 @@ add_subdirectory(make_readme)
 ## production code - not listed on GITHUB
 ##
 if (ENABLE_PRODUCTION)
-    add_subdirectory(codegen)
     add_subdirectory(database_connection)
     add_subdirectory(test_database_connection)
     add_subdirectory(service_provider)
