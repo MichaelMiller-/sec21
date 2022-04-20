@@ -36,3 +36,6 @@ if (BUILD_TESTING)
     enable_testing()
     add_subdirectory(tests)
 endif ()
+
+install(TARGETS ${PROJECT_NAME} ARCHIVE)
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
