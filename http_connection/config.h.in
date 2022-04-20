@@ -1,4 +1,6 @@
+#pragma once
+
 #define VERSION_MAJOR @http_connection_VERSION_MAJOR@
 #define VERSION_MINOR @http_connection_VERSION_MINOR@
 
-constexpr char SEC21_PROGRAM_NAME[] = "@PROJECT_NAME@";
+static constexpr char SEC21_PROGRAM_NAME[] = "@PROJECT_NAME@";
