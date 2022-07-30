@@ -13,7 +13,7 @@ namespace sec21::detail
       void operator()(int index, nlohmann::json const& value, Variant& v) const
       {
          if (index == N) {
-            v = value.get<std::variant_alternative_t<N, Variant>>();
+            v = value.get<std::variant_alternative_t<static_cast<std::size_t>(N), Variant>>();
          } else
             variant_switch<N - 1>{}(index, value, v);
       }
