@@ -1,24 +1,20 @@
-#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
+#include <catch.hpp>
 
 #include <sec21/math.h>
 
 TEST_CASE("average", "[math]")
 {
-   SECTION("average over ints") 
+   SECTION("average over ints") { REQUIRE(sec21::average(1, 2, 3, 4, 5, 6, 7, 8, 9) == 5); }
+   SECTION("average over doubles")
    {
-      REQUIRE(sec21::average(1, 2, 3, 4, 5, 6, 7, 8, 9) == 5);
-   }
-   SECTION("average over doubles") 
-   {
-      REQUIRE(sec21::average(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0) == Approx(5.0));
+      REQUIRE(sec21::average(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0) == Catch::Approx(5.0));
    }
 }
 
 TEST_CASE("test absolute norm of an array", "[math]")
 {
-   const std::vector input{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-   REQUIRE(sec21::norm(std::begin(input), std::end(input)) == Approx(16.881943));
+   const std::vector input{1, 2, 3, 4, 5, 6, 7, 8, 9};
+   REQUIRE(sec21::norm(std::begin(input), std::end(input)) == Catch::Approx(16.881943));
 }
 
 TEST_CASE("floating point min()", "[math]")
@@ -29,5 +25,5 @@ TEST_CASE("floating point min()", "[math]")
 
 TEST_CASE("accumulate", "[math]")
 {
-   REQUIRE(sec21::accumulate(1, 2, 3, 4.5f, 3.145684, 2) == Approx(15.645684));
+   REQUIRE(sec21::accumulate(1, 2, 3, 4.5f, 3.145684, 2) == Catch::Approx(15.645684));
 }
