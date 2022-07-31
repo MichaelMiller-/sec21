@@ -10,6 +10,7 @@
 #include <sec21/structural_analysis/space_truss.h>
 #include <sec21/units.h>
 #include <sec21/structural_analysis/solver/backend/eigen.h>
+#include <sec21/structural_analysis/constants.h>
 
 TEST_CASE("example 1.1 with different node id's (N1 switched with N3 from example 1)", "[sec21][structural_analysis][space_truss]")
 {
@@ -58,45 +59,8 @@ TEST_CASE("example 1.1 with different node id's (N1 switched with N3 from exampl
       REQUIRE(impl::length(sys, m2) == 3.0_m);
       REQUIRE(impl::length(sys, m3) == 3.0_m);
       REQUIRE(impl::length(sys, m4) == 3.0_m);
-      REQUIRE(impl::length(sys, m5).value() == Approx(4.24264)); //_m);
-      REQUIRE(impl::length(sys, m6).value() == Approx(4.24264)); //_m);
-
-      namespace bmc = boost::math::constants;
-      const auto fourth_pi{bmc::half_pi<precision_t>() * static_cast<precision_t>(0.5)};
-
-      REQUIRE(impl::angle_to_x_axis(sys, m1) == Approx(0.0));
-      REQUIRE(impl::angle_to_x_axis(sys, m2) == Approx(bmc::half_pi<precision_t>()));
-      REQUIRE(impl::angle_to_x_axis(sys, m3) == Approx(0.0));
-      REQUIRE(impl::angle_to_x_axis(sys, m4) == Approx(bmc::half_pi<precision_t>()));
-      REQUIRE(impl::angle_to_x_axis(sys, m5) == Approx(fourth_pi));
-      REQUIRE(impl::angle_to_x_axis(sys, m6) == Approx(-fourth_pi));
-   }
-   SECTION("filter supported nodes from lookup table") 
-   {
-      auto lookup = impl::make_lookup(sys, row{0});
-
-      const auto expected = std::array{ row{0}, row{1}, row{2}, row{3}, row{4}, row{5}, row{6}, row{7} };
-      REQUIRE(std::size(lookup) == std::size(expected));
-      REQUIRE(std::equal(std::begin(lookup), std::end(lookup), std::begin(expected)));
-
-      std::vector<bool> mask;
-      support_mask(std::begin(sys.nodes), std::end(sys.nodes), std::back_inserter(mask));
-
-      decltype(lookup) supported_nodes;
-      decltype(lookup) not_supported_nodes;
-
-      impl::partition_lookup(
-         std::begin(lookup), 
-         std::end(lookup),
-         std::begin(mask), 
-         std::end(mask),
-         std::back_inserter(supported_nodes),
-         std::back_inserter(not_supported_nodes));
-
-      const auto expected_rows = std::vector{ row{1}, row{6}, row{7} };
-
-      REQUIRE(std::size(supported_nodes) == std::size(expected_rows));
-      REQUIRE(std::equal(std::begin(supported_nodes), std::end(supported_nodes), std::begin(expected_rows)));
+      REQUIRE(impl::length(sys, m5).value() == Catch::Approx(4.24264)); //_m);
+      REQUIRE(impl::length(sys, m6).value() == Catch::Approx(4.24264)); //_m);
    }
    SECTION("coincidence matrix from member 1")
    {
@@ -232,21 +196,21 @@ TEST_CASE("example 1.1 with different node id's (N1 switched with N3 from exampl
       REQUIRE(flat_support_reaction[7] == Approx(-10'000.0));
 */
       // unit: millimeter [mm]
-      REQUIRE(std::get<0>(result.nodes[0].displacement).value() == Approx(0.18).epsilon(kDivergence));
-      REQUIRE(std::get<1>(result.nodes[0].displacement).value() == Approx(0.0).epsilon(kDivergence));
-      REQUIRE(std::get<0>(result.nodes[1].displacement).value() == Approx(1.04).epsilon(kDivergence));
-      REQUIRE(std::get<1>(result.nodes[1].displacement).value() == Approx(-0.54).epsilon(kDivergence));
-      REQUIRE(std::get<0>(result.nodes[2].displacement).value() == Approx(0.86).epsilon(kDivergence));
-      REQUIRE(std::get<1>(result.nodes[2].displacement).value() == Approx(0.18).epsilon(kDivergence));
-      REQUIRE(std::get<0>(result.nodes[3].displacement).value() == Approx(0.0).epsilon(kDivergence));
-      REQUIRE(std::get<1>(result.nodes[3].displacement).value() == Approx(0.0).epsilon(kDivergence));
+      REQUIRE(std::get<0>(result.nodes[0].displacement).value() == Catch::Approx(0.18).epsilon(kDivergence));
+      REQUIRE(std::get<1>(result.nodes[0].displacement).value() == Catch::Approx(0.0).epsilon(kDivergence));
+      REQUIRE(std::get<0>(result.nodes[1].displacement).value() == Catch::Approx(1.04).epsilon(kDivergence));
+      REQUIRE(std::get<1>(result.nodes[1].displacement).value() == Catch::Approx(-0.54).epsilon(kDivergence));
+      REQUIRE(std::get<0>(result.nodes[2].displacement).value() == Catch::Approx(0.86).epsilon(kDivergence));
+      REQUIRE(std::get<1>(result.nodes[2].displacement).value() == Catch::Approx(0.18).epsilon(kDivergence));
+      REQUIRE(std::get<0>(result.nodes[3].displacement).value() == Catch::Approx(0.0).epsilon(kDivergence));
+      REQUIRE(std::get<1>(result.nodes[3].displacement).value() == Catch::Approx(0.0).epsilon(kDivergence));
 
       // unit: newton [N])
-      REQUIRE(flat_member_result[0] == Approx(5'000));
-      REQUIRE(flat_member_result[1] == Approx(-15'000));
-      REQUIRE(flat_member_result[2] == Approx(5'000));
-      REQUIRE(flat_member_result[3] == Approx(5'000));
-      REQUIRE(flat_member_result[4] == Approx(7'071.0678118655));
-      REQUIRE(flat_member_result[5] == Approx(-7'071.0678118655));
+      REQUIRE(flat_member_result[0] == Catch::Approx(5'000));
+      REQUIRE(flat_member_result[1] == Catch::Approx(-15'000));
+      REQUIRE(flat_member_result[2] == Catch::Approx(5'000));
+      REQUIRE(flat_member_result[3] == Catch::Approx(5'000));
+      REQUIRE(flat_member_result[4] == Catch::Approx(7'071.0678118655));
+      REQUIRE(flat_member_result[5] == Catch::Approx(-7'071.0678118655));
    }
 }
