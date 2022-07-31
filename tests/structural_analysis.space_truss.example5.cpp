@@ -39,7 +39,7 @@ TEST_CASE("example system 5.0 load from json", "[sec21][structural_analysis][spa
    {
       auto it = std::begin(sys.members);
       auto EA = it->E * it->A;
-      REQUIRE(EA.value() == Approx(200'000));
+      REQUIRE(EA.value() == Catch::Approx(200'000));
    }
 #if 0
    SECTION("solve")
