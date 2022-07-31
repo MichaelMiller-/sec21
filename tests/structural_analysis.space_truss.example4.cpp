@@ -53,23 +53,23 @@ TEST_CASE("example system 4.0 load from json", "[sec21][structural_analysis][spa
       [](auto&& m) { return m.normal_force.value(); });
 
    // unit: newton [N]
-   REQUIRE(std::get<0>(result.nodes[0].support_reaction).value() == Approx(60'000).epsilon(kDivergence));
-   REQUIRE(std::get<1>(result.nodes[0].support_reaction).value() == Approx(70'000).epsilon(kDivergence));
-   REQUIRE(std::get<0>(result.nodes[1].support_reaction).value() == Approx(-60'000).epsilon(kDivergence));
-   REQUIRE(std::get<1>(result.nodes[1].support_reaction).value() == Approx(70'000).epsilon(kDivergence));
+   REQUIRE(std::get<0>(result.nodes[0].support_reaction).value() == Catch::Approx(60'000).epsilon(kDivergence));
+   REQUIRE(std::get<1>(result.nodes[0].support_reaction).value() == Catch::Approx(70'000).epsilon(kDivergence));
+   REQUIRE(std::get<0>(result.nodes[1].support_reaction).value() == Catch::Approx(-60'000).epsilon(kDivergence));
+   REQUIRE(std::get<1>(result.nodes[1].support_reaction).value() == Catch::Approx(70'000).epsilon(kDivergence));
 
    // unit: millimeter [mm]
-   REQUIRE(std::get<1>(result.nodes[6].displacement).value() == Approx(-29.2).epsilon(kDivergence));
+   REQUIRE(std::get<1>(result.nodes[6].displacement).value() == Catch::Approx(-29.2).epsilon(kDivergence));
 
    // unit: newton [N]
-   REQUIRE(copied_results[0] == Approx(30'000));
-   REQUIRE(copied_results[1] == Approx(-116'619).epsilon(kDivergence));
-   REQUIRE(copied_results[2] == Approx(-116'619).epsilon(kDivergence));
-   REQUIRE(copied_results[3] == Approx(30'000));
-   REQUIRE(copied_results[4] == Approx(40'000));
-   REQUIRE(copied_results[5] == Approx(-40'000));
-   REQUIRE(copied_results[6] == Approx(80'800).epsilon(kDivergence));
-   REQUIRE(copied_results[7] == Approx(-141'400).epsilon(kDivergence));
-   REQUIRE(copied_results[8] == Approx(141'400).epsilon(kDivergence));
-   REQUIRE(copied_results[9] == Approx(80'800).epsilon(kDivergence));
+   REQUIRE(copied_results[0] == Catch::Approx(30'000));
+   REQUIRE(copied_results[1] == Catch::Approx(-116'619).epsilon(kDivergence));
+   REQUIRE(copied_results[2] == Catch::Approx(-116'619).epsilon(kDivergence));
+   REQUIRE(copied_results[3] == Catch::Approx(30'000));
+   REQUIRE(copied_results[4] == Catch::Approx(40'000));
+   REQUIRE(copied_results[5] == Catch::Approx(-40'000));
+   REQUIRE(copied_results[6] == Catch::Approx(80'800).epsilon(kDivergence));
+   REQUIRE(copied_results[7] == Catch::Approx(-141'400).epsilon(kDivergence));
+   REQUIRE(copied_results[8] == Catch::Approx(141'400).epsilon(kDivergence));
+   REQUIRE(copied_results[9] == Catch::Approx(80'800).epsilon(kDivergence));
 }
