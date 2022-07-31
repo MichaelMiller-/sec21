@@ -2,11 +2,11 @@
 #include <catch.hpp>
 
 #include <sec21/access.h>
-#include <sec21/file_loader.h>
 #include <sec21/numeric/drop.h>
 #include <sec21/numeric/flatten.h>
 #include <sec21/numeric/ublas_allocator_wrapper.h>
 #include <sec21/structural_analysis/loadcase.h>
+#include <sec21/structural_analysis/constants.h>
 #include <sec21/structural_analysis/solve.h>
 #include <sec21/structural_analysis/node.h>
 #include <sec21/structural_analysis/member.h>
@@ -14,9 +14,7 @@
 #include <sec21/units.h>
 #include <sec21/structural_analysis/solver/backend/eigen.h>
 
-#include <algorithm>
 #include <array>
-#include <utility>
 #include <valarray>
 #include <vector>
 
@@ -78,18 +76,8 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       REQUIRE(impl::length(sys, m2) == 3.0_m);
       REQUIRE(impl::length(sys, m3) == 3.0_m);
       REQUIRE(impl::length(sys, m4) == 3.0_m);
-      REQUIRE(impl::length(sys, m5).value() == Approx(4.24264)); //_m);
-      REQUIRE(impl::length(sys, m6).value() == Approx(4.24264)); //_m);
-
-      namespace bmc = boost::math::constants;
-      const auto fourth_pi{bmc::half_pi<precision_t>() * static_cast<precision_t>(0.5)};
-
-      REQUIRE(impl::angle_to_x_axis(sys, m1) == Approx(0.0));
-      REQUIRE(impl::angle_to_x_axis(sys, m2) == Approx(bmc::half_pi<precision_t>()));
-      REQUIRE(impl::angle_to_x_axis(sys, m3) == Approx(0.0));
-      REQUIRE(impl::angle_to_x_axis(sys, m4) == Approx(bmc::half_pi<precision_t>()));
-      REQUIRE(impl::angle_to_x_axis(sys, m5) == Approx(fourth_pi));
-      REQUIRE(impl::angle_to_x_axis(sys, m6) == Approx(-fourth_pi));
+      REQUIRE(impl::length(sys, m5).value() == Catch::Approx(4.24264)); //_m);
+      REQUIRE(impl::length(sys, m6).value() == Catch::Approx(4.24264)); //_m);
    }
    SECTION("create lookup table")
    {
@@ -98,30 +86,6 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
 
       REQUIRE(std::size(lookup) == std::size(expected));
       REQUIRE(std::equal(std::begin(lookup), std::end(lookup), std::begin(expected)));
-   }
-   SECTION("filter supported nodes from lookup table")
-   {
-      using namespace sec21::structural_analysis::impl;
-
-      auto lookup = make_lookup(sys, row{0});
-      const auto expected = std::array{row{0}, row{1}, row{2}, row{3}, row{4}, row{5}, row{6}, row{7}};
-
-      REQUIRE(std::size(lookup) == std::size(expected));
-      REQUIRE(std::equal(std::begin(lookup), std::end(lookup), std::begin(expected)));
-
-      std::vector<bool> mask;
-      support_mask(std::begin(sys.nodes), std::end(sys.nodes), std::back_inserter(mask));
-
-      decltype(lookup) supported_nodes;
-      decltype(lookup) not_supported_nodes;
-
-      partition_lookup(std::begin(lookup), std::end(lookup), std::begin(mask), std::end(mask),
-                       std::back_inserter(supported_nodes), std::back_inserter(not_supported_nodes));
-
-      const auto expected_rows = std::vector{row{5}, row{6}, row{7}};
-
-      REQUIRE(std::size(supported_nodes) == std::size(expected_rows));
-      REQUIRE(std::equal(std::begin(supported_nodes), std::end(supported_nodes), std::begin(expected_rows)));
    }
    SECTION("Steifigkeitsbeziehung vom Fachwerkstab 1 in globalen Koordinaten")
    {
@@ -134,7 +98,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       ///
       /// Stab 1
       /// ------
-      /// Fx1            1  0 -1  0      u1 
+      /// Fx1            1  0 -1  0      u1
       /// Fy1 = E*A/l *  0  0  0  0   *  v1
       /// Fx2           -1  0  1  0      u2
       /// Fy2            0  0  0  0      v2
@@ -160,7 +124,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       ///
       /// Stab 2
       /// ------
-      /// Fx3            0  0  0  0      u3 
+      /// Fx3            0  0  0  0      u3
       /// Fy3 = E*A/l *  0  1  0 -1   *  v3
       /// Fx2            0  0  0  0      u2
       /// Fy2            0 -1  0  1      v2
@@ -186,7 +150,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       ///
       /// Stab 3
       /// ------
-      /// Fx4            1  0 -1  0      u4 
+      /// Fx4            1  0 -1  0      u4
       /// Fy4 = E*A/l *  0  0  0  0   *  v4
       /// Fx3           -1  0  1  0      u3
       /// Fy3            0  0  0  0      v3
@@ -212,7 +176,7 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       ///
       /// Stab 4
       /// ------
-      /// Fx1            0  0  0  0      u1 
+      /// Fx1            0  0  0  0      u1
       /// Fy1 = E*A/l *  0  1  0  -1  *  v1
       /// Fx4            0  0  0  0      u4
       /// Fy4            0  -1  0  1     v4
@@ -533,85 +497,6 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       REQUIRE(std::size(flattend_K) == std::size(expected));
       REQUIRE(approx_equal(flattend_K, expected, kDivergence));
    }
-   SECTION("global stiffness matrix without supports")
-   {
-      using namespace sec21::structural_analysis::impl;
-      using namespace sec21;
-
-      std::vector<bool> mask;
-      support_mask(std::begin(sys.nodes), std::end(sys.nodes), std::back_inserter(mask));
-
-      auto lookup = make_lookup(sys, row{0});
-      decltype(lookup) supported_rows;
-      decltype(lookup) not_supported_rows;
-
-      partition_lookup(std::begin(lookup), std::end(lookup), std::begin(mask), std::end(mask),
-                       std::back_inserter(supported_rows), std::back_inserter(not_supported_rows));
-
-      const auto supported_cols = row_to_col(std::begin(supported_rows), std::end(supported_rows));
-
-      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
-      auto K = impl::global_stiffness_matrix<allocator_t>(sys);
-      auto K_without_supports = sec21::numeric::drop(sec21::numeric::drop(K, supported_rows), supported_cols);
-      REQUIRE(K_without_supports.size1() == 5);
-      REQUIRE(K_without_supports.size2() == 5);
-      // clang-format off
-      //              |  1.35, -0.35, -1.0,  0.0, -0.35, |   | u1 |   | Fx1 |
-      //              | -0.35,  1.35,  0.0,  0.0,  0.35, |   | v1 |   | Fy1 |
-      // 2.8 * 10^3 * | -1.0,   0.0,   1.35  0.35, 0.0,  | * | u2 | = | Fx2 |
-      //              |  0.0,   0.0,   0.35, 1.35, 0.0,  |   | v2 |   | Fy2 |
-      //              | -0.35,  0.35,  0.0,  0.0,  1.35  |   | u3 |   | Fx3 |
-      auto expected = std::valarray<precision_t>{
-          1.35, -0.35, -1.0,  0.0, -0.35,
-         -0.35,  1.35,  0.0,  0.0,  0.35,
-         -1.0,   0.0,   1.35, 0.35, 0.0,
-          0.0,   0.0,   0.35, 1.35, 0.0,
-         -0.35,  0.35,  0.0,  0.0,  1.35
-      };
-      expected *= EA_l1;
-      // clang-format on
-      const auto flattend_K = numeric::flatten(K_without_supports);
-      REQUIRE(std::size(flattend_K) == std::size(expected));
-      REQUIRE(approx_equal(flattend_K, expected, kDivergence));
-   }
-   SECTION("K strich")
-   {
-      using namespace sec21;
-      using namespace sec21::structural_analysis::impl;
-
-      std::vector<bool> mask;
-      support_mask(std::begin(sys.nodes), std::end(sys.nodes), std::back_inserter(mask));
-
-      auto lookup = make_lookup(sys, row{0});
-      decltype(lookup) supported_rows;
-      decltype(lookup) not_supported_rows;
-
-      partition_lookup(std::begin(lookup), std::end(lookup), std::begin(mask), std::end(mask),
-                       std::back_inserter(supported_rows), std::back_inserter(not_supported_rows));
-
-      const auto supported_cols = row_to_col(std::begin(supported_rows), std::end(supported_rows));
-
-      using allocator_t = sec21::numeric::ublas_allocator_wrapper<std::allocator<precision_t>>;
-      auto K = impl::global_stiffness_matrix<allocator_t>(sys);
-      auto K_strich = numeric::drop(numeric::drop(K, not_supported_rows), supported_cols);
-      REQUIRE(K_strich.size1() == 3);
-      REQUIRE(K_strich.size2() == 5);
-      // clang-format off
-      //                                                       | u1 |     
-      //              |  0.35, -0.35,  0.0,  -1.0,  -0.35, |   | v1 |   | Fy3 | 
-      // 2.8 * 10^3 * |  0.0,   0.0,  -0.35, -0.35, -1.0,  | * | u2 | = | Fx4 |  
-      //              |  0.0,  -1.0,  -0.35  -0.35,  0.0   |   | v2 |   | Fy4 |
-      //                                                       | u3 |
-      auto expected = std::valarray<precision_t>{
-          0.35, -0.35, 0.0,  -1.0,  -0.35,
-          0.0,   0.0, -0.35, -0.35, -1.0,
-          0.0,  -1.0, -0.35, -0.35,  0.0
-      };
-      expected *= EA_l1;
-      // clang-format on
-      const auto flattend_K = numeric::flatten(K_strich);
-      REQUIRE(approx_equal(flattend_K, expected, kDivergence));
-   }
    SECTION("solve")
    {
       using namespace sec21;
@@ -625,32 +510,32 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       const auto result = success.value();
 
       // unit: newton [N]
-      REQUIRE(std::get<0>(result.nodes[2].support_reaction).value() == Approx(0.0).epsilon(kDivergence));
-      REQUIRE(std::get<1>(result.nodes[2].support_reaction).value() == Approx(20'000).epsilon(kDivergence));
-      REQUIRE(std::get<0>(result.nodes[3].support_reaction).value() == Approx(-10'000).epsilon(kDivergence));
-      REQUIRE(std::get<1>(result.nodes[3].support_reaction).value() == Approx(-10'000).epsilon(kDivergence));
+      REQUIRE(std::get<0>(result.nodes[2].support_reaction).value() == Catch::Approx(0.0).epsilon(kDivergence));
+      REQUIRE(std::get<1>(result.nodes[2].support_reaction).value() == Catch::Approx(20'000).epsilon(kDivergence));
+      REQUIRE(std::get<0>(result.nodes[3].support_reaction).value() == Catch::Approx(-10'000).epsilon(kDivergence));
+      REQUIRE(std::get<1>(result.nodes[3].support_reaction).value() == Catch::Approx(-10'000).epsilon(kDivergence));
 
       // unit: millimeter [mm]
-      REQUIRE(std::get<0>(result.nodes[0].displacement).value() == Approx(0.86).epsilon(kDivergence));
-      REQUIRE(std::get<1>(result.nodes[0].displacement).value() == Approx(0.18).epsilon(kDivergence));
-      REQUIRE(std::get<0>(result.nodes[1].displacement).value() == Approx(1.04).epsilon(kDivergence));
-      REQUIRE(std::get<1>(result.nodes[1].displacement).value() == Approx(-0.53).epsilon(kDivergence));
-      REQUIRE(std::get<0>(result.nodes[2].displacement).value() == Approx(0.18).epsilon(kDivergence));
-      REQUIRE(std::get<1>(result.nodes[2].displacement).value() == Approx(0.0).epsilon(kDivergence));
-      REQUIRE(std::get<0>(result.nodes[3].displacement).value() == Approx(0.0).epsilon(kDivergence));
-      REQUIRE(std::get<1>(result.nodes[3].displacement).value() == Approx(0.0).epsilon(kDivergence));
+      REQUIRE(std::get<0>(result.nodes[0].displacement).value() == Catch::Approx(0.86).epsilon(kDivergence));
+      REQUIRE(std::get<1>(result.nodes[0].displacement).value() == Catch::Approx(0.18).epsilon(kDivergence));
+      REQUIRE(std::get<0>(result.nodes[1].displacement).value() == Catch::Approx(1.04).epsilon(kDivergence));
+      REQUIRE(std::get<1>(result.nodes[1].displacement).value() == Catch::Approx(-0.53).epsilon(kDivergence));
+      REQUIRE(std::get<0>(result.nodes[2].displacement).value() == Catch::Approx(0.18).epsilon(kDivergence));
+      REQUIRE(std::get<1>(result.nodes[2].displacement).value() == Catch::Approx(0.0).epsilon(kDivergence));
+      REQUIRE(std::get<0>(result.nodes[3].displacement).value() == Catch::Approx(0.0).epsilon(kDivergence));
+      REQUIRE(std::get<1>(result.nodes[3].displacement).value() == Catch::Approx(0.0).epsilon(kDivergence));
 
       std::vector<double> flat_member_result{};
       std::transform(std::begin(result.members), std::end(result.members), std::back_inserter(flat_member_result),
                      [](auto&& e) { return e.normal_force.value(); });
 
       // unit: newton [N])
-      REQUIRE(flat_member_result[0] == Approx(5'000));
-      REQUIRE(flat_member_result[1] == Approx(-15'000));
-      REQUIRE(flat_member_result[2] == Approx(5'000));
-      REQUIRE(flat_member_result[3] == Approx(5'000));
-      REQUIRE(flat_member_result[4] == Approx(7'071.0678118655));
-      REQUIRE(flat_member_result[5] == Approx(-7'071.0678118655));
+      REQUIRE(flat_member_result[0] == Catch::Approx(5'000));
+      REQUIRE(flat_member_result[1] == Catch::Approx(-15'000));
+      REQUIRE(flat_member_result[2] == Catch::Approx(5'000));
+      REQUIRE(flat_member_result[3] == Catch::Approx(5'000));
+      REQUIRE(flat_member_result[4] == Catch::Approx(7'071.0678118655));
+      REQUIRE(flat_member_result[5] == Catch::Approx(-7'071.0678118655));
    }
    SECTION("solve with eigen backend")
    {
@@ -665,31 +550,31 @@ TEST_CASE("example system 1.0", "[sec21][structural_analysis][space_truss]")
       const auto result = success.value();
 
       // unit: newton [N]
-      REQUIRE(std::get<0>(result.nodes[2].support_reaction).value() == Approx(0.0).epsilon(kDivergence));
-      REQUIRE(std::get<1>(result.nodes[2].support_reaction).value() == Approx(20'000).epsilon(kDivergence));
-      REQUIRE(std::get<0>(result.nodes[3].support_reaction).value() == Approx(-10'000).epsilon(kDivergence));
-      REQUIRE(std::get<1>(result.nodes[3].support_reaction).value() == Approx(-10'000).epsilon(kDivergence));
+      REQUIRE(std::get<0>(result.nodes[2].support_reaction).value() == Catch::Approx(0.0).epsilon(kDivergence));
+      REQUIRE(std::get<1>(result.nodes[2].support_reaction).value() == Catch::Approx(20'000).epsilon(kDivergence));
+      REQUIRE(std::get<0>(result.nodes[3].support_reaction).value() == Catch::Approx(-10'000).epsilon(kDivergence));
+      REQUIRE(std::get<1>(result.nodes[3].support_reaction).value() == Catch::Approx(-10'000).epsilon(kDivergence));
 
       // unit: millimeter [mm]
-      REQUIRE(std::get<0>(result.nodes[0].displacement).value() == Approx(0.86).epsilon(kDivergence));
-      REQUIRE(std::get<1>(result.nodes[0].displacement).value() == Approx(0.18).epsilon(kDivergence));
-      REQUIRE(std::get<0>(result.nodes[1].displacement).value() == Approx(1.04).epsilon(kDivergence));
-      REQUIRE(std::get<1>(result.nodes[1].displacement).value() == Approx(-0.53).epsilon(kDivergence));
-      REQUIRE(std::get<0>(result.nodes[2].displacement).value() == Approx(0.18).epsilon(kDivergence));
-      REQUIRE(std::get<1>(result.nodes[2].displacement).value() == Approx(0.0).epsilon(kDivergence));
-      REQUIRE(std::get<0>(result.nodes[3].displacement).value() == Approx(0.0).epsilon(kDivergence));
-      REQUIRE(std::get<1>(result.nodes[3].displacement).value() == Approx(0.0).epsilon(kDivergence));
+      REQUIRE(std::get<0>(result.nodes[0].displacement).value() == Catch::Approx(0.86).epsilon(kDivergence));
+      REQUIRE(std::get<1>(result.nodes[0].displacement).value() == Catch::Approx(0.18).epsilon(kDivergence));
+      REQUIRE(std::get<0>(result.nodes[1].displacement).value() == Catch::Approx(1.04).epsilon(kDivergence));
+      REQUIRE(std::get<1>(result.nodes[1].displacement).value() == Catch::Approx(-0.53).epsilon(kDivergence));
+      REQUIRE(std::get<0>(result.nodes[2].displacement).value() == Catch::Approx(0.18).epsilon(kDivergence));
+      REQUIRE(std::get<1>(result.nodes[2].displacement).value() == Catch::Approx(0.0).epsilon(kDivergence));
+      REQUIRE(std::get<0>(result.nodes[3].displacement).value() == Catch::Approx(0.0).epsilon(kDivergence));
+      REQUIRE(std::get<1>(result.nodes[3].displacement).value() == Catch::Approx(0.0).epsilon(kDivergence));
 
       std::vector<double> flat_member_result{};
       std::transform(std::begin(result.members), std::end(result.members), std::back_inserter(flat_member_result),
                      [](auto&& e) { return e.normal_force.value(); });
 
       // unit: newton [N])
-      REQUIRE(flat_member_result[0] == Approx(5'000));
-      REQUIRE(flat_member_result[1] == Approx(-15'000));
-      REQUIRE(flat_member_result[2] == Approx(5'000));
-      REQUIRE(flat_member_result[3] == Approx(5'000));
-      REQUIRE(flat_member_result[4] == Approx(7'071.0678118655));
-      REQUIRE(flat_member_result[5] == Approx(-7'071.0678118655));
+      REQUIRE(flat_member_result[0] == Catch::Approx(5'000));
+      REQUIRE(flat_member_result[1] == Catch::Approx(-15'000));
+      REQUIRE(flat_member_result[2] == Catch::Approx(5'000));
+      REQUIRE(flat_member_result[3] == Catch::Approx(5'000));
+      REQUIRE(flat_member_result[4] == Catch::Approx(7'071.0678118655));
+      REQUIRE(flat_member_result[5] == Catch::Approx(-7'071.0678118655));
    }
 }

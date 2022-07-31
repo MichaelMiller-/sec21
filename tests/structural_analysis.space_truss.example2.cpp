@@ -192,15 +192,15 @@ TEST_CASE("example system 2.0 load from json", "[sec21][structural_analysis][spa
       REQUIRE(flat_support_reaction[7] == Approx(0.0));
       */
       // unit: millimeter [mm]
-      REQUIRE(std::get<0>(result.nodes[1].displacement).value() == Approx(1.5).epsilon(kDivergence));
-      REQUIRE(std::get<1>(result.nodes[1].displacement).value() == Approx(-22.4).epsilon(kDivergence));
+      REQUIRE(std::get<0>(result.nodes[1].displacement).value() == Catch::Approx(1.5).epsilon(kDivergence));
+      REQUIRE(std::get<1>(result.nodes[1].displacement).value() == Catch::Approx(-22.4).epsilon(kDivergence));
 
       // unit: newton [N]
-      REQUIRE(copied_results[0] == Approx(1'500));
-      REQUIRE(copied_results[1] == Approx(-5'410).epsilon(kDivergence));
-      REQUIRE(copied_results[2] == Approx(-2'120).epsilon(kDivergence));
-      REQUIRE(copied_results[3] == Approx(4'500));
-      REQUIRE(copied_results[4] == Approx(-5'410).epsilon(kDivergence));
+      REQUIRE(copied_results[0] == Catch::Approx(1'500));
+      REQUIRE(copied_results[1] == Catch::Approx(-5'410).epsilon(kDivergence));
+      REQUIRE(copied_results[2] == Catch::Approx(-2'120).epsilon(kDivergence));
+      REQUIRE(copied_results[3] == Catch::Approx(4'500));
+      REQUIRE(copied_results[4] == Catch::Approx(-5'410).epsilon(kDivergence));
 
       {
          std::ofstream ofs{"output_example_2_result.json"};
