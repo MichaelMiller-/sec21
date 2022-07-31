@@ -97,38 +97,38 @@ TEST_CASE("example system 5.0 load from json", "[sec21][structural_analysis][spa
       const auto result = success.value();
 
       // unit: newton [N]
-      REQUIRE(std::get<0>(result.nodes[0].support_reaction).value() == Approx(-12'000).epsilon(kDivergence));
-      REQUIRE(std::get<1>(result.nodes[0].support_reaction).value() == Approx(52'000).epsilon(kDivergence));
-      REQUIRE(std::get<0>(result.nodes[1].support_reaction).value() == Approx(12'000).epsilon(kDivergence));
-      REQUIRE(std::get<1>(result.nodes[1].support_reaction).value() == Approx(52'000).epsilon(kDivergence));
+      REQUIRE(std::get<0>(result.nodes[0].support_reaction).value() == Catch::Approx(-12'000).epsilon(kDivergence));
+      REQUIRE(std::get<1>(result.nodes[0].support_reaction).value() == Catch::Approx(52'000).epsilon(kDivergence));
+      REQUIRE(std::get<0>(result.nodes[1].support_reaction).value() == Catch::Approx(12'000).epsilon(kDivergence));
+      REQUIRE(std::get<1>(result.nodes[1].support_reaction).value() == Catch::Approx(52'000).epsilon(kDivergence));
 
       // // unit: millimeter [mm]
-      REQUIRE(std::get<0>(result.nodes[0].displacement).value() == Approx(0.0).epsilon(kDivergence));
-      REQUIRE(std::get<1>(result.nodes[0].displacement).value() == Approx(0.0).epsilon(kDivergence));
-      REQUIRE(std::get<0>(result.nodes[1].displacement).value() == Approx(0.0).epsilon(kDivergence));
-      REQUIRE(std::get<1>(result.nodes[1].displacement).value() == Approx(0.0).epsilon(kDivergence));
-      REQUIRE(std::get<0>(result.nodes[2].displacement).value() == Approx(-0.77).epsilon(kDivergence));
-      REQUIRE(std::get<1>(result.nodes[2].displacement).value() == Approx(-1.25).epsilon(kDivergence));
-      REQUIRE(std::get<0>(result.nodes[3].displacement).value() == Approx(-0.77).epsilon(kDivergence));
-      REQUIRE(std::get<1>(result.nodes[3].displacement).value() == Approx(-0.8).epsilon(kDivergence));
-      REQUIRE(std::get<0>(result.nodes[4].displacement).value() == Approx(0.77).epsilon(kDivergence));
-      REQUIRE(std::get<1>(result.nodes[4].displacement).value() == Approx(-0.8).epsilon(kDivergence));
-      REQUIRE(std::get<0>(result.nodes[5].displacement).value() == Approx(0.77).epsilon(kDivergence));
-      REQUIRE(std::get<1>(result.nodes[5].displacement).value() == Approx(-1.25).epsilon(kDivergence));
-      REQUIRE(std::get<0>(result.nodes[6].displacement).value() == Approx(-0.24).epsilon(kDivergence));
-      REQUIRE(std::get<1>(result.nodes[6].displacement).value() == Approx(-1.28).epsilon(kDivergence));
-      REQUIRE(std::get<1>(result.nodes[7].displacement).value() == Approx(-1.83).epsilon(kDivergence));
+      REQUIRE(std::get<0>(result.nodes[0].displacement).value() == Catch::Approx(0.0).epsilon(kDivergence));
+      REQUIRE(std::get<1>(result.nodes[0].displacement).value() == Catch::Approx(0.0).epsilon(kDivergence));
+      REQUIRE(std::get<0>(result.nodes[1].displacement).value() == Catch::Approx(0.0).epsilon(kDivergence));
+      REQUIRE(std::get<1>(result.nodes[1].displacement).value() == Catch::Approx(0.0).epsilon(kDivergence));
+      REQUIRE(std::get<0>(result.nodes[2].displacement).value() == Catch::Approx(-0.77).epsilon(kDivergence));
+      REQUIRE(std::get<1>(result.nodes[2].displacement).value() == Catch::Approx(-1.25).epsilon(kDivergence));
+      REQUIRE(std::get<0>(result.nodes[3].displacement).value() == Catch::Approx(-0.77).epsilon(kDivergence));
+      REQUIRE(std::get<1>(result.nodes[3].displacement).value() == Catch::Approx(-0.8).epsilon(kDivergence));
+      REQUIRE(std::get<0>(result.nodes[4].displacement).value() == Catch::Approx(0.77).epsilon(kDivergence));
+      REQUIRE(std::get<1>(result.nodes[4].displacement).value() == Catch::Approx(-0.8).epsilon(kDivergence));
+      REQUIRE(std::get<0>(result.nodes[5].displacement).value() == Catch::Approx(0.77).epsilon(kDivergence));
+      REQUIRE(std::get<1>(result.nodes[5].displacement).value() == Catch::Approx(-1.25).epsilon(kDivergence));
+      REQUIRE(std::get<0>(result.nodes[6].displacement).value() == Catch::Approx(-0.24).epsilon(kDivergence));
+      REQUIRE(std::get<1>(result.nodes[6].displacement).value() == Catch::Approx(-1.28).epsilon(kDivergence));
+      REQUIRE(std::get<1>(result.nodes[7].displacement).value() == Catch::Approx(-1.83).epsilon(kDivergence));
 
       // unit: newton [N]
-      REQUIRE(result.members[0].normal_force.value() == Approx(-23'320).epsilon(kDivergence));
-      REQUIRE(result.members[1].normal_force.value() == Approx(-23'320).epsilon(kDivergence));
-      REQUIRE(result.members[2].normal_force.value() == Approx(-32'000));
-      REQUIRE(result.members[3].normal_force.value() == Approx(-32'000));
-      REQUIRE(result.members[6].normal_force.value() == Approx(16'970).epsilon(kDivergence));
-      REQUIRE(result.members[7].normal_force.value() == Approx(16'970).epsilon(kDivergence));
-      REQUIRE(result.members[8].normal_force.value() == Approx(-32'000));
-      REQUIRE(result.members[9].normal_force.value() == Approx(-32'000));
-      REQUIRE(result.members[12].normal_force.value() == Approx(12'000.0));
-      REQUIRE(result.members[13].normal_force.value() == Approx(12'000.0));
+      REQUIRE(result.members[0].normal_force.value() == Catch::Approx(-23'320).epsilon(kDivergence));
+      REQUIRE(result.members[1].normal_force.value() == Catch::Approx(-23'320).epsilon(kDivergence));
+      REQUIRE(result.members[2].normal_force.value() == Catch::Approx(-32'000));
+      REQUIRE(result.members[3].normal_force.value() == Catch::Approx(-32'000));
+      REQUIRE(result.members[6].normal_force.value() == Catch::Approx(16'970).epsilon(kDivergence));
+      REQUIRE(result.members[7].normal_force.value() == Catch::Approx(16'970).epsilon(kDivergence));
+      REQUIRE(result.members[8].normal_force.value() == Catch::Approx(-32'000));
+      REQUIRE(result.members[9].normal_force.value() == Catch::Approx(-32'000));
+      REQUIRE(result.members[12].normal_force.value() == Catch::Approx(12'000.0));
+      REQUIRE(result.members[13].normal_force.value() == Catch::Approx(12'000.0));
    }
 }
