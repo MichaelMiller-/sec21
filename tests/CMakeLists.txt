@@ -5,7 +5,7 @@ find_package(Eigen3 CONFIG REQUIRED)
 
 ## speed up the compiletime process
 add_library(catch_main STATIC catch_main.cpp)
-target_link_libraries(catch_main PUBLIC Catch2::Catch2)
+target_link_libraries(catch_main PUBLIC Catch2::Catch2 Catch2::Catch2WithMain)
 
 if (ENABLE_VIENNA_CL)
     include(ExternalProject)
