@@ -1,8 +1,8 @@
 #pragma once
 
-#include <utility>
 #include <numeric>
 #include <string_view>
+#include <utility>
 
 namespace sec21::debug_timer
 {
@@ -21,7 +21,7 @@ namespace sec21::debug_timer
       auto operator+(timer const& rhs) { return timer{name, elapsed_seconds + rhs.elapsed_seconds, counter++}; }
    };
 
-   struct messurement
+   struct measurement
    {
       std::string name;
       std::vector<timer> timers;
@@ -36,7 +36,7 @@ namespace sec21::debug_timer
       {
          friend scoped_timer;
 
-         messurement result;
+         measurement result;
          bool locked{false};
 
          void add_scope_values(std::string_view name, double elapsed_seconds)
@@ -103,7 +103,7 @@ namespace sec21::debug_timer
    }
 
    template <typename Callable>
-   [[nodiscard]] inline void stop(Callable func)
+   inline void stop(Callable func)
    {
       func(detail::registry::instance().get_result());
    }
@@ -118,7 +118,7 @@ namespace sec21::debug_timer
    }
 #endif
 #if 0
-   auto string_logger(messurement const& m)
+   auto string_logger(measurement const& m)
    {
       const auto total = m.total();
       std::vector<std::string> lines;
@@ -128,7 +128,7 @@ namespace sec21::debug_timer
       });
       lines.push_back(fmt::format("{:<19} in total: {:f}s", m.name, total.elapsed_seconds));
    }
-   auto console_logger(messurement const& m)
+   auto console_logger(measurement const& m)
    {
       const auto total = m.total();
       for (auto e : m.timers) {
@@ -148,7 +148,9 @@ namespace sec21::debug_timer
 {
    inline void to_json(nlohmann::json& j, timer const& obj)
    {
-      j = nlohmann::json{{"name", obj.name}, {"elapsed_seconds", obj.elapsed_seconds}, {"counter", obj.counter}};
+      j["name"] = obj.name;
+      j["elapsed_seconds"] = obj.elapsed_seconds;
+      j["counter"] = obj.counter;
    }
    inline void from_json(nlohmann::json const& j, timer& obj)
    {
@@ -156,14 +158,15 @@ namespace sec21::debug_timer
       j.at("elapsed_seconds").get_to(obj.elapsed_seconds);
       j.at("counter").get_to(obj.counter);
    }
-   inline void to_json(nlohmann::json& j, messurement const& obj)
+   inline void to_json(nlohmann::json& j, measurement const& obj)
    {
-      j = nlohmann::json{{"name", obj.name}, {"timers", obj.timers}};
+      j["name"] = obj.name;
+      j["timers"] = obj.timers;
    }
-   inline void from_json(nlohmann::json const& j, messurement& obj)
+   inline void from_json(nlohmann::json const& j, measurement& obj)
    {
       j.at("name").get_to(obj.name);
       j.at("timers").get_to(obj.timers);
    }
-} // namespace debug_timer
+} // namespace sec21::debug_timer
 #endif
