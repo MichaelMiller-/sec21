@@ -20,7 +20,7 @@ TEST_CASE("debug timer", "[core]")
       for (auto i = 0; i < 4; ++i) {
          auto v = debug_timer::scope("scope 3");
       }
-      auto result = debug_timer::messurement{};
+      auto result = debug_timer::measurement{};
       debug_timer::stop([&result](auto e) { result = e; });
 
       REQUIRE(size(result.timers) == 3);
@@ -28,14 +28,12 @@ TEST_CASE("debug timer", "[core]")
       REQUIRE(result.timers[1].counter == 1);
       REQUIRE(result.timers[2].counter == 4);
    }
+#if 0
    SECTION("test if no scope timer was set")
    {
-#if 0
-      REQUIRE_THROWS([]() {
-        debug_timer::start("main");
-      }());
-#endif
+      REQUIRE_THROWS([] { debug_timer::start("main"); }());
    }
+#endif
    SECTION("test if scope locking works")
    {
       REQUIRE_THROWS([]() {
@@ -43,10 +41,10 @@ TEST_CASE("debug timer", "[core]")
          {
             auto v = debug_timer::scope("outer scope");
             {
-               auto v = debug_timer::scope("scope 1");
+               auto v1 = debug_timer::scope("scope 1");
             }
             {
-               auto v = debug_timer::scope("scope 2");
+               auto v2 = debug_timer::scope("scope 2");
             }
          }
       }());
