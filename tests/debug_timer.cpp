@@ -23,7 +23,7 @@ TEST_CASE("debug timer", "[core]")
       auto result = debug_timer::measurement{};
       debug_timer::stop([&result](auto e) { result = e; });
 
-      REQUIRE(size(result.timers) == 3);
+      REQUIRE(result.timers.size() == 3);
       REQUIRE(result.timers[0].counter == 1);
       REQUIRE(result.timers[1].counter == 1);
       REQUIRE(result.timers[2].counter == 4);
