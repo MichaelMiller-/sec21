@@ -1,6 +1,8 @@
 #pragma once
 
+#if __cpp_lib_source_location >= 201907L
 #include <source_location>
+#endif
 #include <stdexcept>
 #include <string_view>
 
@@ -15,7 +17,7 @@ namespace sec21
    // example: expects<ErrorHandling::Throwing>([value]{ return value > 23; }, "value has to be greater than 23");
 
    template <ErrorHandling Action = ErrorHandling::Throwing, typename Condition>
-#if __cpp_lib_source_location > 201907L
+#if __cpp_lib_source_location >= 201907L
    // \todo make use of std::source_location
    constexpr void expects(Condition condition, std::string_view error_message,
                           std::source_location location = std::source_location::current())
@@ -35,7 +37,7 @@ namespace sec21
       }
    }
 
-#if __cpp_lib_span > 202002L
+#if __cpp_lib_span >= 202002L
    template <ErrorHandling Action = ErrorHandling::Throwing, typename T, std::size_t N>
    constexpr void expects_to_have_elements(std::span<T, N> seq, std::string_view error_message)
    {
