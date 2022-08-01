@@ -110,12 +110,9 @@ test("numeric.make_vector")
 test("polygon")
 test("projection_func")
 test("resource")
-test("row_col") # TODO: remove
 test("scope_guard")
 test("strong_type")
-test("structural_analysis.axis") # TODO: remove
 test("structural_analysis.common")
-test("structural_analysis.force") # TODO: remove
 test("structural_analysis.loadcase" "example_1.json")
 test("structural_analysis.space_truss")
 test("structural_analysis.space_truss.example1.order" "example_1.json")
