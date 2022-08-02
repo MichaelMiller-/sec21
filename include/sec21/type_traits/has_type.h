@@ -6,8 +6,10 @@
 
 namespace sec21::type_traits
 {
-   template <typename T, typename Ts>
-   struct has_type;
+   template <typename T, typename... Ts>
+   struct has_type : std::disjunction<std::is_same<T, Ts>...>
+   {
+   };
 
    template <typename T, typename... Ts>
    struct has_type<T, std::tuple<Ts...>> : std::disjunction<std::is_same<T, Ts>...>
@@ -19,8 +21,16 @@ namespace sec21::type_traits
    {
    };
 
+   template <typename T, typename... Ts>
+   static constexpr bool has_type_v = has_type<T, Ts...>::value;
+
    namespace compile_time_tests
    {
+      static_assert(has_type<int, int, float, char>::value == true);
+      static_assert(has_type<float, int, float, char>::value == true);
+      static_assert(has_type<char, int, float, char>::value == true);
+      static_assert(has_type<double, int, float, char>::value == false);
+
       using test_tuple_t = std::tuple<int, float, double>;
 
       static_assert(has_type<int, test_tuple_t>::value == true);
