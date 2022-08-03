@@ -15,6 +15,6 @@ namespace sec21::type_traits
    };
 
    template <template <typename...> class Template, typename T>
-   inline constexpr bool is_specialized_v = is_specialized<Template, T>::value;
+   static constexpr bool is_specialized_v = is_specialized<Template, T>::value;
 
-} // namespace sec21
+} // namespace sec21::type_traits
