@@ -20,13 +20,9 @@ namespace sec21::numeric
 
       auto counter{0};
       for (decltype(input.size1()) i = 0; i < input.size1(); ++i) {
-#ifdef _MSC_VER // MSVC // bug -> narrowing conversion
-         if (auto it = std::find(begin(rows), end(rows), row(i)); it != end(rows))
-#else
-         if (auto it = std::find(begin(rows), end(rows), row{i}); it != end(rows))
-#endif
+         if (auto it = std::find(begin(rows), end(rows), row(i)); it != end(rows)) {
             continue;
-
+         }
          const ublas::matrix_row<decltype(input)> input_row(input, i);
          ublas::matrix_row<decltype(result)> result_row(result, counter);
 
@@ -47,13 +43,9 @@ namespace sec21::numeric
 
       auto counter{0};
       for (decltype(input.size2()) i = 0; i < input.size2(); ++i) {
-#ifdef _MSC_VER // bug -> narrowing conversion
-         if (auto it = std::find(begin(cols), end(cols), col(i)); it != end(cols))
-#else
-         if (auto it = std::find(begin(cols), end(cols), col{i}); it != end(cols))
-#endif
+         if (auto it = std::find(begin(cols), end(cols), col(i)); it != end(cols)) {
             continue;
-
+         }
          const ublas::matrix_column<decltype(input)> input_col(input, i);
          ublas::matrix_column<decltype(result)> result_col(result, counter);
 
@@ -71,12 +63,9 @@ namespace sec21::numeric
 
       auto first = begin(result);
       for (decltype(input.size()) i = 0; i < input.size(); ++i) {
-#ifdef _MSC_VER // bug in MSVC -> narrowing conversion
-         if (auto it = std::find(begin(rows), end(rows), row(i)); it != end(rows))
-#else
-         if (auto it = std::find(begin(rows), end(rows), row{i}); it != end(rows))
-#endif
+         if (auto it = std::find(begin(rows), end(rows), row(i)); it != end(rows)) {
             continue;
+         }
 
          *first = input[i];
          ++first;
@@ -89,12 +78,9 @@ namespace sec21::numeric
    {
       std::vector<T, Allocator> result;
       for (auto i = 0; i < size(input); ++i) {
-#ifdef _MSC_VER // bug -> narrowing conversion
-         if (auto it = std::find(begin(rows), end(rows), row(i)); it == end(rows))
-#else
-         if (auto it = std::find(begin(rows), end(rows), row{i}); it == end(rows))
-#endif
+         if (auto it = std::find(begin(rows), end(rows), row(i)); it == end(rows)){
             result.push_back(input[i]);
+         }
       }
       return result;
    }
