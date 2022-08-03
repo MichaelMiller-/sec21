@@ -3,6 +3,9 @@
 #if __cpp_lib_source_location >= 201907L
 #include <source_location>
 #endif
+#if __cpp_lib_span >= 202002L
+#include <span>
+#endif
 #include <stdexcept>
 #include <string_view>
 
