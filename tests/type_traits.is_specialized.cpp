@@ -8,13 +8,17 @@ namespace ns
    struct foo;
 
    template <>
-   struct foo<int> {};
+   struct foo<int>
+   {
+   };
 
    template <>
-   struct foo<std::string> {};
-}
+   struct foo<std::string>
+   {
+   };
+} // namespace ns
 
-TEST_CASE("quantity test", "[sec21][core]")
+TEST_CASE("checks if a specialisation of a template class is available", "[sec21][type_traits]")
 {
    using namespace sec21::type_traits;
    STATIC_REQUIRE(is_specialized_v<ns::foo, int>);
