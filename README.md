@@ -11,8 +11,12 @@
 - [arity ](#arity)
 - [Eventsystem ](#events)
 - [strong_type ](#strongtype)
+- [expects ](#expects)
 - [units](include/sec21/units/README.md)
 - [type_traits](include/sec21/type_traits/README.md)
+
+### Examples
+- [viewer](viewer/README.md)
 
 ## Build and install using CMake
 Building with cmake on Linux is easy, just use the following:
@@ -24,9 +28,6 @@ cmake ..
 sudo make install
 ```
 In case any dependencies are missing, cmake will tell you.
-
-## Examples
-- [viewer](viewer/README.md)
 
 
 --------------
@@ -107,8 +108,6 @@ const auto result = insert_into(obj);
 
 REQUIRE(result == R"(INSERT INTO user (name,password,karma,cash) VALUES ('John Doe','hidden',42,3.14);)");
 ```
-
-### TODO
 ### Dependencies
 - [{fmt}](https://github.com/fmtlib/fmt)
 
@@ -231,4 +230,17 @@ alhpabet_t obj{ "Z" };
 ++obj;
 REQUIRE(obj == "A1");
 ```
+
+--------------
+## expects <span id="expects"></span>
+
+*#include [<sec21/expects.h>](include/sec21/expects.h)*
+
+A simple one-liner that provides general error handling. If the condition evaluates to false, a centrally defined action is executed with the passed text.
+
+```cpp
+// if the condition is false a std::runtime_error is thrown
+expects([=]{ return value > 23; }, "value has to be greater than 23");
+```
+
 
