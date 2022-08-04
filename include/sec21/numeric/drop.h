@@ -18,7 +18,7 @@ namespace sec21::numeric
       // Row > 0
       ublas::matrix<T, boost::numeric::ublas::row_major, Allocator> result(input.size1() - size(rows), input.size2());
 
-      auto counter{0};
+      std::size_t counter{0};
       for (decltype(input.size1()) i = 0; i < input.size1(); ++i) {
          if (auto it = std::find(begin(rows), end(rows), row(i)); it != end(rows)) {
             continue;
@@ -41,7 +41,7 @@ namespace sec21::numeric
       // Col > 0
       ublas::matrix<T, boost::numeric::ublas::row_major, Allocator> result(input.size1(), input.size2() - size(cols));
 
-      auto counter{0};
+      std::size_t counter{0};
       for (decltype(input.size2()) i = 0; i < input.size2(); ++i) {
          if (auto it = std::find(begin(cols), end(cols), col(i)); it != end(cols)) {
             continue;
@@ -78,7 +78,7 @@ namespace sec21::numeric
    {
       std::vector<T, Allocator> result;
       for (auto i = 0; i < size(input); ++i) {
-         if (auto it = std::find(begin(rows), end(rows), row(i)); it == end(rows)){
+         if (auto it = std::find(begin(rows), end(rows), row(i)); it == end(rows)) {
             result.push_back(input[i]);
          }
       }
