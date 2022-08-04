@@ -2,7 +2,7 @@
 
 #include <charconv>
 
-#ifdef __cpp_lib_format >= 201907L
+#if __cpp_lib_format >= 201907L
 #include <format>
 #else
 #include <fmt/format.h>
@@ -25,7 +25,7 @@ namespace sec21::policy
             const auto tmp = type_t{next(begin(result)), end(result)};
             unsigned long long number{0};
             std::from_chars(tmp.data(), tmp.data() + tmp.size(), number);
-#ifdef __cpp_lib_format >= 201907L
+#if __cpp_lib_format >= 201907L
             result = std::format("A{}", ++number);
 #else
             result = fmt::format("A{}", ++number);
