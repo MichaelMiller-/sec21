@@ -12,9 +12,8 @@ env:
   CTEST_OUTPUT_ON_FAILURE: 1
 
 jobs:
-
   VS2019:
-    runs-on: windows-2019
+    runs-on: windows-latest
 
     strategy:
       matrix:
@@ -50,7 +49,7 @@ jobs:
     - name: Configure CMake
       shell: bash
       working-directory: ${{runner.workspace}}/build
-      run: cmake .. -DCMAKE_BUILD_TYPE=${{matrix.config}} -DCMAKE_TOOLCHAIN_FILE=${{runner.workspace}}\vcpkg\scripts\buildsystems\vcpkg.cmake
+      run: cmake .. -DCMAKE_BUILD_TYPE=${{matrix.config}} -DCMAKE_TOOLCHAIN_FILE=${{runner.workspace}}/vcpkg/scripts/buildsystems/vcpkg.cmake
 
     - name: Build
       working-directory: ${{runner.workspace}}/build
