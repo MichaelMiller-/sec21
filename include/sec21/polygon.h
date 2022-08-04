@@ -23,11 +23,11 @@ namespace sec21
          std::transform(begin(vertices), end(vertices), begin(vertices), [v](auto p) { return p + v; });
       }
 
-      auto extent() const noexcept
+      auto extent() const noexcept -> double
       {
          using namespace boost::qvm;
 
-         underlaying_value_t result{};
+         double result{};
          const auto n = size(vertices);
 
          for (std::decay_t<decltype(n)> i = 0; i < n; ++i) {
