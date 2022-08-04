@@ -10,46 +10,29 @@ namespace sec21
    template <typename Behavior>
    class resource : Behavior
    {
-   public:
+    public:
       using behavior_t = Behavior;
       using handle_t = typename behavior_t::handle_t;
       //! \todo Behavior::hash_function
 
-   private:
+    private:
       handle_t handle;
 
-      auto& behavior() noexcept
-      {
-         return static_cast<behavior_t&>(*this);
-      }
-      const auto& behavior() const noexcept
-      {
-         return static_cast<const behavior_t&>(*this);
-      }
+      auto& behavior() noexcept { return static_cast<behavior_t&>(*this); }
+      const auto& behavior() const noexcept { return static_cast<const behavior_t&>(*this); }
 
-   public:
-      resource() noexcept
-         : handle{ behavior().null_handle() }
-      {}
+    public:
+      resource() noexcept : handle{behavior().null_handle()} {}
 
-      ~resource() noexcept
-      {
-         reset();
-      }
+      ~resource() noexcept { reset(); }
 
-      explicit resource(handle_t const& h) noexcept
-         : handle{ h }
-      {}
+      explicit resource(handle_t const& h) noexcept : handle{h} {}
 
       resource(resource const&) = delete;
-      auto& operator = (resource const&) = delete;
+      auto& operator=(resource const&) = delete;
 
-      resource(resource&& rhs) noexcept
-         : handle{ rhs.handle }
-      {
-         rhs.release();
-      }
-      auto& operator = (resource&& rhs) noexcept
+      resource(resource&& rhs) noexcept : handle{rhs.handle} { rhs.release(); }
+      auto& operator=(resource&& rhs) noexcept
       {
          reset();
          handle = rhs.handle;
@@ -58,15 +41,12 @@ namespace sec21
       }
 
       // return the current handle without changing it
-      [[nodiscard]] auto get() const noexcept
-      {
-         return handle;
-      }
+      [[nodiscard]] auto get() const noexcept { return handle; }
 
       // return the current handle and then set the current handle to null handle
       [[nodiscard]] auto release() noexcept
       {
-         auto tmp{ handle };
+         auto tmp{handle};
          handle = behavior().null_handle();
          return tmp;
       }
@@ -89,31 +69,12 @@ namespace sec21
          swap(handle, rhs.handle);
       }
 
-      explicit operator bool() const noexcept
-      {
-         return handle != behavior().null_handle();
-      }
+      explicit operator bool() const noexcept { return handle != behavior().null_handle(); }
 
-      friend bool operator == (resource const& lhs, resource const& rhs) noexcept;
-      friend bool operator != (resource const& lhs, resource const& rhs) noexcept;
-      friend void swap(resource& lhs, resource& rhs) noexcept;
+      friend bool operator==(resource const& lhs, resource const& rhs) noexcept { return lhs.handle == rhs.handle; }
+
+      friend bool operator!=(resource const& lhs, resource const& rhs) noexcept { return !(lhs == rhs); }
+
+      friend void swap(resource& lhs, resource& rhs) noexcept { lhs.swap(rhs); }
    };
-
-   template <typename Behavior>
-   bool operator == (resource<Behavior> const& lhs, resource<Behavior> const& rhs) noexcept
-   {
-      return lhs.handle == rhs.handle;
-   }
-
-   template <typename Behavior>
-   bool operator != (resource<Behavior> const& lhs, resource<Behavior> const& rhs) noexcept
-   {
-      return !(lhs == rhs);
-   }
-
-   template <typename Behavior>
-   void swap(resource<Behavior>& lhs, resource<Behavior>& rhs) noexcept
-   {
-      lhs.swap(rhs);
-   }
-}
+} // namespace sec21
