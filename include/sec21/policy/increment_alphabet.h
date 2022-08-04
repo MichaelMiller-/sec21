@@ -1,43 +1,45 @@
-#pragma once 
+#pragma once
 
 #include <charconv>
 
-#ifdef __cpp_lib_format
-   #include <format>
-   //! \todo use std::format
-#else   
-   #include <fmt/format.h>
+#ifdef __cpp_lib_format >= 201907L
+#include <format>
+#else
+#include <fmt/format.h>
 #endif
 
 namespace sec21::policy
 {
    template <typename T>
-    // A(0) ... Z(0) ... A1 ... Z1 ... A2 ... Z2 ... 
+   // A(0) ... Z(0) ... A1 ... Z1 ... A2 ... Z2 ...
    struct increment_alphabet
    {
-      T& operator ++ () noexcept
+      T& operator++() noexcept
       {
-        using type_t = typename T::underlying_t;
-        static_assert(std::is_same_v<type_t, std::string>);
+         using type_t = typename T::underlying_t;
+         static_assert(std::is_same_v<type_t, std::string>);
 
-        auto& result = static_cast<type_t&>(static_cast<T&>(*this));
+         auto& result = static_cast<type_t&>(static_cast<T&>(*this));
 
-        if (result[0] == 'Z') {
-            const auto tmp = type_t{ next(begin(result)), end(result) };
+         if (result[0] == 'Z') {
+            const auto tmp = type_t{next(begin(result)), end(result)};
             unsigned long long number{0};
             std::from_chars(tmp.data(), tmp.data() + tmp.size(), number);
+#ifdef __cpp_lib_format >= 201907L
+            result = std::format("A{}", ++number);
+#else
             result = fmt::format("A{}", ++number);
-        }
-        else
+#endif
+         } else
             ++result[0];
-        return static_cast<T&>(*this);
+         return static_cast<T&>(*this);
       }
 
-      T operator ++ (int) noexcept
+      T operator++(int) noexcept
       {
          auto result = static_cast<T&>(*this);
          ++*this;
          return result;
       }
    };
-}
+} // namespace sec21::policy
