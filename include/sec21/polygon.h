@@ -20,8 +20,7 @@ namespace sec21
       template <typename U>
       void translate(U v) noexcept
       {
-         std::transform(begin(vertices), end(vertices), begin(vertices),
-                        [v](auto p) { return p + v; });
+         std::transform(begin(vertices), end(vertices), begin(vertices), [v](auto p) { return p + v; });
       }
 
       auto extent() const noexcept
@@ -31,7 +30,7 @@ namespace sec21
          underlaying_value_t result{};
          const auto n = size(vertices);
 
-         for (auto i = 0; i < n; ++i) {
+         for (std::decay_t<decltype(n)> i = 0; i < n; ++i) {
             result += std::sqrt(std::pow(X(vertices[i + 1 < n ? i + 1 : 0]) - X(vertices[i]), 2) +
                                 std::pow(Y(vertices[i + 1 < n ? i + 1 : 0]) - Y(vertices[i]), 2));
          }
@@ -44,7 +43,7 @@ namespace sec21
          underlaying_value_t result{};
          const auto n = size(vertices);
 
-         for (auto i = 0; i < n; ++i) {
+         for (std::decay_t<decltype(n)> i = 0; i < n; ++i) {
             result += (X(vertices[i]) * Y(vertices[i + 1 < n ? i + 1 : 0])) -
                       (Y(vertices[i]) * X(vertices[i + 1 < n ? i + 1 : 0]));
          }
@@ -61,13 +60,13 @@ namespace sec21
          long double xs{};
          long double ys{};
 
-         for (auto i = 0; i < n; ++i) {
-            xs +=
-               (X(vertices[i]) + X(vertices[i + 1 < n ? i + 1 : 0])) *
-               (X(vertices[i]) * Y(vertices[i + 1 < n ? i + 1 : 0]) - X(vertices[i + 1 < n ? i + 1 : 0]) * Y(vertices[i]));
-            ys +=
-               (Y(vertices[i]) + Y(vertices[i + 1 < n ? i + 1 : 0])) *
-               (X(vertices[i]) * Y(vertices[i + 1 < n ? i + 1 : 0]) - X(vertices[i + 1 < n ? i + 1 : 0]) * Y(vertices[i]));
+         for (std::decay_t<decltype(n)> i = 0; i < n; ++i) {
+            xs += (X(vertices[i]) + X(vertices[i + 1 < n ? i + 1 : 0])) *
+                  (X(vertices[i]) * Y(vertices[i + 1 < n ? i + 1 : 0]) -
+                   X(vertices[i + 1 < n ? i + 1 : 0]) * Y(vertices[i]));
+            ys += (Y(vertices[i]) + Y(vertices[i + 1 < n ? i + 1 : 0])) *
+                  (X(vertices[i]) * Y(vertices[i + 1 < n ? i + 1 : 0]) -
+                   X(vertices[i + 1 < n ? i + 1 : 0]) * Y(vertices[i]));
          }
          return Vertex{static_cast<underlaying_value_t>(xs * k0), static_cast<underlaying_value_t>(ys * k0)};
       }
@@ -86,11 +85,11 @@ namespace sec21
          throw std::invalid_argument{"to_triangle_list: too few vertices"};
 
       std::vector<Vertex> result;
-      for (auto i = 0, c = 1; i < size(poly.vertices); i+=2, ++c)
-      {
+      const auto n = size(poly.vertices);
+      for (std::decay_t<decltype(n)> i = 0, c = 1; i < n; i += 2, ++c) {
          result.push_back(poly.vertices[0]);
          result.push_back(poly.vertices[c]);
-         result.push_back(poly.vertices[c+1]);
+         result.push_back(poly.vertices[c + 1]);
       }
       return result;
    }
