@@ -40,7 +40,5 @@ const auto result = insert_into(obj);
 
 REQUIRE(result == R"(INSERT INTO user (name,password,karma,cash) VALUES ('John Doe','hidden',42,3.14);)");
 ```
-
-### TODO
 ### Dependencies
 - [{fmt}](https://github.com/fmtlib/fmt)
