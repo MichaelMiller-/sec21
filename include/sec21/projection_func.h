@@ -37,8 +37,8 @@ namespace sec21
     public:
       projection() = delete;
 
-      explicit projection(Function function, Projection projection, T t) noexcept
-          : m_function{std::move(function)}, m_projection{std::move(projection)}, m_value{std::move(t)}
+      explicit projection(Function function, Projection proj, T t) noexcept
+          : m_function{std::move(function)}, m_projection{std::move(proj)}, m_value{std::move(t)}
       {
       }
 
