@@ -3,9 +3,6 @@
 #if __cpp_lib_source_location >= 201907L
 #include <source_location>
 #endif
-#if __cpp_lib_span >= 202002L
-#include <span>
-#endif
 #include <stdexcept>
 #include <string_view>
 
@@ -40,17 +37,10 @@ namespace sec21
       }
    }
 
-#if __cpp_lib_span >= 202002L
-   template <ErrorHandling Action = ErrorHandling::Throwing, typename T, std::size_t N>
-   constexpr void expects_to_have_elements(std::span<T, N> seq, std::string_view error_message)
-   {
-      expects<Action>([&]() { return seq.size() > 0; }, std::move(error_message));
-   }
-#else
    template <ErrorHandling Action = ErrorHandling::Throwing, typename Sequence>
    constexpr void expects_to_have_elements(Sequence const& seq, std::string_view error_message)
    {
       expects<Action>([&]() { return seq.size() > 0; }, std::move(error_message));
    }
-#endif
+
 } // namespace sec21
