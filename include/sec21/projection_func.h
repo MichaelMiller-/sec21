@@ -1,7 +1,7 @@
 #pragma once
 
-#include <utility>
 #include <functional>
+#include <utility>
 
 namespace sec21
 {
@@ -9,19 +9,19 @@ namespace sec21
    template <typename Function, typename Projection>
    class projection_func
    {
-      Function    m_function;
-      Projection  m_projection;
+      Function m_function;
+      Projection m_projection;
 
-   public:
+    public:
       projection_func() = delete;
 
-      explicit projection_func(Function function, Projection projection) noexcept
-         : m_function{ std::move(function) }
-         , m_projection{ std::move(projection) }
-      {}
+      explicit projection_func(Function function, Projection proj) noexcept
+          : m_function{std::move(function)}, m_projection{std::move(proj)}
+      {
+      }
 
       template <typename... Args>
-      decltype(auto) operator() (Args &&... args) const 
+      decltype(auto) operator()(Args&&... args) const
       {
          return std::invoke(m_function, std::invoke(m_projection, std::forward<Args>(args))...);
       }
@@ -30,23 +30,22 @@ namespace sec21
    template <typename Function, typename Projection, typename T>
    class projection
    {
-      Function    m_function;
-      Projection  m_projection;
+      Function m_function;
+      Projection m_projection;
       T m_value;
 
-   public:
+    public:
       projection() = delete;
 
       explicit projection(Function function, Projection projection, T t) noexcept
-         : m_function{ std::move(function) }
-         , m_projection{ std::move(projection) }
-         , m_value{ std::move(t) }
-      {}
+          : m_function{std::move(function)}, m_projection{std::move(projection)}, m_value{std::move(t)}
+      {
+      }
 
       template <typename... Args>
-      decltype(auto) operator() (Args &&... args) const 
+      decltype(auto) operator()(Args&&... args) const
       {
-         return std::invoke(m_function, std::invoke(m_projection, std::forward<Args>(args))... , m_value);
+         return std::invoke(m_function, std::invoke(m_projection, std::forward<Args>(args))..., m_value);
       }
-   };   
-}
+   };
+} // namespace sec21
