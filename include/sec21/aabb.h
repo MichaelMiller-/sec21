@@ -7,58 +7,63 @@
 
 namespace sec21
 {
-   template <typename T>
-   // requires T a < b;
-   struct aabb
+   //! \brief axis aligned bounding box
+   template <typename Point>
+   class aabb
    {
-      using value_t = T;
-      value_t min{};
-      value_t max{};
+      using value_t = Point;
+      value_t minimum_coordinate{};
+      value_t maximum_coordinate{};
 
-      //! \todo
-      auto length_x() const {}
+    public:
+      aabb(Point min, Point max) : minimum_coordinate{std::move(min)}, maximum_coordinate{std::move(max)} {}
 
-      template <typename U>
-      void translate(U u) noexcept
+      template <typename Vector>
+      void translate(Vector const& delta) noexcept
       {
-         min = min + u;
-         max = max + u;
+         using namespace boost::qvm;
+         minimum_coordinate += delta;
+         maximum_coordinate += delta;
       }
 
       auto center() const noexcept
       {
          using namespace boost::qvm;
-         const auto mid = (max - min) / 2;
-
-         return mid;
+         return (minimum_coordinate + maximum_coordinate) / 2;
       }
 
-      template <typename U>
-      friend auto operator * (aabb const& lhs, U const& rhs) noexcept
+      auto min() const noexcept { return minimum_coordinate; }
+
+      auto max() const noexcept { return maximum_coordinate; }
+
+      friend auto& operator<<(std::ostream& os, aabb const& obj) noexcept
       {
-         return aabb<decltype(lhs.min * rhs)>{lhs.min * rhs, lhs.max * rhs};
-      }
-
-      friend auto& operator << (std::ostream& os, aabb const& obj) noexcept {
-         return os << "[ min: " << obj.min << " max: " << obj.max << "]";
+         return os << "[ min: " << obj.minimum_coordinate << " max: " << obj.maximum_coordinate << "]";
       }
    };
 
-   template <typename T>
-   auto bounding_rect(std::vector<T> const& vertices) -> aabb<T>
+   template <typename Point>
+   auto bounding_rect(std::vector<Point> const& points) -> aabb<Point>
    {
+      static_assert(boost::qvm::vec_traits<Point>::dim == 2, "only 2d vectors are allowed");
+
       using namespace boost::qvm;
 
-      const auto it_max_x = std::max_element(begin(vertices), end(vertices), [](auto lhs, auto rhs){ return X(lhs) < X(rhs); });
-      const auto it_max_y = std::max_element(begin(vertices), end(vertices), [](auto lhs, auto rhs){ return Y(lhs) < Y(rhs); });
-      expects([=](){ return it_max_x != end(vertices); }, "expects a max element");
-      expects([=](){ return it_max_y != end(vertices); }, "expects a max element");
+      const auto it_max_x =
+         std::max_element(begin(points), end(points), [](auto lhs, auto rhs) { return X(lhs) < X(rhs); });
+      const auto it_max_y =
+         std::max_element(begin(points), end(points), [](auto lhs, auto rhs) { return Y(lhs) < Y(rhs); });
+      expects([=]() { return it_max_x != end(points); }, "expects a max element");
+      expects([=]() { return it_max_y != end(points); }, "expects a max element");
 
-      const auto it_min_x = std::min_element(begin(vertices), end(vertices), [](auto lhs, auto rhs){ return X(lhs) < X(rhs); });
-      const auto it_min_y = std::min_element(begin(vertices), end(vertices), [](auto lhs, auto rhs){ return Y(lhs) < Y(rhs); });
-      expects([=](){ return it_min_x != end(vertices); }, "expects a min element");
-      expects([=](){ return it_min_y != end(vertices); }, "expects a min element");
+      const auto it_min_x =
+         std::min_element(begin(points), end(points), [](auto lhs, auto rhs) { return X(lhs) < X(rhs); });
+      const auto it_min_y =
+         std::min_element(begin(points), end(points), [](auto lhs, auto rhs) { return Y(lhs) < Y(rhs); });
+      expects([=]() { return it_min_x != end(points); }, "expects a min element");
+      expects([=]() { return it_min_y != end(points); }, "expects a min element");
 
       return {{X(*it_min_x), Y(*it_min_y)}, {X(*it_max_x), Y(*it_max_y)}};
    }
-}
+
+} // namespace sec21
