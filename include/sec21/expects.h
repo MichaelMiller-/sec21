@@ -14,8 +14,6 @@ namespace sec21
       Terminate
    };
 
-   // example: expects<ErrorHandling::Throwing>([value]{ return value > 23; }, "value has to be greater than 23");
-
    template <ErrorHandling Action = ErrorHandling::Throwing, typename Condition>
 #if __cpp_lib_source_location >= 201907L
    // \todo make use of std::source_location
@@ -27,7 +25,15 @@ namespace sec21
    {
       if constexpr (Action == ErrorHandling::Throwing) {
          if (condition() == false) {
+#if __cpp_lib_source_location >= 201907L
+            std::stringstream ss;
+            ss << "file: " << location.file_name() << "(" << location.line() << ":" << location.column() << ") "
+               << std::quoted(location.function_name()) << ": " << error_message;
+
+            throw std::runtime_error(ss.str());
+#else
             throw std::runtime_error(error_message.data());
+#endif
          }
       }
       if constexpr (Action == ErrorHandling::Terminate) {
