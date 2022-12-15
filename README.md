@@ -7,8 +7,10 @@
 
 - [all_of / any_of ](#allanyof)
 - [scope_guard ](#scopeguard)
+- [to_array ](#to_array)
 - [SQL Database Wrapper ](#database)
 - [arity ](#arity)
+- [transform ](#transform)
 - [Eventsystem ](#events)
 - [strong_type ](#strongtype)
 - [expects ](#expects)
@@ -33,8 +35,8 @@ In case any dependencies are missing, cmake will tell you.
 --------------
 ## all_of / any_of <span id="allanyof"></span>
 
-- [all_of.h](include/sec21/all_of.h)
-- [any_of.h](include/sec21/any_of.h)
+*#include [<sec21/all_of.h>](include/sec21/all_of.h)* <br/>
+*#include [<sec21/any_of.h>](include/sec21/any_of.h)*
 
 Zero overhead syntax helper which also works with lambdas.
 
@@ -64,6 +66,25 @@ if (func(16)) {
 [Header](include/sec21/scope_guard.h)
 
 General-purpose scope guard intended to call its exit function when a scope is exited. 
+
+--------------
+## to_array <span id="to_array"></span>
+
+*#include [<sec21/to_array.h>](include/sec21/to_array.h)*
+
+Transforms any given std::tuple<Ts...> into a std::array. 
+
+```c++
+auto input = std::make_tuple(1, 2, 3, 4.44f, 5.55, "string");
+auto result = to_array(input, [](auto v) {
+  std::stringstream ss;
+  ss << "v: " << v;
+  return ss.str();
+});
+
+// result is std::array<std::string, 6>{  "v: 1", "v: 2", "v: 3", "v: 4.44", "v: 5.55", "v: string" }; 
+```
+
 
 --------------
 ## SQL Database Wrapper <span id="database"></span>
@@ -114,7 +135,7 @@ REQUIRE(result == R"(INSERT INTO user (name,password,karma,cash) VALUES ('John D
 --------------
 ## arity <span id="arity"></span>
 
-[Header](include/sec21/arity.h)
+*#include [<sec21/arity.h>](include/sec21/arity.h)*
 
 Count the number of arguments of any given callable, including generic lambdas and generic function objects.
 
@@ -135,6 +156,21 @@ static_assert(arity(binary_functor{}) == 2);
 const auto l3 = [](auto, auto, auto) {};
 static_assert(arity(l3) == 3);
 ```
+--------------
+## transform <span id="transform"></span>
+
+*#include [<sec21/transform.h>](include/sec21/transform.h)*
+
+Transforms any given std::tuple<Ts...> into a std::tuple<U>.
+
+```c++
+auto input = std::make_tuple(1, 2, 3, 4.44);
+auto result = transform(input, [](auto v) { return v * 2; });
+   
+// result is std::tuple<int, int, int, double>{ 2, 4, 6, 8.88 }; 
+```
+
+
 --------------
 ## Eventsystem <span id="events"></span>
 
