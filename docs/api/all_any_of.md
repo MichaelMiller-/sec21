@@ -1,7 +1,7 @@
 ## all_of / any_of <span id="allanyof"></span>
 
-- [all_of.h](include/sec21/all_of.h)
-- [any_of.h](include/sec21/any_of.h)
+*#include [<sec21/all_of.h>](include/sec21/all_of.h)* <br/>
+*#include [<sec21/any_of.h>](include/sec21/any_of.h)*
 
 Zero overhead syntax helper which also works with lambdas.
 

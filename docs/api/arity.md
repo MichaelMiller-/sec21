@@ -1,6 +1,6 @@
 ## arity <span id="arity"></span>
 
-[Header](include/sec21/arity.h)
+*#include [<sec21/arity.h>](include/sec21/arity.h)*
 
 Count the number of arguments of any given callable, including generic lambdas and generic function objects.
 
