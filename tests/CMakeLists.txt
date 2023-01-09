@@ -36,11 +36,6 @@ function(test filename)
             WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
 endfunction()
 
-## copy optional data 
-if (EXISTS "${CMAKE_SOURCE_DIR}/data/cp_results.sh")
-    configure_file("${CMAKE_SOURCE_DIR}/data/cp_results.sh" "${PROJECT_BINARY_DIR}/cp_results.sh" COPYONLY)
-endif ()
-
 ## unit tests via catch (alphabetical order)
 ##
 test("aabb")
@@ -121,19 +116,9 @@ if (ENABLE_WORK_IN_PROGRESS)
     test("serializer")
     test("snake_ladders")
     test("strange_heap")
-    # test("structural_analysis.beam")
-    # test("structural_analysis.dlt")
-    test("structural_analysis.validation")
     test("synchronized")
     test("system_reader")
     # test("tasks")
     test("test_framework")
     # test("thread_shared_state")
-
-    if (ENABLE_VIENNA_CL)
-        test("structural_analysis.space_truss.solver.backend.viennacl")
-    endif ()
-    test("structural_analysis.space_truss.solver.backend.eigen")
 endif ()
-
-
