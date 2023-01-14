@@ -20,7 +20,7 @@ namespace sec21
    [[nodiscard]] constexpr auto to_array(std::tuple<Ts...> const& input, Callable&& f)
    {
 #if __cpp_generic_lambdas >= 201707L
-      return [&]<size_t... Is>(std::index_sequence<Is...>) noexcept(
+      return [&]<auto... Is>(std::index_sequence<Is...>) noexcept(
          noexcept(std::is_nothrow_invocable_v<Callable, Ts...>))
       {
          return std::array{ f(std::get<Is>(input))... };
