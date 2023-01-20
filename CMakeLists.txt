@@ -4,7 +4,6 @@ project(sec21
         DESCRIPTION "sec21::workspace"
         )
 
-include(GNUInstallDirs)
 include(CTest)
 ## TODO: CDash integration: page 316
 
@@ -37,16 +36,6 @@ enable_doxygen()
 
 include(StaticAnalyzers)
 
-option(ENABLE_VIEWER "Enable system viewer" OFF)
-option(ENABLE_DEVTOOLS "tools needed for the development process" OFF)
-option(ENABLE_PRODUCTION "not listed on GITHUB" OFF)
-option(ENABLE_VIENNA_CL "Enable ViennaCL solver" OFF)
-
-if (ENABLE_VIEWER)
-    message(STATUS "OpenGL system viewer is enabled")
-    add_subdirectory(viewer)
-endif ()
-
 if (BUILD_TESTING) # option is created by CTest
     enable_testing()
     add_subdirectory(tests)
@@ -54,32 +43,13 @@ endif ()
 
 ##
 ##
-add_subdirectory(http_connection)
-add_subdirectory(make_readme)
-
-option(ENABLE_WORK_IN_PROGRESS "work in progress!" OFF)
-if (ENABLE_WORK_IN_PROGRESS)
-    # TODO: delete: add_subdirectory(editor)
-    # add_subdirectory(fuzzing_test)
-    add_subdirectory(integration_test_sqlite3_backend)
-    add_subdirectory(opengl_window)
-    add_subdirectory(plotter)
-    add_subdirectory(pmr)
-    add_subdirectory(polymorphism)
-    # add_subdirectory(portal) ## Wt
-    add_subdirectory(que)
-    add_subdirectory(runtime_enviroment)
-    add_subdirectory(translate)
-    add_subdirectory(udf)
-    add_subdirectory(vulkan)
-    # add_subdirectory(viewer_sfml)
-    add_subdirectory(worker) ## test logger
-    # add_subdirectory(workspace) ## Alia test
-endif ()
+# add_subdirectory(http_connection)
+# add_subdirectory(make_readme)
 
 
 ## Installation + CMake config files
 ##
+include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
 install(TARGETS ${PROJECT_NAME}
