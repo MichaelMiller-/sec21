@@ -4,6 +4,7 @@ project(sec21
         DESCRIPTION "sec21::workspace"
         )
 
+include(GNUInstallDirs)
 include(CTest)
 ## TODO: CDash integration: page 316
 
@@ -49,7 +50,6 @@ endif ()
 
 ## Installation + CMake config files
 ##
-include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
 install(TARGETS ${PROJECT_NAME}
