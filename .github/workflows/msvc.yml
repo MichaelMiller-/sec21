@@ -27,6 +27,8 @@ jobs:
       run: |
         git clone https://github.com/Microsoft/vcpkg.git 
         cd vcpkg
+        cd
+        dir script/
         bootstrap-vcpkg.bat
         vcpkg install boost-core
         vcpkg install boost-function-types 
@@ -39,7 +41,6 @@ jobs:
         vcpkg install glm
         vcpkg install nlohmann-json
         vcpkg install spdlog
-        dir ./vcpkg/scripts/buildsystems/
 
     - name: Create Build Environment
       run: cmake -E make_directory ${{runner.workspace}}/build
