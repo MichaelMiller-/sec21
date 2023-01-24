@@ -11,20 +11,19 @@ include(CTest)
 ## Make CMake modules available
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-
 include(StandardProjectSettings)
 include(DependencyGraph)
 
-## header-only library
+## Header-only library
 add_library(${PROJECT_NAME} INTERFACE)
-## alias
+## Alias
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
+## TODO use target_sources() with FILE_SET -> requires cmake > 3.23
 target_include_directories(${PROJECT_NAME} INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>)
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
-## project dependencies
+## Project dependencies
 find_package(nlohmann_json CONFIG REQUIRED)
 
 target_link_libraries(${PROJECT_NAME} INTERFACE nlohmann_json nlohmann_json::nlohmann_json)
@@ -32,43 +31,38 @@ target_link_libraries(${PROJECT_NAME} INTERFACE nlohmann_json nlohmann_json::nlo
 include(CompilerWarnings)
 set_project_warnings(${PROJECT_NAME})
 
-include(Doxygen)
-enable_doxygen()
-
-include(StaticAnalyzers)
-
 if (BUILD_TESTING) # option is created by CTest
     enable_testing()
     add_subdirectory(tests)
 endif ()
 
+## Internal projects
 ##
-##
-# add_subdirectory(http_connection)
-# add_subdirectory(make_readme)
-
+add_subdirectory(make_readme)
 
 ## Installation + CMake config files
 ##
 include(CMakePackageConfigHelpers)
 
 install(TARGETS ${PROJECT_NAME}
-        EXPORT local-export-name
+        EXPORT sec21ExportTarget
         INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
         )
 
-install(EXPORT local-export-name
+install(EXPORT sec21ExportTarget
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
         NAMESPACE ${PROJECT_NAME}::
-        FILE ${PROJECT_NAME}Config.cmake
+        FILE sec21Config.cmake
         )
 
 write_basic_package_version_file(
-        ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+        sec21ConfigVersion.cmake
         VERSION ${PROJECT_VERSION}
         COMPATIBILITY AnyNewerVersion
-)
+        )
+
 install(FILES
-        ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+        sec21Config.cmake
+        ${PROJECT_BINARY_DIR}/sec21ConfigVersion.cmake
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
         )
