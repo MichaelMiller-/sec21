@@ -1,8 +1,7 @@
 find_package(Catch2 CONFIG REQUIRED)
-find_package(Boost 1.70 REQUIRED)
 find_package(fmt REQUIRED)
 
-## speed up the compiletime process
+## speed up the compile-time process
 add_library(catch_main STATIC catch_main.cpp)
 target_link_libraries(catch_main PUBLIC Catch2::Catch2 Catch2::Catch2WithMain)
 
@@ -12,23 +11,9 @@ function(test filename)
 
     target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
 
-    target_link_libraries(${PROJECT_NAME} PRIVATE Boost::boost)
     target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt-header-only)
     target_link_libraries(${PROJECT_NAME} PRIVATE catch_main)
-    target_link_libraries(${PROJECT_NAME} PRIVATE sec21)
-
-    foreach (ARG ${ARGN})
-        string(LENGTH "${ARG}" length_data_file)
-        if (length_data_file)
-            message(STATUS "copy configure file: ${CMAKE_SOURCE_DIR}/data/${ARG}")
-            ## needed for console "make test"
-            configure_file(${CMAKE_SOURCE_DIR}/data/${ARG} "${PROJECT_BINARY_DIR}/${ARG}" COPYONLY)
-            ## needed for direct call from build directory
-            configure_file(${CMAKE_SOURCE_DIR}/data/${ARG} "${CMAKE_BINARY_DIR}/${ARG}" COPYONLY)
-            ## needed for Clion
-            configure_file(${CMAKE_SOURCE_DIR}/data/${ARG} "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${ARG}" COPYONLY)
-        endif ()
-    endforeach ()
+    target_link_libraries(${PROJECT_NAME} PRIVATE sec21::sec21)
 
     add_test(
             NAME ${PROJECT_NAME}
@@ -80,7 +65,7 @@ test("type_traits.has_type")
 test("type_traits.is_specialized")
 test("type_traits.is_std_string")
 test("units.dimension")
-test("units.quantity" "test_data_units.json")
+test("units.quantity")
 test("units.ratio")
 test("validate")
 test("zip")
@@ -97,8 +82,6 @@ if (ENABLE_WORK_IN_PROGRESS)
     test("features.concepts")
     test("features.coroutines")
     # test("features.concurrency")
-    test("features")
-    test("features.iterators")
     test("features.perfect_forwarding")
     test("features.type_traits")
     test("geometry")
