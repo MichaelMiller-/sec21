@@ -1,2 +1,2 @@
 # sec21::make_readme
-Generates the [README.md](README.md)
+Generates the (https://github.com/MichaelMiller-/sec21/blob/master/README.md)[README.md]
