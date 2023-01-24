@@ -1,5 +1,0 @@
-#define VERSION_MAJOR @mesh_converter_VERSION_MAJOR@
-#define VERSION_MINOR @mesh_converter_VERSION_MINOR@
-
-constexpr char SEC21_PROGRAM_NAME[] = "@PROJECT_NAME@";
-constexpr char SEC21_PROJECT_SOURCE_DIR[] = "@PROJECT_SOURCE_DIR@";
