@@ -31,6 +31,13 @@ jobs:
           git clone https://github.com/Microsoft/vcpkg.git 
           cd vcpkg
           ./bootstrap-vcpkg.sh
+          ./vcpkg install boost-core
+          ./vcpkg install boost-function-types 
+          ./vcpkg install boost-hana
+          ./vcpkg install boost-math
+          ./vcpkg install boost-qvm
+          ./vcpkg install boost-range
+          ./vcpkg install boost-mp11
           ./vcpkg install catch2
           ./vcpkg install glm
           ./vcpkg install nlohmann-json
