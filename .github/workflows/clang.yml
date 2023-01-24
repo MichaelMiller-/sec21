@@ -32,22 +32,10 @@ jobs:
           git clone https://github.com/Microsoft/vcpkg.git 
           cd vcpkg
           ./bootstrap-vcpkg.sh
-          ./vcpkg install boost-core
-          ./vcpkg install boost-function-types 
-          ./vcpkg install boost-geometry
-          ./vcpkg install boost-hana
-          ./vcpkg install boost-math
-          ./vcpkg install boost-program-options
-          ./vcpkg install boost-qvm
-          ./vcpkg install boost-range
-          ./vcpkg install boost-ublas
-          ./vcpkg install boost-mp11
           ./vcpkg install catch2
           ./vcpkg install glm
           ./vcpkg install nlohmann-json
           ./vcpkg install spdlog
-          ./vcpkg install eigen3
-          ./vcpkg install cpprestsdk
 
       - name: Create Build Environment
         run: cmake -E make_directory ${{runner.workspace}}/build
