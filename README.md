@@ -69,7 +69,7 @@ if (func(16)) {
 --------------
 ## scope_guard <span id="scopeguard"></span>
 
-[Header](include/sec21/scope_guard.h)
+*#include [<sec21/scope_guard.h>](include/sec21/scope_guard.h)*
 
 General-purpose scope guard intended to call its exit function when a scope is exited. 
 
@@ -202,7 +202,7 @@ The backend should also be able to convert the events provided by the eventsyste
 --------------
 ## strong_type <span id="strongtype"></span>
 
-[Header](include/sec21/strong_type.h)
+*#include [<sec21/strong_type.h>](include/sec21/strong_type.h)*
 
 The static typing of the programming language C ++ allows you to design types that exactly meet the specified requirements. Due to the [policy-based design](https://en.wikipedia.org/wiki/Modern_C%2B%2B_Design#Policy-based_design) of 'strong_type' it is very easy to design new types. For example, a counter-like type should be designed which can only be incremented. Trying to decrement an object of this type will result in a compiler error. 
 ```c++
