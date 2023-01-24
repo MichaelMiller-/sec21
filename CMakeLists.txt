@@ -8,11 +8,8 @@ include(GNUInstallDirs)
 include(CTest)
 ## TODO: CDash integration: page 316
 
-## Make CMake modules available
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
-
-include(StandardProjectSettings)
-include(DependencyGraph)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/StandardProjectSettings.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/DependencyGraph.cmake)
 
 ## Header-only library
 add_library(${PROJECT_NAME} INTERFACE)
@@ -28,7 +25,7 @@ find_package(nlohmann_json CONFIG REQUIRED)
 
 target_link_libraries(${PROJECT_NAME} INTERFACE nlohmann_json nlohmann_json::nlohmann_json)
 
-include(CompilerWarnings)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/CompilerWarnings.cmake)
 set_project_warnings(${PROJECT_NAME})
 
 if (BUILD_TESTING) # option is created by CTest
