@@ -3,6 +3,8 @@
 
 [![GCC 10.2](https://github.com/MichaelMiller-/sec21/actions/workflows/gcc.yml/badge.svg)](https://github.com/MichaelMiller-/sec21/actions/workflows/gcc.yml) [![GCC 11.0](https://github.com/MichaelMiller-/sec21/actions/workflows/gcc11.yml/badge.svg)](https://github.com/MichaelMiller-/sec21/actions/workflows/gcc11.yml) [![Clang 12](https://github.com/MichaelMiller-/sec21/actions/workflows/clang12.yml/badge.svg)](https://github.com/MichaelMiller-/sec21/actions/workflows/clang12.yml) [![MSVC 2019](https://github.com/MichaelMiller-/sec21/actions/workflows/msvc.yml/badge.svg)](https://github.com/MichaelMiller-/sec21/actions/workflows/msvc.yml) [![AppVeyor MSVC2019](https://ci.appveyor.com/api/projects/status/4s6bg4yexj0cna45?svg=true)](https://ci.appveyor.com/project/MichaelMiller-/sec21)
 
+[![Coverage Status](https://coveralls.io/repos/github/MichaelMiller-/sec21/badge.svg?branch=master)](https://coveralls.io/github/MichaelMiller-/sec21?branch=master)
+
 **sec21** is a collection of useful functions and classes and the boilerplate for a lot of my projects.
 
 - [all_of / any_of ](#allanyof)
