@@ -27,9 +27,10 @@ jobs:
       run: |
         git clone https://github.com/Microsoft/vcpkg.git 
         cd vcpkg
+        bootstrap-vcpkg.bat
         cd
         dir script/
-        bootstrap-vcpkg.bat
+        dir script/buildsystems
         vcpkg install boost-core
         vcpkg install boost-function-types 
         vcpkg install boost-hana
