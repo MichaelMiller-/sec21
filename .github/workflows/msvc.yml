@@ -29,8 +29,8 @@ jobs:
         cd vcpkg
         bootstrap-vcpkg.bat
         dir ${{runner.workspace}}\vcpkg
-        dir ${{runner.workspace}}\\vcpkg\\script
-        dir ${{runner.workspace}}/vcpkg/script/buildsystems
+        dir ${{runner.workspace}}\vcpkg\scripts
+        dir ${{runner.workspace}}\vcpkg\scripts\buildsystems
         vcpkg install boost-core
         vcpkg install boost-function-types 
         vcpkg install boost-hana
