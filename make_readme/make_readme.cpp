@@ -19,19 +19,35 @@ struct content
 
 using namespace std::literals;
 
-constexpr auto output_template = R"(
+inline constexpr auto output_template = R"(
 # sec21
 
-[![GCC 10.2](https://github.com/MichaelMiller-/sec21/actions/workflows/gcc.yml/badge.svg)](https://github.com/MichaelMiller-/sec21/actions/workflows/gcc.yml) [![GCC 11.0](https://github.com/MichaelMiller-/sec21/actions/workflows/gcc11.yml/badge.svg)](https://github.com/MichaelMiller-/sec21/actions/workflows/gcc11.yml)  
-[![Clang 10.0](https://github.com/MichaelMiller-/sec21/actions/workflows/clang.yml/badge.svg)](https://github.com/MichaelMiller-/sec21/actions/workflows/clang.yml)  
-[![MSVC 2019](https://github.com/MichaelMiller-/sec21/actions/workflows/msvc.yml/badge.svg)](https://github.com/MichaelMiller-/sec21/actions/workflows/msvc.yml)  
-[![AppVeyor MSVC2019](https://ci.appveyor.com/api/projects/status/4s6bg4yexj0cna45?svg=true)](https://ci.appveyor.com/project/MichaelMiller-/sec21)  
+[![GCC 10.2](https://github.com/MichaelMiller-/sec21/actions/workflows/gcc.yml/badge.svg)](https://github.com/MichaelMiller-/sec21/actions/workflows/gcc.yml) [![GCC 11.0](https://github.com/MichaelMiller-/sec21/actions/workflows/gcc11.yml/badge.svg)](https://github.com/MichaelMiller-/sec21/actions/workflows/gcc11.yml) [![Clang 12](https://github.com/MichaelMiller-/sec21/actions/workflows/clang12.yml/badge.svg)](https://github.com/MichaelMiller-/sec21/actions/workflows/clang12.yml) [![MSVC 2019](https://github.com/MichaelMiller-/sec21/actions/workflows/msvc.yml/badge.svg)](https://github.com/MichaelMiller-/sec21/actions/workflows/msvc.yml) [![AppVeyor MSVC2019](https://ci.appveyor.com/api/projects/status/4s6bg4yexj0cna45?svg=true)](https://ci.appveyor.com/project/MichaelMiller-/sec21)
 
-**sec21** is a collection of useful functions and classes.
+**sec21** is a collection of useful functions and classes and the boilerplate for a lot of my projects.
 {}
+- [units](include/sec21/units/README.md)
+- [type_traits](include/sec21/type_traits/README.md)
 
-Examples
-- [Viewer](viewer/README.md)
+## Build and install using CMake
+Building with CMake on Linux is very easy, just use the following shell commands:
+```sh
+git clone https://github.com/MichaelMiller-/sec21
+cd sec21
+mkdir _build && cd _build/
+cmake ..
+sudo make install
+```
+
+## Usage in CMake projects
+If you have installed **sec21** system-wide you can use the CMake-package-system.
+```cmake
+find_package(sec21 CONFIG REQUIRED)
+## Required by sec21
+find_package(nlohmann_json CONFIG REQUIRED)
+## ...
+target_link_libraries(${{PROJECT_NAME}} PRIVATE sec21::sec21)
+```
 
 {}
 )";
@@ -85,7 +101,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
          std::accumulate(begin(content_list), end(content_list), std::string{},
                          [document_directory](auto init, auto v) { return init + "\n--------------\n" + v.document; });
 
-      spdlog::info("Write README.md");
+      spdlog::info("Write {}/README.md", std::filesystem::path{SEC21_ROOT_DIRECTORY}.string());
       std::ofstream ofs{std::filesystem::path{SEC21_ROOT_DIRECTORY} / "README.md"};
       ofs << fmt::format(output_template, toc, docs);
 
