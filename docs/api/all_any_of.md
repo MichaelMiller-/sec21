@@ -1,4 +1,4 @@
-## all_of / any_of <span id="allanyof"></span>
+## all_of / any_of<span id="all_of--any_of"></span>
 
 *#include [<sec21/all_of.h>](include/sec21/all_of.h)* <br/>
 *#include [<sec21/any_of.h>](include/sec21/any_of.h)*

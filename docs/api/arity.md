@@ -1,4 +1,4 @@
-## arity <span id="arity"></span>
+## arity<span id="arity"></span>
 
 *#include [<sec21/arity.h>](include/sec21/arity.h)*
 

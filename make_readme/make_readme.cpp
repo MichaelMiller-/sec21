@@ -79,7 +79,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
          std::string first_line{};
          getline(ifs, first_line);
 
-         const std::regex expr(R"(##\s([^<]*)<span id=\"(\w*)\"><\/span>)");
+         const std::regex expr(R"(##\s([^<]*)<span id="(\w[^"]*)\"><\/span>)");
          std::smatch string_match;
          regex_search(file_content, string_match, expr);
 

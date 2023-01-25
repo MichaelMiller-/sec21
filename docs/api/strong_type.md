@@ -1,4 +1,4 @@
-## strong_type <span id="strongtype"></span>
+## strong_type<span id="strong_type"></span>
 
 *#include [<sec21/strong_type.h>](include/sec21/strong_type.h)*
 

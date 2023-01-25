@@ -1,4 +1,4 @@
-## SQL Database Wrapper <span id="database"></span>
+## SQL Database Wrapper<span id="sql_database_wrapper"></span>
 
 Is a simple database wrapper that allows, via a reflection mechanism, to interpret data structures as SQL tables.  
 ```cpp

@@ -1,4 +1,4 @@
-## to_array <span id="to_array"></span>
+## to_array<span id="to_array"></span>
 
 *#include [<sec21/to_array.h>](include/sec21/to_array.h)*
 

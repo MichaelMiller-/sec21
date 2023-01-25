@@ -1,4 +1,4 @@
-## scope_guard <span id="scopeguard"></span>
+## scope_guard<span id="scope_guard"></span>
 
 *#include [<sec21/scope_guard.h>](include/sec21/scope_guard.h)*
 

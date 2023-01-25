@@ -1,4 +1,4 @@
-## expects <span id="expects"></span>
+## expects<span id="expects"></span>
 
 *#include [<sec21/expects.h>](include/sec21/expects.h)*
 

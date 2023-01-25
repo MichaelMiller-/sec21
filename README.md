@@ -7,15 +7,15 @@
 
 **sec21** is a collection of useful functions and classes and the boilerplate for a lot of my projects.
 
-- [all_of / any_of ](#allanyof)
-- [scope_guard ](#scopeguard)
-- [to_array ](#to_array)
-- [SQL Database Wrapper ](#database)
-- [arity ](#arity)
-- [transform ](#transform)
-- [Eventsystem ](#events)
-- [strong_type ](#strongtype)
-- [expects ](#expects)
+- [all_of / any_of](#all_of--any_of)
+- [scope_guard](#scope_guard)
+- [to_array](#to_array)
+- [SQL Database Wrapper](#sql_database_wrapper)
+- [arity](#arity)
+- [transform](#transform)
+- [Eventsystem](#eventsystem)
+- [strong_type](#strong_type)
+- [expects](#expects)
 - [units](include/sec21/units/README.md)
 - [type_traits](include/sec21/type_traits/README.md)
 
@@ -41,7 +41,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE sec21::sec21)
 
 
 --------------
-## all_of / any_of <span id="allanyof"></span>
+## all_of / any_of<span id="all_of--any_of"></span>
 
 *#include [<sec21/all_of.h>](include/sec21/all_of.h)* <br/>
 *#include [<sec21/any_of.h>](include/sec21/any_of.h)*
@@ -69,14 +69,14 @@ if (func(16)) {
 }
 ```
 --------------
-## scope_guard <span id="scopeguard"></span>
+## scope_guard<span id="scope_guard"></span>
 
 *#include [<sec21/scope_guard.h>](include/sec21/scope_guard.h)*
 
 General-purpose scope guard intended to call its exit function when a scope is exited. 
 
 --------------
-## to_array <span id="to_array"></span>
+## to_array<span id="to_array"></span>
 
 *#include [<sec21/to_array.h>](include/sec21/to_array.h)*
 
@@ -95,7 +95,7 @@ auto result = to_array(input, [](auto v) {
 
 
 --------------
-## SQL Database Wrapper <span id="database"></span>
+## SQL Database Wrapper<span id="sql_database_wrapper"></span>
 
 Is a simple database wrapper that allows, via a reflection mechanism, to interpret data structures as SQL tables.  
 ```cpp
@@ -141,7 +141,7 @@ REQUIRE(result == R"(INSERT INTO user (name,password,karma,cash) VALUES ('John D
 - [{fmt}](https://github.com/fmtlib/fmt)
 
 --------------
-## arity <span id="arity"></span>
+## arity<span id="arity"></span>
 
 *#include [<sec21/arity.h>](include/sec21/arity.h)*
 
@@ -165,7 +165,7 @@ const auto l3 = [](auto, auto, auto) {};
 static_assert(arity(l3) == 3);
 ```
 --------------
-## transform <span id="transform"></span>
+## transform<span id="transform"></span>
 
 *#include [<sec21/transform.h>](include/sec21/transform.h)*
 
@@ -180,7 +180,7 @@ auto result = transform(input, [](auto v) { return v * 2; });
 
 
 --------------
-## Eventsystem <span id="events"></span>
+## Eventsystem<span id="eventsystem"></span>
 
 The [input_manager](https://github.com/MichaelMiller-/sec21/blob/master/include/sec21/event/input_manager.h) represents an abstraction layer to system events that are triggered by the hardware (keyboard, mouse, ...). This abstraction allows input events to be simulated using simple input data (JSON files). Making the eventsystem and other systems built on it such as a commmand-queue filled by hardware events very easy to test.
 
@@ -202,7 +202,7 @@ The backend should also be able to convert the events provided by the eventsyste
 - [nlohmann/json](https://github.com/nlohmann/json)
 
 --------------
-## strong_type <span id="strongtype"></span>
+## strong_type<span id="strong_type"></span>
 
 *#include [<sec21/strong_type.h>](include/sec21/strong_type.h)*
 
@@ -276,7 +276,7 @@ REQUIRE(obj == "A1");
 ```
 
 --------------
-## expects <span id="expects"></span>
+## expects<span id="expects"></span>
 
 *#include [<sec21/expects.h>](include/sec21/expects.h)*
 
