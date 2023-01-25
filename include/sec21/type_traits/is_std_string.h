@@ -14,6 +14,6 @@ namespace sec21::type_traits
    using is_std_string = decltype(detail::is_std_string(std::declval<T>()));
 
    template <typename T>
-   static constexpr auto is_std_string_v = is_std_string<T>::value;
+   inline constexpr auto is_std_string_v = is_std_string<T>::value;
 
 } // namespace sec21::type_traits

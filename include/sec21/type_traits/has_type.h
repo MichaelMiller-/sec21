@@ -22,6 +22,6 @@ namespace sec21::type_traits
    };
 
    template <typename T, typename... Ts>
-   static constexpr bool has_type_v = has_type<T, Ts...>::value;
+   inline constexpr bool has_type_v = has_type<T, Ts...>::value;
 
 } // namespace sec21::type_traits
