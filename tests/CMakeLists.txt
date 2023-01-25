@@ -1,4 +1,5 @@
 find_package(Catch2 CONFIG REQUIRED)
+find_package(Boost 1.70 REQUIRED)
 find_package(fmt REQUIRED)
 
 ## speed up the compile-time process
@@ -11,6 +12,7 @@ function(test filename)
 
     target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
 
+    target_link_libraries(${PROJECT_NAME} PRIVATE Boost::boost)
     target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt-header-only)
     target_link_libraries(${PROJECT_NAME} PRIVATE catch_main)
     target_link_libraries(${PROJECT_NAME} PRIVATE sec21::sec21)
