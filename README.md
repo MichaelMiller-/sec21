@@ -169,7 +169,7 @@ static_assert(arity(l3) == 3);
 
 *#include [<sec21/transform.h>](include/sec21/transform.h)*
 
-Transforms any given std::tuple<Ts...> into a std::tuple<U>.
+Transforms any given std::tuple<Ts...>.
 
 ```c++
 auto input = std::make_tuple(1, 2, 3, 4.44);
