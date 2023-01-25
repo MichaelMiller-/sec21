@@ -28,16 +28,17 @@ jobs:
         git clone https://github.com/Microsoft/vcpkg.git 
         cd vcpkg
         bootstrap-vcpkg.bat
-        vcpkg install boost-core
-        vcpkg install boost-function-types 
-        vcpkg install boost-hana
-        vcpkg install boost-math
-        vcpkg install boost-qvm
-        vcpkg install boost-range
-        vcpkg install boost-mp11
-        vcpkg install catch2
-        vcpkg install nlohmann-json
-        vcpkg install spdlog
+        vcpkg install boost-core:x64-windows
+        vcpkg install boost-function-types:x64-windows 
+        vcpkg install boost-hana:x64-windows
+        vcpkg install boost-math:x64-windows
+        vcpkg install boost-qvm:x64-windows
+        vcpkg install boost-range:x64-windows
+        vcpkg install boost-mp11:x64-windows
+        vcpkg install catch2:x64-windows
+        vcpkg install nlohmann-json:x64-windows
+        vcpkg install spdlog:x64-windows
+        vcpkg integrate install
 
     - name: Create Build Environment
       run: cmake -E make_directory ${{runner.workspace}}\build
