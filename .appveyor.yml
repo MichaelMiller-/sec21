@@ -17,18 +17,15 @@ install:
   - vcpkg install boost-program-options:x64-windows
   - vcpkg install boost-locale:x64-windows
   - vcpkg install catch2:x64-windows
-  - vcpkg install glm:x64-windows
   - vcpkg install nlohmann-json:x64-windows
   - vcpkg install spdlog:x64-windows
-  - vcpkg install eigen3:x64-windows
-  - vcpkg install cpprestsdk:x64-windows
   - cd c:\tools\vcpkg
   - vcpkg integrate install
 
 build_script:
   - mkdir c:\projects\source\_build
   - cd c:\projects\source\_build
-  - cmake -G "Visual Studio 16" -A x64 -DENABLE_VIEWER:BOOL=FALSE -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake ..
+  - cmake -A x64 -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake ..
   - cmake --build . 
 
 test_script:
