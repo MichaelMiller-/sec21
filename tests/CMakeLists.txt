@@ -16,10 +16,11 @@ function(test filename)
     target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt-header-only)
     target_link_libraries(${PROJECT_NAME} PRIVATE catch_main)
     target_link_libraries(${PROJECT_NAME} PRIVATE sec21::sec21)
+    target_link_libraries(${PROJECT_NAME} PRIVATE enable_compiler_warnings)
 
     add_test(
             NAME ${PROJECT_NAME}
-            COMMAND "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_NAME}"
+            COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_NAME}
             WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
 endfunction()
 
@@ -62,10 +63,11 @@ test("strong_type")
 test("timestamp")
 test("transform")
 test("to_array")
-test("traits")
 test("type_traits.has_type")
+test("type_traits.index_of")
 test("type_traits.is_specialized")
 test("type_traits.is_std_string")
+test("type_traits.is_tuple")
 test("units.dimension")
 test("units.quantity")
 test("units.ratio")
