@@ -1,36 +1,36 @@
 #pragma once
 
-#include <numeric>
 #include <cmath>
 #include <iterator>
+#include <numeric>
 
 namespace sec21
 {
-#ifdef __cpp_fold_expressions
-   
+#if __cpp_fold_expressions >= 201603L
+
    //! \brief
    template <typename... Args>
-   auto accumulate(Args ... args) noexcept
+   [[nodiscard]] constexpr auto accumulate(Args... args) noexcept
    {
       return (args + ...);
    }
 
    //! \brief
    template <typename... Args>
-   auto average(Args &&... args) noexcept
+   [[nodiscard]] constexpr auto average(Args&&... args) noexcept
    {
       return accumulate(std::forward<Args>(args)...) / sizeof...(Args);
    }
 
    //! \brief
-#ifdef __cpp_concepts   
+#if __cpp_concepts >= 201907L
    template <std::floating_point Arithmetic, std::floating_point... Args>
 #else
    template <typename Arithmetic, typename... Args>
-#endif   
-   decltype(auto) fmin(Arithmetic v, Args &&... args)
+#endif
+   [[nodiscard]] constexpr auto fmin(Arithmetic v, Args&&... args)
    {
-      auto result{ v };
+      auto result{v};
       ((result = std::fmin(result, args)), ...);
       return result;
    }
@@ -38,13 +38,9 @@ namespace sec21
 
    //! \brief calculates the absolute norm of an array (Euklidische Norm)
    template <typename Iterator>
-   constexpr auto norm(Iterator first, Iterator last) noexcept
+   [[nodiscard]] constexpr auto norm(Iterator first, Iterator last) noexcept
    {
-      return std::sqrt(
-          std::accumulate(
-              first, 
-              last, 
-              typename std::iterator_traits<Iterator>::value_type(), 
-              [](auto const& a, auto const& b){ return a + (b * b); }));
+      return std::sqrt(std::accumulate(first, last, typename std::iterator_traits<Iterator>::value_type(),
+                                       [](auto const& a, auto const& b) { return a + (b * b); }));
    }
-}
+} // namespace sec21
