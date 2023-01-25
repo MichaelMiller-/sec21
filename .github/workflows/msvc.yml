@@ -50,7 +50,7 @@ jobs:
 
     - name: Build
       working-directory: ${{runner.workspace}}\build
-      run: cmake --config ${{matrix.config}} -j4
+      run: cmake --config ${{matrix.config}}
 
     - name: Test
       working-directory: ${{runner.workspace}}\build
