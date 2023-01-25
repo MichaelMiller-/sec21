@@ -1,0 +1,48 @@
+language: cpp
+dist: jammy
+
+compiler:
+  - clang
+  - gcc
+
+os:
+  - linux
+
+branches:
+  only:
+    - master
+    - "/^v\\d+\\./"
+
+git:
+  depth: false
+  quiet: true
+  submodules: false
+
+notifications:
+  email:
+    recipients:
+      - miller.michael@gmx.de
+    on_success: always
+    on_failure: always
+  irc:
+    channels:
+      - chat.freenode.net#sec21
+    template:
+      - "%{repository}/%{branch} (%{commit} - %{author}): %{build_url}: %{message}"
+
+before_install:
+  - sudo apt-get update
+  - sudo apt install libboost-dev
+  - git clone https://github.com/Microsoft/vcpkg.git
+  - cd vcpkg
+  - ./bootstrap-vcpkg.sh
+  - ./vcpkg install catch2
+  - ./vcpkg install nlohmann-json
+  - ./vcpkg install spdlog
+  - export VCPKG_PATH=$PWD
+
+script:
+  - cmake . -DCMAKE_TOOLCHAIN_FILE=$VCPKG_PATH/scripts/buildsystems/vcpkg.cmake
+  - cmake --build . -- -j4
+
+# after_success:
