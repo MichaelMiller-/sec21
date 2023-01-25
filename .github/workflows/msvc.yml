@@ -35,6 +35,7 @@ jobs:
         vcpkg install boost-qvm:x64-windows
         vcpkg install boost-range:x64-windows
         vcpkg install boost-mp11:x64-windows
+        vcpkg install boost-algorithm:x64-windows
         vcpkg install catch2:x64-windows
         vcpkg install nlohmann-json:x64-windows
         vcpkg install spdlog:x64-windows
