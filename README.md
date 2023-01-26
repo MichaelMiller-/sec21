@@ -16,6 +16,7 @@
 - [Eventsystem](#eventsystem)
 - [strong_type](#strong_type)
 - [expects](#expects)
+- [bit_pattern](#bit_pattern)
 - [for_each_indexed](#for_each_indexed)
 - [units](include/sec21/units/README.md)
 - [type_traits](include/sec21/type_traits/README.md)
@@ -69,6 +70,13 @@ if (func(16)) {
    // do something
 }
 ```
+
+Those classes could also be used in a compile-time context.
+### Example
+```c++
+static_assert(all_of{10, 50, 99} < 100); 
+```
+
 --------------
 ## scope_guard<span id="scope_guard"></span>
 
@@ -289,6 +297,17 @@ expects([=]{ return value > 23; }, "value has to be greater than 23");
 ```
 
 
+--------------
+## bit_pattern<span id="bit_pattern"></span>
+
+*#include [<sec21/bit_pattern.h>](include/sec21/bit_pattern.h)*
+
+Matches the bits via a pattern. The letter **x** represents a placeholder.
+
+### Example
+```c++
+static_assert(0b1101010u == bit_pattern("11xxx10"));
+```
 --------------
 ## for_each_indexed<span id="for_each_indexed"></span>
 

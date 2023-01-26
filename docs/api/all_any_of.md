@@ -25,3 +25,9 @@ if (func(16)) {
    // do something
 }
 ```
+
+Those classes could also be used in a compile-time context.
+### Example
+```c++
+static_assert(all_of{10, 50, 99} < 100); 
+```
