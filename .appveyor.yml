@@ -14,7 +14,6 @@ install:
   - vcpkg install boost-math:x64-windows
   - vcpkg install boost-qvm:x64-windows
   - vcpkg install boost-ublas:x64-windows
-  - vcpkg install boost-program-options:x64-windows
   - vcpkg install boost-locale:x64-windows
   - vcpkg install catch2:x64-windows
   - vcpkg install nlohmann-json:x64-windows
