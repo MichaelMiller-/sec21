@@ -2,7 +2,7 @@
 
 *#include [<sec21/for_each_indexed.h>](include/sec21/for_each_indexed.h)*
 
-Executes the passed function per element with the associated index.
+Executes the passed function per element with the associated index. There is another overload where the start index can be specified.
 
 ```c++
 auto input = std::vector{ 4, 3, 2, 1 };
