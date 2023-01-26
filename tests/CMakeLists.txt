@@ -25,9 +25,6 @@ function(test filename)
 endfunction()
 
 ## unit tests via catch (alphabetical order)
-##
-test("aabb")
-# test("actor_lib_feature")
 test("all_of")
 test("alphabet")
 test("any_of")
@@ -75,6 +72,8 @@ test("zip")
 
 
 if (ENABLE_WORK_IN_PROGRESS)
+    # test("actor_lib_feature")
+    test("geometry.aabb")
     test("chaining")
     test("coroutines")
     test("demux")
