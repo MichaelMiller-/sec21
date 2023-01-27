@@ -7,21 +7,22 @@ add_library(catch_main STATIC catch_main.cpp)
 target_link_libraries(catch_main PUBLIC Catch2::Catch2 Catch2::Catch2WithMain)
 
 function(test filename)
-    project(test.${filename})
-    add_executable(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/${filename}.cpp)
+    set(test_project_name test.${filename})
+    add_executable(${test_project_name})
 
-    target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
+    target_sources(${test_project_name} PRIVATE ${filename}.cpp)
 
-    target_link_libraries(${PROJECT_NAME} PRIVATE Boost::boost)
-    target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt-header-only)
-    target_link_libraries(${PROJECT_NAME} PRIVATE catch_main)
-    target_link_libraries(${PROJECT_NAME} PRIVATE sec21::sec21)
-    target_link_libraries(${PROJECT_NAME} PRIVATE enable_compiler_warnings)
+    target_compile_features(${test_project_name} PUBLIC cxx_std_20)
+
+    target_link_libraries(${test_project_name} PRIVATE Boost::boost)
+    target_link_libraries(${test_project_name} PRIVATE fmt::fmt-header-only)
+    target_link_libraries(${test_project_name} PRIVATE catch_main)
+    target_link_libraries(${test_project_name} PRIVATE sec21::sec21)
+    target_link_libraries(${test_project_name} PRIVATE enable_compiler_warnings)
 
     add_test(
-            NAME ${PROJECT_NAME}
-            COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_NAME}
-            WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+            NAME ${test_project_name}
+            COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${test_project_name})
 endfunction()
 
 ## unit tests via catch (alphabetical order)

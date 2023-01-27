@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.9)
 project(sec21
-        VERSION 0.0.1
+        VERSION 1.0.0
         DESCRIPTION "sec21::workspace"
         )
 
@@ -17,24 +17,24 @@ include(cmake/CompilerWarnings.cmake)
 set_project_warnings(enable_compiler_warnings)
 
 ## Header-only library
-add_library(${PROJECT_NAME} INTERFACE)
+add_library(sec21 INTERFACE)
 ## Alias
-add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+add_library(sec21::sec21 ALIAS sec21)
 
-target_compile_features(${PROJECT_NAME} INTERFACE cxx_std_20)
+target_compile_features(sec21 INTERFACE cxx_std_20)
 
 ## TODO use target_sources() with FILE_SET -> requires cmake > 3.23
-target_include_directories(${PROJECT_NAME} INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>)
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+target_include_directories(sec21 INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 ## Project dependencies
 find_package(nlohmann_json CONFIG REQUIRED)
 
-target_link_libraries(${PROJECT_NAME} INTERFACE nlohmann_json nlohmann_json::nlohmann_json)
+target_link_libraries(sec21 INTERFACE nlohmann_json nlohmann_json::nlohmann_json)
 ## TODO: target_link_libraries(${PROJECT_NAME} INTERFACE enable_compiler_warnings)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/CompilerWarnings.cmake)
-set_project_warnings(${PROJECT_NAME})
+set_project_warnings(sec21)
 
 if (BUILD_TESTING) # option is created by CTest
     enable_testing()
@@ -55,7 +55,7 @@ add_subdirectory(make_readme)
 ##
 include(CMakePackageConfigHelpers)
 
-install(TARGETS ${PROJECT_NAME}
+install(TARGETS sec21
         EXPORT sec21ExportTarget
         INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
         )
