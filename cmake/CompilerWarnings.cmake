@@ -62,7 +62,6 @@ function(set_project_warnings project_name)
     set(CLANG_WARNINGS
             ${POSIX_WARNINGS}
             -Wlifetime                # (only special branch of Clang currently) shows object lifetime issues
-            -Weverything
             )
 
     set(GCC_WARNINGS
