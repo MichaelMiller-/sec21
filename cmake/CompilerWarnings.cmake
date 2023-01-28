@@ -59,9 +59,10 @@ function(set_project_warnings project_name)
         set(MSVC_WARNINGS ${MSVC_WARNINGS} /WX)
     endif ()
 
+    ## https://clang.llvm.org/docs/DiagnosticsReference.html
     set(CLANG_WARNINGS
             ${POSIX_WARNINGS}
-            -Wlifetime                # (only special branch of Clang currently) shows object lifetime issues
+            # -Wlifetime                # (only special branch of Clang currently) shows object lifetime issues
             )
 
     set(GCC_WARNINGS
