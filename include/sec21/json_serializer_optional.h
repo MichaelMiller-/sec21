@@ -1,6 +1,8 @@
 #pragma once
 
+#include <nlohmann/adl_serializer.hpp>
 #include <nlohmann/json.hpp>
+
 #include <optional>
 
 namespace nlohmann
@@ -23,4 +25,4 @@ namespace nlohmann
             opt = j.get<T>();
       }
    };
-}
+} // namespace nlohmann

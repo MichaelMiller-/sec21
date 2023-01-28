@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nlohmann/json.hpp>
+#include <nlohmann/adl_serializer.hpp>
 
 #include <variant>
 

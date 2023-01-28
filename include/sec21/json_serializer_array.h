@@ -1,7 +1,9 @@
 #pragma once
 
-#include <array>
+#include <nlohmann/adl_serializer.hpp>
 #include <nlohmann/json.hpp>
+
+#include <array>
 
 namespace nlohmann
 {
@@ -10,7 +12,12 @@ namespace nlohmann
    {
       using type_t = std::array<T, 2>;
 
-      static void to_json(json& j, type_t const& pt) { j = json{{"x", std::get<0>(pt)}, {"y", std::get<1>(pt)}}; }
+      static void to_json(json& j, type_t const& pt)
+      {
+         j["x"] = std::get<0>(pt);
+         j["y"] = std::get<1>(pt);
+      }
+
       static void from_json(json const& j, type_t& pt)
       {
          j.at("x").get_to(std::get<0>(pt));
@@ -25,7 +32,9 @@ namespace nlohmann
 
       static void to_json(json& j, type_t const& pt)
       {
-         j = json{{"x", std::get<0>(pt)}, {"y", std::get<1>(pt)}, {"z", std::get<2>(pt)}};
+         j["x"] = std::get<0>(pt);
+         j["y"] = std::get<1>(pt);
+         j["z"] = std::get<2>(pt);
       }
       static void from_json(json const& j, type_t& pt)
       {
