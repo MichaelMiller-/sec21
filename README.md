@@ -13,6 +13,7 @@
 - [SQL Database Wrapper](#sql_database_wrapper)
 - [arity](#arity)
 - [transform](#transform)
+- [transform_if](#transform_if)
 - [Eventsystem](#eventsystem)
 - [strong_type](#strong_type)
 - [expects](#expects)
@@ -205,6 +206,29 @@ auto input = std::make_tuple(1, 2, 3, 4.44);
 auto result = transform(input, [](auto v) { return v * 2; });
    
 // result is std::tuple<int, int, int, double>{ 2, 4, 6, 8.88 }; 
+```
+
+
+--------------
+## transform_if<span id="transform_if"></span>
+
+*#include [<sec21/transform_if.h>](include/sec21/transform_if.h)*
+
+Transforms any element in a range, defined by [first, last), into a destination range if the predicate is satisfied. 
+
+### Example
+```c++
+std::vector in{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+std::vector<Data> result{};
+
+transform_if(
+  std::begin(in),
+  std::end(in),
+  std::back_inserter(result),
+  [](auto i) { return i < 5; },
+  [](auto i) { return Data{i}; });
+
+// result == { Data{1}, Data{2}, Data{3}, Data{4} }; 
 ```
 
 
