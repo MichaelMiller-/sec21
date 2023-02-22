@@ -18,6 +18,7 @@
 - [expects](#expects)
 - [bit_pattern](#bit_pattern)
 - [for_each_indexed](#for_each_indexed)
+- [split_if](#split_if)
 - [units](include/sec21/units/README.md)
 - [type_traits](include/sec21/type_traits/README.md)
 
@@ -347,4 +348,24 @@ for_each_indexed(
 // i: 2 v: 2  
 // i: 3 v: 1  
 ```
+
+--------------
+## split_if<span id="split_if"></span>
+
+*#include [<sec21/split_if.h>](include/sec21/split_if.h)*
+
+Divides the elements in a range, defined by [first, last), into two destination ranges depending on a predicate. If the predicate is true then the current element is appended to the first destination range, otherwise to the second.
+
+### Example
+```c++
+std::vector in{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+std::vector<int> result1{};
+std::vector<int> result2{};
+
+split_if(begin(in), end(in), back_inserter(result1), back_inserter(result2), [](auto i) { return i < 5; });
+
+// result1  == { 1, 2, 3, 4 }; 
+// result2  == { 5, 6, 7, 8, 9, 10 }; 
+```
+
 
