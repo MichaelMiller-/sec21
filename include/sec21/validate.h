@@ -1,90 +1,47 @@
 #pragma once
 
-#include <sec21/type_traits/is_specialized.h>
-
-#include <functional>
 #include <tuple>
 #include <variant>
 #include <string_view>
-#include <optional>
-
-//! \todo header requires: __cpp_generic_lambdas > 201304
+#include <functional>
 
 namespace sec21
 {
-   // customization point for input validation
+   // customization point for 'actions'. any 'action' has to specialize the 'validate' template
+   // and has to provide a function call operator witch has to return a std::optional of the action type.
    template <typename T>
    struct validate;
 
-   namespace detail
+   struct invalid_input {};
+
+   // transform any given input into a 'action'. if input validation fails the variant holds 'invalid_input'.
+   template <typename... Actions>
+   struct input_dispatcher
    {
-      template<typename...Ts, typename Function, size_t... Is>
-      auto transform(std::tuple<Ts...> const& inputs, Function function, std::index_sequence<Is...>)
-      {
-         return std::tuple<std::invoke_result_t<Function, Ts>...>{function(std::get<Is>(inputs))...};
-      }
+      static_assert(sizeof...(Actions) > 0);
 
-      template<typename... Ts, typename Function>
-      [[nodiscard]] decltype(auto) transform(std::tuple<Ts...> const& inputs, Function function)
-      {
-#if __cpp_generic_lambdas > 201304
-         return [&]<size_t... Is>(std::index_sequence<Is...>){
-           return std::tuple<std::invoke_result_t<Function, Ts>...>{function(std::get<Is>(inputs))...};
-         }(std::make_index_sequence<sizeof...(Ts)>{});
-#else
-         return transform(inputs, function, std::make_index_sequence<sizeof...(Ts)>{});
-#endif
-      }
+      using action_t = std::variant<invalid_input, Actions...>;
 
-      template <typename... InputDescriptions>
-      [[nodiscard]] decltype(auto) transform_inputs(std::string_view input)
+      template <typename... Args>
+      [[nodiscard]] auto operator()(Args &&... args) const -> action_t
       {
-#if __cpp_generic_lambdas > 201304         
-         const auto validate_input = [&input]<typename T>(T) { return std::invoke(validate<T>{}, std::move(input)); };
-#else         
-         const auto validate_input = [&input](auto v) {
-            return std::invoke(validate<std::decay_t<decltype(v)>>{}, input); 
+         auto validate_input = [args...](auto v) {
+            return std::invoke(validate<std::decay_t<decltype(v)>>{}, std::forward<Args>(args)...);
          };
-#endif
-         return transform(std::tuple<InputDescriptions...>{}, validate_input);
-      }
-   }
 
-   template <typename Response, typename... InputDescriptions>
-   class input_dispatcher
-   {
-      static_assert(sizeof...(InputDescriptions) > 0);
-      static_assert(std::conjunction_v<type_traits::is_specialized<validate, InputDescriptions>...>);
+         auto validated_inputs = std::apply(
+            [&](auto const &... v) { return std::make_tuple(validate_input(v)...); },
+            std::tuple<Actions...>{});
 
-   public:
-      using action_t = std::variant<InputDescriptions...>;
-      using process_t = std::function<Response(std::optional<action_t>)>;
-
-   private:
-      process_t func;
-
-   public:
-      constexpr explicit input_dispatcher(process_t process) : func{std::move(process)} {}
-
-      [[nodiscard]] auto operator()(std::string_view input) const noexcept -> Response
-      {
-         const auto validated_inputs = detail::transform_inputs<InputDescriptions...>(std::move(input));
-
-         // check if at least one input is valid 
-         //! \todo count is maybe saver: condition= c == 1 -> true; else is false
-         //! \todo any_of with v.has_value()
-         if (std::apply([](auto const &... v) { return (v.has_value() || ...); }, validated_inputs) == false) 
-            return std::invoke(func, std::nullopt);
-
-         // extract action
-         action_t result;
-         const auto transform_to_action = [&result](auto t) { 
-            if (t.has_value())
+         action_t result{};
+         auto transform_to_action = [&result](auto t) {
+            if (t.has_value()) {
                result = *t;
+            }
          };
          std::apply([&](auto const &... v) { (transform_to_action(v),...); }, validated_inputs);
 
-         return std::invoke(func, result);
+         return result;
       }
    };
 }

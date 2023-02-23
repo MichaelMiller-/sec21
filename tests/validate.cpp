@@ -4,26 +4,29 @@
 #include <sec21/validate.h>
 
 #include <functional>
+#include <optional>
 #include <tuple>
 #include <variant>
-#include <optional>
 
 // begin-snippet: validate.user.action
-struct action1 {};
+struct action1
+{
+};
 
 template <>
 struct sec21::validate<action1>
 {
    std::optional<action1> operator()(std::string_view input) const noexcept
    {
-      if (input == "action1")
+      if (input == "action1") {
          return action1{};
+      }
       return std::nullopt;
    }
 };
 // end-snippet
 
-TEST_CASE("action1 validation", "[sec21][core]")
+TEST_CASE("validate action1", "[sec21][core]")
 {
    using namespace sec21;
 
@@ -44,9 +47,12 @@ TEST_CASE("action1 validation", "[sec21][core]")
    }
 }
 
-struct action2 { std::string arg1{}; };
+struct action2
+{
+   std::string arg1{};
+};
 
-#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/split.hpp>
 
 template <>
 struct sec21::validate<action2>
@@ -56,13 +62,14 @@ struct sec21::validate<action2>
       std::vector<std::string> results;
       boost::split(results, input, [](auto c) { return c == '='; });
 
-      if (std::size(results) == 2 && results[0] == "action2")
-         return action2{ results[1] };
+      if (std::size(results) == 2 && results[0] == "action2") {
+         return action2{results[1]};
+      }
       return std::nullopt;
-  }
+   }
 };
 
-TEST_CASE("action2 validation", "[sec21][core]")
+TEST_CASE("validate action2", "[sec21][core]")
 {
    using namespace sec21;
 
@@ -90,11 +97,8 @@ struct input_json
    int i{};
    std::string s{};
 };
-void to_json(nlohmann::json &j, input_json const &obj)
-{
-   j = nlohmann::json{{"i", obj.i}, {"s", obj.s }};
-}
-void from_json(nlohmann::json const &j, input_json &obj)
+void to_json(nlohmann::json& j, input_json const& obj) { j = nlohmann::json{{"i", obj.i}, {"s", obj.s}}; }
+void from_json(nlohmann::json const& j, input_json& obj)
 {
    j.at("i").get_to(obj.i);
    j.at("s").get_to(obj.s);
@@ -108,8 +112,7 @@ struct sec21::validate<input_json>
       try {
          const auto j = nlohmann::json::parse(input);
          return j.get<input_json>();
-      }
-      catch(...) {
+      } catch (...) {
          return std::nullopt;
       }
       return std::nullopt;
@@ -123,68 +126,57 @@ TEST_CASE("validate a json object", "[sec21][core]")
    const auto result = process(R"({"i":42,"s":"foobar"})");
 
    REQUIRE(result.has_value());
-   
+
    const auto obj = *result;
    REQUIRE(obj.i == 42);
    REQUIRE(obj.s == "foobar");
 }
 
-#include <boost/algorithm/string.hpp>
-
-// request actions
-struct listfiles {};
-struct filecontent { std::string filename{}; };
-
-using action_t = std::variant<
-	listfiles,
-	filecontent>;
+// actions
+struct list_files {};
+struct input_file { std::string filename{}; };
 
 template <>
-struct sec21::validate<listfiles>
+struct sec21::validate<list_files>
 {
-   std::optional<listfiles> operator()(std::string_view input) const noexcept
+   std::optional<list_files> operator()(std::string_view input) const noexcept
    {
-      if (input == "listfiles")
-         return listfiles{};
+      if (input == "list_files") {
+         return list_files{};
+      }
       return std::nullopt;
    }
 };
 
 template <>
-struct sec21::validate<filecontent>
+struct sec21::validate<input_file>
 {
-   std::optional<filecontent> operator()(std::string_view input) const noexcept
+   std::optional<input_file> operator()(std::string_view input) const
    {
-      std::vector<std::string> results;
-      boost::split(results, input, [](auto c) { return c == '='; });
+      std::vector<std::string> parts{};
+      boost::split(parts, input, [](auto c) { return c == '='; });
 
-      if (std::size(results) == 2 && results[0] == "filecontent")
-         return filecontent{ results[1] };
+      if (size(parts) == 2 && parts[0] == "input_file") {
+         return input_file{ parts[1] };
+      }
       return std::nullopt;
    }
 };
-
-std::string response(action_t action) noexcept
-{
-	return std::visit(
-        sec21::overloaded{
-			[](filecontent) { return std::string{ "example filecontent" }; },
-			[](listfiles) { return std::string{ "list of files[]" }; }
-		},
-		action
-	);
-}
 
 TEST_CASE("dispatch the user input to a action", "[sec21][core]")
 {
-   const auto process_input = sec21::input_dispatcher<std::string, listfiles, filecontent>([](auto action) -> std::string {
-         if (action) {
-            return response(*action);
-         }
-         return "invalid input";
-      });
+   auto dispatcher = sec21::input_dispatcher<list_files, input_file>{};
 
-   REQUIRE(process_input("filecontent") == "invalid input");
-   REQUIRE(process_input("filecontent=/home/bar/foo.file") == "example filecontent");
-   REQUIRE(process_input("listfiles") == "list of files[]");
+   SECTION("test 'list_files' input value")
+   {
+      auto result = dispatcher("list_files");
+      REQUIRE(std::get_if<list_files>(&result) != nullptr);
+   }
+   SECTION("test 'input_file' input value")
+   {
+      auto result = dispatcher("input_file=foo.bar");
+      auto ptr = std::get_if<input_file>(&result);
+      REQUIRE(ptr != nullptr);
+      REQUIRE(ptr->filename == "foo.bar");
+   }
 }
