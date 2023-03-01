@@ -19,7 +19,6 @@ namespace sec21
    [[nodiscard]] auto concat(std::tuple<Ts...> const& tuple, std::string_view delimiter, UnaryOperation unary_op)
    {
       std::stringstream stream{};
-      std::string_view separator = "";
       std::size_t index{0};
 
       const auto worker = [&](auto const& value) {
