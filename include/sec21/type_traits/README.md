@@ -1,4 +1,4 @@
-## sec21::type_traits <span id="units"></span>
+## sec21::type_traits
 
 Templates for fundamental properties of types.
 
@@ -109,4 +109,19 @@ static_assert(is_tuple_v<std::tuple<>> == true);
 static_assert(is_tuple_v<int> == false);
 static_assert(is_tuple_v<std::string> == false);
 static_assert(is_tuple_v<double> == false);
+```
+
+---
+## member_pointer_traits
+
+*#include [<sec21/type_traits/member_pointer_traits.h>](include/sec21/type_traits/member_pointer_traits.h)*
+
+Decomposes a member pointer into its components.
+
+### Example
+```c++
+class cls {};
+
+static_assert(std::is_same_v<member_pointer_traits<int(cls::*)>::class_t, cls>);
+static_assert(std::is_same_v<member_pointer_traits<int(cls::*)>::value_t, int>);
 ```
