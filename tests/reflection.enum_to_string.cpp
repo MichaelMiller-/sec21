@@ -1,10 +1,10 @@
-#include "catch.hpp"
+#include <catch.hpp>
 
-#include <sec21/enum_to_string.h>
+#include <sec21/reflection/enum_to_string.h>
 
 enum class DaysOfTheWeek { Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday };
 
-using namespace sec21;
+using namespace sec21::reflection;
 
 TEST_CASE("convert enum to string", "[sec21][core]")
 {
