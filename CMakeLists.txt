@@ -1,10 +1,9 @@
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.23)
 project(sec21
         VERSION 1.0.0
         DESCRIPTION "sec21::workspace"
         )
 
-include(GNUInstallDirs)
 include(CTest)
 ## TODO: CDash integration: page 316
 
@@ -13,7 +12,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/DependencyGraph.cmake)
 
 # Link this 'library' to use the warnings specified in CompilerWarnings.cmake
 add_library(enable_compiler_warnings INTERFACE)
-include(cmake/CompilerWarnings.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/CompilerWarnings.cmake)
 set_project_warnings(enable_compiler_warnings)
 
 ## Header-only library
@@ -24,15 +23,13 @@ add_library(sec21::sec21 ALIAS sec21)
 target_compile_features(sec21 INTERFACE cxx_std_20)
 
 ## TODO use target_sources() with FILE_SET -> requires cmake > 3.23
+## set(HEADER_FILES )
+## target_sources(sec21 INTERFACE FILE_SET HEADERS)
+
 target_include_directories(sec21 INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
-## Project dependencies
-find_package(nlohmann_json CONFIG REQUIRED)
-
-target_link_libraries(sec21 INTERFACE nlohmann_json nlohmann_json::nlohmann_json)
-## TODO: target_link_libraries(${PROJECT_NAME} INTERFACE enable_compiler_warnings)
-
+## TODO:
+## target_link_libraries(sec21 INTERFACE enable_compiler_warnings)
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/CompilerWarnings.cmake)
 set_project_warnings(sec21)
 
@@ -53,7 +50,10 @@ add_subdirectory(make_readme)
 
 ## Installation + CMake config files
 ##
+include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
+
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 install(TARGETS sec21
         EXPORT sec21ExportTarget
