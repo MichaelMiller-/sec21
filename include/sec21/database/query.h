@@ -1,10 +1,9 @@
 #pragma once
 
-#include <sec21/database/column.h>
+#include <sec21/concat.h>
 #include <sec21/database/column_type.h>
-#include <sec21/database/table.h>
-
-#include <fmt/format.h>
+#include <sec21/database/constraints.h>
+#include <sec21/reflection/table.h>
 
 #include <iomanip>
 #include <sstream>
@@ -16,119 +15,92 @@ namespace sec21::database
 {
    namespace detail
    {
-      template <typename Column>
-      void get_column_type(std::ostream& os) noexcept
+      template <typename Columns>
+      [[nodiscard]] auto column_table_description() noexcept
       {
-         os << column_type<typename Column::value_t>::name;
+         return '(' +
+                concat(Columns{}, ",",
+                       [](auto const& v) noexcept {
+                          using T = std::remove_cvref_t<decltype(v)>;
+
+                          auto constraints = concat_constraints<typename T::constraints_t>();
+
+                          std::stringstream stream;
+                          stream << v.name << " " << column_type<typename T::value_t>::value;
+                          if (not empty(constraints)) {
+                             stream << " " << constraints;
+                          }
+                          return stream.str();
+                       }) +
+                ");";
       }
 
-      template <typename Constraints, std::size_t... Is>
-      void concat_constraints(std::ostream& os, std::index_sequence<Is...>) noexcept
+      template <typename Columns>
+      [[nodiscard]] auto concat_column_names() noexcept
       {
-         // ((os << (Is == 0 ? "" : " ") << std::tuple_element_t<Is, Constraints>::value), ...);
-         ((os << " " << std::tuple_element_t<Is, Constraints>::value), ...);
+         return concat(Columns{}, ",", [](auto const& v) noexcept { return v.name; });
       }
 
-      template <typename Column>
-      void column_constraints(std::ostream& os) noexcept
+      template <typename Columns>
+      [[nodiscard]] auto embraced_column_names() noexcept
       {
-         using constraints_t = typename Column::constraints_t;
-         constexpr auto indices = std::make_index_sequence<std::tuple_size_v<constraints_t>>{};
-         concat_constraints<constraints_t>(os, indices);
-      }
-
-      template <typename Columns, std::size_t... Is>
-      void column_table_description(std::ostream& os, std::index_sequence<Is...>) noexcept
-      {
-         // clang-format off
-         os << '(';
-         (
-            (os << (Is == 0 ? "" : ","), 
-            os << std::tuple_element_t<Is, Columns>::name << " ",
-            detail::get_column_type<std::tuple_element_t<Is, Columns>>(os),
-            detail::column_constraints<std::tuple_element_t<Is, Columns>>(os)
-         ), ...);
-         os << ");";
-         // clang-format on
-      }
-
-      template <typename Columns, std::size_t... Is>
-      void column_names(std::ostream& os, std::index_sequence<Is...>) noexcept
-      {
-         ((os << (Is == 0 ? "" : ",") << std::tuple_element_t<Is, Columns>::name), ...);
-      }
-
-      template <typename Columns, std::size_t... Is>
-      void embraced_column_names(std::ostream& os, std::index_sequence<Is...>) noexcept
-      {
-         os << '(';
-         column_names<Columns>(os, std::make_index_sequence<sizeof...(Is)>{});
-         os << ')';
+         return '(' + concat_column_names<Columns>() + ')';
       }
 
       template <typename Column, typename Row>
-      void escape_value_if_necessary(std::ostream& os, Row const& row) noexcept
+      [[nodiscard]] auto escape_value_if_necessary(Row const& row) noexcept
       {
-         if constexpr (std::is_convertible_v<typename Column::value_t, std::string>) {
-            os << std::quoted(Column::get(row), '\'');
-            return;
+         std::stringstream stream;
+
+         if constexpr (std::is_convertible_v<typename std::remove_cvref_t<Column>::value_t, std::string>) {
+            stream << std::quoted(std::remove_cvref_t<Column>::get(row), '\'');
+            return stream.str();
          }
-         os << Column::get(row);
+         stream << std::remove_cvref_t<Column>::get(row);
+         return stream.str();
       }
 
-      template <typename Columns, typename Row, std::size_t... Is>
-      void embraced_row_values(std::ostream& os, Row const& row, std::index_sequence<Is...>) noexcept
+      template <typename Columns, typename Row>
+      [[nodiscard]] auto embraced_row_values(Row const& row) noexcept
       {
-         os << '(';
-         ((os << (Is == 0 ? "" : ","), escape_value_if_necessary<std::tuple_element_t<Is, Columns>>(os, row)), ...);
-         os << ')';
+         return '(' +
+                concat(std::apply(
+                   [&row](auto const&... value) {
+                      return std::make_tuple(escape_value_if_necessary<decltype(value)>(row)...);
+                   },
+                   Columns{})) +
+                ')';
       }
    } // namespace detail
 
    template <typename Table>
    auto create_table()
    {
-      using reflection_t = typename table<Table>::metainfo;
-      constexpr auto indices = std::make_index_sequence<std::tuple_size_v<reflection_t>>{};
+      using reflection_t = typename reflection::table<Table>::metainfo;
 
       std::stringstream out;
-      out << "CREATE TABLE ";
-      out << table<Table>::name;
-      detail::column_table_description<reflection_t>(out, indices);
+      out << "CREATE TABLE " << reflection::table<Table>::name << detail::column_table_description<reflection_t>();
       return out.str();
    }
 
-   //! \todo auto insert_into(RowConcept auto const& row)
    template <typename Row>
    auto insert_into(Row const& row)
    {
-      using reflection_t = typename table<Row>::metainfo;
-      constexpr auto indices = std::make_index_sequence<std::tuple_size_v<reflection_t>>{};
+      using reflection_t = typename reflection::table<Row>::metainfo;
 
       std::stringstream out;
-      out << "INSERT INTO ";
-      out << table<Row>::name << " ";
-      detail::embraced_column_names<reflection_t>(out, indices);
-      out << " VALUES ";
-      detail::embraced_row_values<reflection_t>(out, row, indices);
-      out << ";";
+      out << "INSERT INTO " << reflection::table<Row>::name << " " << detail::embraced_column_names<reflection_t>()
+          << " VALUES " << detail::embraced_row_values<reflection_t>(row) << ";";
       return out.str();
    }
 
    template <typename Table>
    auto select()
    {
-      using reflection_t = typename table<Table>::metainfo;
-      constexpr auto indices = std::make_index_sequence<std::tuple_size_v<reflection_t>>{};
-#if 1
+      using reflection_t = typename reflection::table<Table>::metainfo;
+
       std::stringstream out;
-      out << "SELECT ";
-      detail::column_names<reflection_t>(out, indices);
-      out << " FROM ";
-      out << table<Table>::name;
+      out << "SELECT " << detail::concat_column_names<reflection_t>() << " FROM " << reflection::table<Table>::name;
       return out.str();
-#else
-      return fmt::format("SELECT {} FROM {}", column_names<reflection_t>(), table<Table>::name);
-#endif
    }
 } // namespace sec21::database
