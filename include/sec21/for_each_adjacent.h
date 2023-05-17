@@ -4,8 +4,7 @@
 
 namespace sec21
 {
-   //! \todo write test
-   template<typename Iterator, class Callable>
+   template <typename Iterator, class Callable>
    auto for_each_adjacent(Iterator first, Iterator last, Callable&& func)
    {
       if (first == last) {
@@ -20,4 +19,9 @@ namespace sec21
       }
    }
 
+   template <typename Sequence, class Callable>
+   auto for_each_adjacent(Sequence&& sequence, Callable&& func)
+   {
+      return for_each_adjacent(begin(sequence), end(sequence), std::forward<Callable>(func));
+   }
 } // namespace sec21
