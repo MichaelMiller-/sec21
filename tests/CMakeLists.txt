@@ -12,7 +12,7 @@ function(test filename)
 
     target_sources(${test_project_name} PRIVATE ${filename}.cpp)
 
-    target_compile_features(${test_project_name} PUBLIC cxx_std_20)
+    target_compile_features(${test_project_name} PRIVATE cxx_std_20)
 
     target_link_libraries(${test_project_name} PRIVATE Boost::boost)
     target_link_libraries(${test_project_name} PRIVATE fmt::fmt-header-only)
@@ -42,6 +42,7 @@ test("drawdown")
 test("enumerate")
 test("erase_if_index")
 test("flat_vector")
+test("for_each_adjacent")
 test("for_each_chunk")
 test("for_each_indexed")
 test("make_iota_array")
