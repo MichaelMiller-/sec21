@@ -14,11 +14,10 @@ namespace sec21
       try {
          std::ifstream ifs{filename};
          const auto j = nlohmann::json::parse(ifs);
-         result = j.get<T>();
+         j.get_to<T>(result);
       } catch (...) {
          // ignore
       }
       return result;
    }
-
 } // namespace sec21
