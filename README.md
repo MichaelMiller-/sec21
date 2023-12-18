@@ -7,7 +7,7 @@
 **sec21** is a collection of useful functions and classes and the boilerplate for a lot of my projects.
 
 ## Documentation
-See the [Wiki](https://github.com/MichaelMiller-/sec21/wiki) for full documentation, examples, operational details and other information.
+See the [Wiki](https://github.com/MichaelMiller-/sec21/wiki) for the full documentation, examples, operational details and other information.
 
 ## License
 Please see LICENSE.
