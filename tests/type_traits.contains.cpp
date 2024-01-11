@@ -2,6 +2,9 @@
 
 #include <sec21/type_traits/contains.h>
 
+#include <tuple>
+#include <variant>
+
 TEST_CASE("Check whether an explicit type is in a type list", "[sec21][type_traits]")
 {
    using namespace sec21::type_traits;
