@@ -1,4 +1,4 @@
-name: MSVC 2019
+name: MSVC
 
 on:
   push:
@@ -8,11 +8,8 @@ on:
     branches:
       - master
 
-env:
-  CTEST_OUTPUT_ON_FAILURE: 1
-
 jobs:
-  VS2019:
+  build-and-test:
     runs-on: windows-latest
 
     strategy:
@@ -37,10 +34,7 @@ jobs:
         vcpkg install boost-mp11:x64-windows
         vcpkg install boost-algorithm:x64-windows
         vcpkg install boost-date-time:x64-windows
-        vcpkg install boost-ublas:x64-windows
         vcpkg install catch2:x64-windows
-        vcpkg install nlohmann-json:x64-windows
-        vcpkg install spdlog:x64-windows
         vcpkg integrate install
 
     - name: Create Build Environment

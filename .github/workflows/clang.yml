@@ -1,30 +1,40 @@
-name: Clang 10.0
+name: Clang
 
 on:
   push:
-    branches: [ master ]
+    branches:
+      - master
   pull_request:
-    branches: [ master ]
+    branches:
+      - master
 
   workflow_dispatch:
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        config: [Debug, Release]
+        version: [ 16, 17 ]
+        config: [ Debug, Release ]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@master
 
       - name: Install Compiler
         run: |
-          sudo apt install clang
+          sudo apt-get update 
+          wget https://apt.llvm.org/llvm.sh
+          chmod u+x llvm.sh
+          sudo ./llvm.sh ${{matrix.version}}
+          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-${{matrix.version}} 110
           clang --version
-          sudo pip install gcovr
-          
+
+      - name: Setup system
+        run: |
+          sudo apt install -y libboost-all-dev
+
       - name: Install Dependencies
         shell: bash
         working-directory: ${{runner.workspace}}
@@ -32,18 +42,7 @@ jobs:
           git clone https://github.com/Microsoft/vcpkg.git 
           cd vcpkg
           ./bootstrap-vcpkg.sh
-          ./vcpkg install boost-core
-          ./vcpkg install boost-function-types 
-          ./vcpkg install boost-geometry
-          ./vcpkg install boost-hana
-          ./vcpkg install boost-math
-          ./vcpkg install boost-qvm
-          ./vcpkg install boost-range
-          ./vcpkg install boost-ublas
-          ./vcpkg install boost-mp11
           ./vcpkg install catch2
-          ./vcpkg install nlohmann-json
-          ./vcpkg install spdlog
 
       - name: Create Build Environment
         run: cmake -E make_directory ${{runner.workspace}}/build
