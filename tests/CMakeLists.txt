@@ -1,5 +1,7 @@
 find_package(Catch2 CONFIG REQUIRED)
 find_package(Boost 1.70 REQUIRED)
+find_package(fmt REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
 
 ## speed up the compile-time process
 add_library(catch_main STATIC catch_main.cpp)
@@ -15,6 +17,8 @@ function(test filename)
     target_link_libraries(${test_project_name} PRIVATE catch_main)
     target_link_libraries(${test_project_name} PRIVATE sec21::sec21)
     target_link_libraries(${test_project_name} PRIVATE enable_compiler_warnings)
+    target_link_libraries(${test_project_name} PRIVATE fmt::fmt-header-only)
+    target_link_libraries(${test_project_name} PRIVATE nlohmann_json nlohmann_json::nlohmann_json)
 
     add_test(
             NAME ${test_project_name}

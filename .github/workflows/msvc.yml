@@ -35,6 +35,8 @@ jobs:
         vcpkg install boost-algorithm:x64-windows
         vcpkg install boost-date-time:x64-windows
         vcpkg install catch2:x64-windows
+        vcpkg install fmt:x64-windows
+        vcpkg install nlohmann-json:x64-windows
         vcpkg integrate install
 
     - name: Create Build Environment
