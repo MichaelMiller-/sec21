@@ -20,10 +20,7 @@ namespace sec21
 #endif      
          : value{ t }
       {}
-      constexpr explicit strong_type(T&& t)
-#ifdef __cpp_lib_is_nothrow_convertible
-      noexcept(std::is_nothrow_move_constructible<T>::value)
-#endif      
+      constexpr explicit strong_type(T&& t) noexcept
          : value{ std::move(t) }
       {}
 

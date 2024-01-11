@@ -1,7 +1,6 @@
 // this test demonstrates how fuzz-testing works
 
 #include <iostream>
-#include <cstdint>
 #include <string_view>
 #include <iomanip>
 #include <optional>

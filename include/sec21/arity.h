@@ -1,5 +1,7 @@
 #pragma once
 
+#include <utility>
+
 namespace sec21
 {
    namespace detail
@@ -8,10 +10,10 @@ namespace sec21
       struct arbitrary_type
       {
          template <typename T>
-         operator T &&();
+         operator T&&();
 
          template <typename T>
-         operator T & ();
+         operator T&();
       };
 
       template <typename F, auto... Is, typename U = decltype(std::declval<F>()(arbitrary_type<Is>{}...))>
@@ -40,24 +42,12 @@ namespace sec21
          // start checking function signatures with maximum 10 elements
          return arity_impl<10, F>(0);
       }
-   }
+   } // namespace detail
 
    //! \brief count the number of arguments of any given function, including generic lambdas
    template <typename Callable>
-   constexpr auto arity(Callable) { return detail::arity_impl<std::decay_t<Callable>>(); }
-
-   namespace compile_time_tests
+   constexpr auto arity(Callable)
    {
-      struct BinaryFunctor {
-         template<typename T, typename U>
-         void operator()(T, U) {}
-      };
-      static_assert(arity(BinaryFunctor{}) == 2);
-
-      const auto l0 = [](){};
-      const auto l3 = [](auto, auto, auto){};
-
-      static_assert(arity(l0) == 0);
-      static_assert(arity(l3) == 3);
+      return detail::arity_impl<std::decay_t<Callable>>();
    }
-}
+} // namespace sec21

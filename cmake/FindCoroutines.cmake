@@ -95,10 +95,10 @@ Using `find_package(Coroutines)` with no component arguments:
 #]=======================================================================]
 
 
-if(TARGET std::coroutines)
+if (TARGET std::coroutines)
     # This module has already been processed. Don't do it again.
     return()
-endif()
+endif ()
 
 include(CMakePushCheckState)
 include(CheckCXXSourceCompiles)
@@ -108,94 +108,94 @@ include(CheckCXXSourceCompiles)
 
 cmake_push_check_state()
 
-set(CMAKE_REQUIRED_QUIET ${Coroutines_FIND_QUIETLY})
+#set(CMAKE_REQUIRED_QUIET ${Coroutines_FIND_QUIETLY})
 
 # figure out correct compiler flags
-if(("x${CMAKE_CXX_COMPILER_ID}" MATCHES "x.*Clang" AND "x${CMAKE_CXX_SIMULATE_ID}" STREQUAL "xMSVC") OR "x${CMAKE_CXX_COMPILER_ID}" STREQUAL "xMSVC")
-    set(_CXX_COROUTINES_AWAIT "/await")
-else()
-    set(_CXX_COROUTINES_AWAIT "-fcoroutines-ts")
-endif()
+# if(("x${CMAKE_CXX_COMPILER_ID}" MATCHES "x.*Clang" AND "x${CMAKE_CXX_SIMULATE_ID}" STREQUAL "xMSVC") OR "x${CMAKE_CXX_COMPILER_ID}" STREQUAL "xMSVC")
+#    set(_CXX_COROUTINES_AWAIT "/await")
+#else()
+#    set(_CXX_COROUTINES_AWAIT "-fcoroutines-ts")
+#endif()
 
 # Normalize and check the component list we were given
 set(want_components ${Coroutines_FIND_COMPONENTS})
-if(Coroutines_FIND_COMPONENTS STREQUAL "")
+if (Coroutines_FIND_COMPONENTS STREQUAL "")
     set(want_components Final)
-endif()
+endif ()
 
 # Warn on any unrecognized components
 set(extra_components ${want_components})
 list(REMOVE_ITEM extra_components Final Experimental)
-foreach(component IN LISTS extra_components)
+foreach (component IN LISTS extra_components)
     message(WARNING "Extraneous find_package component for Coroutines: ${component}")
-endforeach()
+endforeach ()
 
 # Detect which of Experimental and Final we should look for
 set(find_experimental TRUE)
-set(find_final TRUE)
-if(NOT "Final" IN_LIST want_components)
-    set(find_final FALSE)
-endif()
+# set(find_final TRUE)
+# if(NOT "Final" IN_LIST want_components)
+#    set(find_final FALSE)
+# endif()
 # if(NOT "Experimental" IN_LIST want_components)
 #     set(find_experimental FALSE)
 # endif()
 
-if(find_final)
-    if(CMAKE_CXX_COMPILER_ID MATCHES Clang)
-        if(WIN32)
-            check_cxx_compiler_flag("/std:c++latest"            SUPPORT_LATEST)
-            check_cxx_compiler_flag("/clang:-fcoroutines-ts"    SUPPORT_COROUTINE)
-            check_include_file_cxx("experimental/coroutine" HAS_COROUTINE_TS "/std:c++latest")
-        else()
-            check_cxx_compiler_flag("-std=c++2a"          SUPPORT_LATEST)
-            check_cxx_compiler_flag("-fcoroutines-ts"     SUPPORT_COROUTINE)
-            check_include_file_cxx("coroutine" _CXX_COROUTINES_HAVE_HEADER "-std=c++2a -fcoroutines-ts")
-            check_include_file_cxx("experimental/coroutine" HAS_COROUTINE_TS "-std=c++2a")
-        endif()
-    elseif(MSVC)
-        #
-        # Notice that `/std:c++latest` and `/await` is exclusive to each other.
-        # With MSVC, we have to distinguish Coroutines TS & C++ 20 Coroutines
-        #
-        check_cxx_compiler_flag("/std:c++latest"    support_latest)
-        check_cxx_compiler_flag("/await"            support_coroutine)
-        check_include_file_cxx("coroutine"  has_coroutine
-                "/std:c++latest"
+set(_CXX_COROUTINES_HAVE_HEADER FALSE)
+
+if (CMAKE_CXX_COMPILER_ID MATCHES Clang)
+    if (WIN32)
+        check_cxx_compiler_flag("/std:c++latest" SUPPORT_LATEST)
+        check_cxx_compiler_flag("/clang:-fcoroutines-ts" SUPPORT_COROUTINE)
+        check_include_file_cxx("experimental/coroutine" HAS_COROUTINE_TS "/std:c++latest")
+    else ()
+        check_cxx_compiler_flag("-std=c++2a" SUPPORT_LATEST)
+        check_cxx_compiler_flag("-fcoroutines-ts" SUPPORT_COROUTINE)
+        check_include_file_cxx("coroutine" _CXX_COROUTINES_HAVE_HEADER "-std=c++2a")
+        check_include_file_cxx("coroutine" FOUND_COROUTINE_HEADER "-std=c++2a")
+        message("fiudn header: ${FOUND_COROUTINE_HEADER}")
+        check_include_file_cxx("experimental/coroutine" HAS_COROUTINE_TS "-std=c++2a")
+    endif ()
+elseif (MSVC)
+    #
+    # Notice that `/std:c++latest` and `/await` is exclusive to each other.
+    # With MSVC, we have to distinguish Coroutines TS & C++ 20 Coroutines
+    #
+    check_cxx_compiler_flag("/std:c++latest" support_latest)
+    check_cxx_compiler_flag("/await" support_coroutine)
+    check_include_file_cxx("coroutine" has_coroutine
+            "/std:c++latest"
+            )
+    if (NOT has_coroutine)
+        message(STATUS "Try <experimental/coroutine> (Coroutines TS) instead of <coroutine> ...")
+        check_include_file_cxx("experimental/coroutine" has_coroutine_ts
+                "/std:c++17"
                 )
-        if(NOT has_coroutine)
-            message(STATUS "Try <experimental/coroutine> (Coroutines TS) instead of <coroutine> ...")
-            check_include_file_cxx("experimental/coroutine" has_coroutine_ts
-                    "/std:c++17"
-                    )
-        endif()
-        if(NOT has_coroutine AND NOT has_coroutine_ts)
-            message(WARNING "There are no headers for C++ Coroutines")
-        endif()
-    elseif(CMAKE_CXX_COMPILER_ID MATCHES GNU)
-        #
-        # expect GCC 10 or later
-        #
-        check_cxx_compiler_flag("-std=gnu++20" SUPPORT_LATEST)
-        check_cxx_compiler_flag("-fcoroutines" SUPPORT_COROUTINE)
-        check_include_file_cxx("coroutine" _CXX_COROUTINES_HAVE_HEADER "-std=gnu++20 -fcoroutines")
-    endif()
+    endif ()
+    if (NOT has_coroutine AND NOT has_coroutine_ts)
+        message(WARNING "There are no headers for C++ Coroutines")
+    endif ()
+elseif (CMAKE_CXX_COMPILER_ID MATCHES GNU)
+    #
+    # expect GCC 10 or later
+    #
+    check_cxx_compiler_flag("-std=gnu++20" SUPPORT_LATEST)
+    check_cxx_compiler_flag("-fcoroutines" SUPPORT_COROUTINE)
+    check_include_file_cxx("coroutine" _CXX_COROUTINES_HAVE_HEADER "-std=gnu++20 -fcoroutines")
+endif ()
 
-    mark_as_advanced(_CXX_COROUTINES_HAVE_HEADER)
-    if(_CXX_COROUTINES_HAVE_HEADER)
-        # We found the non-experimental header. Don't bother looking for the
-        # experimental one.
-        set(find_experimental FALSE)
-    endif()
-else()
-    set(_CXX_COROUTINES_HAVE_HEADER FALSE)
-endif()
+mark_as_advanced(_CXX_COROUTINES_HAVE_HEADER)
+if (_CXX_COROUTINES_HAVE_HEADER)
+    # We found the non-experimental header. Don't bother looking for the
+    # experimental one.
+    set(find_experimental FALSE)
+endif ()
 
-if(find_experimental)
+if (find_experimental)
     check_include_file_cxx("experimental/coroutine" _CXX_COROUTINES_HAVE_EXPERIMENTAL_HEADER)
     mark_as_advanced(_CXX_COROUTINES_HAVE_EXPERIMENTAL_HEADER)
-else()
+else ()
     set(_CXX_COROUTINES_HAVE_EXPERIMENTAL_HEADER FALSE)
-endif()
+endif ()
 
 message("support C++20: ${SUPPORT_LATEST}")
 message("support coroutines: ${SUPPORT_COROUTINE}")
@@ -204,19 +204,20 @@ message("has coroutines TS: ${HAS_COROUTINE_TS}")
 message("find_experimental: ${find_experimental}")
 message("_CXX_COROUTINES_HAVE_EXPERIMENTAL_HEADER: ${_CXX_COROUTINES_HAVE_EXPERIMENTAL_HEADER}")
 
-if(_CXX_COROUTINES_HAVE_HEADER)
+if (_CXX_COROUTINES_HAVE_HEADER)
     set(_have_coro TRUE)
     set(_coro_header coroutine)
     set(_coro_namespace std)
-elseif(_CXX_COROUTINES_HAVE_EXPERIMENTAL_HEADER)
+elseif (_CXX_COROUTINES_HAVE_EXPERIMENTAL_HEADER)
     set(_have_coro TRUE)
     set(_coro_header experimental/coroutine)
     set(_coro_namespace std::experimental)
-else()
+else ()
     set(_have_coro FALSE)
-endif()
+endif ()
 
 message("_have_coro ${_have_coro}")
+message("_coro_header ${_coro_header}")
 
 set(CXX_COROUTINES_HAVE_COROUTINES ${_have_coro} CACHE BOOL "TRUE if we have the C++ coroutines feature")
 set(CXX_COROUTINES_HEADER ${_coro_header} CACHE STRING "The header that should be included to obtain the coroutines APIs")
@@ -224,7 +225,7 @@ set(CXX_COROUTINES_NAMESPACE ${_coro_namespace} CACHE STRING "The C++ namespace 
 
 set(_found FALSE)
 
-if(CXX_COROUTINES_HAVE_COROUTINES)
+if (CXX_COROUTINES_HAVE_COROUTINES)
     # We have some coroutines library available. Do link checks
     string(CONFIGURE [[
         #include <utility>
@@ -268,31 +269,31 @@ if(CXX_COROUTINES_HAVE_COROUTINES)
 
     set(can_link ${CXX_COROUTINES_NO_AWAIT_NEEDED})
 
-    if(NOT CXX_COROUTINES_NO_AWAIT_NEEDED)
+    if (NOT CXX_COROUTINES_NO_AWAIT_NEEDED)
         # Add the -fcoroutines-ts (or /await) flag
         set(CMAKE_REQUIRED_FLAGS "${_CXX_COROUTINES_AWAIT}")
         check_cxx_source_compiles("${code}" CXX_COROUTINES_AWAIT_NEEDED)
         set(can_link ${CXX_COROUTINES_AWAIT_NEEDED})
-    endif()
+    endif ()
 
-    if(can_link)
+    if (can_link)
         add_library(std::coroutines INTERFACE IMPORTED)
         set(_found TRUE)
 
-        if(CXX_COROUTINES_NO_AWAIT_NEEDED)
+        if (CXX_COROUTINES_NO_AWAIT_NEEDED)
             # Nothing to add...
-        elseif(CXX_COROUTINES_AWAIT_NEEDED)
+        elseif (CXX_COROUTINES_AWAIT_NEEDED)
             target_compile_options(std::coroutines INTERFACE ${_CXX_COROUTINES_AWAIT})
-        endif()
-    else()
+        endif ()
+    else ()
         set(CXX_COROUTINES_HAVE_COROUTINES FALSE)
-    endif()
-endif()
+    endif ()
+endif ()
 
 cmake_pop_check_state()
 
 set(Coroutines_FOUND ${_found} CACHE BOOL "TRUE if we can compile and link a program using std::coroutines" FORCE)
 
-if(Coroutines_FIND_REQUIRED AND NOT Coroutines_FOUND)
+if (Coroutines_FIND_REQUIRED AND NOT Coroutines_FOUND)
     message(FATAL_ERROR "Cannot compile simple program using std::coroutines. Is C++17 or later activated?")
-endif()
+endif ()

@@ -163,7 +163,7 @@ namespace sec21::units
       typename Q2, 
       std::enable_if_t<has_same_dimension<Q1, Q2>::value, bool> = true>
 #endif
-   constexpr auto operator + (Q1 const& lhs, Q2 const& rhs) noexcept
+   constexpr decltype(auto) operator + (Q1 const& lhs, Q2 const& rhs) noexcept
    {
       return Q1{ lhs.value() + Q1{ rhs }.value() };
    }
@@ -176,7 +176,7 @@ namespace sec21::units
       typename Q2, 
       std::enable_if_t<has_same_dimension<Q1, Q2>::value, bool> = true>
 #endif
-   constexpr auto operator - (Q1 const& lhs, Q2 const& rhs) noexcept
+   constexpr decltype(auto) operator - (Q1 const& lhs, Q2 const& rhs) noexcept
    {
       return Q1{ lhs.value() - Q1{ rhs }.value() };
    }
@@ -193,7 +193,7 @@ namespace sec21::units
          is_quantity<Q2>::value && 
          has_same_dimension<Q1, Q2>::value, bool> = true>
 #endif      
-   constexpr auto operator * (Q1 const& lhs, Q2 const& rhs) 
+   constexpr decltype(auto) operator * (Q1 const& lhs, Q2 const& rhs)
    {
       using vt = decltype(lhs.value() * rhs.value());
       using unit1_t = typename Q1::unit_t;
@@ -219,7 +219,7 @@ namespace sec21::units
          is_quantity<Q2>::value && 
          has_same_dimension<Q1, Q2>::value == false, bool> = true>
 #endif
-   constexpr auto operator * (Q1 const& lhs, Q2 const& rhs) 
+   constexpr decltype(auto) operator * (Q1 const& lhs, Q2 const& rhs)
    {
       using vt = decltype(lhs.value() * rhs.value());
       using dt = multiply_dimension_t<typename Q1::dimension_t, typename Q2::dimension_t>;
@@ -236,7 +236,7 @@ namespace sec21::units
       typename S, 
       std::enable_if_t<is_quantity<Q1>::value && std::is_scalar<S>::value, bool> = true>
 #endif
-   constexpr auto operator * (Q1 const& lhs, S rhs) 
+   constexpr decltype(auto) operator * (Q1 const& lhs, S rhs)
    {
       return Q1{ lhs.value() * rhs };
    }
@@ -249,7 +249,7 @@ namespace sec21::units
       typename Q1, 
       std::enable_if_t<is_quantity<Q1>::value && std::is_scalar<S>::value, bool> = true>
 #endif
-   constexpr auto operator * (S rhs, Q1 const& lhs) 
+   constexpr decltype(auto) operator * (S rhs, Q1 const& lhs)
    {
       return Q1{ lhs.value() * rhs };
    }
@@ -265,7 +265,7 @@ namespace sec21::units
          is_quantity<Q2>::value && 
          has_same_dimension<Q1, Q2>::value, bool> = true>
 #endif
-   constexpr auto operator / (Q1 const& lhs, Q2 const& rhs)
+   constexpr decltype(auto) operator / (Q1 const& lhs, Q2 const& rhs)
    {
       // [[expects: rhs != 0]]
       return lhs.value() / Q1{ rhs }.value();
@@ -282,7 +282,7 @@ namespace sec21::units
          is_quantity<Q2>::value && 
          has_same_dimension<Q1, Q2>::value == false, bool> = true>
 #endif
-   [[nodiscard]] constexpr auto operator / (Q1 const& lhs, Q2 const& rhs)
+   [[nodiscard]] constexpr decltype(auto) operator / (Q1 const& lhs, Q2 const& rhs)
    {
       // [[expects: rhs != 0]]
       using vt = decltype(lhs.value() / rhs.value());
@@ -318,7 +318,7 @@ namespace sec21::units
       typename S, 
       std::enable_if_t<is_quantity<Q>::value && std::is_scalar<S>::value, bool> = true>
 #endif   
-   [[nodiscard]] constexpr auto operator / (S lhs, Q const& rhs)
+   [[nodiscard]] constexpr decltype(auto) operator / (S lhs, Q const& rhs)
    {
       // [[expects: rhs != quantity<U2, T2>(0)]]
       using vt = decltype(lhs / rhs.value());
@@ -337,11 +337,6 @@ namespace sec21::units
    struct abbreviation {};
 }
 
-//! \todo 
-#define SEC21_UNITS_JSON_SERIALIZER
-
-#ifdef SEC21_UNITS_JSON_SERIALIZER
-
 #include <nlohmann/json.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/lexical_cast.hpp>
@@ -352,7 +347,7 @@ namespace sec21::units
 {
    namespace detail
    {
-      inline auto split(std::string const& input)
+      inline decltype(auto) split(std::string const& input)
       {
          const std::string delimiter = "_";    
          auto pos = input.find(delimiter);
@@ -441,5 +436,3 @@ namespace sec21::units
       obj = detail::from_string<Q>(value);
    }
 }
-
-#endif

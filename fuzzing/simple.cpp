@@ -1,5 +1,5 @@
 // showcase of the boilerplate code
-#include "boilerplate.h"
+#include "make_fuzzed_object.h"
 
 #include <string>
 

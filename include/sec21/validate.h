@@ -7,14 +7,15 @@
 
 namespace sec21
 {
-   // customization point for 'actions'. any 'action' has to specialize the 'validate' template
-   // and has to provide a function call operator witch has to return a std::optional of the action type.
+   // customization point for 'actions'. Any 'action' has to specialize the 'validate' template
+   // and has to provide a function call operator which has to return a std::optional of the action type.
    template <typename T>
    struct validate;
 
    struct invalid_input {};
 
    // transform any given input into a 'action'. if input validation fails the variant holds 'invalid_input'.
+   //! \todo guard Action with a concept
    template <typename... Actions>
    struct input_dispatcher
    {
