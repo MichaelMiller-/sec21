@@ -10,16 +10,13 @@ namespace sec21
    template <auto N>
    struct fixed_string
    {
-      static_assert(N > 0);
       char data[N + 1]{};
 
       constexpr fixed_string(const char (&str)[N + 1]) { std::copy_n(str, N + 1, data); }
 
-      constexpr std::string_view sv() const { return {data}; }
+      constexpr auto operator<=>(fixed_string const&) const = default;
 
-      auto operator<=>(fixed_string const&) const = default;
-
-      constexpr operator char const*() const { return data; }
+      constexpr operator std::string_view() const { return data; }
    };
 
    template <auto N>
