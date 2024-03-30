@@ -3,20 +3,22 @@ find_package(Boost 1.70 REQUIRED)
 find_package(fmt REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 
-## speed up the compile-time process
+## Speed up the compile-time process
 add_library(catch_main STATIC catch_main.cpp)
 target_link_libraries(catch_main PUBLIC Catch2::Catch2 Catch2::Catch2WithMain)
+
+include(CompilerWarnings)
 
 function(test filename)
     set(test_project_name test.${filename})
     add_executable(${test_project_name})
+    set_project_warnings(${test_project_name})
 
     target_sources(${test_project_name} PRIVATE ${filename}.cpp)
 
     target_link_libraries(${test_project_name} PRIVATE Boost::boost)
     target_link_libraries(${test_project_name} PRIVATE catch_main)
     target_link_libraries(${test_project_name} PRIVATE sec21::sec21)
-    target_link_libraries(${test_project_name} PRIVATE enable_compiler_warnings)
     target_link_libraries(${test_project_name} PRIVATE fmt::fmt-header-only)
     target_link_libraries(${test_project_name} PRIVATE nlohmann_json nlohmann_json::nlohmann_json)
 
@@ -25,7 +27,7 @@ function(test filename)
             COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${test_project_name})
 endfunction()
 
-## unit tests via catch (alphabetical order)
+## Unit tests via catch (alphabetical order)
 test("all_of")
 test("alphabet")
 test("any_of")
@@ -36,6 +38,7 @@ test("concat")
 test("database.column_type")
 test("database.constraints")
 test("database.query")
+test("fixed_string")
 test("for_each_adjacent")
 test("for_each_chunk")
 test("for_each_indexed")

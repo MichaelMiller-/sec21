@@ -4,18 +4,9 @@ project(sec21
         DESCRIPTION "sec21::workspace"
 )
 
-include(CTest)
-## TODO: CDash integration: page 316
-
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/StandardProjectSettings.cmake)
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/DependencyGraph.cmake)
-
 set(CMAKE_CXX_STANDARD 26)
 
-# Link this 'library' to use the warnings specified in CompilerWarnings.cmake
-add_library(enable_compiler_warnings INTERFACE)
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/CompilerWarnings.cmake)
-set_project_warnings(enable_compiler_warnings)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
 ## Header-only library
 add_library(sec21 INTERFACE)
@@ -27,6 +18,7 @@ target_include_directories(sec21 INTERFACE
         $<INSTALL_INTERFACE:include>
 )
 
+include(CTest)
 if (BUILD_TESTING) # option is created by CTest
     enable_testing()
     add_subdirectory(tests)
@@ -53,7 +45,7 @@ install(TARGETS sec21
 install(EXPORT sec21ExportTarget
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
         NAMESPACE ${PROJECT_NAME}::
-        FILE sec21Config.cmake
+        FILE sec21Targets.cmake
 )
 
 write_basic_package_version_file(
