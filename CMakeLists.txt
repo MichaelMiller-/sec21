@@ -45,7 +45,7 @@ install(TARGETS sec21
 install(EXPORT sec21ExportTarget
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
         NAMESPACE ${PROJECT_NAME}::
-        FILE sec21Config.cmake
+        FILE sec21Targets.cmake
 )
 
 write_basic_package_version_file(
