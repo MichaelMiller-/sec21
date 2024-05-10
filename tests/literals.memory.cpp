@@ -7,6 +7,8 @@ TEST_CASE("checks memory literals", "[sec21][literals]")
    using namespace sec21;
    using namespace sec21::literals;
 
+   STATIC_REQUIRE(memory{1_B}.bytes == 1);
+
    STATIC_REQUIRE(memory{1_kB}.bytes == 1'000);
    STATIC_REQUIRE(memory{1_MB}.bytes == 1'000'000);
    STATIC_REQUIRE(memory{1_GB}.bytes == 1'000'000'000);

@@ -16,10 +16,24 @@ namespace sec21
       friend auto operator<<(std::ostream& out, memory const& obj) -> auto& { return out << obj.bytes; }
    };
 
+   [[nodiscard]] constexpr auto operator+(memory const& lhs, std::byte rhs) noexcept -> memory
+   {
+      return {lhs.bytes + std::to_underlying(rhs)};
+   }
+
    [[nodiscard]] constexpr auto operator+(memory const& lhs, memory const& rhs) noexcept -> memory
    {
       return {lhs.bytes + rhs.bytes};
    }
+
+   [[nodiscard]] constexpr auto operator-(memory const& lhs, std::byte rhs) noexcept -> memory
+   {
+      if (std::to_underlying(rhs) > lhs.bytes) {
+         throw std::out_of_range{"right-hand-side is greater than the left-hand-side"};
+      }
+      return {lhs.bytes - std::to_underlying(rhs)};
+   }
+
    [[nodiscard]] constexpr auto operator-(memory const& lhs, memory const& rhs) -> memory
    {
       if (rhs.bytes > lhs.bytes) {
@@ -27,6 +41,12 @@ namespace sec21
       }
       return {lhs.bytes - rhs.bytes};
    }
+
+   [[nodiscard]] constexpr auto operator*(memory const& lhs, std::byte rhs) noexcept -> memory
+   {
+      return {lhs.bytes * std::to_underlying(rhs)};
+   }
+
    [[nodiscard]] constexpr auto operator*(memory const& lhs, memory const& rhs) noexcept -> memory
    {
       return {lhs.bytes * rhs.bytes};

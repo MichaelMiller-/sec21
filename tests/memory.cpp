@@ -1,37 +1,32 @@
 #include <catch.hpp>
 
-#include <sec21/memory.h>
 #include <sec21/literals/memory.h>
+#include <sec21/memory.h>
 
 TEST_CASE("memory class", "[sec21]")
 {
    using namespace sec21;
+   using namespace sec21::literals;
 
    SECTION("addition")
    {
-      memory m1{1};
-      memory m2{2};
-      REQUIRE(m1 + m2 == memory{3});
+      REQUIRE(memory{1} + memory{2} == memory{3});
+      REQUIRE(4_kiB + std::byte{4} == memory{4100});
    }
    SECTION("subtraction")
    {
-      memory m1{1};
-      memory m2{2};
-      REQUIRE(m2 - m1 == memory{1});
+      REQUIRE(memory{2} - memory{1} == memory{1});
+      REQUIRE(4_kiB - std::byte{4} == memory{4092});
    }
    SECTION("test safety check of subtraction operator")
    {
-      REQUIRE_THROWS([] {
-         memory m1{1};
-         memory m2{2};
-         auto result = m1 - m2;
-      }());
+      REQUIRE_THROWS([] { auto result = memory{2} - memory{10}; }());
+      // REQUIRE_THROWS([] { auto result = memory{2} - std::byte{10}; }());
    }
    SECTION("multiplication")
    {
-      memory m1{1};
-      memory m2{2};
-      REQUIRE(m1 * m2 == memory{2});
+      REQUIRE(memory{2} * memory{1} == 2_B);
+      REQUIRE(4_kiB * std::byte{2} == memory{8192});
    }
    SECTION("test formatter")
    {
@@ -39,8 +34,6 @@ TEST_CASE("memory class", "[sec21]")
 
       SECTION("format output to a human readable format")
       {
-         using namespace sec21::literals;
-
          REQUIRE(std::format("{:h}", memory{1_kiB}) == "1.02kB");
          REQUIRE(std::format("{:h}", memory{1_MiB}) == "1.05MB");
          REQUIRE(std::format("{:h}", memory{1_GiB}) == "1.07GB");

@@ -4,6 +4,9 @@
 
 namespace sec21::literals
 {
+   //! \brief Byte
+   constexpr auto operator""_B(unsigned long long n) noexcept -> memory { return {n}; }
+
    // SI
    //
    //! \brief Kilobyte
