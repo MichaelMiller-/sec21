@@ -2,19 +2,20 @@
 
 #include <sec21/literals/memory.h>
 
-TEST_CASE("checks memory literals", "[sec21][type_traits]")
+TEST_CASE("checks memory literals", "[sec21][literals]")
 {
+   using namespace sec21;
    using namespace sec21::literals;
 
-   STATIC_REQUIRE(1_kB == 1'000);
-   STATIC_REQUIRE(1_MB == 1'000'000);
-   STATIC_REQUIRE(1_GB == 1'000'000'000);
-   STATIC_REQUIRE(1_TB == 1'000'000'000'000);
-   STATIC_REQUIRE(1_PB == 1'000'000'000'000'000);
+   STATIC_REQUIRE(memory{1_kB}.bytes == 1'000);
+   STATIC_REQUIRE(memory{1_MB}.bytes == 1'000'000);
+   STATIC_REQUIRE(memory{1_GB}.bytes == 1'000'000'000);
+   STATIC_REQUIRE(memory{1_TB}.bytes == 1'000'000'000'000);
+   STATIC_REQUIRE(memory{1_PB}.bytes == 1'000'000'000'000'000);
 
-   STATIC_REQUIRE(1_kiB == 1024);
-   STATIC_REQUIRE(1_MiB == 1048576);
-   STATIC_REQUIRE(1_GiB == 1073741824);
-   STATIC_REQUIRE(1_TiB == 1099511627776);
-   STATIC_REQUIRE(1_PiB == 1125899906842624);
+   STATIC_REQUIRE(memory{1_kiB}.bytes == 1024);
+   STATIC_REQUIRE(memory{1_MiB}.bytes == 1048576);
+   STATIC_REQUIRE(memory{1_GiB}.bytes == 1073741824);
+   STATIC_REQUIRE(memory{1_TiB}.bytes == 1099511627776);
+   STATIC_REQUIRE(memory{1_PiB}.bytes == 1125899906842624);
 }
