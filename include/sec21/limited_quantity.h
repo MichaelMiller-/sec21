@@ -1,6 +1,8 @@
 #pragma once
 
+#if __cpp_lib_format >= 201907L and __has_include(<format>)
 #include <format>
+#endif
 #include <limits>
 #include <stdexcept>
 #include <utility>
@@ -19,7 +21,11 @@ namespace sec21
       [[nodiscard]] constexpr explicit limited_quantity(value_t v) : value{v}
       {
          if (not in_range(v)) {
+#if __cpp_lib_format >= 201907L
             throw std::out_of_range(std::format("Given value ({}) is not in range of [{},{}]", v, Infimum, Supremum));
+#else
+            throw std::out_of_range("Given value is out of range");
+#endif
          }
       }
 
