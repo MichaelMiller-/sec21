@@ -10,21 +10,26 @@ target_link_libraries(catch_main PUBLIC Catch2::Catch2 Catch2::Catch2WithMain)
 include(CompilerWarnings)
 
 function(test filename)
-    set(test_project_name test.${filename})
-    add_executable(${test_project_name})
-    set_project_warnings(${test_project_name})
+    set(target_name test.${filename})
+    add_executable(${target_name})
+    set_project_warnings(${target_name})
 
-    target_sources(${test_project_name} PRIVATE ${filename}.cpp)
+    target_sources(${target_name} PRIVATE ${filename}.cpp)
 
-    target_link_libraries(${test_project_name} PRIVATE Boost::boost)
-    target_link_libraries(${test_project_name} PRIVATE catch_main)
-    target_link_libraries(${test_project_name} PRIVATE sec21::sec21)
-    target_link_libraries(${test_project_name} PRIVATE fmt::fmt-header-only)
-    target_link_libraries(${test_project_name} PRIVATE nlohmann_json nlohmann_json::nlohmann_json)
+if (SEC21_ENABLE_COVERAGE)
+    target_compile_options(${target_name} PRIVATE "--coverage")
+    target_link_libraries(${target_name} PRIVATE gcov)
+endif ()
+
+    target_link_libraries(${target_name} PRIVATE Boost::boost)
+    target_link_libraries(${target_name} PRIVATE catch_main)
+    target_link_libraries(${target_name} PRIVATE sec21::sec21)
+    target_link_libraries(${target_name} PRIVATE fmt::fmt-header-only)
+    target_link_libraries(${target_name} PRIVATE nlohmann_json nlohmann_json::nlohmann_json)
 
     add_test(
-            NAME ${test_project_name}
-            COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${test_project_name})
+            NAME ${target_name}
+            COMMAND $<TARGET_FILE:${target_name}>)
 endfunction()
 
 ## Unit tests via catch (alphabetical order)
