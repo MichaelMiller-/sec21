@@ -14,7 +14,7 @@ jobs:
 
     strategy:
       matrix:
-        version: [ 12, 13 ]
+        version: [ 12, 13, 14 ]
         config: [ Debug, Release ]
 
     steps:
