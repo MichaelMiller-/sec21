@@ -12,7 +12,7 @@ namespace sec21
    }
 
    template <typename T>
-   static constexpr auto is_return_type_optional_v =
+   inline constexpr auto is_return_type_optional_v =
       type_traits::is_optional_v<typename type_traits::function_traits<std::remove_pointer_t<T>>::result_type>;
 
    // g: A -> optional<B>, f: B -> optional<C>
