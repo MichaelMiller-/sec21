@@ -9,7 +9,9 @@ namespace sec21
 {
    class blob
    {
-      std::vector<std::byte> memory{};
+      // note: std::byte causes a lot more problems, therefore 'char' is the better type
+      std::vector<char> memory{};
+      static_assert(sizeof(char) == 1);
 
     public:
       template <typename T>
@@ -17,6 +19,16 @@ namespace sec21
       {
          memory.resize(sizeof(T));
          std::memcpy(memory.data(), &value, sizeof(T));
+      }
+
+      struct parse
+      {
+      };
+
+      blob(parse, std::string const& str)
+      {
+         std::istringstream stream{str};
+         stream >> *this;
       }
 
       template <typename T>
@@ -32,7 +44,7 @@ namespace sec21
       [[nodiscard]] operator T() const
       {
          if (memory.size() < sizeof(T)) {
-            throw std::runtime_error("invalid blob size");
+            throw std::runtime_error("Invalid blob size");
          }
          T result{};
          std::memcpy(&result, memory.data(), sizeof(T));
@@ -40,5 +52,35 @@ namespace sec21
       }
 
       [[nodiscard]] auto size() const noexcept { return memory.size(); }
+
+      template <typename T>
+      [[nodiscard]] auto as() const -> T
+      {
+         return *this;
+      }
+
+      friend auto operator<<(std::ostream& output, blob const& obj) -> std::ostream&
+      {
+         output << obj.size();
+         using value_t = decltype(obj.memory)::value_type;
+         std::copy(begin(obj.memory), end(obj.memory), std::ostream_iterator<value_t>(output));
+         return output;
+      }
+
+      friend auto operator>>(std::istream& input, blob& obj) -> std::istream&
+      {
+         decltype(obj.size()) count{};
+         input >> count;
+         obj.memory.resize(count);
+         input.read(obj.memory.data(), static_cast<std::streamsize>(count));
+         return input;
+      }
    };
+
+   [[nodiscard]] auto to_string(blob const& obj)
+   {
+      std::stringstream stream;
+      stream << obj;
+      return stream.str();
+   }
 } // namespace sec21

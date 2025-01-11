@@ -8,6 +8,8 @@ set(CMAKE_CXX_STANDARD 26)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
+option(SEC21_ENABLE_COVERAGE "Enable coverage build" OFF)
+
 ## Header-only library
 add_library(sec21 INTERFACE)
 ## Alias
@@ -24,8 +26,8 @@ if (BUILD_TESTING) # option is created by CTest
     add_subdirectory(tests)
 endif ()
 
-option(ENABLE_FUZZING "Enable fuzzing tests" OFF)
-if (ENABLE_FUZZING)
+option(SEC21_ENABLE_FUZZING "Enable fuzzing tests" OFF)
+if (SEC21_ENABLE_FUZZING)
     message("Building Fuzz Tests, using fuzzing sanitizer https://www.llvm.org/docs/LibFuzzer.html")
     add_subdirectory(fuzzing)
 endif ()
