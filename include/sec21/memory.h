@@ -18,7 +18,11 @@ namespace sec21
 
    [[nodiscard]] constexpr auto operator+(memory const& lhs, std::byte rhs) noexcept -> memory
    {
+#if __cpp_lib_to_underlying >= 202102L
       return {lhs.bytes + std::to_underlying(rhs)};
+#else
+      return {lhs.bytes + static_cast<std::underlying_type_t<decltype(rhs)>>(rhs)};
+#endif
    }
 
    [[nodiscard]] constexpr auto operator+(memory const& lhs, memory const& rhs) noexcept -> memory
