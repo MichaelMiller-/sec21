@@ -1,6 +1,7 @@
 {
   "dependencies": [
     "catch2",
-    "nlohmann-json"
+    "nlohmann-json",
+    "boost-mp11"
   ]
 }
