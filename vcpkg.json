@@ -3,6 +3,7 @@
     "catch2",
     "nlohmann-json",
     "boost-algorithm",
+    "boost-lexical-cast",
     "boost-mp11"
   ]
 }
