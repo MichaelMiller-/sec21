@@ -10,14 +10,6 @@ install:
   - git pull
   - .\bootstrap-vcpkg.bat
   - cd %APPVEYOR_BUILD_FOLDER%
-  - vcpkg install boost-mp11:x64-windows
-  - vcpkg install boost-math:x64-windows
-  - vcpkg install boost-qvm:x64-windows
-  - vcpkg install boost-ublas:x64-windows
-  - vcpkg install boost-locale:x64-windows
-  - vcpkg install catch2:x64-windows
-  - vcpkg install nlohmann-json:x64-windows
-  - vcpkg install spdlog:x64-windows
   - cd c:\tools\vcpkg
   - vcpkg integrate install
 
