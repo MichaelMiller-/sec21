@@ -38,18 +38,6 @@ jobs:
         git clone https://github.com/Microsoft/vcpkg.git 
         cd vcpkg
         ./bootstrap-vcpkg.sh
-        ./vcpkg install boost-core
-        ./vcpkg install boost-function-types 
-        ./vcpkg install boost-geometry
-        ./vcpkg install boost-hana
-        ./vcpkg install boost-math
-        ./vcpkg install boost-qvm
-        ./vcpkg install boost-range
-        ./vcpkg install boost-ublas
-        ./vcpkg install boost-mp11
-        ./vcpkg install catch2
-        ./vcpkg install nlohmann-json
-        ./vcpkg install spdlog
         cd ..
         cmake . -DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake
         cmake --build . -- -j4
