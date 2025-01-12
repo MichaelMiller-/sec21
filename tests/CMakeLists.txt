@@ -1,6 +1,4 @@
 find_package(Catch2 CONFIG REQUIRED)
-find_package(Boost 1.70 REQUIRED)
-find_package(fmt REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 
 ## Speed up the compile-time process
@@ -21,10 +19,8 @@ if (SEC21_ENABLE_COVERAGE)
     target_link_libraries(${target_name} PRIVATE gcov)
 endif ()
 
-    target_link_libraries(${target_name} PRIVATE Boost::boost)
     target_link_libraries(${target_name} PRIVATE catch_main)
     target_link_libraries(${target_name} PRIVATE sec21::sec21)
-    target_link_libraries(${target_name} PRIVATE fmt::fmt-header-only)
     target_link_libraries(${target_name} PRIVATE nlohmann_json nlohmann_json::nlohmann_json)
 
     add_test(
