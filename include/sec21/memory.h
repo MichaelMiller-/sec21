@@ -26,12 +26,19 @@ namespace sec21
       return {lhs.bytes + rhs.bytes};
    }
 
-   [[nodiscard]] constexpr auto operator-(memory const& lhs, std::byte rhs) noexcept -> memory
+   [[nodiscard]] constexpr auto operator-(memory const& lhs, std::byte rhs) -> memory
    {
+#if __cpp_lib_to_underlying >= 202102L
       if (std::to_underlying(rhs) > lhs.bytes) {
          throw std::out_of_range{"right-hand-side is greater than the left-hand-side"};
       }
       return {lhs.bytes - std::to_underlying(rhs)};
+#else
+      if (static_cast<std::underlying_type_t<decltype(rhs)>>(rhs) > lhs.bytes) {
+         throw std::out_of_range{"right-hand-side is greater than the left-hand-side"};
+      }
+      return {lhs.bytes - static_cast<std::underlying_type_t<decltype(rhs)>>(rhs)};
+#endif
    }
 
    [[nodiscard]] constexpr auto operator-(memory const& lhs, memory const& rhs) -> memory
@@ -44,7 +51,11 @@ namespace sec21
 
    [[nodiscard]] constexpr auto operator*(memory const& lhs, std::byte rhs) noexcept -> memory
    {
+#if __cpp_lib_to_underlying >= 202102L
       return {lhs.bytes * std::to_underlying(rhs)};
+#else
+      return {lhs.bytes * static_cast<std::underlying_type_t<decltype(rhs)>>(rhs)};
+#endif
    }
 
    [[nodiscard]] constexpr auto operator*(memory const& lhs, memory const& rhs) noexcept -> memory
@@ -78,7 +89,7 @@ struct std::formatter<sec21::memory>
 
       if (human_readable) {
          constexpr auto factor = 1000;
-         constexpr auto factorIEC = 1024; //! \todo
+         //! \todo constexpr auto factorIEC = 1024;
 
          auto value = static_cast<double>(obj.bytes);
          auto unit = units[0];
