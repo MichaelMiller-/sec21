@@ -2,13 +2,9 @@ name: Clang
 
 on:
   push:
-    branches:
-      - master
+    branches: [ master ]
   pull_request:
-    branches:
-      - master
-
-  workflow_dispatch:
+    branches: [ master ]
 
 jobs:
   build-and-test:
@@ -16,23 +12,19 @@ jobs:
 
     strategy:
       matrix:
-        version: [ 16, 17, 18 ]
+        version: [ 18, 19 ]
         config: [ Debug, Release ]
 
     steps:
       - uses: actions/checkout@master
 
-      - name: Install Compiler
+      - name: Install compiler
         run: |
           sudo apt-get update 
           wget https://apt.llvm.org/llvm.sh
           chmod u+x llvm.sh
           sudo ./llvm.sh ${{matrix.version}}
           clang --version
-
-      - name: Prepare system
-        run: |
-          sudo apt install -y libboost-all-dev
 
       - name: Install Dependencies
         shell: bash

@@ -5,7 +5,7 @@
 #if __cpp_lib_format >= 201907L
 #include <format>
 #else
-#include <fmt/format.h>
+#include <sstream>
 #endif
 
 namespace sec21::policy
@@ -28,7 +28,11 @@ namespace sec21::policy
 #if __cpp_lib_format >= 201907L
             result = std::format("A{}", ++number);
 #else
-            result = fmt::format("A{}", ++number);
+            {
+               std::stringstream stream{};
+               stream << 'A' << ++number;
+               result = stream.str();
+            }
 #endif
          } else
             ++result[0];
