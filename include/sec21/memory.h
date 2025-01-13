@@ -69,8 +69,11 @@ namespace sec21
 } // namespace sec21
 
 template <>
-struct std::formatter<sec21::memory>
+class std::formatter<sec21::memory>
 {
+   bool human_readable{false};
+   std::size_t precision{2};
+ public:
    constexpr auto parse(std::format_parse_context& ctx)
    {
       auto pos = ctx.begin();
@@ -79,7 +82,7 @@ struct std::formatter<sec21::memory>
             human_readable = true;
          }
          if (*pos == '.') {
-            pos = std::from_chars(++pos, ctx.end(), precision).ptr;
+            pos = std::from_chars(&*(++pos), ctx.end(), precision).ptr;
             --pos;
          }
          ++pos;
@@ -108,7 +111,4 @@ struct std::formatter<sec21::memory>
       }
       return std::format_to(ctx.out(), "{}{}", obj.bytes, units[0]);
    }
-
-   bool human_readable{false};
-   std::size_t precision{2};
 };
