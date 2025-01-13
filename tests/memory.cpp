@@ -34,18 +34,25 @@ TEST_CASE("memory class", "[sec21]")
 
       SECTION("format output to a human readable format")
       {
-         REQUIRE(std::format("{:h}", memory{1_kiB}) == "1.02kB");
-         REQUIRE(std::format("{:h}", memory{1_MiB}) == "1.05MB");
-         REQUIRE(std::format("{:h}", memory{1_GiB}) == "1.07GB");
-         REQUIRE(std::format("{:h}", memory{1_TiB}) == "1.10TB");
-         REQUIRE(std::format("{:h}", memory{1_PiB}) == "1.13PB");
+         REQUIRE(std::format("{:h}", memory{1_kiB}) == "1kB");
+         REQUIRE(std::format("{:h}", memory{1_MiB}) == "1MB");
+         REQUIRE(std::format("{:h}", memory{1_GiB}) == "1GB");
+         REQUIRE(std::format("{:h}", memory{1_TiB}) == "1TB");
+         REQUIRE(std::format("{:h}", memory{1_PiB}) == "1PB");
       }
       SECTION("human readable format with precision")
       {
          REQUIRE(std::format("{:.0h}", memory{1024 * 1024}) == "1MB");
          REQUIRE(std::format("{:.1h}", memory{1024 * 1024}) == "1.0MB");
+         REQUIRE(std::format("{:.2h}", memory{1024 * 1024}) == "1.05MB");
          REQUIRE(std::format("{:.4h}", memory{1024 * 1024}) == "1.0486MB");
-         REQUIRE(std::format("{:.h}", memory{1024 * 1024}) == "1.05MB");
+         REQUIRE(std::format("{:.h}", memory{1024 * 1024}) == "1MB");
+      }
+      SECTION("format with precision")
+      {
+         REQUIRE(std::format("{:.0}", memory{1}) == "1B");
+         REQUIRE(std::format("{:.1}", memory{1}) == "1.0B");
+         REQUIRE(std::format("{:.4}", memory{1}) == "1.0000B");
       }
    }
 }

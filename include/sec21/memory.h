@@ -72,7 +72,8 @@ template <>
 class std::formatter<sec21::memory>
 {
    bool human_readable{false};
-   std::size_t precision{2};
+   std::size_t precision{0};
+
  public:
    constexpr auto parse(std::format_parse_context& ctx)
    {
@@ -82,8 +83,10 @@ class std::formatter<sec21::memory>
             human_readable = true;
          }
          if (*pos == '.') {
-            pos = std::from_chars(&*(++pos), &*ctx.end(), precision).ptr;
-            --pos;
+            // workaround until proposal is approved
+            // https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2020/p2007r0.html
+            auto ptr = std::from_chars(&*(++pos), &*ctx.end(), precision).ptr;
+            std::advance(pos, std::distance(&*pos, ptr) - 1);
          }
          ++pos;
       }
@@ -93,13 +96,12 @@ class std::formatter<sec21::memory>
    auto format(sec21::memory const& obj, std::format_context& ctx) const
    {
       constexpr auto units = std::array{"B", "kB", "MB", "GB", "TB", "PB"};
+      auto value = static_cast<double>(obj.bytes);
+      auto unit = units[0];
 
       if (human_readable) {
          constexpr auto factor = 1000;
          //! \todo constexpr auto factorIEC = 1024;
-
-         auto value = static_cast<double>(obj.bytes);
-         auto unit = units[0];
 
          for (decltype(units.size()) i = 0; i < units.size(); ++i) {
             if (obj.bytes >= std::pow(factor, i)) {
@@ -107,8 +109,7 @@ class std::formatter<sec21::memory>
                unit = units[i];
             }
          }
-         return std::format_to(ctx.out(), "{:.{}f}{}", value, precision, unit);
       }
-      return std::format_to(ctx.out(), "{}{}", obj.bytes, units[0]);
+      return std::format_to(ctx.out(), "{:.{}f}{}", value, precision, unit);
    }
 };
