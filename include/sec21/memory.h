@@ -82,7 +82,7 @@ class std::formatter<sec21::memory>
             human_readable = true;
          }
          if (*pos == '.') {
-            pos = std::from_chars(&*(++pos), ctx.end(), precision).ptr;
+            pos = std::from_chars(&*(++pos), &*ctx.end(), precision).ptr;
             --pos;
          }
          ++pos;
