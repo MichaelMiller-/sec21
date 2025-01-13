@@ -68,6 +68,7 @@ namespace sec21
    }
 } // namespace sec21
 
+#if __cpp_lib_constexpr_charconv >= 202207L
 template <>
 class std::formatter<sec21::memory>
 {
@@ -83,10 +84,8 @@ class std::formatter<sec21::memory>
             human_readable = true;
          }
          if (*pos == '.') {
-            // workaround until proposal is approved
-            // https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2020/p2007r0.html
-            auto ptr = std::from_chars(&*(++pos), &*ctx.end(), precision).ptr;
-            std::advance(pos, std::distance(&*pos, ptr) - 1);
+            pos = std::from_chars(++pos, ctx.end(), precision).ptr;
+            --pos;
          }
          ++pos;
       }
@@ -113,3 +112,4 @@ class std::formatter<sec21::memory>
       return std::format_to(ctx.out(), "{:.{}f}{}", value, precision, unit);
    }
 };
+#endif

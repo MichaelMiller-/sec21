@@ -28,6 +28,7 @@ TEST_CASE("memory class", "[sec21]")
       REQUIRE(memory{2} * memory{1} == 2_B);
       REQUIRE(4_kiB * std::byte{2} == memory{8192});
    }
+#if __cpp_lib_constexpr_charconv >= 202207L
    SECTION("test formatter")
    {
       SECTION("default") { REQUIRE(std::format("{}", memory{1024}) == "1024B"); }
@@ -55,4 +56,5 @@ TEST_CASE("memory class", "[sec21]")
          REQUIRE(std::format("{:.4}", memory{1}) == "1.0000B");
       }
    }
+#endif
 }
