@@ -68,9 +68,14 @@ namespace sec21
    }
 } // namespace sec21
 
+#if __cpp_lib_constexpr_charconv >= 202207L
 template <>
-struct std::formatter<sec21::memory>
+class std::formatter<sec21::memory>
 {
+   bool human_readable{false};
+   std::size_t precision{0};
+
+ public:
    constexpr auto parse(std::format_parse_context& ctx)
    {
       auto pos = ctx.begin();
@@ -78,10 +83,15 @@ struct std::formatter<sec21::memory>
          if (*pos == 'h' or *pos == 'H') {
             human_readable = true;
          }
+#ifndef WIN32
          if (*pos == '.') {
+            //! \todo some issues with MSVC compiler
+            // maybe should work if proposal 'std::from_chars should work with std::string_view' is approved
+            // https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2020/p2007r0.html
             pos = std::from_chars(++pos, ctx.end(), precision).ptr;
             --pos;
          }
+#endif
          ++pos;
       }
       return pos;
@@ -90,13 +100,12 @@ struct std::formatter<sec21::memory>
    auto format(sec21::memory const& obj, std::format_context& ctx) const
    {
       constexpr auto units = std::array{"B", "kB", "MB", "GB", "TB", "PB"};
+      auto value = static_cast<double>(obj.bytes);
+      auto unit = units[0];
 
       if (human_readable) {
          constexpr auto factor = 1000;
          //! \todo constexpr auto factorIEC = 1024;
-
-         auto value = static_cast<double>(obj.bytes);
-         auto unit = units[0];
 
          for (decltype(units.size()) i = 0; i < units.size(); ++i) {
             if (obj.bytes >= std::pow(factor, i)) {
@@ -104,11 +113,8 @@ struct std::formatter<sec21::memory>
                unit = units[i];
             }
          }
-         return std::format_to(ctx.out(), "{:.{}f}{}", value, precision, unit);
       }
-      return std::format_to(ctx.out(), "{}{}", obj.bytes, units[0]);
+      return std::format_to(ctx.out(), "{:.{}f}{}", value, precision, unit);
    }
-
-   bool human_readable{false};
-   std::size_t precision{2};
 };
+#endif
