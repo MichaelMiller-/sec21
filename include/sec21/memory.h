@@ -83,10 +83,15 @@ class std::formatter<sec21::memory>
          if (*pos == 'h' or *pos == 'H') {
             human_readable = true;
          }
+#ifndef WIN32
          if (*pos == '.') {
+            //! \todo some issues with MSVC compiler
+            // maybe should work if proposal 'std::from_chars should work with std::string_view' is approved
+            // https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2020/p2007r0.html
             pos = std::from_chars(++pos, ctx.end(), precision).ptr;
             --pos;
          }
+#endif
          ++pos;
       }
       return pos;

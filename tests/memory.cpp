@@ -20,7 +20,7 @@ TEST_CASE("memory class", "[sec21]")
    }
    SECTION("test safety check of subtraction operator")
    {
-      REQUIRE_THROWS([] { auto result = memory{2} - memory{10}; }());
+      REQUIRE_THROWS([] { [[maybe_unused]] auto result = memory{2} - memory{10}; }());
       // REQUIRE_THROWS([] { auto result = memory{2} - std::byte{10}; }());
    }
    SECTION("multiplication")
@@ -41,6 +41,7 @@ TEST_CASE("memory class", "[sec21]")
          REQUIRE(std::format("{:h}", memory{1_TiB}) == "1TB");
          REQUIRE(std::format("{:h}", memory{1_PiB}) == "1PB");
       }
+#ifndef WIN32
       SECTION("human readable format with precision")
       {
          REQUIRE(std::format("{:.0h}", memory{1024 * 1024}) == "1MB");
@@ -55,6 +56,7 @@ TEST_CASE("memory class", "[sec21]")
          REQUIRE(std::format("{:.1}", memory{1}) == "1.0B");
          REQUIRE(std::format("{:.4}", memory{1}) == "1.0000B");
       }
+#endif
    }
 #endif
 }
