@@ -22,12 +22,12 @@ TEST_CASE("Memory blob", "[sec21][core]")
       auto const blob = sec21::blob{obj};
       REQUIRE(blob.size() == sizeof(foo));
    }
-   SECTION("Convert blob")
+   SECTION("Explicit conversion operator")
    {
       auto const blob = sec21::blob{obj};
       REQUIRE(blob.size() == sizeof(foo));
 
-      foo const result = blob;
+      auto result = static_cast<foo const>(blob);
       REQUIRE(result.x == 17);
       REQUIRE(result.y == 42);
       REQUIRE(result.d == Catch::Approx(3.14));
@@ -44,7 +44,7 @@ TEST_CASE("Memory blob", "[sec21][core]")
    SECTION("Retrieve the first int")
    {
       auto const blob = sec21::blob{obj};
-      int i = blob;
+      auto i = static_cast<int>(blob);
       REQUIRE(i == 17);
    }
    SECTION("Store blob in a std::string")
