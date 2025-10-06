@@ -17,7 +17,7 @@ If you have installed **sec21** system-wide you can use the CMake-package-system
 ```cmake
 find_package(sec21 CONFIG REQUIRED)
 ## ...
-target_link_libraries(${PROJECT_NAME} PRIVATE sec21::sec21)
+target_link_libraries(main PRIVATE sec21::sec21)
 ```
 
 ## Using FetchContent
@@ -36,5 +36,5 @@ FetchContent_MakeAvailable(sec21)
 set_target_properties(sec21 PROPERTIES BUILD_TESTING FALSE)
 
 ## Link against sec21::sec21
-target_link_libraries(${PROJECT_NAME} PRIVATE sec21::sec21)
+target_link_libraries(main PRIVATE sec21::sec21)
 ```
