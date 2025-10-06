@@ -43,4 +43,8 @@ namespace sec21
     private:
       constexpr auto get() const noexcept -> std::tuple<Ts...> const& { return *this; }
    };
+
+   template <typename... Ts>
+   all_of(Ts &&...) -> all_of<Ts...>;
+
 } // namespace sec21
