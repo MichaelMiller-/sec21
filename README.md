@@ -7,12 +7,12 @@
 **sec21** is a collection of useful functions and classes and also the boilerplate for a lot of my projects.
 
 ## Documentation
-See the [Wiki](https://github.com/MichaelMiller-/sec21/wiki) for the full documentation, examples, operational details and other information.
+See the [full documentation](https://michaelmiller-.github.io/sec21/) for examples, operational details and other information.
 
 
 ## Usage
 
-### Build **sec21** from Sources
+### Build from source
 Building with CMake is pretty easy, just invoke the following shell commands:
 ```sh
 git clone https://github.com/MichaelMiller-/sec21
