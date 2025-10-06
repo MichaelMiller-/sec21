@@ -2,6 +2,8 @@
 
 #include <sec21/limited_quantity.h>
 
+#include <functional>
+
 template <typename T, template <typename...> typename Operation>
 struct op_wrapper
 {
