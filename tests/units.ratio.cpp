@@ -1,12 +1,11 @@
-﻿#define CATCH_CONFIG_MAIN
-#include <catch.hpp>
+﻿#include <catch2/catch_test_macros.hpp>
 
-#include <type_traits>
 #include <ratio>
+#include <type_traits>
 
 #include <sec21/units/ratio.h>
 
-TEST_CASE("units ratio", "[sec21][units]") 
+TEST_CASE("units ratio", "[sec21][units]")
 {
    using namespace sec21::units;
 
@@ -17,4 +16,3 @@ TEST_CASE("units ratio", "[sec21][units]")
 
    STATIC_REQUIRE(std::is_same_v<r1, std::ratio<2, 3>>);
 }
-

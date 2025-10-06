@@ -1,8 +1,8 @@
-#include <catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include <sec21/scope_guard.h>
 
-TEST_CASE("increment a value in scope guard", "[sec21][core]")
+TEST_CASE("increment a value in scope guard", "[sec21]")
 {
    int i = 5;
    {
@@ -11,19 +11,16 @@ TEST_CASE("increment a value in scope guard", "[sec21][core]")
    REQUIRE(i == 6);
 }
 
-TEST_CASE("scope guard in a exception context", "[sec21][core]")
+TEST_CASE("scope guard in a exception context", "[sec21]")
 {
    using namespace sec21;
 
    int i = 5;
-   try
-   {
+   try {
       const scope_guard_if_exception sge([&i] { i = 0; }); // rollback action
       const scope_guard sg([&i] { i += 2; });
       throw "any exception";
-   }
-   catch (...)
-   {
+   } catch (...) {
       // do nothing
    }
    REQUIRE(i == 0);

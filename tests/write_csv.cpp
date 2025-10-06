@@ -1,7 +1,7 @@
-#include <catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
-#include <sec21/write_csv.h>
 #include <sec21/reflection/column.h>
+#include <sec21/write_csv.h>
 
 using namespace sec21;
 
@@ -26,19 +26,12 @@ struct reflection::table<user>
       using cash = reflection::column<"cash", &user::cash>;
    };
 
-   using metainfo = std::tuple<
-      columns::name,
-      columns::password,
-      columns::karma,
-      columns::cash>;
+   using metainfo = std::tuple<columns::name, columns::password, columns::karma, columns::cash>;
 };
 
-TEST_CASE("transform a range", "[sec21][core]")
+TEST_CASE("transform a range", "[sec21]")
 {
-   std::vector<user> input{
-      { "John Doe", "secret", 42, 0 },
-      { "Max Mustermann", "****", 1, 45'678 }
-   };
+   std::vector<user> input{{"John Doe", "secret", 42, 0}, {"Max Mustermann", "****", 1, 45'678}};
 
    std::stringstream stream;
    write_csv(stream, input);

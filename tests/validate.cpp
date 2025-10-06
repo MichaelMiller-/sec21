@@ -1,4 +1,4 @@
-#include <catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include <sec21/overloaded.h>
 #include <sec21/validate.h>
@@ -26,7 +26,7 @@ struct sec21::validate<action1>
 };
 // end-snippet
 
-TEST_CASE("validate action1", "[sec21][core]")
+TEST_CASE("validate action1", "[sec21]")
 {
    using namespace sec21;
 
@@ -69,7 +69,7 @@ struct sec21::validate<action2>
    }
 };
 
-TEST_CASE("validate action2", "[sec21][core]")
+TEST_CASE("validate action2", "[sec21]")
 {
    using namespace sec21;
 
@@ -119,7 +119,7 @@ struct sec21::validate<input_json>
    }
 };
 
-TEST_CASE("validate a json object", "[sec21][core]")
+TEST_CASE("validate a json object", "[sec21]")
 {
    using namespace sec21;
    validate<input_json> process;
@@ -133,8 +133,13 @@ TEST_CASE("validate a json object", "[sec21][core]")
 }
 
 // actions
-struct list_files {};
-struct input_file { std::string filename{}; };
+struct list_files
+{
+};
+struct input_file
+{
+   std::string filename{};
+};
 
 template <>
 struct sec21::validate<list_files>
@@ -157,13 +162,13 @@ struct sec21::validate<input_file>
       boost::split(parts, input, [](auto c) { return c == '='; });
 
       if (size(parts) == 2 && parts[0] == "input_file") {
-         return input_file{ parts[1] };
+         return input_file{parts[1]};
       }
       return std::nullopt;
    }
 };
 
-TEST_CASE("dispatch the user input to a action", "[sec21][core]")
+TEST_CASE("dispatch the user input to a action", "[sec21]")
 {
    auto dispatcher = sec21::input_dispatcher<list_files, input_file>{};
 

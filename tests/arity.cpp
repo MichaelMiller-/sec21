@@ -1,4 +1,4 @@
-#include <catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include <sec21/arity.h>
 
@@ -12,7 +12,7 @@ struct binary_functor
    }
 };
 
-TEST_CASE("count the number of arguments", "[sec21][core]")
+TEST_CASE("count the number of arguments", "[sec21]")
 {
    using namespace sec21;
 
