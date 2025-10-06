@@ -25,7 +25,7 @@ namespace sec21
       {
       };
 
-      constexpr blob(parse, std::string const& str)
+      blob(parse, std::string const& str)
       {
          std::istringstream stream{str};
          stream >> *this;
