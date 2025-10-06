@@ -1,6 +1,4 @@
-## transform_if<span id="transform_if"></span>
-
-*#include [<sec21/transform_if.h>](include/sec21/transform_if.h)*
+*#include [&lt;sec21/transform_if.h&gt;](https://github.com/MichaelMiller-/sec21/blob/master/include/sec21/transform_if.h)*
 
 Transforms any element in a range, defined by [first, last), into a destination range if the predicate is satisfied. 
 
@@ -18,4 +16,3 @@ transform_if(
 
 // result == { Data{1}, Data{2}, Data{3}, Data{4} }; 
 ```
-

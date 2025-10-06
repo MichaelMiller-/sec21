@@ -1,6 +1,4 @@
-## to_array<span id="to_array"></span>
-
-*#include [<sec21/to_array.h>](include/sec21/to_array.h)*
+*#include [&lt;sec21/to_array.h&gt;](https://github.com/MichaelMiller-/sec21/blob/master/include/sec21/to_array.h)*
 
 Transforms any given std::tuple<Ts...> into a std::array. 
 
@@ -14,4 +12,3 @@ auto result = to_array(input, [](auto v) {
 
 // result is std::array<std::string, 6>{  "v: 1", "v: 2", "v: 3", "v: 4.44", "v: 5.55", "v: string" }; 
 ```
-

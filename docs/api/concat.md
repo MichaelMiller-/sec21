@@ -1,12 +1,8 @@
-## concat<span id="concat"></span>
+*#include [&lt;sec21/concat.h&gt;](https://github.com/MichaelMiller-/sec21/blob/master/include/sec21/concat.h)*
 
-*#include [<sec21/concat.h>](include/sec21/concat.h)*
+Joins string-convertible objects into one string. There are overloads for std::tuple and variadic template parameters. It is also possible to specify the delimiter between the objects.
 
-Concat all elements from a std::tuple or a variadic template list, with a custom delimiter, to a std::string. 
-
-### Example
-```c++
+```cpp
 auto input = std::make_tuple("foo", "bar", "baz");
-auto result = concat(input, "+++"); 
-// result == "foo+++bar+++baz"
+auto result = concat(input, "+++");  // == "foo+++bar+++baz");
 ```

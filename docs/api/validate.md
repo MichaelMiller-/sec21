@@ -1,6 +1,4 @@
-## validate<span id="validate"></span>
-
-*#include [<sec21/validate.h>](include/sec21/validate.h)*
+*#include [&lt;sec21/validate.h&gt;](https://github.com/MichaelMiller-/sec21/blob/master/include/sec21/validate.h)*
 
 ### Every input has to be validated
 
@@ -115,4 +113,3 @@ std::visit(overloaded{
 ```
 
 Be aware that std::variant is a type-safe union and the that any missing overload results into a compile time error. Therefore it is very hard to get things wrong.
-
