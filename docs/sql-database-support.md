@@ -1,4 +1,4 @@
-With the help of the [reflection](https://github.com/MichaelMiller-/sec21/wiki/Reflection.md) library, it is very easy to map data structures as SQL tables.
+With the help of the [reflection](reflection.md) library, it is very easy to map data structures as SQL tables.
 
 ```cpp
 struct user
