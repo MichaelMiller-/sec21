@@ -1,7 +1,9 @@
-#include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include <sec21/blob.h>
+
+#include <array>
 
 struct foo
 {
