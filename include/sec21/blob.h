@@ -67,7 +67,7 @@ namespace sec21
          return output;
       }
 
-      friend auto operator>>(std::istream& input, blob& obj) -> std::istream&
+      friend constexpr auto operator>>(std::istream& input, blob& obj) -> std::istream&
       {
          decltype(obj.size()) count{};
          input >> count;
