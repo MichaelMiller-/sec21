@@ -1,10 +1,6 @@
 find_package(Catch2 CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 
-## Speed up the compile-time process
-add_library(catch_main STATIC catch_main.cpp)
-target_link_libraries(catch_main PUBLIC Catch2::Catch2 Catch2::Catch2WithMain)
-
 include(CompilerWarnings)
 
 function(test filename)
@@ -19,13 +15,11 @@ if (SEC21_ENABLE_COVERAGE)
     target_link_libraries(${target_name} PRIVATE gcov)
 endif ()
 
-    target_link_libraries(${target_name} PRIVATE catch_main)
+    target_link_libraries(${target_name} PRIVATE Catch2::Catch2 Catch2::Catch2WithMain)
     target_link_libraries(${target_name} PRIVATE sec21::sec21)
     target_link_libraries(${target_name} PRIVATE nlohmann_json nlohmann_json::nlohmann_json)
 
-    add_test(
-            NAME ${target_name}
-            COMMAND $<TARGET_FILE:${target_name}>)
+    add_test(NAME ${target_name} COMMAND $<TARGET_FILE:${target_name}>)
 endfunction()
 
 ## Unit tests via catch (alphabetical order)

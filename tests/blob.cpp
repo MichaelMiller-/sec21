@@ -1,6 +1,5 @@
-#include <catch.hpp>
-
-#include <iostream>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/catch_approx.hpp>
 
 #include <sec21/blob.h>
 
@@ -13,7 +12,7 @@ struct foo
    std::array<int, 8> a{};
 };
 
-TEST_CASE("Memory blob", "[sec21][core]")
+TEST_CASE("Memory blob", "[sec21]")
 {
    foo const obj{17, 42, 3.14, 4.2f, {1, 2, 4, 5, 6, 7, 8, 9}};
 

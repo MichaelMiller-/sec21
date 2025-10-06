@@ -1,22 +1,17 @@
-﻿#include <catch.hpp>
+﻿#include <catch2/catch_test_macros.hpp>
 
-#include <sec21/strong_type.h>
-#include <sec21/policy/integer_arithmetic.h>
 #include <sec21/policy/compare.h>
+#include <sec21/policy/integer_arithmetic.h>
 #include <sec21/policy/print.h>
+#include <sec21/strong_type.h>
 
 #include <sstream>
 
-TEST_CASE("test strong types", "[sec21][core]") 
+TEST_CASE("test strong types", "[sec21]")
 {
    using namespace sec21;
 
-   using width_t = strong_type<
-      int, 
-      struct width_tag, 
-      policy::integer_arithmetic, 
-      policy::compare, 
-      policy::print>;
+   using width_t = strong_type<int, struct width_tag, policy::integer_arithmetic, policy::compare, policy::print>;
    using T = width_t::underlying_t;
 
    static_assert(std::is_same_v<T, underlying_t<width_t>>);
@@ -25,8 +20,8 @@ TEST_CASE("test strong types", "[sec21][core]")
    static_assert(is_strong_type_v<int> == false);
    static_assert(is_strong_type_v<width_t> == true);
 
-   width_t a{ 4 };
-   width_t b{ 5 };
+   width_t a{4};
+   width_t b{5};
    // width_t fail(3.14); == warning -> use curly brackets
 
    SECTION("addition policy")
@@ -35,7 +30,7 @@ TEST_CASE("test strong types", "[sec21][core]")
       static_assert(std::is_same_v<decltype(c), width_t>);
       REQUIRE(static_cast<T>(c) == 9);
 
-      b += width_t{ 15 };
+      b += width_t{15};
       REQUIRE(static_cast<T>(b) == 20);
    }
    SECTION("subtraction policy")
@@ -44,7 +39,7 @@ TEST_CASE("test strong types", "[sec21][core]")
       static_assert(std::is_same_v<decltype(c), width_t>);
       REQUIRE(static_cast<T>(c) == 1);
 
-      b -= width_t{ 2 };
+      b -= width_t{2};
       REQUIRE(static_cast<T>(b) == 3);
    }
    SECTION("multiplication policy")
@@ -53,16 +48,16 @@ TEST_CASE("test strong types", "[sec21][core]")
       static_assert(std::is_same_v<decltype(c), width_t>);
       REQUIRE(static_cast<T>(c) == 20);
 
-      b *= width_t{ 2 };
+      b *= width_t{2};
       REQUIRE(static_cast<T>(b) == 10);
    }
    SECTION("division policy")
    {
-      auto c = width_t{ 10 } / b;
+      auto c = width_t{10} / b;
       static_assert(std::is_same_v<decltype(c), width_t>);
       REQUIRE(static_cast<T>(c) == 2);
 
-      a /= width_t{ 2 };
+      a /= width_t{2};
       REQUIRE(static_cast<T>(a) == 2);
    }
    SECTION("increment")
@@ -103,7 +98,7 @@ using type1_t = sec21::strong_type<int, struct tag1>;
 template <typename T>
 struct mix_addition
 {
-   friend constexpr T& operator += (T& lhs, type1_t const& rhs) noexcept
+   friend constexpr T& operator+=(T& lhs, type1_t const& rhs) noexcept
    {
       using lhs_t = typename T::underlying_t;
       using rhs_t = type1_t::underlying_t;
@@ -112,7 +107,7 @@ struct mix_addition
       static_cast<lhs_t&>(lhs) += static_cast<rhs_t const&>(rhs);
       return lhs;
    }
-   friend constexpr T operator + (T const& lhs, type1_t const& rhs) noexcept
+   friend constexpr T operator+(T const& lhs, type1_t const& rhs) noexcept
    {
       using lhs_t = typename T::underlying_t;
       using rhs_t = type1_t::underlying_t;
@@ -122,17 +117,17 @@ struct mix_addition
    }
 };
 // also possible
-//template <typename T>
-//using mix_addition = sec21::policy::mixed_addition<T, OtherType>;
+// template <typename T>
+// using mix_addition = sec21::policy::mixed_addition<T, OtherType>;
 
 using type2_t = sec21::strong_type<int, struct tag2, mix_addition>;
 
-TEST_CASE("mix strong types", "[sec21][core]")
+TEST_CASE("mix strong types", "[sec21]")
 {
    using namespace sec21;
 
-   type1_t a{ 4 };
-   type2_t b{ 5 };
+   type1_t a{4};
+   type2_t b{5};
 
    using T = type2_t::underlying_t;
 

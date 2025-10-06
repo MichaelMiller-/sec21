@@ -1,5 +1,4 @@
-﻿#define CATCH_CONFIG_MAIN
-#include <catch.hpp>
+﻿#include <catch2/catch_test_macros.hpp>
 
 #include <sec21/units/dimension.h>
 
@@ -7,9 +6,15 @@ TEST_CASE("dimension test", "[sec21][units]")
 {
    using namespace sec21::units;
 
-   struct d0 : base_dimension<0> {};
-   struct d1 : base_dimension<1> {};
-   struct d2 : base_dimension<2> {};
+   struct d0 : base_dimension<0>
+   {
+   };
+   struct d1 : base_dimension<1>
+   {
+   };
+   struct d2 : base_dimension<2>
+   {
+   };
 
    SECTION("invert exponents")
    {
@@ -57,6 +62,6 @@ TEST_CASE("dimension test", "[sec21][units]")
       STATIC_REQUIRE(std::is_same_v<r2, dimension<exponent<d0, -1>, exponent<d1, -2>>>);
 
       using r4 = invert_dimension_t<dim4>;
-      STATIC_REQUIRE(std::is_same_v<r4,  dimension<exponent<d0, 1>, exponent<d1, 2>, exponent<d2, -3>>>);
+      STATIC_REQUIRE(std::is_same_v<r4, dimension<exponent<d0, 1>, exponent<d1, 2>, exponent<d2, -3>>>);
    }
 }

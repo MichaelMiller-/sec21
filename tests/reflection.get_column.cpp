@@ -1,8 +1,8 @@
-#include <catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
-#include <sec21/reflection/table.h>
 #include <sec21/reflection/column.h>
 #include <sec21/reflection/get_column.h>
+#include <sec21/reflection/table.h>
 
 using namespace sec21;
 
@@ -27,16 +27,12 @@ struct reflection::table<user>
       using cash = reflection::column<"cash", &user::cash>;
    };
 
-   using metainfo = std::tuple<
-      columns::name,
-      columns::password,
-      columns::karma,
-      columns::cash>;
+   using metainfo = std::tuple<columns::name, columns::password, columns::karma, columns::cash>;
 };
 
-TEST_CASE("helper to get tha value from a column", "[sec21][core]")
+TEST_CASE("helper to get tha value from a column", "[sec21][reflection]")
 {
-   user input{ "John Doe", "secret", 42, 3.14 };
+   user input{"John Doe", "secret", 42, 3.14};
 
    SECTION("getter")
    {

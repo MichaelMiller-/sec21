@@ -1,6 +1,8 @@
-﻿#include <catch.hpp>
+﻿#include <catch2/catch_test_macros.hpp>
 
 #include <sec21/limited_quantity.h>
+
+#include <functional>
 
 template <typename T, template <typename...> typename Operation>
 struct op_wrapper

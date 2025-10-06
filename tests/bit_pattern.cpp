@@ -1,8 +1,8 @@
-#include <catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include <sec21/bit_pattern.h>
 
-TEST_CASE("match bits via a pattern", "[sec21][core]")
+TEST_CASE("match bits via a pattern", "[sec21]")
 {
    using namespace sec21;
 

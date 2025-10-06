@@ -1,8 +1,8 @@
-#include <catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include <sec21/to_array.h>
 
-TEST_CASE("convert a std::tuple into a std::array", "[sec21][core]")
+TEST_CASE("convert a std::tuple into a std::array", "[sec21]")
 {
    using namespace sec21;
 

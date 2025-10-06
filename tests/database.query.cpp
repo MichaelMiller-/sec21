@@ -1,4 +1,4 @@
-#include <catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include <sec21/database/constraints.h>
 #include <sec21/database/query.h>

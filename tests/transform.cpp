@@ -1,16 +1,13 @@
-#define CATCH_CONFIG_MAIN
-#include <catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include <sec21/transform.h>
 
-TEST_CASE("convert a std::tuple into another std::tuple", "[sec21][core]")
+TEST_CASE("convert a std::tuple into another std::tuple", "[sec21]")
 {
    using namespace sec21;
 
    auto input = std::make_tuple(1, 2, 3, 4.44);
-   auto result = transform(input, [](auto v) {
-      return v * 2;
-   });
+   auto result = transform(input, [](auto v) { return v * 2; });
 
    REQUIRE(std::tuple_size_v<decltype(result)> == 4);
    REQUIRE(std::get<0>(result) == 2);

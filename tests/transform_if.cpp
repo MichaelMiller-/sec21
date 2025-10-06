@@ -1,4 +1,4 @@
-#include <catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include <sec21/transform_if.h>
 
@@ -11,7 +11,7 @@ struct Data
    friend bool operator==(Data const&, Data const&) = default;
 };
 
-TEST_CASE("transform a range", "[sec21][core]")
+TEST_CASE("transform a range", "[sec21]")
 {
    std::vector in{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
    std::vector<Data> result{};
