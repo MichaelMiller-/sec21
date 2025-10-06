@@ -1,0 +1,106 @@
+# To view the documentation locally on your machine, use the following steps
+#
+# Clone the repository locally, then on the command line:
+#
+#   python -m venv .venv
+#   source .venv/bin/activate
+#   pip install mkdocs-material
+#   mkdocs new .
+#   mkdocs serve
+#
+#
+site_name: "sec21"
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.expand
+    - navigation.instant
+    - navigation.instant.preview
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.tabs.link
+    - content.code.annotate
+    - content.code.annotation
+    - content.code.copy
+    - content.footnote.tooltips
+  language: en
+  palette:
+    - scheme: slate
+      #toggle:
+        #icon: material/toggle-switch
+        #name: Switch to light mode
+        # primary: teal
+        # accent: lime
+#    - scheme: default
+#      toggle:
+#        icon: material/toggle-switch-off-outline
+#        name: Switch to dark mode
+#      primary: teal
+#      accent: purple
+
+# extra_css:
+#  - stylesheets/extra.css
+
+nav:
+  - 'Welcome & getting started': index.md
+  - 'Libraries':
+      - 'Type traits': type-traits.md
+      - 'Reflection':
+          - 'Intro': reflection.md
+          - 'SQL database': sql-database-support.md
+          - 'CSV writer': csv-writer.md
+      - 'Units': units.md
+  - 'Reference':
+      - 'all_of / any_of': api/all_of-any_of.md
+      - 'arity': api/arity.md
+      - 'array_qvm_vec_traits': api/array_qvm_vec_traits.md
+      - 'bit_pattern': api/bit_pattern.md
+      - 'blob': api/blob.md
+      - 'concat': api/concat.md
+      - 'contains': api/contains.md
+      - 'expects': api/expects.md
+      - 'fixed_string': api/fixed_string.md
+      - 'for_each_adjacent': api/for_each_adjacent.md
+      - 'for_each_chunk': api/for_each_chunk.md
+      - 'for_each_indexed': api/for_each_indexed.md
+      - 'index_of': api/index_of.md
+      - 'instance_of': api/instance_of.md
+      - 'is_specialized': api/is_specialized.md
+      - 'is_std_string': api/is_std_string.md
+      - 'is_tuple': api/is_tuple.md
+      - 'json_serializer': api/json_serializer.md
+      - 'limited_quantity': api/limited_quantity.md
+      - 'member_pointer_traits': api/member_pointer_traits.md
+      - 'memory': api/memory.md
+      - 'overloaded': api/overloaded.md
+      - 'scope_guard': api/scope_guard.md
+      - 'strong_type': api/strong_type.md
+      - 'split_if': api/split_if.md
+      - 'to_array': api/to_array.md
+      - 'transform': api/transform.md
+      - 'transform_if': api/transform_if.md
+      - 'validate': api/validate.md
+      - 'zip': api/zip.md
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - admonition
+  - pymdownx.arithmatex:
+      generic: true
+  - footnotes
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.mark
+  - attr_list
+
+copyright: |
+  &copy <a href="https://github.com/MichaelMiller-" target="_blank" rel="noopener">Michael Miller</a> &bull; <a href="https://github.com/MichaelMiller-/sec21/blob/master/LICENSE"> License</a>
