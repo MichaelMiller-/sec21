@@ -1,7 +1,9 @@
 #pragma once
 
+#include <array>
 #include <cmath>
 #include <format>
+#include <string_view>
 #include <utility>
 
 namespace sec21
@@ -13,7 +15,7 @@ namespace sec21
 
       friend auto operator<=>(memory const&, memory const&) = default;
 
-      friend auto operator<<(std::ostream& out, memory const& obj) -> auto& { return out << obj.bytes; }
+      friend auto operator<<(std::ostream& out, memory const& obj) -> decltype(auto) { return out << obj.bytes; }
    };
 
    [[nodiscard]] constexpr auto operator+(memory const& lhs, std::byte rhs) noexcept -> memory
@@ -99,16 +101,16 @@ class std::formatter<sec21::memory>
 
    auto format(sec21::memory const& obj, std::format_context& ctx) const
    {
-      constexpr auto units = std::array{"B", "kB", "MB", "GB", "TB", "PB"};
+      static constexpr auto units = std::array<std::string_view, 6>{"B", "kB", "MB", "GB", "TB", "PB"};
       auto value = static_cast<double>(obj.bytes);
       auto unit = units[0];
 
       if (human_readable) {
-         constexpr auto factor = 1000;
+         static constexpr auto factor = 1000;
          //! \todo constexpr auto factorIEC = 1024;
 
          for (decltype(units.size()) i = 0; i < units.size(); ++i) {
-            if (obj.bytes >= std::pow(factor, i)) {
+            if (static_cast<double>(obj.bytes) >= std::pow(factor, i)) {
                value = static_cast<double>(obj.bytes) / std::pow(factor, i);
                unit = units[i];
             }
