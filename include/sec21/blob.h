@@ -25,7 +25,7 @@ namespace sec21
       {
       };
 
-      constexpr blob(parse, std::string const& str)
+      blob(parse, std::string const& str)
       {
          std::istringstream stream{str};
          stream >> *this;
@@ -67,7 +67,7 @@ namespace sec21
          return output;
       }
 
-      friend constexpr auto operator>>(std::istream& input, blob& obj) -> std::istream&
+      friend auto operator>>(std::istream& input, blob& obj) -> std::istream&
       {
          decltype(obj.size()) count{};
          input >> count;
