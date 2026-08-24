@@ -40,11 +40,11 @@ namespace sec21
          return std::apply([&](auto const&... v) { return (v(args...) && ...); }, get());
       }
 
-    private:
+   private:
       constexpr auto get() const noexcept -> std::tuple<Ts...> const& { return *this; }
    };
 
    template <typename... Ts>
-   all_of(Ts &&...) -> all_of<Ts...>;
+   all_of(Ts...) -> all_of<Ts...>;
 
 } // namespace sec21
