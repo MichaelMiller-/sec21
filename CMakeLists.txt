@@ -37,7 +37,7 @@ add_library(sec21 INTERFACE)
 ## Alias
 add_library(sec21::sec21 ALIAS sec21)
 
-target_compile_features(sec21 INTERFACE cxx_std_26)
+target_compile_features(sec21 INTERFACE cxx_std_23)
 
 target_include_directories(sec21 INTERFACE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
