@@ -8,11 +8,22 @@ on:
     branches:
       - master
 
+env:
+  GCC_VERSION: 16
+
 jobs:
   run:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
+
+      - name: Install compiler
+        run: |
+          sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+          sudo apt install gcc-$GCC_VERSION g++-$GCC_VERSION
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-$GCC_VERSION 110 --slave /usr/bin/g++ g++ /usr/bin/g++-$GCC_VERSION --slave /usr/bin/gcov gcov /usr/bin/gcov-GCC_VERSION
+          gcov --version
+          g++ --version
 
       - name: Setup system
         run: |
