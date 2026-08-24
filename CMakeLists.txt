@@ -29,6 +29,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(CTest)
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
+include(CompilerWarnings)
 
 ## Header-only library
 ##
@@ -155,6 +156,13 @@ target_sources(sec21 INTERFACE
             include/sec21/write_csv.h
             include/sec21/zip.h
 )
+
+## Link to this 'library' in order to use the warnings specified in CompilerWarnings.cmake
+##
+include(CompilerWarnings)
+add_library(sec21_enable_compiler_warnings INTERFACE)
+add_library(sec21::enable_compiler_warnings ALIAS sec21_enable_compiler_warnings)
+enable_warnings(sec21_enable_compiler_warnings)
 
 ## Testing
 ##
