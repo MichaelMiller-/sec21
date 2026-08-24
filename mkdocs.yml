@@ -52,6 +52,7 @@ nav:
           - 'SQL database': sql-database-support.md
           - 'CSV writer': csv-writer.md
       - 'Units': units.md
+      - 'Meta programming': meta.md
   - 'Reference':
       - 'all_of / any_of': api/all_of-any_of.md
       - 'arity': api/arity.md

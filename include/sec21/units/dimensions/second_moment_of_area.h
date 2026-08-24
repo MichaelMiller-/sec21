@@ -50,29 +50,32 @@ namespace sec21::units
 
    inline namespace literals
    {
-      constexpr auto operator"" _mm4(unsigned long long v) noexcept
+      constexpr auto operator""_mm4(unsigned long long v) noexcept
       {
          return quantity<millimeters_to_the_fourth_power, unsigned long long>{v};
       }
-      constexpr auto operator"" _mm4(long double v) noexcept
+
+      constexpr auto operator""_mm4(long double v) noexcept
       {
          return quantity<millimeters_to_the_fourth_power, long double>{v};
       }
 
-      constexpr auto operator"" _cm4(unsigned long long v) noexcept
+      constexpr auto operator""_cm4(unsigned long long v) noexcept
       {
          return quantity<centimeters_to_the_fourth_power, unsigned long long>{v};
       }
-      constexpr auto operator"" _cm4(long double v) noexcept
+
+      constexpr auto operator""_cm4(long double v) noexcept
       {
          return quantity<centimeters_to_the_fourth_power, long double>{v};
       }
 
-      constexpr auto operator"" _m4(unsigned long long v) noexcept
+      constexpr auto operator""_m4(unsigned long long v) noexcept
       {
          return quantity<meters_to_the_fourth_power, unsigned long long>{v};
       }
-      constexpr auto operator"" _m4(long double v) noexcept
+
+      constexpr auto operator""_m4(long double v) noexcept
       {
          return quantity<meters_to_the_fourth_power, long double>{v};
       }

@@ -2,7 +2,7 @@
 
 Templates for fundamental properties of types.
 
-| Name                                                  | Description                                                      |
+| Name (alphabetical order)                             | Description                                                      |
 |:------------------------------------------------------|:-----------------------------------------------------------------|
 | [contains](api/contains.md)                           | Template which checks whether an explicit type is in a type list |
 | [index_of](api/index_of.md)                           | Calculates the index of a type in a type list                    |

@@ -1,6 +1,6 @@
 Is a modern, lightweight library for [dimensional analysis](https://en.wikipedia.org/wiki/Dimensional_analysis). 
 Inspired by [Boost](https://www.boost.org)-Units and Boost-MPL. 
-In order to be able to use their full range of functions, only one include is required. 
+In order to be able to use their full range of functions, only one include and no additional dependency is required.
 ```c++
 #include <sec21/units.h>
 ```
@@ -21,7 +21,3 @@ struct pascal : derived_unit<pascal, pressure, base_unit> {};
 struct kilopascal : derived_unit<kilopascal, pressure, std::kilo> {};
 // ...
 ```
-
-### Dependencies
-- [Boost.Mp11](https://www.boost.org/doc/libs/1_74_0/libs/mp11/doc/html/mp11.html)
-- [nlohmann/json](https://github.com/nlohmann/json)

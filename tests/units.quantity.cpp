@@ -98,7 +98,7 @@ TEST_CASE("SI units test", "[sec21][units]")
    STATIC_REQUIRE(1_km + 1_m == 1001_m);
    STATIC_REQUIRE(5_m + 7_m == 12_m);
    STATIC_REQUIRE(10_km / 5_km == 2);
-   STATIC_REQUIRE(10_km / 2 == 5_km);
+   STATIC_REQUIRE(10_km / 2u == 5_km);
    STATIC_REQUIRE(100_mm / 5_cm == 2);
 
    // mass
@@ -107,10 +107,10 @@ TEST_CASE("SI units test", "[sec21][units]")
    STATIC_REQUIRE(1_t == 1000000_g);
 
    // frequency
-   STATIC_REQUIRE(2 / 1_s == 2_Hz);
-   STATIC_REQUIRE(120 / 1_min == 2_Hz);
-   STATIC_REQUIRE(1000 / 1_s == 1_kHz);
-   STATIC_REQUIRE(1 / 1_ms == 1_kHz);
+   STATIC_REQUIRE(2u / 1_s == 2_Hz);
+   STATIC_REQUIRE(120u / 1_min == 2_Hz);
+   STATIC_REQUIRE(1000u / 1_s == 1_kHz);
+   STATIC_REQUIRE(1u / 1_ms == 1_kHz);
    // STATIC_REQUIRE(3.2_GHz == 3'200'000_Hz);
 
    // force
@@ -150,7 +150,7 @@ TEST_CASE("SI units test", "[sec21][units]")
    // velocity
    STATIC_REQUIRE(10_m / 5_s == 2_mps);
    STATIC_REQUIRE(1_km / 1_s == 1000_mps);
-   STATIC_REQUIRE(10 / 5_s * 1_m == 2_mps);
+   STATIC_REQUIRE(10u / 5_s * 1_m == 2_mps);
    // STATIC_REQUIRE(2_kmph * 2_h == 4_km);
    // STATIC_REQUIRE(2_km / 2_kmph == 1_h);
 

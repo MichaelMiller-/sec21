@@ -1,9 +1,10 @@
 {
-  "dependencies": [
-    "catch2",
-    "nlohmann-json",
-    "boost-algorithm",
-    "boost-lexical-cast",
-    "boost-mp11"
-  ]
+  "features": {
+    "testing": {
+      "dependencies": [
+        "catch2"
+      ],
+      "description": "Dependencies for testing"
+    }
+  }
 }
