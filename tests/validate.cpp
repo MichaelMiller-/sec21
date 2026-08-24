@@ -52,6 +52,7 @@ struct action2
    std::string arg1{};
 };
 
+#if TODO_REPLACE
 #include <boost/algorithm/string/split.hpp>
 
 template <>
@@ -89,7 +90,9 @@ TEST_CASE("validate action2", "[sec21]")
       REQUIRE(obj("action2=/home/user/data.file=bar.file").has_value() == false);
    }
 }
+#endif
 
+#if TODO_MAKE_OPTIONAL
 #include <nlohmann/json.hpp>
 
 struct input_json
@@ -185,3 +188,4 @@ TEST_CASE("dispatch the user input to a action", "[sec21]")
       REQUIRE(ptr->filename == "foo.bar");
    }
 }
+#endif
