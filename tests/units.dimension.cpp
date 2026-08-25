@@ -2,7 +2,7 @@
 
 #include <sec21/units/dimension.h>
 
-TEST_CASE("dimension test", "[sec21][units]")
+TEST_CASE("Dimension test", "[sec21][units]")
 {
    using namespace sec21::units;
 
@@ -16,12 +16,12 @@ TEST_CASE("dimension test", "[sec21][units]")
    {
    };
 
-   SECTION("invert exponents")
+   SECTION("Invert exponents")
    {
       STATIC_REQUIRE(std::is_same_v<invert_exponent_t<exponent<d0, 1>>, exponent<d0, -1>>);
       STATIC_REQUIRE(std::is_same_v<invert_exponent_t<exponent<d1, -2>>, exponent<d1, 2>>);
    }
-   SECTION("add exponents")
+   SECTION("Add exponents")
    {
       using e1 = add_exponent_t<exponent<d0, 1>, exponent<d0, 3>>;
       STATIC_REQUIRE(std::is_same_v<e1, exponent<d0, 4>>);
@@ -36,7 +36,7 @@ TEST_CASE("dimension test", "[sec21][units]")
    using dim3 = dimension<exponent<d0, 1>, exponent<d1, 2>, exponent<d2, 3>>;
    using dim4 = dimension<exponent<d0, -1>, exponent<d1, -2>, exponent<d2, 3>>;
 
-   SECTION("multiply dimensions")
+   SECTION("Multiply dimensions")
    {
       using r1 = multiply_dimension_t<dim0, dim1>;
       STATIC_REQUIRE(std::is_same_v<r1, dimension<exponent<d0, 1>>>);
@@ -53,7 +53,12 @@ TEST_CASE("dimension test", "[sec21][units]")
       using r5 = multiply_dimension_t<dim1, dim4>;
       STATIC_REQUIRE(std::is_same_v<r5, dimension<exponent<d1, -2>, exponent<d2, 3>>>);
    }
-   SECTION("invert dimensions")
+   SECTION("Divide dimensions")
+   {
+      using r1 = divide_dimension_t<dim0, dim1>;
+      STATIC_REQUIRE(std::is_same_v<r1, dimension<exponent<d0, -1>>>);
+   }
+   SECTION("Invert dimensions")
    {
       using r1 = invert_dimension_t<dim1>;
       STATIC_REQUIRE(std::is_same_v<r1, dimension<exponent<d0, -1>>>);

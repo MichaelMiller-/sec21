@@ -28,7 +28,8 @@ namespace sec21::units
 
    inline namespace literals
    {
-      constexpr auto operator"" _K(unsigned long long v) noexcept { return quantity<kelvin, unsigned long long>{v}; }
-      constexpr auto operator"" _K(long double v) noexcept { return quantity<kelvin, long double>{v}; }
+      constexpr auto operator""_K(unsigned long long v) noexcept { return quantity<kelvin, unsigned long long>{v}; }
+
+      constexpr auto operator""_K(long double v) noexcept { return quantity<kelvin, long double>{v}; }
    } // namespace literals
 } // namespace sec21::units

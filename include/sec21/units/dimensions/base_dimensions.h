@@ -5,7 +5,7 @@
 
 namespace sec21::units
 {
-   // Basiseinheiten im SI-system
+   // SI base untis
    // 
    //! \todo: using base_dimension_length = base_dimension<"length"> {}; -> need some static/compiletime text
    struct base_dimension_length : base_dimension<0> {};

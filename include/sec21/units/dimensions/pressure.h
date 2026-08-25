@@ -108,51 +108,52 @@ namespace sec21::units
 
    inline namespace literals
    {
-      constexpr auto operator"" _Pa(unsigned long long v) noexcept { return quantity<pascal, unsigned long long>{v}; }
-      constexpr auto operator"" _Pa(long double v) noexcept { return quantity<pascal, long double>{v}; }
+      constexpr auto operator""_Pa(unsigned long long v) noexcept { return quantity<pascal, unsigned long long>{v}; }
 
-      constexpr auto operator"" _kPa(unsigned long long v) noexcept
+      constexpr auto operator""_Pa(long double v) noexcept { return quantity<pascal, long double>{v}; }
+
+      constexpr auto operator""_kPa(unsigned long long v) noexcept
       {
          return quantity<kilopascal, unsigned long long>{v};
       }
-      constexpr auto operator"" _kPa(long double v) noexcept { return quantity<kilopascal, long double>{v}; }
+      constexpr auto operator""_kPa(long double v) noexcept { return quantity<kilopascal, long double>{v}; }
 
-      constexpr auto operator"" _MPa(unsigned long long v) noexcept
+      constexpr auto operator""_MPa(unsigned long long v) noexcept
       {
          return quantity<megapascal, unsigned long long>{v};
       }
-      constexpr auto operator"" _MPa(long double v) noexcept { return quantity<megapascal, long double>{v}; }
+      constexpr auto operator""_MPa(long double v) noexcept { return quantity<megapascal, long double>{v}; }
 
-      constexpr auto operator"" _GPa(unsigned long long v) noexcept
+      constexpr auto operator""_GPa(unsigned long long v) noexcept
       {
          return quantity<gigapascal, unsigned long long>{v};
       }
-      constexpr auto operator"" _GPa(long double v) noexcept { return quantity<gigapascal, long double>{v}; }
+      constexpr auto operator""_GPa(long double v) noexcept { return quantity<gigapascal, long double>{v}; }
 
       // stress
-      constexpr auto operator"" _N_per_sqm(unsigned long long v) noexcept
+      constexpr auto operator""_N_per_sqm(unsigned long long v) noexcept
       {
          return quantity<newton_per_square_meter, unsigned long long>{v};
       }
-      constexpr auto operator"" _N_per_sqm(long double v) noexcept
+      constexpr auto operator""_N_per_sqm(long double v) noexcept
       {
          return quantity<newton_per_square_meter, long double>{v};
       }
 
-      constexpr auto operator"" _N_per_sqmm(unsigned long long v) noexcept
+      constexpr auto operator""_N_per_sqmm(unsigned long long v) noexcept
       {
          return quantity<newton_per_square_millimeter, unsigned long long>{v};
       }
-      constexpr auto operator"" _N_per_sqmm(long double v) noexcept
+      constexpr auto operator""_N_per_sqmm(long double v) noexcept
       {
          return quantity<newton_per_square_millimeter, long double>{v};
       }
 
-      constexpr auto operator"" _kN_per_sqm(unsigned long long v) noexcept
+      constexpr auto operator""_kN_per_sqm(unsigned long long v) noexcept
       {
          return quantity<kilonewton_per_square_meter, unsigned long long>{v};
       }
-      constexpr auto operator"" _kN_per_sqm(long double v) noexcept
+      constexpr auto operator""_kN_per_sqm(long double v) noexcept
       {
          return quantity<kilonewton_per_square_meter, long double>{v};
       }

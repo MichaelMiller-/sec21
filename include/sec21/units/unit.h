@@ -2,8 +2,6 @@
 
 #include <ratio>
 
-#include <sec21/units/unit_casting.h>
-
 namespace sec21::units
 {
    // a specific physical dimension
@@ -14,7 +12,7 @@ namespace sec21::units
       using ratio_t = Ratio;
    };
 
-   template <typename BaseUnit, typename To>
+   template <typename BaseUnit, typename>
    struct cast_helper : BaseUnit
    {
       using typename BaseUnit::dimension_t;

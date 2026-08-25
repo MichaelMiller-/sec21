@@ -1,12 +1,8 @@
 find_package(Catch2 CONFIG REQUIRED)
-find_package(nlohmann_json CONFIG REQUIRED)
-
-include(CompilerWarnings)
 
 function(test filename)
     set(target_name test.${filename})
     add_executable(${target_name})
-    set_project_warnings(${target_name})
 
     target_sources(${target_name} PRIVATE ${filename}.cpp)
 
@@ -17,7 +13,7 @@ endif ()
 
     target_link_libraries(${target_name} PRIVATE Catch2::Catch2 Catch2::Catch2WithMain)
     target_link_libraries(${target_name} PRIVATE sec21::sec21)
-    target_link_libraries(${target_name} PRIVATE nlohmann_json nlohmann_json::nlohmann_json)
+    target_link_libraries(${target_name} PRIVATE sec21::enable_compiler_warnings)
 
     add_test(NAME ${target_name} COMMAND $<TARGET_FILE:${target_name}>)
 endfunction()
@@ -40,6 +36,14 @@ test("for_each_chunk")
 test("for_each_indexed")
 test("limited_quantity")
 test("memory")
+test("meta.contains")
+test("meta.difference")
+test("meta.intersection")
+test("meta.merge")
+test("meta.push_front")
+test("meta.remove_if")
+test("meta.sort")
+test("meta.zip_transform")
 test("literals.memory")
 test("reflection.get_column")
 test("scope_guard")
