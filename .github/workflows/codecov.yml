@@ -57,8 +57,12 @@ jobs:
         run: ctest --build-config Debug
 
       - name: Analyze the coverage data files
-        working-directory: ${{runner.workspace}}/build
-        run: gcovr --xml coverage-service.xml
+        working-directory: ${{ runner.workspace }}/build
+        run: |
+          gcovr \
+            --root "$GITHUB_WORKSPACE" \
+            --object-directory "${{ runner.workspace }}/build" \
+            --xml coverage-service.xml
 
       - name: Upload coverage reports to Codecov
         working-directory: ${{runner.workspace}}/build
