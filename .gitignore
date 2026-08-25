@@ -1,3 +1,4 @@
 _backup/
 _build/
 /docs/DeploymentServer.md
+/make_and_deploy.sh.in

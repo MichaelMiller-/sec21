@@ -1,137 +1,69 @@
 # sec21
-[![GCC](https://github.com/MichaelMiller-/sec21/actions/workflows/gcc.yml/badge.svg)](https://github.com/MichaelMiller-/sec21/actions/workflows/gcc.yml) [![Clang](https://github.com/MichaelMiller-/sec21/actions/workflows/clang.yml/badge.svg)](https://github.com/MichaelMiller-/sec21/actions/workflows/clang.yml) [![MSVC](https://github.com/MichaelMiller-/sec21/actions/workflows/msvc.yml/badge.svg)](https://github.com/MichaelMiller-/sec21/actions/workflows/msvc.yml)
 
-**sec21** is a collection of useful functions and classes.
-- [Units](#Units)
-- [Eventsystem](#Eventsystem)
-- [SQL Database Wrapper](include/sec21/database/README.md)
-- [strong_type](#strong_type)
+[![GCC](https://github.com/MichaelMiller-/sec21/actions/workflows/gcc.yml/badge.svg)](https://github.com/MichaelMiller-/sec21/actions/workflows/gcc.yml) [![Clang](https://github.com/MichaelMiller-/sec21/actions/workflows/clang.yml/badge.svg)](https://github.com/MichaelMiller-/sec21/actions/workflows/clang.yml) [![MSVC](https://github.com/MichaelMiller-/sec21/actions/workflows/msvc.yml/badge.svg)](https://github.com/MichaelMiller-/sec21/actions/workflows/msvc.yml) [![AppVeyor MSVC2019](https://ci.appveyor.com/api/projects/status/4s6bg4yexj0cna45?svg=true)](https://ci.appveyor.com/project/MichaelMiller-/sec21)
+
+[![codecov](https://codecov.io/gh/MichaelMiller-/sec21/branch/master/graph/badge.svg?token=f7vlTsHZWl)](https://codecov.io/gh/MichaelMiller-/sec21) [![CodeQL](https://github.com/MichaelMiller-/sec21/actions/workflows/codeql.yml/badge.svg)](https://github.com/MichaelMiller-/sec21/actions/workflows/codeql.yml)
+
+**sec21** is a collection of useful functions and classes and also the boilerplate for a lot of my projects.
+
+## Documentation
+See the [full documentation](https://michaelmiller-.github.io/sec21/) for examples, operational details and other information.
 
 
-Examples 
-- [Viewer](viewer/README.md)
+## Usage
 
----------------------------------------
-## Units
-Is a modern, lightweight library for [dimensional analysis](https://en.wikipedia.org/wiki/Dimensional_analysis). 
-Inspired by [Boost](https://www.boost.org)-Units and Boost-MPL. 
-In order to be able to use their full range of functions, only one include is required. 
-```
-#include <sec21/units.h>
-```
-
-The library is also very easy to expand. If a dimension is missing, it can be created very easily and made known to the system.
-The following is an example of [pressure](https://en.wikipedia.org/wiki/Pressure), the dimension of which is equal to **M L^-1 T^-2**. 
-```c++
-using pressure = dimension<
-   exponent<base_dimension_mass, 1>, 
-   exponent<base_dimension_length, -1>,
-   exponent<base_dimension_time, -2>>;
-```
-The basic dimensions represent freely chosen compiletime constants. 
-The procedure is similarly simple for new units. These just have to be defined and derived from [derived_unit](https://github.com/MichaelMiller-/sec21/blob/master/include/sec21/units/unit.h).
-
-```c++
-struct pascal : derived_unit<pascal, pressure, base_unit> {};
-struct kilopascal : derived_unit<kilopascal, pressure, std::kilo> {};
-// ...
+### Build from source
+Building with CMake is pretty easy, just invoke the following shell commands:
+```sh
+git clone https://github.com/MichaelMiller-/sec21
+cd sec21
+mkdir _build && cd _build/
+cmake ..
+sudo make install
 ```
 
-### Dependencies
-- [Boost.Mp11](https://www.boost.org/doc/libs/1_74_0/libs/mp11/doc/html/mp11.html)
-- [nlohmann/json](https://github.com/nlohmann/json)
-
-
----------------------------------------
-## Eventsystem
-
-The [input_manager](https://github.com/MichaelMiller-/sec21/blob/master/include/sec21/event/input_manager.h) represents an abstraction layer to system events that are triggered by the hardware (keyboard, mouse, ...). This abstraction allows input events to be simulated using simple input data (JSON files). Making the eventsystem and other systems built on it such as a commmand-queue filled by hardware events very easy to test.
-
-It allows various custom backends. The only limitation is that the backend defines a method poll_event().
-This must return a `std::tuple<bool, event_t>` and can take a variable number of parameters. These parameters are passed from the `input_manager` to the backend.
-
-```c++
-struct possible_backend
-{
-   std::tuple<bool, event_t> poll_event();
-};
-
+### Usage in CMake projects
+If you have installed **sec21** system-wide you can use the CMake-package-system.
+```cmake
+find_package(sec21 CONFIG REQUIRED)
+## ...
+target_link_libraries(target_name PRIVATE sec21::sec21)
 ```
-The backend should also be able to convert the events provided by the eventsystem into the appropriate backend format. Two sample backends are already implemented: 
-- [SDL2](https://www.libsdl.org/)
-- [SFML](https://www.sfml-dev.org/)
-
-### Dependencies
-- [nlohmann/json](https://github.com/nlohmann/json)
 
 
----------------------------------------
-## strong_type
-The static typing of the programming language C ++ allows you to design types that exactly meet the specified requirements. Due to the [policy-based design](https://en.wikipedia.org/wiki/Modern_C%2B%2B_Design#Policy-based_design) of 'strong_type' it is very easy to design new types. For example, a counter-like type should be designed which can only be incremented. Trying to decrement an object of this type will result in a compiler error. 
-```c++
-using counter_t = strong_type<int, struct counter_tag, policy::increment>;
+## Get
+There a are several methods to get the library.
 
-counter_t cnt{ 42 };
-++cnt;          // counter_t.value == 43
-// --cnt;       // is not possible
+### Use CPM
+One of them is the setup-free CMake [CPM](https://github.com/cpm-cmake/CPM.cmake) dependency manager:
+```cmake
+CPMAddPackage("gh:MichaelMiller-/sec21@1.0.1")
+## ...
+target_link_libraries(target_name PRIVATE sec21::sec21)
 ```
-Due to the specific type, interfaces can be developed much more safely and clearly.
-The following example illustrates this well. The interface uses POD data types as function arguments.
-When the function is called, the order of the arguments cannot be guaranteed and errors can occur during execution. 
-```c++
-void set_window_dimension(int width, int height);
-// ...
-int input_width{ 800 };
-int input_height{ 800 };
 
-// interface call
-void set_window_dimension(input_width, input_height);
-// work's as well
-void set_window_dimension(input_height, input_width);
+### Use Vcpkg
+You also can download and install **sec21** using the [vcpkg](https://github.com/Microsoft/vcpkg) dependency manager:
+```sh
+$ vcpkg install michaelmiller-sec21
 ```
-A strong_type function argument, however, forces the caller side to explicitly specify the type. Among other things, this also improves the readability of the code. 
-```c++
-using width_t = strong_type<int, struct width_tag>;
-using height_t = strong_type<int, struct height_tag>;
 
-void set_window_dimension(width_t{ 800 }, height_t{ 600 });
+### Using FetchContent
+Alternatively, the project can also be used only in a private context. Simply add the following to your CMakeLists.txt:
+```cmake
+include(FetchContent)
+FetchContent_Declare(sec21
+        GIT_REPOSITORY https://github.com/MichaelMiller-/sec21
+        # GIT_TAG ... # optional tag
+        )
+FetchContent_MakeAvailable(sec21)
+## If BUILD_TESTING for sec21 is enabled make sure that Catch2 is available.
+## find_package(Catch2 CONFIG REQUIRED)
+set_target_properties(sec21 PROPERTIES BUILD_TESTING FALSE)
+
+## Link against sec21::sec21
+target_link_libraries(main PRIVATE sec21::sec21)
 ```
-Furthermore, the behavior and the interface of the strong_type can be extended and tested very easily. The following example shows a type that represents an alphabet. Incrementing above the last letter can throw an error or provide a new value with an index. 
 
-```c++
-template <typename T>
-// A(0) ... Z(0) ... A1 ... Z1 ... A2 ... Z2 ... 
-struct increment_alphabet
-{
-   T& operator ++ () noexcept
-   {
-      using type_t = typename T::underlying_t;
-      static_assert(std::is_same_v<type_t, std::string>);
-
-      // get reference to the underlaying type
-      auto& result = static_cast<type_t&>(static_cast<T&>(*this));
-
-      // modify value
-      if (result[0] == 'Z') {
-         const auto tmp = type_t{ next(begin(result)), end(result) };
-         unsigned long long number{0};
-         std::from_chars(tmp.data(), tmp.data() + tmp.size(), number);
-         result = fmt::format("A{}", ++number);
-      }
-      else
-         ++result[0];
-
-      return static_cast<T&>(*this);
-   }
-};
-
-using alhpabet_t = strong_type<
-   std::string, 
-   struct alhpabet_tag, 
-   increment_alphabet, 
-   policy::compare>;
-
-alhpabet_t obj{ "Z" };
-++obj;
-REQUIRE(obj == "A1");
-```
+## License
+Please see LICENSE.

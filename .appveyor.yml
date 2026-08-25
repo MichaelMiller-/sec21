@@ -1,5 +1,5 @@
 image:
-  - Visual Studio 2019
+  - Visual Studio 2022
 
 clone_folder: c:\projects\source
 
@@ -10,31 +10,15 @@ install:
   - git pull
   - .\bootstrap-vcpkg.bat
   - cd %APPVEYOR_BUILD_FOLDER%
-  - vcpkg install boost-mp11:x64-windows
-  - vcpkg install boost-math:x64-windows
-  - vcpkg install boost-qvm:x64-windows
-  - vcpkg install boost-outcome:x64-windows
-  - vcpkg install boost-ublas:x64-windows
-  - vcpkg install boost-program-options:x64-windows
-  - vcpkg install catch2:x64-windows
-  - vcpkg install glm:x64-windows
-  - vcpkg install nlohmann-json:x64-windows
-  - vcpkg install spdlog:x64-windows
-  - vcpkg install sdl2:x64-windows
-  - vcpkg install sdl2-image:x64-windows
-  - vcpkg install glew:x64-windows
-  - vcpkg install imgui:x64-windows
-  - vcpkg install entt:x64-windows
-  - vcpkg install assimp:x64-windows
-  - vcpkg install freetype:x64-windows
   - cd c:\tools\vcpkg
   - vcpkg integrate install
 
 build_script:
   - mkdir c:\projects\source\_build
   - cd c:\projects\source\_build
-  - cmake -G "Visual Studio 16" -A x64 -DENABLE_VIEWER:BOOL=FALSE -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake ..
+  - cmake -A x64 -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake ..
   - cmake --build . 
 
 test_script:
-  - cmd: ctest
+  - ctest -C Debug
+  - ctest -C Debug --rerun-failed --output-on-failure

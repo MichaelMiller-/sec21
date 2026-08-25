@@ -20,10 +20,7 @@ namespace sec21
 #endif      
          : value{ t }
       {}
-      constexpr explicit strong_type(T&& t)
-#ifdef __cpp_lib_is_nothrow_convertible
-      noexcept(std::is_nothrow_move_constructible<T>::value)
-#endif      
+      constexpr explicit strong_type(T&& t) noexcept
          : value{ std::move(t) }
       {}
 
@@ -65,5 +62,16 @@ namespace sec21
    } // namespace detail
 
    template <typename T>
-   using underlying_type = decltype(detail::underlying_type(std::declval<std::decay_t<T>>()));
+#ifdef __cpp_concepts
+   requires StrongType<T>
+#endif
+   using underlying_t = decltype(detail::underlying_type(std::declval<std::decay_t<T>>()));
+
+   // compile-time checks
+   static_assert(is_strong_type_v<int> == false);
+   static_assert(is_strong_type_v<std::string> == false);
+   static_assert(is_strong_type_v<strong_type<int, struct tag>> == true);
+   static_assert(std::is_same_v<underlying_t<strong_type<int, struct tag>>, int> == true);
+   static_assert(std::is_same_v<underlying_t<strong_type<float, struct tag>>, float> == true);
+   static_assert(std::is_same_v<underlying_t<strong_type<int, struct tag>>, float> == false);
 }

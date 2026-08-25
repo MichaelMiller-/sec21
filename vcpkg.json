@@ -1,0 +1,10 @@
+{
+  "features": {
+    "testing": {
+      "dependencies": [
+        "catch2"
+      ],
+      "description": "Dependencies for testing"
+    }
+  }
+}

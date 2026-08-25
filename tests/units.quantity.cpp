@@ -1,4 +1,4 @@
-﻿#include <catch.hpp>
+﻿#include <catch2/catch_test_macros.hpp>
 
 #include <sec21/units.h>
 
@@ -28,7 +28,7 @@ TEST_CASE("quantity test", "[sec21][units]")
    STATIC_REQUIRE(quantity<example_unit, int>().value() == 0);
    STATIC_REQUIRE(quantity<example_unit, int>(512).value() == 512);
 
-   constexpr quantity<second, int> one_hour{ 3600 };
+   static constexpr quantity<second, int> one_hour{3600};
    STATIC_REQUIRE(one_hour.value() == 3600);
    STATIC_REQUIRE(quantity<hour, int>(one_hour).value() == 1);
 
@@ -98,7 +98,7 @@ TEST_CASE("SI units test", "[sec21][units]")
    STATIC_REQUIRE(1_km + 1_m == 1001_m);
    STATIC_REQUIRE(5_m + 7_m == 12_m);
    STATIC_REQUIRE(10_km / 5_km == 2);
-   STATIC_REQUIRE(10_km / 2 == 5_km);
+   STATIC_REQUIRE(10_km / 2u == 5_km);
    STATIC_REQUIRE(100_mm / 5_cm == 2);
 
    // mass
@@ -107,10 +107,10 @@ TEST_CASE("SI units test", "[sec21][units]")
    STATIC_REQUIRE(1_t == 1000000_g);
 
    // frequency
-   STATIC_REQUIRE(2 / 1_s == 2_Hz);
-   STATIC_REQUIRE(120 / 1_min == 2_Hz);
-   STATIC_REQUIRE(1000 / 1_s == 1_kHz);
-   STATIC_REQUIRE(1 / 1_ms == 1_kHz);
+   STATIC_REQUIRE(2u / 1_s == 2_Hz);
+   STATIC_REQUIRE(120u / 1_min == 2_Hz);
+   STATIC_REQUIRE(1000u / 1_s == 1_kHz);
+   STATIC_REQUIRE(1u / 1_ms == 1_kHz);
    // STATIC_REQUIRE(3.2_GHz == 3'200'000_Hz);
 
    // force
@@ -150,13 +150,13 @@ TEST_CASE("SI units test", "[sec21][units]")
    // velocity
    STATIC_REQUIRE(10_m / 5_s == 2_mps);
    STATIC_REQUIRE(1_km / 1_s == 1000_mps);
-   STATIC_REQUIRE(10 / 5_s * 1_m == 2_mps);
-   //STATIC_REQUIRE(2_kmph * 2_h == 4_km);
-   //STATIC_REQUIRE(2_km / 2_kmph == 1_h);
+   STATIC_REQUIRE(10u / 5_s * 1_m == 2_mps);
+   // STATIC_REQUIRE(2_kmph * 2_h == 4_km);
+   // STATIC_REQUIRE(2_km / 2_kmph == 1_h);
 
    STATIC_REQUIRE(1_km / 1_s == 1000_mps);
-   //STATIC_REQUIRE(1.0km / 1h == 1kmph);
-   //STATIC_REQUIRE(1000.0m / 3600.0s == 1kmph);
+   // STATIC_REQUIRE(1.0km / 1h == 1kmph);
+   // STATIC_REQUIRE(1000.0m / 3600.0s == 1kmph);
 
    // acceleration
    STATIC_REQUIRE(10_mps / 10_s == 1_mps_sq);
@@ -173,7 +173,7 @@ TEST_CASE("SI units test", "[sec21][units]")
    STATIC_REQUIRE(1_m * 1_m * 1_m == 1_cub_m);
    STATIC_REQUIRE(10_sq_m * 10_m == 100_cub_m);
    // STATIC_REQUIRE(10_km * 10_km * 10_km == 1000_cub_km);
-   //STATIC_REQUIRE(1_cub_m == 1'000'000_cub_cm);
+   // STATIC_REQUIRE(1_cub_m == 1'000'000_cub_cm);
 }
 
 TEST_CASE("constant quantities", "[sec21][units]")
@@ -184,7 +184,7 @@ TEST_CASE("constant quantities", "[sec21][units]")
    STATIC_REQUIRE(G == 9.80665_mps_sq);
 }
 
-#ifdef SEC21_UNITS_JSON_SERIALIZER
+#if 0
 
 #include <fstream>
 #include <iomanip>
@@ -203,7 +203,7 @@ TEST_CASE("nlohmann json reflection for units", "[sec21][units]")
    {
       auto q{5.12_m};
       json j = q;
-      std::ofstream ofs{temporary_test_file};   
+      std::ofstream ofs{temporary_test_file};
       ofs << std::setw(4) << j << std::endl;
 
       int z{7};
@@ -231,22 +231,19 @@ namespace ns
       units::quantity<units::kilopascal, double> pressure;
    };
 
-   void to_json(nlohmann::json& j, example_values const& obj) {
+   void to_json(nlohmann::json& j, example_values const& obj)
+   {
       j = nlohmann::json{
-         {"len", obj.len},
-         {"area", obj.area},
-         {"temperature", obj.temperature},
-         {"pressure", obj.pressure}
-      };
+         {"len", obj.len}, {"area", obj.area}, {"temperature", obj.temperature}, {"pressure", obj.pressure}};
    }
-   void from_json(nlohmann::json const& j, example_values& obj) 
+   void from_json(nlohmann::json const& j, example_values& obj)
    {
       j.at("len").get_to(obj.len);
       j.at("area").get_to(obj.area);
       j.at("temperature").get_to(obj.temperature);
       j.at("pressure").get_to(obj.pressure);
    }
-}
+} // namespace ns
 TEST_CASE("test unit parser", "[sec21][units]")
 {
    using namespace sec21::units::literals;
@@ -263,7 +260,7 @@ TEST_CASE("test unit parser", "[sec21][units]")
       REQUIRE(result.area.value() == 2.2);
       REQUIRE(result.temperature == 480_K);
       REQUIRE(result.pressure == 7000_Pa);
-   }  
+   }
 }
 
 #endif

@@ -15,23 +15,35 @@ namespace sec21::units
    class quantity;
 
    // type traits
-   template <typename T>
-   struct is_exponent : std::false_type {};
+   template <typename>
+   struct is_exponent : std::false_type
+   {
+   };
 
    template <typename BaseDimension, auto Num, auto Denom>
-   struct is_exponent<exponent<BaseDimension, Num, Denom>> : std::true_type {};
+   struct is_exponent<exponent<BaseDimension, Num, Denom>> : std::true_type
+   {
+   };
 
-   template <typename T>
-   struct is_quantity : std::false_type {};
+   template <typename>
+   struct is_quantity : std::false_type
+   {
+   };
 
    template <typename Unit, typename T>
-   struct is_quantity<quantity<Unit, T>> : std::true_type {};
+   struct is_quantity<quantity<Unit, T>> : std::true_type
+   {
+   };
 
-   template <typename T>
-   struct is_dimension : std::false_type {};
+   template <typename>
+   struct is_dimension : std::false_type
+   {
+   };
 
    template <typename... Exponents>
-   struct is_dimension<dimension<Exponents...>> : std::true_type {};
+   struct is_dimension<dimension<Exponents...>> : std::true_type
+   {
+   };
 
    template <typename T> // Quantity
    using to_dimension_t = dimension<typename T::dimension_t>;
@@ -41,7 +53,7 @@ namespace sec21::units
 
 #ifdef __cpp_concepts
    template <typename T>
-   concept Scalar = std::is_scalar<T>::value;
+   concept Scalar = std::is_scalar_v<T>;
 
    template <typename T>
    concept Exponent = is_exponent<T>::value;
@@ -53,6 +65,6 @@ namespace sec21::units
    concept Quantity = is_quantity<T>::value;
 
    template <typename T, typename U>
-   concept SameDimension = std::is_same<dimension<typename T::dimension_t>, dimension<typename U::dimension_t>>::value;
-#endif   
-}
+   concept SameDimension = std::is_same_v<dimension<typename T::dimension_t>, dimension<typename U::dimension_t>>;
+#endif
+} // namespace sec21::units

@@ -2,61 +2,40 @@ name: MSVC
 
 on:
   push:
-    branches:
-      - master
+    branches: [ master ]
   pull_request:
-    branches:
-      - master
-
-env:
-  CTEST_OUTPUT_ON_FAILURE: 1
+    branches: [ master ]
 
 jobs:
-
-  VS2019:
-    runs-on: windows-2019
+  build-and-test:
+    runs-on: windows-latest
 
     strategy:
       matrix:
-        config: [Debug, Release]
+        config: [ Debug, Release ]
 
     steps:
     - uses: actions/checkout@v2
 
     - name: Install Dependencies
+      working-directory: ${{runner.workspace}}
       run: |
         git clone https://github.com/Microsoft/vcpkg.git 
         cd vcpkg
         bootstrap-vcpkg.bat
-        vcpkg install boost
-        vcpkg install boost-core
-        vcpkg install boost-function-types 
-        vcpkg install boost-geometry
-        vcpkg install boost-hana
-        vcpkg install boost-math
-        vcpkg install boost-outcome
-        vcpkg install boost-program-options
-        vcpkg install boost-qvm
-        vcpkg install boost-range
-        vcpkg install boost-ublas
-        vcpkg install catch2
-        vcpkg install glm
-        vcpkg install nlohmann-json
-        vcpkg install spdlog
-        vcpkg install eigen3
 
     - name: Create Build Environment
-      run: cmake -E make_directory build
+      run: cmake -E make_directory ${{runner.workspace}}/build
 
     - name: Configure CMake
       shell: bash
-      working-directory: build
-      run: cmake -DCMAKE_BUILD_TYPE=${{matrix.config}} -DCMAKE_TOOLCHAIN_FILE="..\vcpkg\scripts\buildsystems\vcpkg.cmake" ..
+      working-directory: ${{runner.workspace}}/build
+      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{matrix.config}} -DCMAKE_TOOLCHAIN_FILE=D:/a/sec21/vcpkg/scripts/buildsystems/vcpkg.cmake
 
     - name: Build
-      working-directory: build
-      run: cmake --config ${{matrix.config}} -j4
+      working-directory: ${{runner.workspace}}/build
+      run: cmake --build . --config ${{matrix.config}}
 
     - name: Test
-      working-directory: build
+      working-directory: ${{runner.workspace}}/build
       run: ctest --build-config ${{matrix.config}}

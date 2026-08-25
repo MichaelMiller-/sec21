@@ -6,24 +6,26 @@ on:
   pull_request:
     branches: [ master ]
 
-  workflow_dispatch:
-
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        config: [Debug, Release]
+        version: [ 20, 21, 22 ]
+        config: [ Debug, Release ]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@master
 
-      - name: Install Compiler
+      - name: Install compiler
         run: |
-          sudo apt install clang
-          sudo pip install gcovr
-          
+          sudo apt-get update 
+          wget https://apt.llvm.org/llvm.sh
+          chmod u+x llvm.sh
+          sudo ./llvm.sh ${{matrix.version}}
+          clang --version
+
       - name: Install Dependencies
         shell: bash
         working-directory: ${{runner.workspace}}
@@ -31,23 +33,6 @@ jobs:
           git clone https://github.com/Microsoft/vcpkg.git 
           cd vcpkg
           ./bootstrap-vcpkg.sh
-          ./vcpkg install boost-core
-          ./vcpkg install boost-function-types 
-          ./vcpkg install boost-geometry
-          ./vcpkg install boost-hana
-          ./vcpkg install boost-math
-          ./vcpkg install boost-outcome
-          ./vcpkg install boost-program-options
-          ./vcpkg install boost-qvm
-          ./vcpkg install boost-range
-          ./vcpkg install boost-ublas
-          ./vcpkg install boost-mp11
-          ./vcpkg install catch2
-          ./vcpkg install glm
-          ./vcpkg install nlohmann-json
-          ./vcpkg install spdlog
-          ./vcpkg install eigen3
-          ./vcpkg install cpprestsdk
 
       - name: Create Build Environment
         run: cmake -E make_directory ${{runner.workspace}}/build
@@ -56,9 +41,13 @@ jobs:
         shell: bash
         working-directory: ${{runner.workspace}}/build
         run: |
-          export CC=`which clang`
-          export CXX=`which clang++`
-          cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{matrix.config}} -DCMAKE_TOOLCHAIN_FILE=${{runner.workspace}}/vcpkg/scripts/buildsystems/vcpkg.cmake
+          export CC=`which clang-${{matrix.version}}`
+          export CXX=`which clang-${{matrix.version}}`
+          cmake \
+            $GITHUB_WORKSPACE \
+            -DCMAKE_BUILD_TYPE=${{matrix.config}} \
+            -DCMAKE_CXX_COMPILER=clang++ \
+            -DCMAKE_TOOLCHAIN_FILE=${{runner.workspace}}/vcpkg/scripts/buildsystems/vcpkg.cmake
 
       - name: Build
         working-directory: ${{runner.workspace}}/build
@@ -68,4 +57,4 @@ jobs:
       - name: Test
         working-directory: ${{runner.workspace}}/build
         shell: bash
-        run: ctest --build-config ${{matrix.config}} --rerun-failed --output-on-failure
+        run: ctest --build-config ${{matrix.config}}

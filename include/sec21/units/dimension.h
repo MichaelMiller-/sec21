@@ -1,6 +1,11 @@
 ﻿#pragma once
 
-#include <boost/mp11.hpp>
+#include <sec21/meta/difference.h>
+#include <sec21/meta/intersection.h>
+#include <sec21/meta/merge.h>
+#include <sec21/meta/remove_if.h>
+#include <sec21/meta/sort.h>
+#include <sec21/meta/zip_transform.h>
 
 namespace sec21::units
 {
@@ -13,134 +18,107 @@ namespace sec21::units
       static constexpr auto symbol = Symbol;
    };
 
+   // clang-format off
    template <typename D1, typename D2>
-   struct base_dimension_less : std::bool_constant<D1::name < D2::name> {};
-
-   template <typename D1, typename D2>
-   inline constexpr bool base_dimension_less_v = base_dimension_less<D1, D2>::value;
-
-
-   template <typename Base>
-   struct upcast_base {
-      using base_t = Base;
+   struct base_dimension_less : std::bool_constant<D1::name < D2::name>
+   {
    };
+   // clang-format on
 
-   // a typelist-type that stores an ordered list of exponents of one or more base_dimension
-   template <typename... Exponents>
-   struct dimension : upcast_base<dimension<Exponents...>> {};
-
+   // a type-list that stores an ordered list of exponents of one or more base_dimension
+   template <typename...>
+   struct dimension
+   {
+   };
 
    // ! \todo possible solution: P0732 class types in non-type template parameter
 
-
    // a base dimension and it's exponent in a derived dimension
-   template <typename BaseDimension, auto Num, auto Denom = 1>
+   template <typename BaseDimension, auto Numerator, auto Denominator = 1>
    struct exponent
    {
-      //! \todo remove dimension_t
-      using dimension_t = BaseDimension;
-      using tag_t = BaseDimension;
+      using base_t = BaseDimension;
 
-      static constexpr auto num = Num;
-      static constexpr auto den = Denom;
+      static constexpr auto numerator_v = Numerator;
+      static constexpr auto denominator_v = Denominator;
+   };
+
+   template <typename Lhs, typename Rhs>
+   struct exponent_less : base_dimension_less<typename Lhs::base_t, typename Rhs::base_t>
+   {
+   };
+
+   template <typename Lhs, typename Rhs>
+   struct exponent_same_base : std::is_same<typename Lhs::base_t, typename Rhs::base_t>
+   {
+   };
+
+   template <typename T, typename... Ts>
+   struct exponent_contains_same_base : std::disjunction<exponent_same_base<T, Ts>...>
+   {
    };
 
    template <typename E>
-   struct is_numerator_null : std::bool_constant<E::num == 0> {};
-
-
-   template <typename E1, typename E2>
-   using same_dimension = std::is_same<dimension<typename E1::dimension_t>, dimension<typename E2::dimension_t>>;
-
-   template <typename E1, typename E2>
-   inline constexpr bool same_dimension_v = same_dimension<E1, E2>::value;
-
-
-   template <typename E1, typename E2>
-   struct dimension_less : base_dimension_less<typename E1::dimension_t, typename E2::dimension_t> {};
-
-   namespace detail
+   struct is_numerator_null : std::bool_constant<E::numerator_v == 0>
    {
-      template<typename E1, typename E2>
-      struct add_exponent_impl
-      {
-         static_assert(std::is_same_v<typename E1::dimension_t, typename E2::dimension_t>, "why");
-         using type = exponent<typename E1::dimension_t, E1::num + E2::num>;
-      };
+   };
 
-   }
+   template <typename E1, typename E2>
+   struct dimension_less : base_dimension_less<typename E1::base_t, typename E2::base_t>
+   {
+   };
 
-   template<typename E1, typename E2>
-   // requires std::is_same_v<typename E1::dimension_t, typename E2::dimension_t>
-   using add_exponent_t = typename detail::add_exponent_impl<E1, E2>::type;
-
+   template <typename E1, typename E2>
+      requires std::is_same_v<typename E1::base_t, typename E2::base_t>
+   using add_exponent_t = exponent<typename E1::base_t, E1::numerator_v + E2::numerator_v>;
 
    template <typename T>
-   using invert_exponent_t = exponent<typename T::dimension_t, -T::num, T::den>;
+   using invert_exponent_t = exponent<typename T::base_t, -T::numerator_v, T::denominator_v>;
 
-
-   namespace detail
+   template <typename Lhs, typename Rhs>
+   struct multiply_dimension
    {
-      template <typename U>
-      struct quoted_same_dimension
-      {
-          template <typename T>
-          using fn = same_dimension<T, U>;
-      };
-      //! \todo could ne inside multiply_dimension_impl<>
-      template <typename L>
-      struct dimension_in_list
-      {
-          template <typename T>
-          using fn = boost::mp11::mp_count_if_q<L, quoted_same_dimension<T>>;
-      };
-      //! \todo could ne inside multiply_dimension_impl<>
-      struct quoted_exponent_add
-      {
-          template <typename E1, typename E2>
-          using fn = add_exponent_t<E1, E2>;
-      };
+      // clang-format off
+         using type = meta::sort<
+            typename meta::merge<
+               typename meta::remove_if<
+                  typename meta::zip_transform<
+                     typename meta::sort<
+                        typename meta::intersection<Lhs, Rhs, exponent_contains_same_base>::type, exponent_less>::type,
+                     typename meta::sort<
+                        typename meta::intersection<Rhs, Lhs, exponent_contains_same_base>::type, exponent_less>::type,
+                     add_exponent_t>::type,
+                  is_numerator_null>::type,
+               typename meta::difference<Lhs, Rhs, exponent_contains_same_base>::type,
+               typename meta::difference<Rhs, Lhs, exponent_contains_same_base>::type>::type,
+            dimension_less>::type;
+      // clang-format on
+   };
 
-      template <typename D1, typename D2>
-      struct multiply_dimension_impl
-      {
-         using L1 = boost::mp11::mp_sort<boost::mp11::mp_copy_if_q<D1, dimension_in_list<D2>>, dimension_less>;
-         using L2 = boost::mp11::mp_sort<boost::mp11::mp_copy_if_q<D2, dimension_in_list<D1>>, dimension_less>;
-
-         using T1 = boost::mp11::mp_transform_q<quoted_exponent_add, L1, L2>;
-
-         using R1 = boost::mp11::mp_remove_if<T1, is_numerator_null>;
-         using R2 = boost::mp11::mp_remove_if_q<D1, dimension_in_list<D2>>;
-         using R3 = boost::mp11::mp_remove_if_q<D2, dimension_in_list<D1>>;
-
-         using type = boost::mp11::mp_sort<boost::mp11::mp_append<R1, R2, R3>, dimension_less>;
-      };
-   }
+   template <typename Lhs, typename Rhs>
+   using multiply_dimension_t = multiply_dimension<Lhs, Rhs>::type;
 
    template <typename D1, typename D2>
-   using multiply_dimension_t = typename detail::multiply_dimension_impl<typename D1::base_t, typename D2::base_t>::type;
+   struct divide_dimension;
 
-   namespace detail 
+   template <typename... E1, typename... E2>
+   struct divide_dimension<dimension<E1...>, dimension<E2...>>
+       : multiply_dimension<dimension<E1...>, dimension<invert_exponent_t<E2>...>>
    {
-      template <typename D1, typename D2>
-      struct divide_dimension_impl;
+   };
 
-      template <typename... E1, typename... E2>
-      struct divide_dimension_impl<dimension<E1...>, dimension<E2...>> : multiply_dimension_impl<dimension<E1...>, dimension<invert_exponent_t<E2>...>> {};
-   }
-
-   template <typename D1, typename D2>
-   using divide_dimension_t = typename detail::divide_dimension_impl<typename D1::base_t, typename D2::base_t>::type;
-
-   namespace detail
-   {
-      template <typename D>
-      struct invert_dimension_impl;
-
-      template <typename... D>
-      struct invert_dimension_impl<dimension<D...>> : boost::mp11::mp_identity<dimension<invert_exponent_t<D>...>> {};
-   }
+   template <typename Lhs, typename Rhs>
+   using divide_dimension_t = divide_dimension<Lhs, Rhs>::type;
 
    template <typename D>
-   using invert_dimension_t = typename detail::invert_dimension_impl<typename D::base_t>::type;
-}
+   struct invert_dimension;
+
+   template <typename... D>
+   struct invert_dimension<dimension<D...>> : std::type_identity<dimension<invert_exponent_t<D>...>>
+   {
+   };
+
+   template <typename D>
+   using invert_dimension_t = invert_dimension<D>::type;
+
+} // namespace sec21::units

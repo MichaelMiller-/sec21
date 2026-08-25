@@ -9,14 +9,12 @@ namespace sec21::units
    using substance = dimension<exponent<base_dimension_substance, 1>>;
 
    // units
-   struct mole : derived_unit<mole, substance, si_tag> {};
-   
+   struct mole : derived_unit<mole, substance, si_tag>
+   {
+   };
+
    inline namespace literals
    {
-      constexpr auto operator "" _mol(unsigned long long v) noexcept  { return quantity<mole, unsigned long long>{ v }; }
-   }
-
-#ifdef __cpp_concepts
-
-#endif
-}
+      constexpr auto operator""_mol(unsigned long long v) noexcept { return quantity<mole, unsigned long long>{v}; }
+   } // namespace literals
+} // namespace sec21::units

@@ -1,198 +1,214 @@
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.25)
+
+## Options
+##
+option(SEC21_ENABLE_COVERAGE "Enable coverage build" OFF)
+option(SEC21_ENABLE_FUZZING "Enable fuzzing tests" OFF)
+option(BUILD_TESTING "Build tests" ON)
+
+## VCPKG_MANIFEST_FEATURES must be configured before project(), because the
+## vcpkg toolchain is evaluated while project() is executed.
+##
+if (BUILD_TESTING) # option is also used by CTest
+    list(APPEND VCPKG_MANIFEST_FEATURES "testing")
+endif()
+
+## Project
+##
+include(${CMAKE_CURRENT_LIST_DIR}/projectVersion.cmake)
 project(sec21
-        VERSION 0.0.1
-        DESCRIPTION "sec21::workspace"
-        )
+        VERSION ${projectVersion}
+        DESCRIPTION "sec21::utilities"
+        LANGUAGES CXX
+)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set(SEC21_CMAKE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+## CMake modules
+##
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-include(${SEC21_CMAKE_PATH}/StandardProjectSettings.cmake)
+include(CTest)
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+include(CompilerWarnings)
 
-## header-only library
-add_library(${PROJECT_NAME} INTERFACE)
+## Header-only library
+##
+add_library(sec21 INTERFACE)
+## Alias
+add_library(sec21::sec21 ALIAS sec21)
 
-set(Boost_USE_STATIC_LIBS ON)
-set(Boost_USE_MULTITHREADED ON)
-set(Boost_USE_STATIC_RUNTIME OFF)
+target_compile_features(sec21 INTERFACE cxx_std_23)
 
-find_package(Boost 1.70 REQUIRED)
-find_package(nlohmann_json CONFIG REQUIRED)
+target_include_directories(sec21 INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
+)
 
-target_link_libraries(${PROJECT_NAME} INTERFACE Boost::boost)
-target_link_libraries(${PROJECT_NAME} INTERFACE nlohmann_json nlohmann_json::nlohmann_json)
-target_include_directories(${PROJECT_NAME} SYSTEM INTERFACE include)
+target_sources(sec21 INTERFACE
+        FILE_SET HEADERS
+        BASE_DIRS
+            ${CMAKE_CURRENT_SOURCE_DIR}/include
+        FILES
+            # database
+            include/sec21/database/column_type.h
+            include/sec21/database/constraints.h
+            include/sec21/database/data_mapper.h
+            include/sec21/database/query.h
+            # literals
+            include/sec21/literals/memory.h
+            # meta
+            include/sec21/meta/contains.h
+            include/sec21/meta/difference.h
+            include/sec21/meta/intersection.h
+            include/sec21/meta/merge.h
+            include/sec21/meta/push_front.h
+            include/sec21/meta/remove_if.h
+            include/sec21/meta/sort.h
+            include/sec21/meta/type_list.h
+            include/sec21/meta/zip_transform.h
+            # policy
+            include/sec21/policy/addition.h
+            include/sec21/policy/compare.h
+            include/sec21/policy/compare_less.h
+            include/sec21/policy/decrement.h
+            include/sec21/policy/division.h
+            include/sec21/policy/increment_alphabet.h
+            include/sec21/policy/increment.h
+            include/sec21/policy/integer_arithmetic.h
+            include/sec21/policy/multiplication.h
+            include/sec21/policy/print.h
+            include/sec21/policy/subtraction.h
+            # reflection
+            include/sec21/reflection/column.h
+            include/sec21/reflection/column_type.h
+            include/sec21/reflection/get_column.h
+            include/sec21/reflection/table.h
+            # type_traits
+            include/sec21/type_traits/contains.h
+            include/sec21/type_traits/index_of.h
+            include/sec21/type_traits/is_instance_of.h
+            include/sec21/type_traits/is_specialized.h
+            include/sec21/type_traits/is_std_string.h
+            include/sec21/type_traits/is_tuple.h
+            include/sec21/type_traits/member_pointer_traits.h
+            # units/dimensions
+            include/sec21/units/dimensions/acceleration.h
+            include/sec21/units/dimensions/area.h
+            include/sec21/units/dimensions/base_dimensions.h
+            include/sec21/units/dimensions/current.h
+            include/sec21/units/dimensions/electric_charge.h
+            include/sec21/units/dimensions/energy.h
+            include/sec21/units/dimensions/force.h
+            include/sec21/units/dimensions/frequency.h
+            include/sec21/units/dimensions/luminous_intensity.h
+            include/sec21/units/dimensions/mass.h
+            include/sec21/units/dimensions/power.h
+            include/sec21/units/dimensions/pressure.h
+            include/sec21/units/dimensions/second_moment_of_area.h
+            include/sec21/units/dimensions/substance.h
+            include/sec21/units/dimensions/temperature.h
+            include/sec21/units/dimensions/time.h
+            include/sec21/units/dimensions/velocity.h
+            include/sec21/units/dimensions/voltage.h
+            include/sec21/units/dimensions/volume.h
+            # units
+            include/sec21/units/concepts.h
+            include/sec21/units/dimension.h
+            include/sec21/units/quantity.h
+            include/sec21/units/ratio.h
+            include/sec21/units/unit.h
+            include/sec21/units/unit_casting.h
+            #
+            include/sec21/all_of.h
+            include/sec21/alphabet.h
+            include/sec21/any_of.h
+            include/sec21/arity.h
+            include/sec21/array_qvm_vec_traits.h
+            include/sec21/bit_pattern.h
+            include/sec21/blob.h
+            include/sec21/concat.h
+            include/sec21/database
+            include/sec21/expects.h
+            include/sec21/fixed_string.h
+            include/sec21/for_each_adjacent.h
+            include/sec21/for_each_chunk.h
+            include/sec21/for_each_indexed.h
+            include/sec21/json_serializer_array.h
+            include/sec21/json_serializer_optional.h
+            include/sec21/json_serializer_uuid.h
+            include/sec21/json_serializer_variant.h
+            include/sec21/limited_quantity.h
+            include/sec21/literals
+            include/sec21/memory.h
+            include/sec21/overloaded.h
+            include/sec21/policy
+            include/sec21/reflection
+            include/sec21/scope_guard.h
+            include/sec21/split_if.h
+            include/sec21/strong_type.h
+            include/sec21/to_array.h
+            include/sec21/transform.h
+            include/sec21/transform_if.h
+            include/sec21/type_traits
+            include/sec21/units
+            include/sec21/units.h
+            include/sec21/validate.h
+            include/sec21/write_csv.h
+            include/sec21/zip.h
+)
 
-include(${SEC21_CMAKE_PATH}/CompilerWarnings.cmake)
-set_project_warnings(${PROJECT_NAME})
+## Link to this 'library' in order to use the warnings specified in CompilerWarnings.cmake
+##
+include(CompilerWarnings)
+add_library(sec21_enable_compiler_warnings INTERFACE)
+add_library(sec21::enable_compiler_warnings ALIAS sec21_enable_compiler_warnings)
+enable_warnings(sec21_enable_compiler_warnings)
 
-include(${SEC21_CMAKE_PATH}/Sanitizers.cmake)
-enable_sanitizers(${PROJECT_NAME})
-
-include(${SEC21_CMAKE_PATH}/Doxygen.cmake)
-enable_doxygen()
-
-include(${SEC21_CMAKE_PATH}/StaticAnalyzers.cmake)
-
-## https://blog.kitware.com/static-checks-with-cmake-cdash-iwyu-clang-tidy-lwyu-cpplint-and-cppcheck/
-if (CMAKE_LINK_WHAT_YOU_USE)
-    message(STATUS "*link what you use* is enabled")
-endif ()
-
-## TODO replace with c++ modules
-option(ENABLE_PCH "Enable Precompiled Headers" OFF)
-if (ENABLE_PCH)
-    target_precompile_headers(${PROJECT_NAME} INTERFACE <vector> <string> <map> <utility> <algorithm> <numeric>)
-endif ()
-
-option(ENABLE_BENCHMARKS "Enable benchmarks" OFF)
-option(ENABLE_VIEWER "Enable system viewer" OFF)
-option(ENABLE_SCRIPT_INTERFACE "Enable script interface" OFF)
-option(ENABLE_TESTS "Enable tests" ON)
-option(ENABLE_DEVTOOLS "tools needed for the development process" OFF)
-option(ENABLE_PRODUCTION "not listed on GITHUB" OFF)
-
-if (ENABLE_BENCHMARKS)
-    message(STATUS "Benchmarks enabled")
-    add_subdirectory(benchmarks)
-endif ()
-
-if (ENABLE_VIEWER)
-    message(STATUS "OpenGL system viewer is enabled")
-    add_subdirectory(viewer)
-endif ()
-
-if (ENABLE_SCRIPT_INTERFACE)
-    message(STATUS "Lua script interface is enabled")
-    add_subdirectory(scripting)
-endif ()
-
-if (ENABLE_TESTS)
-    include(CTest)
-    enable_testing()
+## Testing
+##
+if (BUILD_TESTING)
     add_subdirectory(tests)
 endif ()
 
+## Fuzzing
 ##
-##
-add_custom_target(
-        dependency_graph
-        COMMAND ${CMAKE_COMMAND} "--graphviz=${PROJECT_NAME}-dependency-graph.dot" .
-        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
-        COMMENT "Generate dependency graph: ${PROJECT_NAME}-dependency-graph.dot"
-        VERBATIM)
-
-##
-##
-add_subdirectory(http_connection)
-add_subdirectory(orm_compiler)
-
-## production code - not listed on GITHUB
-##
-if (ENABLE_PRODUCTION)
-    add_subdirectory(codegen)
-    add_subdirectory(collect)
-    add_subdirectory(controller)
-    add_subdirectory(database_connection)
-    add_subdirectory(editor)
-    add_subdirectory(esbp)
-    # add_subdirectory(fuzzing_test)
-    # add_subdirectory(integration_test_sqlite3_backend)
-    add_subdirectory(log_service)
-    add_subdirectory(logger)
-    add_subdirectory(opengl_window)
-    add_subdirectory(plotter)
-    add_subdirectory(pmr)
-    add_subdirectory(polymorphism)
-    # add_subdirectory(portal) ## Wt
-    add_subdirectory(que)
-    add_subdirectory(resttest)
-    add_subdirectory(runtime_enviroment)
-    add_subdirectory(translate)
-    add_subdirectory(udf)
-    add_subdirectory(viewer_sfml)
-    # add_subdirectory(webviewer) ## Emscripten test
-    add_subdirectory(worker)
-    # add_subdirectory(workspace) ## Alia test
+if (SEC21_ENABLE_FUZZING)
+    message("Building Fuzz Tests, using fuzzing sanitizer https://www.llvm.org/docs/LibFuzzer.html")
+    add_subdirectory(fuzzing)
 endif ()
 
-## installation
+## Installation
 ##
-include(GNUInstallDirs)
-## set different paths
-#install(TARGETS ${CMAKE_PROJECT_NAME}
-#        RUNTIME DESTINATION bin
-#        LIBRARY DESTINATION lib
-#        ARCHIVE DESTINATION lib)
-
-set(CPACK_PACKAGE_NAME ${PROJECT_NAME})
-set(CPACK_PACKAGE_VENDOR "Planungsbüro Michael Miller")
-set(CPACK_VERBATIM_VARIABLES true)
-set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
-set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
-set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
-set(CPACK_PACKAGE_CONTACT "info@pb-miller.de")
-
-## rpm
-##
-## https://nebula-graph.io/posts/packaging-with-cpack-in-nebula-graph/
-## TODO: set(CMAKE_RPM_PACKAGE_GROUP ${PROJECT_NAME})
-# set(CMAKE_RPM_PACKAGE_LICENSE "TODO")
-
-## dep
-##
-set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
-## TODO: automate with:
-# objdump -p bin/esbp | grep NEEDED
-# objdump -p bin/controller | grep NEEDED
-# NEEDED               libpthread.so.0
-# NEEDED               libstdc++.so.6
-# NEEDED               libgcc_s.so.1
-set(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.31), libpqxx-6.4 (>= 6.4)")
-
-## PKGBUILD
-##
-#configure_file(${PROJECT_SOURCE_DIR}/VERSION.in ${PROJECT_BINARY_DIR}/VERSION @ONLY)
-#configure_file(${PROJECT_SOURCE_DIR}/PKGBUILD.in ${PROJECT_BINARY_DIR}/PKGBUILD.generated @ONLY)
-#configure_file(${PROJECT_SOURCE_DIR}/generate_pkgbuild.sh.in ${PROJECT_BINARY_DIR}/generate_pkgbuild.sh @ONLY)
-
-# add_custom_command(
-#    OUTPUT "package.checksum"
-#    COMMAND ${CMAKE_COMMAND} -E sha512sum "${PROJECT_NAME}-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}-Linux.tar.gz" > package.checksum.generated
-#    COMMAND cut --delimiter=\" \" -f 1 package.checksum.generated > package.checksum
-#    COMMAND sed -e "s/GENERATED_HASH_LIST/sdfsd\$\(cat package.checksum\)/" PKGBUILD.generated > PKGBUILD
-#    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
-#    COMMENT "Write package checksum"
-# )
-
-include(CPack)
-
-add_custom_target(
-        packages
-        COMMAND cpack -C Release -G "STGZ;TGZ;DEB"
-        ## run makepkg for ArchLinux
-        #COMMAND sh generate_pkgbuild.sh
-        #COMMAND makepkg -f
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-        VERBATIM
-        COMMENT "Make installation packages"
+install(
+        TARGETS sec21
+        EXPORT sec21Targets
+        FILE_SET HEADERS
+            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
+install(EXPORT sec21Targets
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+        NAMESPACE ${PROJECT_NAME}::
+        FILE sec21Targets.cmake
+)
+
+## Package configuration
 ##
-## TODO: copy dockerfile
-# add_custom_target(
-#    docker
-# )
+configure_package_config_file(
+        ${CMAKE_CURRENT_SOURCE_DIR}/cmake/sec21Config.cmake.in
+        ${CMAKE_CURRENT_BINARY_DIR}/sec21Config.cmake
+        INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+)
 
-## copy optional data
-##
-if (EXISTS "${PROJECT_SOURCE_DIR}/data/cp_gen.sh")
-    configure_file(${PROJECT_SOURCE_DIR}/data/cp_gen.sh ${PROJECT_BINARY_DIR}/cp_gen.sh COPYONLY)
-endif ()
+write_basic_package_version_file(
+        ${CMAKE_CURRENT_BINARY_DIR}/sec21ConfigVersion.cmake
+        VERSION ${PROJECT_VERSION}
+        COMPATIBILITY AnyNewerVersion
+)
 
-## TODO: take a look at "lizard"
-## https://www.youtube.com/watch?v=IndGlm2uZCU
-
-## TODD: inspect translation unit
-## https://www.youtube.com/watch?v=3KoXeegncrs&list=PLHTh1InhhwT5o3GwbFYy3sR7HDNRA353e&index=2
-## g++ -std=c++20 -E main.cpp | egrep -v '#' | tee main.i
+install(
+        FILES
+        ${CMAKE_CURRENT_BINARY_DIR}/sec21Config.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/sec21ConfigVersion.cmake
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+)

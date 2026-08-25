@@ -1,0 +1,83 @@
+name: Codecov
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  GCC_VERSION: 16
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup system
+        run: |
+          sudo apt install -y gcovr
+
+      - name: Install compiler
+        run: |
+          sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+          sudo apt install gcc-$GCC_VERSION g++-$GCC_VERSION
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-$GCC_VERSION 110 --slave /usr/bin/g++ g++ /usr/bin/g++-$GCC_VERSION --slave /usr/bin/gcov gcov /usr/bin/gcov-$GCC_VERSION
+          gcov --version
+          g++ --version
+
+      - name: Install Dependencies
+        shell: bash
+        working-directory: ${{runner.workspace}}
+        run: |
+          git clone https://github.com/Microsoft/vcpkg.git 
+          cd vcpkg
+          ./bootstrap-vcpkg.sh
+
+      - name: Create Build Environment
+        run: cmake -E make_directory ${{runner.workspace}}/build
+
+      - name: Configure CMake
+        shell: bash
+        working-directory: ${{runner.workspace}}/build
+        run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=${{runner.workspace}}/vcpkg/scripts/buildsystems/vcpkg.cmake -DSEC21_ENABLE_COVERAGE=On
+
+      - name: Build
+        working-directory: ${{runner.workspace}}/build
+        shell: bash
+        run: cmake --build . --config Debug
+
+      - name: Test
+        working-directory: ${{runner.workspace}}/build
+        shell: bash
+        run: ctest --build-config Debug
+
+      - name: Analyze the coverage data files
+        working-directory: ${{ runner.workspace }}/build
+        run: |
+          gcovr \
+            --root "$GITHUB_WORKSPACE" \
+            --object-directory "${{ runner.workspace }}/build" \
+            --xml coverage-service.xml
+
+      - name: Upload coverage reports to Codecov
+        working-directory: ${{runner.workspace}}/build
+        run: |
+          curl -Os https://cli.codecov.io/latest/linux/codecov
+          chmod +x codecov
+          ./codecov \
+            --verbose \
+            upload-process \
+            --fail-on-error \
+            --disable-search \
+            --git-service github \
+            --slug "${{ github.repository }}" \
+            --commit-sha "${{ github.sha }}" \
+            -t "${{ secrets.CODECOV_TOKEN }}" \
+            -n "service-${{ github.run_id }}" \
+            -F service \
+            -f coverage-service.xml          

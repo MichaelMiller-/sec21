@@ -1,0 +1,17 @@
+## BasedOnStyle:  LLVM
+# Language: Cpp
+IndentWidth: 3
+ContinuationIndentWidth: 3
+AccessModifierOffset: -3
+IndentAccessModifiers: false
+ColumnLimit: 120
+AlwaysBreakTemplateDeclarations: 'Yes'
+NamespaceIndentation: All
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterFunction: true
+  AfterNamespace: true
+  AfterStruct: true
+  AfterClass: true
+## BreakBeforeBraces: Stroustrup
+PointerAlignment: Left
