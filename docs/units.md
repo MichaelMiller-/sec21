@@ -21,3 +21,12 @@ struct pascal : derived_unit<pascal, pressure, base_unit> {};
 struct kilopascal : derived_unit<kilopascal, pressure, std::kilo> {};
 // ...
 ```
+
+### User-code example 
+```c++
+using pressure_t = sec21::units::quantity<sec21::units::pascal, double>; 
+
+void interface(pressure_t pressure);
+```
+
+The type can simply passed by value as it meets the triviality requirements of the C++ Standard [basic.types.trivial].
