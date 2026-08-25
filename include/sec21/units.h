@@ -24,6 +24,14 @@
 
 namespace sec21::units
 {
+   //! \note Test with some hardcoded template arguments to ensure that the class is trivially constructible, copyable
+   // and destructible.
+   static_assert(std::is_trivially_constructible_v<quantity<meter>>);
+   static_assert(std::is_trivially_destructible_v<quantity<meter>>);
+   static_assert(std::is_trivially_copyable_v<quantity<meter>>);
+   static_assert(std::is_trivially_copy_assignable_v<quantity<meter>>);
+   static_assert(std::is_trivially_copy_constructible_v<quantity<meter>>);
+
    inline namespace constants
    {
       // gravity acceleration
