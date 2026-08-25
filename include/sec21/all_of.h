@@ -6,7 +6,7 @@
 namespace sec21
 {
    template <typename... Ts>
-   class all_of : std::tuple<Ts...>
+   class all_of
    {
       std::tuple<Ts...> m_values;
 
