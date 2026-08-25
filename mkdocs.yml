@@ -53,6 +53,8 @@ nav:
           - 'CSV writer': csv-writer.md
       - 'Units': units.md
       - 'Meta programming': meta.md
+  - 'Helper':
+      - 'CMake modules': cmake.md
   - 'Reference':
       - 'all_of / any_of': api/all_of-any_of.md
       - 'arity': api/arity.md
